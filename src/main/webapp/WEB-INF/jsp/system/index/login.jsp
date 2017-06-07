@@ -100,7 +100,7 @@
 				<form action="" method="post" name="loginForm" id="loginForm">
 					<div class="control-group normal_text">
 						<h3>
-							<img src="static/login/logo1.png" alt="盘锦市体育局综合管理平台" />
+							<img src="static/login/logo.png" alt="东部管道人工成本核算系统" />
 						</h3>
 						
 						<h2 class="title">
@@ -154,7 +154,7 @@
 				<form action="" method="post" name="loginForm" id="loginForm">
 					<div class="control-group normal_text">
 						<h3>
-							<img src="static/login/logo1.png" alt="盘锦市体育局综合管理平台" />
+							<img src="static/login/logo.png" alt="东部管道人工成本核算系统" />
 						</h3>
 						
 						<h2 class="title">
