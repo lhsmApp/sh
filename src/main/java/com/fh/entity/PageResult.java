@@ -7,7 +7,7 @@ import com.fh.util.Const;
 import com.fh.util.Tools;
 
 /**
- * 主要用于DataGrid的固定数据格式绑定（total,rows），包括分页和数据结合
+ * 主要用于JqDataGrid的固定数据格式绑定（total,rows,records,page），包括分页和数据结合
 * @ClassName: PageResult
 * @Description: TODO(这里用一句话描述这个类的作用)
 * @author jiachao
@@ -17,11 +17,13 @@ import com.fh.util.Tools;
  */
 public class PageResult<T> extends CommonBase{
 	private int rowNum; //每页显示记录数
-	private int total;
-	private int records;
-	private int page;
-	private List<T> rows;
-	
+	private int total;//总页数
+	private int records;//总记录数
+	private int page;//当前页
+	private List<T> rows;//返回的实际数据集合
+	private Object userdata;//自定义返回的数据，例如总列表在底部返回的合计：userDataOnFooter: true, // the calculated sums and/or strings from server are put at footer row.
+	//private PageData pageData;//返回的查询时的条件
+
 	public PageResult(){
 		try {
 			this.rowNum = Integer.parseInt(Tools.readTxtFile(Const.PAGE));
@@ -33,7 +35,6 @@ public class PageResult<T> extends CommonBase{
 	public int getRowNum() {
 		return rowNum;
 	}
-
 	public void setRowNum(int rowNum) {
 		this.rowNum = rowNum;
 	}
@@ -55,11 +56,8 @@ public class PageResult<T> extends CommonBase{
 		else
 			total = records/rowNum+1;
 	}
+	
 	public int getPage() {
-		/*if(page<=0)
-			page = 1;
-		if(page>getTotal())
-			page = getTotal();*/
 		return page;
 	}
 	public void setPage(int page) {
@@ -71,5 +69,13 @@ public class PageResult<T> extends CommonBase{
 	}
 	public void setRows(List<T> rows) {
 		this.rows = rows;
+	}
+	
+	public Object getUserdata() {
+		return userdata;
+	}
+
+	public void setUserdata(Object userdata) {
+		this.userdata = userdata;
 	}
 }

@@ -23,6 +23,8 @@
 		<typeAlias type="com.fh.util.PageData" alias="pd"/>
 		<!-- 分页 -->
 		<typeAlias type="com.fh.entity.Page" alias="Page"/>
+		<!-- Jqgrid分页 -->
+		<typeAlias type="com.fh.entity.JqPage" alias="jqPage"/>
 	</typeAliases>
 	
 	<plugins>
