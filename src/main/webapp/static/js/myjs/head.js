@@ -216,7 +216,7 @@ function instframe(){
 	 }
 	 else
 		 //siMenu('10001','1000','组织机构浏览','instframe/getInstframeGuest.do');
-	 	siMenu('10005','1000','jqgrid','jqgrid/list.do');
+	 	siMenu('10005','1000','jqgrid','jqgridJia/list.do');
 }
 
 //信息查询
