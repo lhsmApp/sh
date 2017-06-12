@@ -91,11 +91,10 @@
 	    })
 		
 		$("#jqGrid").jqGrid({
-			<%-- url: '<%=basePath%>static/data/data.json', --%>
 			url: '<%=basePath%>jqGridExtend/getPageList.do',
 			datatype: "json",
 			colModel: [
-						{name:'myac',index:'', width:80, fixed:true, sortable:false, resize:false,
+						{name:'',index:'', width:80, fixed:true, sortable:false, resize:false,
 							formatter:'actions', 
 							formatoptions:{ 
 								keys:true,
@@ -110,24 +109,25 @@
 							editable: true, edittype:'text', editoptions:{maxLength:'50'}, editrules:{required:true}
 						},
 						{ label: 'Product Name', name: 'PRODUCTNAME', width: 90,
-							editable: true, edittype:'text', editoptions:{maxlength:"100"} 
+							editable: true, edittype:'textarea', editoptions:{maxlength:'100'} //, rows:'2', cols:'20'
 						},
 						{ label: 'Country', name: 'COUNTRY', width: 100,
-							editable: true, edittype:'text', editoptions:{maxlength:"30"} 
+							editable: true, edittype:'select', editoptions:{value:'USA:USA;UK:UK;CHI:CHINA'} 
 						},
 						{ label: 'Price', name: 'PRICE', width: 80, sorttype: 'integer', align: 'right', summaryType:'sum', summaryTpl:'<b>{0}</b>',
-							editable: true, edittype:'text', editoptions:{maxlength:"10", number: true} 
+							editable: true, edittype:'text', editoptions:{maxlength:'10', number: true} 
 						},
 						// sorttype is used only if the data is loaded locally or loadonce is set to true
 						{ label: 'Quantity', name: 'QUANTITY', width: 80, sorttype: 'number',
-							editable: true, edittype:'text', editoptions:{maxlength:"11", integer: true} 
+							editable: true, edittype:'text', editoptions:{maxlength:'11', integer: true} 
 						}
 			],
 			caption: "jqGrid with inline editing",
 			viewrecords: true, 
+			emptyrecords: 'Nothing to display',
 			rowNum: 30,
 			height: 340, 
-			altRows: true,
+            multiselect: true,
 			
 			pager: "#jqGridPager",
 			footerrow: true,
@@ -140,6 +140,7 @@
 				groupText: ['<b>{0}</b>'],
 				groupSummary: [true],
 				groupSummaryPos: ['header'],
+				groupCollapse: false,
 			},
 			
 			loadComplete : function() {
@@ -154,7 +155,42 @@
 			editurl: '<%=basePath%>jqGridExtend/edit.do?',
 		});
 		
+		//navButtons
+		$("#jqGrid").navGrid("#jqGridPager", 
+				{
+			        //navbar options
+			        add: true,
+			        addicon : 'ace-icon fa fa-plus-circle purple',
+			        edit: false,
+			        editicon : 'ace-icon fa fa-pencil blue',
+			        del: false,
+			        delicon : 'ace-icon fa fa-trash-o red',
+			        search: false,
+			        searchicon : 'ace-icon fa fa-search orange',
+			        refresh: false,
+			        refreshicon : 'ace-icon fa fa-refresh green',
+			        view: false,
+			        viewicon : 'ace-icon fa fa-search-plus grey',
+		        },
+				{
+
+				}
+		);
+		
 		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
+		
+		//获得选中的行的方法
+		/* function getSelecteds(){  
+			//获取多选到的id集合  
+			var ids = $("#grid-table").jqGrid("getGridParam", "selarrrow");  
+			//遍历访问这个集合  
+			$(ids).each(function (index, id){  
+			     //由id获得对应数据行  
+			var row = $("#grid-table").jqGrid('getRowData', id);  
+			alert("row.ID:"+row.ID+"  "+"row.fieldName:"+row.fieldName);  
+			}  
+			}  */
+			  
 
 		function style_edit_form(form) {
 			//enable datepicker on "sdate" field and switches for "stock" field
