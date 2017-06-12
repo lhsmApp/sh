@@ -97,11 +97,50 @@
 						{name:'',index:'', width:80, fixed:true, sortable:false, resize:false,
 							formatter:'actions', 
 							formatoptions:{ 
+		                        //onSuccess: function(response) {
+		                        //    debugger;
+		                        //    $.unblockUI();
+		                        //        var jsonResponse = $.parseJSON(response.responseText);
+		                        //        if (jsonResponse.State != 'Success') {
+		                        //            return [false, jsonResponse.ResponseMessage];
+		                        //        } else {
+		                        //            return [true];
+		                        //        }                            },
+		                        //onError :function(rowid, response, textStatus) {
+		                        //    debugger;
+		                        //    $.unblockUI();
+		                        //},
 								keys:true,
-								//delbutton: false,//disable delete button
-								
-								delOptions:{recreateForm: true, beforeShowForm:beforeDeleteCallback},
-								//editformbutton:true, editOptions:{recreateForm: true, beforeShowForm:beforeEditCallback}
+								editOptions:
+								{
+									recreateForm: true, 
+		                            onclickSubmit: function(params, posdata) {
+                                        if(params==add){
+                                           
+                                        }
+		                            },
+								},
+		                        delOptions: {
+		                            url: '<%=basePath%>jqGridExtend/delete.do?',
+		                            /* onclickSubmit: function(params, posdata) {
+		                                $.blockUI({message: ("#working")});
+		                            },
+		                            afterSubmit: function(response, postData) {
+		                                $.unblockUI();
+		                                var jsonResponse = $.parseJSON(response.responseText);
+		                                if (jsonResponse.State != 'Success') {
+		                                    return [false, jsonResponse.ResponseMessage];
+		                                } else {
+		                                    return [true];
+		                                }
+		                            },
+		                            beforeShowForm: function(form) {
+		                                var dlgDiv = $("#delmod" + jpgCustomers.id);
+		                                CenterDialog(dlgDiv);
+		                                var sel_id = $("#DelData>td:nth-child(1)").text();
+		                                $("td.delmsg", form).html("Delete User <b>" + $("#jpgCustomers").jqGrid('getCell', sel_id, 'LogonName') + "</b>?");
+		                            } */
+		                        }
 							}
 						},
 						{ name: 'ID', hidden: true, key: true},
@@ -128,6 +167,7 @@
 			rowNum: 30,
 			height: 340, 
             multiselect: true,
+            sortname: 'CATEGORYNAME',
 			
 			pager: "#jqGridPager",
 			footerrow: true,
@@ -157,84 +197,118 @@
 		
 		//navButtons
 		$("#jqGrid").navGrid("#jqGridPager", 
-				{
-			        //navbar options
-			        add: true,
-			        addicon : 'ace-icon fa fa-plus-circle purple',
-			        edit: false,
-			        editicon : 'ace-icon fa fa-pencil blue',
-			        del: false,
-			        delicon : 'ace-icon fa fa-trash-o red',
-			        search: false,
-			        searchicon : 'ace-icon fa fa-search orange',
-			        refresh: false,
-			        refreshicon : 'ace-icon fa fa-refresh green',
-			        view: false,
-			        viewicon : 'ace-icon fa fa-search-plus grey',
-		        },
-				{
+			{
+		        //navbar options
+		        edit: false,
+		        editicon : 'ace-icon fa fa-pencil blue',
+		        add: true,
+		        addicon : 'ace-icon fa fa-plus-circle purple',
+		        del: false,
+		        delicon : 'ace-icon fa fa-trash-o red',
+		        search: false,
+		        searchicon : 'ace-icon fa fa-search orange',
+		        refresh: false,
+		        refreshicon : 'ace-icon fa fa-refresh green',
+		        view: false,
+		        viewicon : 'ace-icon fa fa-search-plus grey',
+	        },{}, {}, {}, {}, {}, {});
+		//prmEdit, prmAdd, prmDel, prmSearch, prmRefresh, prmView);
+		
+		 $("#jqGrid").navButtonAdd('#jqGridPager', {
+             caption : "",
+             buttonicon : "ace-icon fa fa-save green",
+             onClickButton : saveRows,
+             position : "last",
+             title : "",
+             cursor : "pointer"
+         });
 
-				}
-		);
-		
-		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
-		
-		//获得选中的行的方法
-		/* function getSelecteds(){  
-			//获取多选到的id集合  
-			var ids = $("#grid-table").jqGrid("getGridParam", "selarrrow");  
+	    function saveRows(){
+	    	//获得选中的行的方法
+            var rows = $("#jqGrid").jqGrid("getGridParam", "selarrrow");  
+
+			if(!(rows!=null&&rows.length>0)){
+				bootbox.dialog({
+					message: "<span class='bigger-110'>您没有选择任何内容!</span>",
+					buttons: 			
+					{ "button":{ "label":"确定", "className":"btn-sm btn-success"}}
+				});
+				return;
+			}else{
+                var msg = '确定要删除选中的数据吗?';
+                bootbox.confirm(msg, function(result) {
+    				if(result) {
+    					top.jzts();
+    					//String data=JSON.stringify(rows).toString();
+    					$.ajax({
+    						type: "POST",
+    						url: '<%=basePath%>jqGridExtend/updateAll.do?',
+    				    	//data: {DATA_ROWS:data},
+    						dataType:'json',
+    						cache: false,
+    						success: function(data){
+    							refreshJqGrid();
+    						}
+    					});
+    				}
+                });
+			}
+	    }
+	    
+		 $("#jqGrid").navButtonAdd('#jqGridPager', {
+             caption : "",
+             buttonicon : "ace-icon fa fa-trash-o red",
+             onClickButton : deleteRows,
+             position : "last",
+             title : "",
+             cursor : "pointer"
+         });
+
+	    function deleteRows(){
+	    	//获得选中的行的方法
+	    	var ids = $("#jqGrid").jqGrid("getGridParam", "selarrrow");  
+
+			var str = '';
 			//遍历访问这个集合  
 			$(ids).each(function (index, id){  
-			     //由id获得对应数据行  
-			var row = $("#grid-table").jqGrid('getRowData', id);  
-			alert("row.ID:"+row.ID+"  "+"row.fieldName:"+row.fieldName);  
-			}  
-			}  */
-			  
+			    //由id获得对应数据行  
+			    var row = $("#jqGrid").jqGrid('getRowData', id);  
+			  	if(str.trim()=='') str += row.ID;
+			  	else str += ',' + row.ID;
+			});
+			if(str==''){
+				bootbox.dialog({
+					message: "<span class='bigger-110'>您没有选择任何内容!</span>",
+					buttons: 			
+					{ "button":{ "label":"确定", "className":"btn-sm btn-success"}}
+				});
+				return;
+			}else{
+                var msg = '确定要删除选中的数据吗?';
+                bootbox.confirm(msg, function(result) {
+    				if(result) {
+    					top.jzts();
+    					$.ajax({
+    						type: "POST",
+    						url: '<%=basePath%>jqGridExtend/deleteAll.do?',
+    				    	data: {DATA_IDS:str},
+    						dataType:'json',
+    						cache: false,
+    						success: function(data){
+    							refreshJqGrid();
+    						}
+    					});
+    				}
+                });
+			}
+		}
 
-		function style_edit_form(form) {
-			//enable datepicker on "sdate" field and switches for "stock" field
-			form.find('input[name=sdate]').datepicker({format:'yyyy-mm-dd' , autoclose:true})
-			
-			form.find('input[name=stock]').addClass('ace ace-switch ace-switch-5').after('<span class="lbl"></span>');
-					   //don't wrap inside a label element, the checkbox value won't be submitted (POST'ed)
-					  //.addClass('ace ace-switch ace-switch-5').wrap('<label class="inline" />').after('<span class="lbl"></span>');
-	
-					
-			//update buttons classes
-			var buttons = form.next().find('.EditButton .fm-button');
-			buttons.addClass('btn btn-sm').find('[class*="-icon"]').hide();//ui-icon, s-icon
-			buttons.eq(0).addClass('btn-primary').prepend('<i class="ace-icon fa fa-check"></i>');
-			buttons.eq(1).prepend('<i class="ace-icon fa fa-times"></i>')
-			
-			buttons = form.next().find('.navButton a');
-			buttons.find('.ui-icon').hide();
-			buttons.eq(0).append('<i class="ace-icon fa fa-chevron-left"></i>');
-			buttons.eq(1).append('<i class="ace-icon fa fa-chevron-right"></i>');		
+		function refreshJqGrid(){
+			$("#jqGrid").trigger("reloadGrid");  
+			$(top.hangge());//关闭加载状态
 		}
-	
-		function style_delete_form(form) {
-			var buttons = form.next().find('.EditButton .fm-button');
-			buttons.addClass('btn btn-sm btn-white btn-round').find('[class*="-icon"]').hide();//ui-icon, s-icon
-			buttons.eq(0).addClass('btn-danger').prepend('<i class="ace-icon fa fa-trash-o"></i>');
-			buttons.eq(1).addClass('btn-default').prepend('<i class="ace-icon fa fa-times"></i>')
-		}
-		
-		function beforeDeleteCallback(e) {
-			var form = $(e[0]);
-			if(form.data('styled')) return false;
-			
-			form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
-			style_delete_form(form);
-			
-			form.data('styled', true);
-		}
-		
-		function beforeEditCallback(e) {
-			var form = $(e[0]);
-			form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
-			style_edit_form(form);
-		}
+	    
+		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
 		
 		//it causes some flicker when reloading or navigating grid
 		//it may be possible to have some custom formatter to do this as the grid is being created to prevent this

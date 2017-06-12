@@ -199,6 +199,31 @@ public class JqGridExtendController extends BaseController {
 		return AppUtil.returnObject(pd, map);
 	}
 	
+	 /**批量修改
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/updateAll")
+	@ResponseBody
+	public Object updateAll() throws Exception{
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限
+		PageData pd = new PageData();		
+		Map<String,Object> map = new HashMap<String,Object>();
+		pd = this.getPageData();
+		Object DATA_IDS = pd.get("DATA_ROWS");
+		if(null != DATA_IDS && !"".equals(DATA_IDS)){
+			//String ArrayDATA_IDS[] = DATA_IDS.split(",");
+			//jqGridExtendService.updateAll(DATA_IDS);
+			pd.put("msg", "ok");
+		}else{
+			pd.put("msg", "no");
+		}
+		List<PageData> pdList = new ArrayList<PageData>();
+		pdList.add(pd);
+		map.put("list", pdList);
+		return AppUtil.returnObject(pd, map);
+	}
+	
 	 /**导出到excel
 	 * @param
 	 * @throws Exception

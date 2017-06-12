@@ -98,5 +98,13 @@ public class JqGridExtendService implements JqGridExtendManager{
 		dao.delete("JqGridExtendMapper.deleteAll", ArrayDATA_IDS);
 	}
 	
+	/**批量修改
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void updateAll(List<PageData> pd)throws Exception{
+		dao.batchUpdate("JqGridExtendMapper.updateAll", pd);
+	}
+	
 }
 

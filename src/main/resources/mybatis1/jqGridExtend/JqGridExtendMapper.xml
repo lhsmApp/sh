@@ -151,11 +151,27 @@
 		delete from
 		<include refid="tableName"></include>
 		where 
-			JGGRID_ID in
+			ID in
 		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
                  #{item}
 		</foreach>
 	</delete>
+	
+	<!-- 批量保存 -->
+	<update id="updateAll" parameterType="java.util.List">
+		<foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
+		    update
+		    <include refid="tableName"></include>
+		    set 
+		    	CATEGORYNAME = #{item.CATEGORYNAME},
+			    PRODUCTNAME = #{item.PRODUCTNAME},
+			    COUNTRY = #{item.COUNTRY},
+			    PRICE = #{item.PRICE},
+			    QUANTITY = #{item.QUANTITY}
+		    where 
+		    ID = #{item.ID}
+		</foreach>
+	</update>
 	
 	<!-- fh313596790qq(青苔) -->
 </mapper>
