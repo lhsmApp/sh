@@ -48,15 +48,6 @@ public class JqGridExtendService implements JqGridExtendManager{
 		dao.update("JqGridExtendMapper.edit", pd);
 	}
 	
-	/**列表
-	 * @param page
-	 * @throws Exception
-	 */
-	@SuppressWarnings("unchecked")
-	public List<PageData> list(JqPage page)throws Exception{
-		return (List<PageData>)dao.findForList("JqGridExtendMapper.datalistJqPage", page);
-	}
-	
 	/**列表(全部)
 	 * @param pd
 	 * @throws Exception
@@ -74,20 +65,29 @@ public class JqGridExtendService implements JqGridExtendManager{
 		return (PageData)dao.findForObject("JqGridExtendMapper.findById", pd);
 	}
 	
+	/**列表
+	 * @param page
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PageData> list(JqPage page)throws Exception{
+		return (List<PageData>)dao.findForList("JqGridExtendMapper.datalistJqPage", page);
+	}
+	
 	/**获取记录数量
 	 * @param pd
 	 * @throws Exception
 	 */
-	public int countJqGridExtend(PageData pd)throws Exception{
-		return (int)dao.findForObject("JqGridExtendMapper.countJqGridExtend", pd);
+	public int countJqGridExtend(JqPage page)throws Exception{
+		return (int)dao.findForObject("JqGridExtendMapper.countJqGridExtend", page);
 	}
 	
 	/**获取记录总合计
 	 * @param pd
 	 * @throws Exception
 	 */
-	public PageData getFooterSummary(PageData pd)throws Exception{
-		return (PageData)dao.findForObject("JqGridExtendMapper.getFooterSummary", pd);
+	public PageData getFooterSummary(JqPage page)throws Exception{
+		return (PageData)dao.findForObject("JqGridExtendMapper.getFooterSummary", page);
 	}
 
 	

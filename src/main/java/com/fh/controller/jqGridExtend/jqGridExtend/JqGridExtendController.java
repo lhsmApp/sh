@@ -135,8 +135,8 @@ public class JqGridExtendController extends BaseController {
 		}
 		page.setPd(pd);
 		List<PageData> varList = jqGridExtendService.list(page);	//列出Betting列表
-		int records = jqGridExtendService.countJqGridExtend(pd);
-		PageData userdata=jqGridExtendService.getFooterSummary(pd);
+		int records = jqGridExtendService.countJqGridExtend(page);
+		PageData userdata=jqGridExtendService.getFooterSummary(page);
 		PageResult<PageData> result = new PageResult<PageData>();
 		result.setRows(varList);
 		result.setRecords(records);

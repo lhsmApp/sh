@@ -144,7 +144,7 @@
         </if>
 	</select>
 	
-	<select id="countJqGridExtend" parameterType="pd" resultType="int">
+	<select id="countJqGridExtend" parameterType="jqPage" resultType="int">
 		select count(*) from <include refid="tableName"></include> 
 		<!-- <where>
 			<if test="menuId != null and '' != menuId" >           
@@ -152,7 +152,7 @@
 	        </if>
         </where> -->
 	</select>
-	<select id="getFooterSummary" parameterType="pd" resultType="pd">
+	<select id="getFooterSummary" parameterType="jqPage" resultType="pd">
 		select sum(PRICE) PRICE from <include refid="tableName"></include> 
 		<!-- <where>
 			<if test="menuId != null and '' != menuId" >           

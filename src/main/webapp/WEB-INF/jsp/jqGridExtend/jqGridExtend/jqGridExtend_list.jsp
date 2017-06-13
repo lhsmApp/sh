@@ -204,6 +204,7 @@
     					$(ids).each(function (index, id){  
     			            $("#jqGrid").saveRow(id, false, 'clientArray');
     			            var rowData = $("#jqGrid").getRowData(id);
+    			            
     			            listJson+='{'
     			            	+'\"ID\":' + rowData.ID +','
     			            	+'\"CATEGORYNAME\":\"' + rowData.CATEGORYNAME +'\",'
