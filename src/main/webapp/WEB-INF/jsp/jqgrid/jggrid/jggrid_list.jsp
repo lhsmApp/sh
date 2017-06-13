@@ -102,6 +102,7 @@
 		$("#jqGrid").jqGrid({
 			<%-- url: '<%=basePath%>static/data/data.json', --%>
 			url: '<%=basePath%>jqgrid/getPageList.do',
+			
 			datatype: "json",
 			 colModel: [
 				{ label: 'Category Name', name: 'CATEGORYNAME', width: 75 },

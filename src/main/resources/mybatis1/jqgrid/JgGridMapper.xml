@@ -117,6 +117,7 @@
 					)
 			</if>
 		</where>
+		order by CATEGORYNAME ${pd.sord} 
 		<if test="currentResult != null and rowNum != null" >           
               limit #{currentResult}, #{rowNum} 
         </if>
@@ -144,7 +145,7 @@
 		delete from
 		<include refid="tableName"></include>
 		where 
-			JGGRID_ID in
+			ID in
 		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
                  #{item}
 		</foreach>
