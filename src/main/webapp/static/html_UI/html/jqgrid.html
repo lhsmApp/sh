@@ -1299,6 +1299,9 @@
 					altRows: true,
 					//toppager: true,
 					
+					rownumbers: true, // show row numbers
+            rownumWidth: 35, // the width of the row numbers columns
+					
 					multiselect: true,
 					//multikey: "ctrlKey",
 			        multiboxonly: true,
@@ -1498,6 +1501,7 @@
 				}
 				
 				function beforeEditCallback(e) {
+					console.log("zhixing");
 					var form = $(e[0]);
 					form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
 					style_edit_form(form);

@@ -23,7 +23,6 @@ function siMenu(id,fid,MENU_NAME,MENU_URL){
 	$("#"+fid).attr("class","active open");
 	$("#"+id).attr("class","active");
 	top.mainFrame.tabAddHandler(id,MENU_NAME,MENU_URL);
-	//console.log(id);
 	if(MENU_URL != "druid/index.html"){
 		jzts();
 	}
@@ -195,7 +194,7 @@ function fhsms(){
 		diag.close();
 	 };
 	 diag.show();*/
-	console.log(user);
+	//console.log(user);
 	 if(user=="Guest"){
 		 $("#mainFrame").attr("src",locat+"/policyCustom/listAllPolicyType.do");
 		 $("#subTitle").text("政策法规浏览");
@@ -210,7 +209,6 @@ function fhsms(){
 
 //组织机构
 function instframe(){
-	console.log(user);
 	 if(user=="Guest"){
 		 $("#mainFrame").attr("src",locat+"/instframe/getInstframeGuest.do");
 		 $("#subTitle").text("组织机构浏览");
@@ -218,7 +216,7 @@ function instframe(){
 	 }
 	 else
 		 //siMenu('10001','1000','组织机构浏览','instframe/getInstframeGuest.do');
-	 	siMenu('10005','1000','jqgrid','jqgrid/list.do');
+	 	siMenu('10005','1000','成本核算','jqgridJia/list.do');
 }
 
 //信息查询
