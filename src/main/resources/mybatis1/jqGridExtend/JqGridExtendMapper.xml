@@ -56,16 +56,33 @@
 	
 	<!-- 修改 -->
 	<update id="edit" parameterType="pd">
-		update
-		<include refid="tableName"></include>
-		set 
-			CATEGORYNAME = #{CATEGORYNAME},
-			PRODUCTNAME = #{PRODUCTNAME},
-			COUNTRY = #{COUNTRY},
-			PRICE = #{PRICE},
-			QUANTITY = #{QUANTITY}
-		where 
-		ID = #{ID}
+		<if test="oper!= null and oper == 'edit'">
+		    update
+	    	<include refid="tableName"></include>
+		    set 
+			    CATEGORYNAME = #{CATEGORYNAME},
+			    PRODUCTNAME = #{PRODUCTNAME},
+			    COUNTRY = #{COUNTRY},
+			    PRICE = #{PRICE},
+			    QUANTITY = #{QUANTITY}
+		    where 
+		    ID = #{ID}
+		</if>
+		<if test="oper!= null and oper == 'add'">
+		    insert into 
+        	<include refid="tableName"></include>
+	    	(
+        	    <include refid="insertField"></include>
+		    ) values (
+	            <include refid="FieldValue"></include>
+		    )
+		</if>
+		<if test="oper!= null and oper == 'del'">
+		    delete from
+		    <include refid="tableName"></include>
+		    where 
+			    ID = #{ID}
+		</if>
 	</update>
 	
 	<!-- 通过ID获取数据 -->
@@ -116,6 +133,12 @@
 					)
 			</if>
 		</where>
+		<if test="sidx != null and sidx != ''" >           
+              order by #{sidx}
+        </if>
+		<if test="sord != null and sord != ''" >           
+              #{sord}
+        </if>
 		<if test="currentResult != null and rowNum != null" >           
               limit #{currentResult}, #{rowNum} 
         </if>
@@ -158,18 +181,20 @@
 	</delete>
 	
 	<!-- 批量保存 -->
-	<update id="updateAll" parameterType="java.util.List">
+	<update id="updateAll" parameterType="com.fh.entity.JqGrid">
 		<foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
-		    update
-		    <include refid="tableName"></include>
-		    set 
-		    	CATEGORYNAME = #{item.CATEGORYNAME},
-			    PRODUCTNAME = #{item.PRODUCTNAME},
-			    COUNTRY = #{item.COUNTRY},
-			    PRICE = #{item.PRICE},
-			    QUANTITY = #{item.QUANTITY}
-		    where 
-		    ID = #{item.ID}
+		    <if test="item!=null">
+		        update
+		        <include refid="tableName"></include>
+		        set 
+		    	    CATEGORYNAME = #{item.CATEGORYNAME},
+			        PRODUCTNAME = #{item.PRODUCTNAME},
+			        COUNTRY = #{item.COUNTRY},
+			        PRICE = #{item.PRICE},
+			        QUANTITY = #{item.QUANTITY}
+		        where 
+		        ID = #{item.ID}
+		    </if>
 		</foreach>
 	</update>
 	

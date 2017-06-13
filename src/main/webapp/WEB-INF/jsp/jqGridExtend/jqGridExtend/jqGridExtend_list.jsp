@@ -97,54 +97,12 @@
 						{name:'',index:'', width:80, fixed:true, sortable:false, resize:false,
 							formatter:'actions', 
 							formatoptions:{ 
-		                        //onSuccess: function(response) {
-		                        //    debugger;
-		                        //    $.unblockUI();
-		                        //        var jsonResponse = $.parseJSON(response.responseText);
-		                        //        if (jsonResponse.State != 'Success') {
-		                        //            return [false, jsonResponse.ResponseMessage];
-		                        //        } else {
-		                        //            return [true];
-		                        //        }                            },
-		                        //onError :function(rowid, response, textStatus) {
-		                        //    debugger;
-		                        //    $.unblockUI();
-		                        //},
 								keys:true,
-								editOptions:
-								{
-									recreateForm: true, 
-		                            onclickSubmit: function(params, posdata) {
-                                        if(params==add){
-                                           
-                                        }
-		                            },
-								},
-		                        delOptions: {
-		                            url: '<%=basePath%>jqGridExtend/delete.do?',
-		                            /* onclickSubmit: function(params, posdata) {
-		                                $.blockUI({message: ("#working")});
-		                            },
-		                            afterSubmit: function(response, postData) {
-		                                $.unblockUI();
-		                                var jsonResponse = $.parseJSON(response.responseText);
-		                                if (jsonResponse.State != 'Success') {
-		                                    return [false, jsonResponse.ResponseMessage];
-		                                } else {
-		                                    return [true];
-		                                }
-		                            },
-		                            beforeShowForm: function(form) {
-		                                var dlgDiv = $("#delmod" + jpgCustomers.id);
-		                                CenterDialog(dlgDiv);
-		                                var sel_id = $("#DelData>td:nth-child(1)").text();
-		                                $("td.delmsg", form).html("Delete User <b>" + $("#jpgCustomers").jqGrid('getCell', sel_id, 'LogonName') + "</b>?");
-		                            } */
-		                        }
-							}
+							},
+							frozen: true
 						},
-						{ name: 'ID', hidden: true, key: true},
-						{ label: 'Category Name', name: 'CATEGORYNAME', width: 75, 
+						{ name: 'ID', hidden: true, key: true, frozen: true},
+						{ label: 'Category Name', name: 'CATEGORYNAME', width: 75, frozen: true,
 							editable: true, edittype:'text', editoptions:{maxLength:'50'}, editrules:{required:true}
 						},
 						{ label: 'Product Name', name: 'PRODUCTNAME', width: 90,
@@ -167,7 +125,9 @@
 			rowNum: 30,
 			height: 340, 
             multiselect: true,
+            sortable: true,
             sortname: 'CATEGORYNAME',
+			sortorder: 'asc',
 			
 			pager: "#jqGridPager",
 			footerrow: true,
@@ -195,6 +155,8 @@
 			editurl: '<%=basePath%>jqGridExtend/edit.do?',
 		});
 		
+		$('#jqGrid').jqGrid('setFrozenColumns');
+		
 		//navButtons
 		$("#jqGrid").navGrid("#jqGridPager", 
 			{
@@ -205,14 +167,13 @@
 		        addicon : 'ace-icon fa fa-plus-circle purple',
 		        del: false,
 		        delicon : 'ace-icon fa fa-trash-o red',
-		        search: false,
+		        search: true,
 		        searchicon : 'ace-icon fa fa-search orange',
 		        refresh: false,
 		        refreshicon : 'ace-icon fa fa-refresh green',
 		        view: false,
 		        viewicon : 'ace-icon fa fa-search-plus grey',
-	        },{}, {}, {}, {}, {}, {});
-		//prmEdit, prmAdd, prmDel, prmSearch, prmRefresh, prmView);
+	        });
 		
 		 $("#jqGrid").navButtonAdd('#jqGridPager', {
              caption : "",
@@ -224,31 +185,49 @@
          });
 
 	    function saveRows(){
-	    	//获得选中的行的方法
-            var rows = $("#jqGrid").jqGrid("getGridParam", "selarrrow");  
-
-			if(!(rows!=null&&rows.length>0)){
+	    	//获得选中行ids的方法
+            var ids = $("#jqGrid").jqGrid("getGridParam", "selarrrow");  
+	    	
+			if(!(ids!=null&&ids.length>0)){
 				bootbox.dialog({
 					message: "<span class='bigger-110'>您没有选择任何内容!</span>",
 					buttons: 			
 					{ "button":{ "label":"确定", "className":"btn-sm btn-success"}}
 				});
-				return;
 			}else{
-                var msg = '确定要删除选中的数据吗?';
+                var msg = '确定要保存选中的数据吗?';
                 bootbox.confirm(msg, function(result) {
     				if(result) {
+    			    	var listJson = "";
+    			    	listJson+='[';
+    					//遍历访问这个集合  
+    					$(ids).each(function (index, id){  
+    			            $("#jqGrid").saveRow(id, false, 'clientArray');
+    			            var rowData = $("#jqGrid").getRowData(id);
+    			            listJson+='{'
+    			            	+'\"ID\":' + rowData.ID +','
+    			            	+'\"CATEGORYNAME\":\"' + rowData.CATEGORYNAME +'\",'
+    			            	+'\"PRODUCTNAME\":\"' + rowData.PRODUCTNAME +'\",'
+    			            	+'\"COUNTRY\":\"' + rowData.COUNTRY +'\",'
+    			            	+'\"PRICE\":' + rowData.PRICE +','
+    			            	+'\"QUANTITY\":' + rowData.QUANTITY +''
+    			            	+'},';
+    					});
+    			    	listJson+=']';
+    					
     					top.jzts();
-    					//String data=JSON.stringify(rows).toString();
     					$.ajax({
     						type: "POST",
     						url: '<%=basePath%>jqGridExtend/updateAll.do?',
-    				    	//data: {DATA_ROWS:data},
+    				    	data: {DATA_ROWS:listJson},
     						dataType:'json',
     						cache: false,
     						success: function(data){
     							refreshJqGrid();
-    						}
+    						},
+    				    	error: function(e) {
+    							$(top.hangge());//关闭加载状态
+    				    	}
     					});
     				}
                 });
@@ -265,16 +244,14 @@
          });
 
 	    function deleteRows(){
-	    	//获得选中的行的方法
-	    	var ids = $("#jqGrid").jqGrid("getGridParam", "selarrrow");  
+	    	//获得选中的行ids的方法
+	    	var ids = $("#jqGrid").getGridParam("selarrrow");  
 
 			var str = '';
 			//遍历访问这个集合  
 			$(ids).each(function (index, id){  
-			    //由id获得对应数据行  
-			    var row = $("#jqGrid").jqGrid('getRowData', id);  
-			  	if(str.trim()=='') str += row.ID;
-			  	else str += ',' + row.ID;
+			  	if(str.trim()=='') str += id;
+			  	else str += ',' + id;
 			});
 			if(str==''){
 				bootbox.dialog({
@@ -282,7 +259,6 @@
 					buttons: 			
 					{ "button":{ "label":"确定", "className":"btn-sm btn-success"}}
 				});
-				return;
 			}else{
                 var msg = '确定要删除选中的数据吗?';
                 bootbox.confirm(msg, function(result) {
@@ -296,7 +272,10 @@
     						cache: false,
     						success: function(data){
     							refreshJqGrid();
-    						}
+    						},
+    				    	error: function(e) {
+    							$(top.hangge());//关闭加载状态
+    				    	}
     					});
     				}
                 });

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fh.controller.base.BaseController;
+import com.fh.entity.JqGrid;
 import com.fh.entity.JqPage;
 import com.fh.entity.PageResult;
 import com.fh.service.jqGridExtend.jqGridExtend.JqGridExtendManager;
@@ -27,6 +28,9 @@ import com.fh.util.AppUtil;
 import com.fh.util.Jurisdiction;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 /**
  * JqGridExtend测试练习
@@ -210,10 +214,21 @@ public class JqGridExtendController extends BaseController {
 		PageData pd = new PageData();		
 		Map<String,Object> map = new HashMap<String,Object>();
 		pd = this.getPageData();
-		Object DATA_IDS = pd.get("DATA_ROWS");
-		if(null != DATA_IDS && !"".equals(DATA_IDS)){
-			//String ArrayDATA_IDS[] = DATA_IDS.split(",");
-			//jqGridExtendService.updateAll(DATA_IDS);
+		Object DATA_ROWS = pd.get("DATA_ROWS");
+		String json = DATA_ROWS.toString();  
+        JSONArray array = JSONArray.fromObject(json);  
+        List<JqGrid>  dtoList=new ArrayList<JqGrid>();  
+
+        for (int i = 0; i < array.size(); i++) {  
+            JSONObject jsonObject = array.getJSONObject(i);  
+            JqGrid item = (JqGrid) JSONObject.toBean(jsonObject, JqGrid.class);
+            if(item != null){
+                dtoList.add(item);  
+            }
+        }  
+
+		if(null != dtoList && dtoList.size() > 0){
+			jqGridExtendService.updateAll(dtoList);
 			pd.put("msg", "ok");
 		}else{
 			pd.put("msg", "no");
