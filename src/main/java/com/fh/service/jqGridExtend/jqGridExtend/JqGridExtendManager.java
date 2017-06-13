@@ -2,7 +2,7 @@ package com.fh.service.jqGridExtend.jqGridExtend;
 
 import java.util.List;
 
-import com.fh.entity.JqGrid;
+import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
 import com.fh.util.PageData;
 
@@ -72,7 +72,7 @@ public interface JqGridExtendManager{
 	 * @param pd
 	 * @throws Exception
 	 */
-	public void updateAll(List<JqGrid> pd)throws Exception;
+	public void updateAll(List<JqGridModel> pd)throws Exception;
 	
 }
 

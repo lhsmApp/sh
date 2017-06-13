@@ -181,7 +181,7 @@
 	</delete>
 	
 	<!-- 批量保存 -->
-	<update id="updateAll" parameterType="com.fh.entity.JqGrid">
+	<update id="updateAll" parameterType="com.fh.entity.JqGridModel">
 		<foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
 		    <if test="item!=null">
 		        update

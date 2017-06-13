@@ -2,29 +2,19 @@ package com.fh.entity;
 
 import java.io.Serializable;
 
-/**
- * JqGrid类
-* @ClassName: JqGrid
-* @Description: TODO(这里用一句话描述这个类的作用)
-* @author zhangxiaoliu
-* @date 2017年6月12日
-*
- */
-public class JqGrid implements Serializable  {
-	
+public  class JqGridModel implements Serializable {
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	/**
-	 * 
-	 */
-	private int ID;
-	private String CATEGORYNAME;
-	private String PRODUCTNAME;
-	private String COUNTRY;
-	private double PRICE;
-	private int QUANTITY;
+
+    private int ID;
+    private String CATEGORYNAME;
+    private String PRODUCTNAME;
+    private String COUNTRY;
+    private double PRICE;
+    private int QUANTITY;
 	public int getID() {
 		return ID;
 	}
@@ -61,7 +51,5 @@ public class JqGrid implements Serializable  {
 	public void setQUANTITY(int qUANTITY) {
 		QUANTITY = qUANTITY;
 	}
-	
-	
+    
 }
-	

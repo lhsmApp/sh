@@ -21,6 +21,13 @@
 	
 	<!-- 最新版的Jqgrid Css，如果旧版本（Ace）某些方法不好用，尝试用此版本Css，替换旧版本Css -->
 	<!-- <link rel="stylesheet" type="text/css" media="screen" href="static/ace/css/ui.jqgrid-bootstrap.css" /> -->
+	<style>
+		.page-header{
+			padding-top: 9px;
+			padding-bottom: 9px;
+			margin: 0 0 8px;
+		}
+	</style>
 </head>
 <body class="no-skin">
 	<div class="main-container" id="main-container">
@@ -29,13 +36,22 @@
 				<div class="page-content">
 					<!-- /section:settings.box -->
 					<div class="page-header">
-						<h1>
+						<!-- <h1>
 							东部管道
 							<small>
 								<i class="ace-icon fa fa-angle-double-right"></i>
 								成本核算
 							</small>
-						</h1>
+						</h1> -->
+						<table >
+							<tr>
+								<td>
+									<span class="label label-xlg label-success arrowed-right">东部管道</span>
+									<!-- arrowed-in-right -->
+									<span class="label label-xlg label-yellow arrowed-in arrowed-right" id="subTitle" style="margin-left:2px;">成本核算</span>
+								</td>
+							</tr>
+						</table>
 					</div><!-- /.page-header -->
 				
 					<div class="row">
@@ -84,6 +100,8 @@
 	<script src="static/ace/js/date-time/bootstrap-datepicker.js"></script>
 	<!--提示框-->
 	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
+	<!-- JqGrid统一样式统一操作 -->
+	<script type="text/javascript" src="static/js/common/jqgrid_style.js"></script>
 		
 	<script type="text/javascript"> 
 	$(document).ready(function () {
@@ -95,7 +113,7 @@
 		$(window).on('resize.jqGrid', function () {
 			$("#jqGrid").jqGrid( 'setGridWidth', $(".page-content").width());
 			//console.log("ccc"+$("iframe").height());
-			//$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - 138);
+			$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - 200);
 	    })
 		
 		$("#jqGrid").jqGrid({
@@ -111,7 +129,6 @@
                         	//var jsonResponse = $.parseJSON(response.responseText);
 							//console.log(response.responseJSON);
 							if(response.responseJSON.code==0){
-								
 								return [true];
 							}else{
 								return [false, response.responseJSON.message];
@@ -129,12 +146,25 @@
                         },
                         
                         afterSave:function(rowid, res){
+                        	//console.log("afterSave");
                         	$("#jqGrid").trigger("reloadGrid");
                         },
 					
 						keys:true,
 						//delbutton: false,//disable delete button
-						delOptions:{recreateForm: true, beforeShowForm:beforeDeleteCallback},
+						delOptions:{
+							recreateForm: true, 
+							beforeShowForm:beforeDeleteCallback,
+							afterSubmit: function(response, postData) {
+								if(response.responseJSON.code==0){
+									console.log("sss");
+									return [true];
+								}else{
+									console.log("rsdf");
+									return [false, response.responseJSON.message];
+								}
+                            },
+						}
 						//editformbutton:true, editOptions:{recreateForm: true, beforeShowForm:beforeEditCallback}
 						 
 						/* editformbutton:true, 
@@ -172,9 +202,9 @@
 			//autowidth:true,
 			//shrinkToFit:true,
 			viewrecords: true, // show the current page, data rang and total records on the toolbar
-			//rowNum: 30,
+			rowNum: 10,
 			//loadonce: true, // this is just for the demo
-			height: '100%', 
+			//height: '100%', 
 			
 			sortname: 'PRODUCTNAME',
 			
@@ -213,6 +243,8 @@
 			
 			altRows: true,
 			//toppager: true,
+			rownumbers: true, // show row numbers
+            rownumWidth: 35, // the width of the row numbers columns
 			
 			multiselect: true,
 			//multikey: "ctrlKey",
@@ -222,86 +254,87 @@
 		
 		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
 	
-		//it causes some flicker when reloading or navigating grid
-		//it may be possible to have some custom formatter to do this as the grid is being created to prevent this
-		//or go back to default browser checkbox styles for the grid
-		function styleCheckbox(table) {
-		/**
-			$(table).find('input:checkbox').addClass('ace')
-			.wrap('<label />')
-			.after('<span class="lbl align-top" />')
-	
-	
-			$('.ui-jqgrid-labels th[id*="_cb"]:first-child')
-			.find('input.cbox[type=checkbox]').addClass('ace')
-			.wrap('<label />').after('<span class="lbl align-top" />');
-		*/
-		}
-		
-	
-		//unlike navButtons icons, action icons in rows seem to be hard-coded
-		//you can change them like this in here if you want
-		function updateActionIcons(table) {
-			/**
-			var replacement = 
+		//navButtons
+		jQuery("#jqGrid").jqGrid('navGrid',"#jqGridPager",
+			{ 	//navbar options
+				edit: false,
+				editicon : 'ace-icon fa fa-pencil blue',
+				add: true,
+				addicon : 'ace-icon fa fa-plus-circle purple',
+				del: true,
+				delicon : 'ace-icon fa fa-trash-o red',
+				search: true,
+				searchicon : 'ace-icon fa fa-search orange',
+				refresh: true,
+				refreshicon : 'ace-icon fa fa-refresh green',
+				view: false,
+				viewicon : 'ace-icon fa fa-search-plus grey',
+			},
 			{
-				'ui-ace-icon fa fa-pencil' : 'ace-icon fa fa-pencil blue',
-				'ui-ace-icon fa fa-trash-o' : 'ace-icon fa fa-trash-o red',
-				'ui-icon-disk' : 'ace-icon fa fa-check green',
-				'ui-icon-cancel' : 'ace-icon fa fa-times red'
-			};
-			$(table).find('.ui-pg-div span.ui-icon').each(function(){
-				var icon = $(this);
-				var $class = $.trim(icon.attr('class').replace('ui-icon', ''));
-				if($class in replacement) icon.attr('class', 'ui-icon '+replacement[$class]);
-			})
-			*/
-		}
-		
-		//replace icons with FontAwesome icons like above
-		function updatePagerIcons(table) {
-			var replacement = 
+				//edit record form
+				//closeAfterEdit: true,
+				//width: 700,
+				recreateForm: true,
+				beforeShowForm :beforeEditOrAddCallback
+			},
 			{
-				'ui-icon-seek-first' : 'ace-icon fa fa-angle-double-left bigger-140',
-				'ui-icon-seek-prev' : 'ace-icon fa fa-angle-left bigger-140',
-				'ui-icon-seek-next' : 'ace-icon fa fa-angle-right bigger-140',
-				'ui-icon-seek-end' : 'ace-icon fa fa-angle-double-right bigger-140'
-			};
-			$('.ui-pg-table:not(.navtable) > tbody > tr > .ui-pg-button > .ui-icon').each(function(){
-				var icon = $(this);
-				var $class = $.trim(icon.attr('class').replace('ui-icon', ''));
-				
-				if($class in replacement) icon.attr('class', 'ui-icon '+replacement[$class]);
-			})
-		}
-	
-		function enableTooltips(table) {
-			$('.navtable .ui-pg-button').tooltip({container:'body'});
-			$(table).find('.ui-pg-div').tooltip({container:'body'});
-		}
-		
-		function style_delete_form(form) {
-			var buttons = form.next().find('.EditButton .fm-button');
-			buttons.addClass('btn btn-sm btn-white btn-round').find('[class*="-icon"]').hide();//ui-icon, s-icon
-			buttons.eq(0).addClass('btn-danger').prepend('<i class="ace-icon fa fa-trash-o"></i>');
-			buttons.eq(1).addClass('btn-default').prepend('<i class="ace-icon fa fa-times"></i>')
-		}
-		
-		function beforeDeleteCallback(e) {
-			var form = $(e[0]);
-			if(form.data('styled')) return false;
-			
-			form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
-			style_delete_form(form);
-			
-			form.data('styled', true);
-		}
-		
-		function fn_editSubmit(response,postdata){
-			console.log("ssss");
-			var json=response.responseText;
-			alert(json);//显示返回值
+				//new record form
+				//width: 700,
+				closeAfterAdd: true,
+				recreateForm: true,
+				viewPagerButtons: false,
+				//reloadAfterSubmit: true,
+				beforeShowForm : beforeEditOrAddCallback,
+			    onclickSubmit: function(params, posdata) {
+					console.log("onclickSubmit");
+                    //console.log(posdata	);
+                } , 
+                afterSubmit: fn_addSubmit
+			},
+			{
+				//delete record form
+				recreateForm: true,
+				beforeShowForm : beforeDeleteCallback,
+				onClick : function(e) {
+					<%-- console.log("BatchDelete");
+					//alert(1);
+					var ids = grid.jqGrid('getDataIDs');
+					var strIds="";
+					for (var i = 0; i < ids.length; i++) {
+						if(strIds=='')
+							strIds+= ids[i];
+						else
+							strIds+= ','+ids[i];
+                		//grid.jqGrid('editRow',ids[i]);
+            		}
+					$.ajax({
+						type: "POST",
+						url: '<%=basePath%>jqgridJia/deleteAll.do?tm='+new Date().getTime(),
+				    	data: {DATA_IDS:str},
+						dataType:'json',
+						//beforeSend: validateData,
+						cache: false,
+						success: function(data){
+							 
+						}
+					}); --%>
+				}
+			},
+			{
+				//search form
+				recreateForm: true,
+				afterShowSearch: beforeSearchCallback,
+				afterRedraw: function(){
+					style_search_filters($(this));
+				}
+				,
+				multipleSearch: true,
+				/**
+				multipleGroup:true,
+				showQuery: true
+				*/
 			}
+		);
 	
 	});
 

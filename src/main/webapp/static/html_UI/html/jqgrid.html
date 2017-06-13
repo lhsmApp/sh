@@ -1281,7 +1281,7 @@
 								//delbutton: false,//disable delete button
 								
 								delOptions:{recreateForm: true, beforeShowForm:beforeDeleteCallback},
-								editformbutton:false, editOptions:{recreateForm: true, beforeShowForm:beforeEditCallback}
+								//editformbutton:true, editOptions:{recreateForm: true, beforeShowForm:beforeEditCallback}
 							}
 						},
 						{name:'id',index:'id', width:60, sorttype:"int", editable: true},
@@ -1298,6 +1298,9 @@
 					pager : pager_selector,
 					altRows: true,
 					//toppager: true,
+					
+					rownumbers: true, // show row numbers
+            rownumWidth: 35, // the width of the row numbers columns
 					
 					multiselect: true,
 					//multikey: "ctrlKey",

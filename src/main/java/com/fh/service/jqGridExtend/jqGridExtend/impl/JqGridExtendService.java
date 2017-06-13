@@ -7,7 +7,7 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.fh.dao.DaoSupport;
-import com.fh.entity.JqGrid;
+import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
 import com.fh.service.jqGridExtend.jqGridExtend.JqGridExtendManager;
 import com.fh.util.PageData;
@@ -103,7 +103,7 @@ public class JqGridExtendService implements JqGridExtendManager{
 	 * @param pd
 	 * @throws Exception
 	 */
-	public void updateAll(List<JqGrid> pd)throws Exception{
+	public void updateAll(List<JqGridModel> pd)throws Exception{
 		dao.update("JqGridExtendMapper.updateAll", pd);
 	}
 	

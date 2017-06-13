@@ -1,5 +1,6 @@
 package com.fh.controller.jqgrid.jggrid;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -10,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -22,11 +26,16 @@ import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
 import com.fh.entity.JqPage;
 import com.fh.entity.PageResult;
+import com.fh.entity.jqGrid;
 import com.fh.service.jqgrid.jggrid.JgGridManager;
 import com.fh.util.AppUtil;
 import com.fh.util.Jurisdiction;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
+import com.mysql.jdbc.RowData;
+import com.sun.tools.internal.xjc.model.Model;
+
+import net.sf.json.JSONObject;
 
 /**
  * JqGrid测试练习
@@ -88,11 +97,42 @@ public class JgGridController extends BaseController {
 		ModelAndView mv = this.getModelAndView();
 		PageData pd = new PageData();
 		pd = this.getPageData();
-		jqgridService.edit(pd);
+		
+		
+		String type = pd.getString("oper");
+		if (type.equals("edit")) {
+			jqgridService.edit(pd);
+		} else if (type.equals("add")) {
+			jqgridService.save(pd);
+		} else if (type.equals("del")) {
+			String DATA_IDS = pd.getString("id");
+			if(null != DATA_IDS && !"".equals(DATA_IDS)){
+				String ArrayDATA_IDS[] = DATA_IDS.split(",");
+				jqgridService.deleteAll(ArrayDATA_IDS);
+			}
+		}
 		mv.addObject("msg","success");
 		mv.setViewName("save_result");
 		return mv;
 	}
+	
+	@RequestMapping(value="/doPost")
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {  
+        String rowData = request.getParameter("rowData");  
+     if (rowData!=null&&!"".equals(rowData)) {  
+            JSONObject json=JSONObject.fromObject(rowData);  
+            int size = json.size();  
+            List<jqGrid> list= new ArrayList<jqGrid>();  
+            for (int i = 0; i < size; i++) {  
+                JSONObject o = (JSONObject) json.get(""+i);  
+                jqGrid b = (jqGrid) JSONObject.toBean(o,jqGrid.class);  
+                System.out.println(b.getCategoryName());  
+                list.add(b);  
+            }  
+                      
+        }   
+    }  
+	
 	
 	/**列表
 	 * @param page
@@ -133,6 +173,11 @@ public class JgGridController extends BaseController {
 		List<PageData> varList = jqgridService.list(page);	//列出Betting列表
 		int records = jqgridService.countJqGrid(pd);
 		PageResult<PageData> result = new PageResult<PageData>();
+		
+		PageData userdata = new PageData();
+		userdata.put("PRICE", "2000");
+		result.setUserdata(userdata);
+		
 		result.setRows(varList);
 		result.setRecords(records);
 		result.setPage(page.getPage());
@@ -197,6 +242,15 @@ public class JgGridController extends BaseController {
 		return AppUtil.returnObject(pd, map);
 	}
 	
+	
+//	public Object editAll() throws Exception {
+//		PageData pd = new PageData();
+//		Map<String, Object> map = new HashMap<String,Object>();
+//		pd = this.getPageData();
+//		
+//		
+//	}
+	
 	 /**导出到excel
 	 * @param
 	 * @throws Exception
@@ -238,4 +292,26 @@ public class JgGridController extends BaseController {
 		DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		binder.registerCustomEditor(Date.class, new CustomDateEditor(format,true));
 	}
+	
+	/**列表(练习）
+	 * @param page
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/listTest")
+	public ModelAndView listTest() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"列表JgGrid");
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = this.getPageData();
+		mv.setViewName("jqgridTest/jggridTest/jggrid_list_test");
+		
+		/**此处放当前页面初始化时用到的一些数据，例如搜索的下拉列表数据，所需的字典数据、权限数据等等。
+		mv.addObject("pd", pd);
+		mv.addObject("QX",Jurisdiction.getHC());	//按钮权限
+		 * 
+		 * 
+		 */
+		return mv;
+	}
+	
 }

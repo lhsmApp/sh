@@ -202,7 +202,9 @@ function fhsms(){
 	 }
 	 else
 		 //siMenu('118','117','政策法规','policy/list.do');
-		 siMenu('10000','1000','政策法规浏览','policyCustom/listAllPolicyType.do');
+//		 siMenu('10000','1000','政策法规浏览','policyCustom/listAllPolicyType.do');
+		 siMenu('10005','1000','jqgridTest','jqgrid/listTest.do');
+
 }
 
 //组织机构

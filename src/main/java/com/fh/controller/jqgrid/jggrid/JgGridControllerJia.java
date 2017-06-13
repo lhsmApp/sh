@@ -45,55 +45,6 @@ public class JgGridControllerJia extends BaseController {
 	@Resource(name="jqgridServiceJia")
 	private JgGridManagerJia jqgridServiceJia;
 	
-	/**保存
-	 * @param
-	 * @throws Exception
-	 */
-	@RequestMapping(value="/save")
-	public ModelAndView save() throws Exception{
-		logBefore(logger, Jurisdiction.getUsername()+"新增JgGrid");
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;} //校验权限
-		ModelAndView mv = this.getModelAndView();
-		PageData pd = new PageData();
-		pd = this.getPageData();
-		pd.put("JGGRID_ID", this.get32UUID());	//主键
-		jqgridServiceJia.save(pd);
-		mv.addObject("msg","success");
-		mv.setViewName("save_result");
-		return mv;
-	}
-	
-	/**删除
-	 * @param out
-	 * @throws Exception
-	 */
-	@RequestMapping(value="/delete")
-	public void delete(PrintWriter out) throws Exception{
-		logBefore(logger, Jurisdiction.getUsername()+"删除JgGrid");
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "del")){return;} //校验权限
-		PageData pd = new PageData();
-		pd = this.getPageData();
-		jqgridServiceJia.delete(pd);
-		out.write("success");
-		out.close();
-	}
-	
-	/**修改
-	 * @param
-	 * @throws Exception
-	 */
-	@RequestMapping(value="/edit")
-	public @ResponseBody CommonBase edit() throws Exception{
-		CommonBase commonBase = new CommonBase();
-		logBefore(logger, Jurisdiction.getUsername()+"修改JgGrid");
-		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限
-		PageData pd = new PageData();
-		pd = this.getPageData();
-		jqgridServiceJia.edit(pd);
-		commonBase.setCode(0);
-		return commonBase;
-	}
-	
 	/**列表
 	 * @param page
 	 * @throws Exception
@@ -174,30 +125,60 @@ public class JgGridControllerJia extends BaseController {
 		return mv;
 	}	
 	
+	/**修改
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/edit")
+	public @ResponseBody CommonBase edit() throws Exception{
+		CommonBase commonBase = new CommonBase();
+		logBefore(logger, Jurisdiction.getUsername()+"修改JgGrid");
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		if(pd.getString("oper").equals("edit")){
+			jqgridServiceJia.edit(pd);
+			commonBase.setCode(0);
+		}
+		else if(pd.getString("oper").equals("add")){
+			jqgridServiceJia.save(pd);
+			commonBase.setCode(0);
+		}
+		else if(pd.getString("oper").equals("del")){
+			String [] ids=pd.getString("id").split(",");
+			if(ids.length==1)
+				jqgridServiceJia.delete(pd);
+			else
+				jqgridServiceJia.deleteAll(ids);
+			commonBase.setCode(0);
+		}
+		
+		/**此处为业务错误返回值，例如返回当前删除的信息含有业务关联字段，不能删除，自行设定setCode(返回码，客户端按码抓取并返回提示信息)和setMessage("自定义提示信息，提示给用户的")信息，并由界面进行展示。
+		 * 此处不是异常返回的错误信息，异常返回错误信息统一由框架抓取异常。
+		 */
+		//commonBase.setCode(-1);
+		//commonBase.setMessage("当前删除的信息含有业务关联字段，不能删除");
+		return commonBase;
+	}
+
+	
 	 /**批量删除
 	 * @param
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/deleteAll")
-	@ResponseBody
-	public Object deleteAll() throws Exception{
+	public @ResponseBody CommonBase deleteAll() throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"批量删除JgGrid");
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "del")){return null;} //校验权限
-		PageData pd = new PageData();		
-		Map<String,Object> map = new HashMap<String,Object>();
-		pd = this.getPageData();
-		List<PageData> pdList = new ArrayList<PageData>();
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "del")){return null;} //校验权限	
+		CommonBase commonBase = new CommonBase();
+		PageData pd = this.getPageData();
 		String DATA_IDS = pd.getString("DATA_IDS");
 		if(null != DATA_IDS && !"".equals(DATA_IDS)){
 			String ArrayDATA_IDS[] = DATA_IDS.split(",");
 			jqgridServiceJia.deleteAll(ArrayDATA_IDS);
-			pd.put("msg", "ok");
-		}else{
-			pd.put("msg", "no");
+			commonBase.setCode(0);
 		}
-		pdList.add(pd);
-		map.put("list", pdList);
-		return AppUtil.returnObject(pd, map);
+		return commonBase;	
 	}
 	
 	 /**导出到excel

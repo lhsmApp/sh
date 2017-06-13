@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fh.controller.base.BaseController;
-import com.fh.entity.JqGrid;
+import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
 import com.fh.entity.PageResult;
 import com.fh.service.jqGridExtend.jqGridExtend.JqGridExtendManager;
@@ -217,11 +217,11 @@ public class JqGridExtendController extends BaseController {
 		Object DATA_ROWS = pd.get("DATA_ROWS");
 		String json = DATA_ROWS.toString();  
         JSONArray array = JSONArray.fromObject(json);  
-        List<JqGrid>  dtoList=new ArrayList<JqGrid>();  
+        List<JqGridModel>  dtoList=new ArrayList<JqGridModel>();  
 
         for (int i = 0; i < array.size(); i++) {  
             JSONObject jsonObject = array.getJSONObject(i);  
-            JqGrid item = (JqGrid) JSONObject.toBean(jsonObject, JqGrid.class);
+            JqGridModel item = (JqGridModel) JSONObject.toBean(jsonObject, JqGridModel.class);
             if(item != null){
                 dtoList.add(item);  
             }
