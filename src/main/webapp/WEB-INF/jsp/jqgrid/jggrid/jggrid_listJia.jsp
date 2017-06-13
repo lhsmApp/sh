@@ -89,7 +89,6 @@
 	$(document).ready(function () {
 		/* $.jgrid.defaults.width = 780;*/
 		//$.jgrid.defaults.styleUI = 'Bootstrap'; 
-		
 		$(top.hangge());//关闭加载状态
 		
 		//resize to fit page size
@@ -101,23 +100,81 @@
 		
 		$("#jqGrid").jqGrid({
 			<%-- url: '<%=basePath%>static/data/data.json', --%>
-			url: '<%=basePath%>jqgrid/getPageList.do',
+			url: '<%=basePath%>jqgridJia/getPageList.do',
 			datatype: "json",
 			 colModel: [
-				{ label: 'Category Name', name: 'CATEGORYNAME', width: 75 },
-				{ label: 'Product Name', name: 'PRODUCTNAME', width: 90 },
-				{ label: 'Country', name: 'COUNTRY', width: 100 },
-				{ label: 'Price', name: 'PRICE', width: 80, formatter: 'number',sorttype: 'number',summaryTpl: "sum: {0}", summaryType: "sum"},
+				{label: ' ',name:'myac',index:'', width:80, fixed:true, sortable:false, resize:false,
+					formatter:'actions', 
+					formatoptions:{ 
+                        onSuccess: function(response) {
+							
+                        	//var jsonResponse = $.parseJSON(response.responseText);
+							//console.log(response.responseJSON);
+							if(response.responseJSON.code==0){
+								
+								return [true];
+							}else{
+								return [false, response.responseJSON.message];
+							}
+							
+                            /* if (jsonResponse.State != 'Success') {
+                                return [false, jsonResponse.ResponseMessage];
+                            } else {
+                                return [true];
+                            }  */                    
+                        },
+                        onError :function(rowid, res, stat, err) {
+                        	if(err!=null)
+                        		console.log(err);
+                        },
+                        
+                        afterSave:function(rowid, res){
+                        	$("#jqGrid").trigger("reloadGrid");
+                        },
+					
+						keys:true,
+						//delbutton: false,//disable delete button
+						delOptions:{recreateForm: true, beforeShowForm:beforeDeleteCallback},
+						//editformbutton:true, editOptions:{recreateForm: true, beforeShowForm:beforeEditCallback}
+						 
+						/* editformbutton:true, 
+						editOptions:{
+							onclickSubmit: function(params, posdata) {
+								console.log("submit");
+                                console.log(posdata	);
+                            } , 
+                            afterSubmit: fn_editSubmit
+						} */ 
+						
+						//editformbutton:true,
+						/*editOptions: {  //编辑操作，这个很重要，实现编辑时传送参数什么的。  
+                            //reloadAfterSubmit: true,
+                             editData: {  
+                                editkey: function () {  
+                                    var sel_id = $('#TblClassTypeId').jqGrid('getGridParam', 'selrow');  
+                                    var value = $('#TblClassTypeId').jqGrid('getCell', sel_id, 'Id_Key');  
+                                    return value;  
+                                }  
+                            }   
+						}*/
+					}
+				},
+				{label: 'id',name:'ID',index:'',key: true, width:30, sorttype:"int", editable: false},
+				{ label: 'Category Name', name: 'CATEGORYNAME', width: 75,editable: true,editoptions:{size:"20",maxlength:"30"} },
+				{ label: 'Product Name', name: 'PRODUCTNAME', width: 90,editable: true,editoptions:{size:"20",maxlength:"30"} },
+				{ label: 'Country', name: 'COUNTRY', width: 100,editable: true,edittype:"select",editoptions:{value:"FE:FedEx;IN:InTime;TN:TNT;AR:ARAMEX"} },
+				{ label: 'Price', name: 'PRICE', width: 80, formatter: 'number',sorttype: 'number',summaryTpl: "sum: {0}", summaryType: "sum",editable: true},
 				// sorttype is used only if the data is loaded locally or loadonce is set to true
-				{ label: 'Quantity', name: 'QUANTITY', width: 80, sorttype: 'integer' }                   
+				{ label: 'Quantity', name: 'QUANTITY', width: 80, sorttype: 'integer',editable: true }                   
 			],
-			caption: "jqGrid with inline editing",
+			reloadAfterSubmit: true, 
+			//caption: "jqGrid with inline editing",
 			//autowidth:true,
 			//shrinkToFit:true,
 			viewrecords: true, // show the current page, data rang and total records on the toolbar
 			//rowNum: 30,
 			//loadonce: true, // this is just for the demo
-			height: 340, 
+			height: '100%', 
 			
 			sortname: 'PRODUCTNAME',
 			
@@ -152,7 +209,15 @@
 					updatePagerIcons(table);
 					enableTooltips(table);
 				}, 0);
-			}
+			},
+			
+			altRows: true,
+			//toppager: true,
+			
+			multiselect: true,
+			//multikey: "ctrlKey",
+	        multiboxonly: true,
+	        editurl: "<%=basePath%>jqgridJia/edit.do"//nothing is saved
 		});
 		
 		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
@@ -214,6 +279,29 @@
 			$('.navtable .ui-pg-button').tooltip({container:'body'});
 			$(table).find('.ui-pg-div').tooltip({container:'body'});
 		}
+		
+		function style_delete_form(form) {
+			var buttons = form.next().find('.EditButton .fm-button');
+			buttons.addClass('btn btn-sm btn-white btn-round').find('[class*="-icon"]').hide();//ui-icon, s-icon
+			buttons.eq(0).addClass('btn-danger').prepend('<i class="ace-icon fa fa-trash-o"></i>');
+			buttons.eq(1).addClass('btn-default').prepend('<i class="ace-icon fa fa-times"></i>')
+		}
+		
+		function beforeDeleteCallback(e) {
+			var form = $(e[0]);
+			if(form.data('styled')) return false;
+			
+			form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
+			style_delete_form(form);
+			
+			form.data('styled', true);
+		}
+		
+		function fn_editSubmit(response,postdata){
+			console.log("ssss");
+			var json=response.responseText;
+			alert(json);//显示返回值
+			}
 	
 	});
 

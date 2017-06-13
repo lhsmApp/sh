@@ -1281,7 +1281,7 @@
 								//delbutton: false,//disable delete button
 								
 								delOptions:{recreateForm: true, beforeShowForm:beforeDeleteCallback},
-								//editformbutton:true, editOptions:{recreateForm: true, beforeShowForm:beforeEditCallback}
+								editformbutton:false, editOptions:{recreateForm: true, beforeShowForm:beforeEditCallback}
 							}
 						},
 						{name:'id',index:'id', width:60, sorttype:"int", editable: true},
@@ -1498,6 +1498,7 @@
 				}
 				
 				function beforeEditCallback(e) {
+					console.log("zhixing");
 					var form = $(e[0]);
 					form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
 					style_edit_form(form);
