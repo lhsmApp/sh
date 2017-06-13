@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fh.controller.base.BaseController;
+import com.fh.entity.CommonBase;
 import com.fh.entity.JqPage;
 import com.fh.entity.PageResult;
 import com.fh.service.jqgrid.jggrid.JgGridManagerJia;
@@ -82,16 +83,15 @@ public class JgGridControllerJia extends BaseController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/edit")
-	public ModelAndView edit() throws Exception{
+	public @ResponseBody CommonBase edit() throws Exception{
+		CommonBase commonBase = new CommonBase();
 		logBefore(logger, Jurisdiction.getUsername()+"修改JgGrid");
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限
-		ModelAndView mv = this.getModelAndView();
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限
 		PageData pd = new PageData();
 		pd = this.getPageData();
 		jqgridServiceJia.edit(pd);
-		mv.addObject("msg","success");
-		mv.setViewName("save_result");
-		return mv;
+		commonBase.setCode(0);
+		return commonBase;
 	}
 	
 	/**列表
