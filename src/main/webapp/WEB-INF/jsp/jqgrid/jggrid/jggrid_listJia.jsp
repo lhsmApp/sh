@@ -192,10 +192,10 @@
 				{label: 'id',name:'ID',index:'',key: true, width:30, sorttype:"int", editable: false},
 				{ label: 'Category Name', name: 'CATEGORYNAME', width: 75,editable: true,editoptions:{size:"20",maxlength:"30"} },
 				{ label: 'Product Name', name: 'PRODUCTNAME', width: 90,editable: true,editoptions:{size:"20",maxlength:"30"} },
-				{ label: 'Country', name: 'COUNTRY', width: 100,editable: true,edittype:"select",editoptions:{value:"FE:FedEx;IN:InTime;TN:TNT;AR:ARAMEX"} },
-				{ label: 'Price', name: 'PRICE', width: 80, formatter: 'number',sorttype: 'number',summaryTpl: "sum: {0}", summaryType: "sum",editable: true},
+				{ label: 'Country', name: 'COUNTRY', width: 100,editable: true,edittype:"select",editoptions:{value:"FE:FedEx;IN:InTime;TN:TNT;AR:ARAMEX"}},
+				{ label: 'Price', name: 'PRICE', width: 80, formatter: 'number',sorttype: 'number',summaryTpl: "sum: {0}", summaryType: "sum",editable: true,align:'right'},
 				// sorttype is used only if the data is loaded locally or loadonce is set to true
-				{ label: 'Quantity', name: 'QUANTITY', width: 80, sorttype: 'integer',editable: true }                   
+				{ label: 'Quantity', name: 'QUANTITY', width: 80, sorttype: 'integer',editable: true,align:'right'  }                   
 			],
 			reloadAfterSubmit: true, 
 			//caption: "jqGrid with inline editing",
@@ -249,7 +249,19 @@
 			multiselect: true,
 			//multikey: "ctrlKey",
 	        multiboxonly: true,
-	        editurl: "<%=basePath%>jqgridJia/edit.do"//nothing is saved
+	        editurl: "<%=basePath%>jqgridJia/edit.do",//nothing is saved
+	        
+	      //subgrid options
+			subGrid : true,
+			//subGridModel: [{ name : ['No','Item Name','Qty'], width : [55,200,80] }],
+			//datatype: "xml",
+			subGridOptions : {
+				plusicon : "ace-icon fa fa-plus center bigger-110 blue",
+				minusicon  : "ace-icon fa fa-minus center bigger-110 blue",
+				openicon : "ace-icon fa fa-chevron-right center orange"
+			},
+			//for this example we are using local data
+			subGridRowExpanded: showChildGrid,
 		});
 		
 		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
@@ -326,13 +338,13 @@
 				afterShowSearch: beforeSearchCallback,
 				afterRedraw: function(){
 					style_search_filters($(this));
-				}
-				,
+				},
 				multipleSearch: true,
-				/**
-				multipleGroup:true,
+				
+				
+				//multipleGroup:true,
 				showQuery: true
-				*/
+				
 			}
 		);
 	
@@ -433,6 +445,49 @@
 	    	}
 		});
     }
+	
+	//显示明细信息
+	// the event handler on expanding parent row receives two parameters
+    // the ID of the grid tow  and the primary key of the row
+    function showChildGrid(parentRowID, parentRowKey) {
+    	console.log(parentRowID+"  "+parentRowKey);
+        var childGridID = parentRowID + "_table";
+        var childGridPagerID = parentRowID + "_pager";
+     // send the parent row primary key to the server so that we know which grid to show
+        var childGridURL = '<%=basePath%>jqGridExtend/getDetailList.do?parentId='+parentRowKey+'';
+        //childGridURL = childGridURL + "&parentRowID=" + encodeURIComponent(parentRowKey)
+
+        // add a table and pager HTML elements to the parent grid row - we will render the child grid here
+        $('#' + parentRowID).append('<table id=' + childGridID + '></table><div id=' + childGridPagerID + ' class=scroll></div>');
+        $("#" + childGridID).jqGrid({
+            url: childGridURL,
+            mtype: "GET",
+            datatype: "json",
+            page: 1,
+            colModel: [
+			           {lable: 'ParentID', name: 'ParentID', width: 80},
+			           {lable: 'ID', name: 'ID', width: 80},
+			           {lable: 'Name', name: 'Name'},
+			           {lable: 'Qty', name: 'Qty', width: 100},
+			           {lable: 'SaleDate', name: 'SaleDate', width: 150,sorttype:'date',formatter: 'date',
+			        	   formatoptions: {srcformat:'u',newformat:'Y-m-d'}
+			           }
+            ],
+            //width: '100%',
+            height: '100%',
+            //autowidth:true,
+            //pager: "#" + childGridPagerID,
+            loadComplete : function() {
+				var table = this;
+				setTimeout(function(){
+					styleCheckbox(table);
+					updateActionIcons(table);
+					updatePagerIcons(table);
+					enableTooltips(table);
+				}, 0);
+			},
+        });
+	}
  	</script>
 </body>
 </html>

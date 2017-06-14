@@ -31,6 +31,7 @@ import com.fh.util.AppUtil;
 import com.fh.util.Jurisdiction;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
+import com.fh.util.SqlTools;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -86,6 +87,11 @@ public class JgGridControllerJia extends BaseController {
 		if(null != keywords && !"".equals(keywords)){
 			pd.put("keywords", keywords.trim());
 		}
+		String filters = pd.getString("filters");				//多条件过滤条件
+		if(null != filters && !"".equals(filters)){
+			pd.put("filterWhereResult", SqlTools.constructWhere(filters,null));
+		}
+		
 		page.setPd(pd);
 		List<PageData> varList = jqgridServiceJia.list(page);	//列出Betting列表
 		int records = jqgridServiceJia.countJqGrid(pd);
