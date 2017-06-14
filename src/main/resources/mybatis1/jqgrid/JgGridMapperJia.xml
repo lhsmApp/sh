@@ -153,5 +153,21 @@
 		</foreach>
 	</delete>
 	
-	<!-- fh313596790qq(青苔) -->
+	<!-- 批量保存 -->
+	<update id="updateAll" parameterType="com.fh.entity.JqGridModel">
+		<foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
+		    <if test="item!=null">
+		        update
+		        <include refid="tableName"></include>
+		        set 
+		    	    CATEGORYNAME = #{item.CATEGORYNAME},
+			        PRODUCTNAME = #{item.PRODUCTNAME},
+			        COUNTRY = #{item.COUNTRY},
+			        PRICE = #{item.PRICE},
+			        QUANTITY = #{item.QUANTITY}
+		        where 
+		        ID = #{item.ID}
+		    </if>
+		</foreach>
+	</update>
 </mapper>

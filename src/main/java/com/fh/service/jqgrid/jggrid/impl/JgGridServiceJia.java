@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.fh.dao.DaoSupport;
+import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
 import com.fh.service.jqgrid.jggrid.JgGridManagerJia;
 import com.fh.util.PageData;
@@ -88,6 +89,14 @@ public class JgGridServiceJia implements JgGridManagerJia{
 	 */
 	public void deleteAll(String[] ArrayDATA_IDS)throws Exception{
 		dao.delete("JgGridMapperJia.deleteAll", ArrayDATA_IDS);
+	}
+	
+	/**批量修改
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void updateAll(List<JqGridModel> pd)throws Exception{
+		dao.update("JgGridMapperJia.updateAll", pd);
 	}
 	
 }

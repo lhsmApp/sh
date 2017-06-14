@@ -2,6 +2,7 @@ package com.fh.service.jqGridExtend.jqGridExtend;
 
 import java.util.List;
 
+import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
 import com.fh.util.PageData;
 
@@ -31,12 +32,6 @@ public interface JqGridExtendManager{
 	 */
 	public void edit(PageData pd)throws Exception;
 	
-	/**列表
-	 * @param page
-	 * @throws Exception
-	 */
-	public List<PageData> list(JqPage page)throws Exception;
-	
 	/**列表(全部)
 	 * @param pd
 	 * @throws Exception
@@ -49,23 +44,40 @@ public interface JqGridExtendManager{
 	 */
 	public PageData findById(PageData pd)throws Exception;
 	
+	/**列表
+	 * @param page
+	 * @throws Exception
+	 */
+	public List<PageData> list(JqPage page)throws Exception;
+	/**明细
+	 * @param
+	 * @throws Exception
+	 */
+	public List<PageData> getDetailList(PageData pd)throws Exception;
+	
 	/**获取记录数量
 	 * @param pd
 	 * @throws Exception
 	 */
-	public int countJqGridExtend(PageData pd)throws Exception;
+	public int countJqGridExtend(JqPage page)throws Exception;
 	
 	/**获取记录总合计
 	 * @param pd
 	 * @throws Exception
 	 */
-	public PageData getFooterSummary(PageData pd)throws Exception;
+	public PageData getFooterSummary(JqPage page)throws Exception;
 	
 	/**批量删除
 	 * @param ArrayDATA_IDS
 	 * @throws Exception
 	 */
 	public void deleteAll(String[] ArrayDATA_IDS)throws Exception;
+	
+	/**批量修改
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void updateAll(List<JqGridModel> pd)throws Exception;
 	
 }
 

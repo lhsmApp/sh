@@ -8,7 +8,6 @@ import com.fh.entity.system.Dictionaries;
 import com.fh.service.system.dictionaries.DictionariesManager;
 import com.fh.util.PageData;
 import com.fh.util.StringUtil;
-import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion.Static;
 
 /**
  * 字典信息通用类

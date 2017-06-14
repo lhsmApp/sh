@@ -1,6 +1,6 @@
 package com.fh.entity;
 
-public class jqGrid {
+public class jqGrid  {
 
 	private String ID;			
 	private String CategoryName;	

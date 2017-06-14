@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fh.controller.base.BaseController;
+import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
 import com.fh.entity.PageResult;
 import com.fh.service.jqGridExtend.jqGridExtend.JqGridExtendManager;
@@ -27,6 +28,9 @@ import com.fh.util.AppUtil;
 import com.fh.util.Jurisdiction;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 /**
  * JqGridExtend测试练习
@@ -131,13 +135,29 @@ public class JqGridExtendController extends BaseController {
 		}
 		page.setPd(pd);
 		List<PageData> varList = jqGridExtendService.list(page);	//列出Betting列表
-		int records = jqGridExtendService.countJqGridExtend(pd);
-		PageData userdata=jqGridExtendService.getFooterSummary(pd);
+		int records = jqGridExtendService.countJqGridExtend(page);
+		PageData userdata=jqGridExtendService.getFooterSummary(page);
 		PageResult<PageData> result = new PageResult<PageData>();
 		result.setRows(varList);
 		result.setRecords(records);
 		result.setPage(page.getPage());
 		result.setUserdata(userdata);
+		
+		return result;
+	}
+	/**明细
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/getDetailList")
+	public @ResponseBody PageResult<PageData> getDetailList() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"明细Betting");
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		
+		List<PageData> varList = jqGridExtendService.getDetailList(pd);	//列出Betting列表
+		PageResult<PageData> result = new PageResult<PageData>();
+		result.setRows(varList);
 		
 		return result;
 	}
@@ -194,6 +214,42 @@ public class JqGridExtendController extends BaseController {
 		}else{
 			pd.put("msg", "no");
 		}
+		pdList.add(pd);
+		map.put("list", pdList);
+		return AppUtil.returnObject(pd, map);
+	}
+	
+	 /**批量修改
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/updateAll")
+	@ResponseBody
+	public Object updateAll() throws Exception{
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限
+		PageData pd = new PageData();		
+		Map<String,Object> map = new HashMap<String,Object>();
+		pd = this.getPageData();
+		Object DATA_ROWS = pd.get("DATA_ROWS");
+		String json = DATA_ROWS.toString();  
+        JSONArray array = JSONArray.fromObject(json);  
+        List<JqGridModel>  dtoList=new ArrayList<JqGridModel>();  
+
+        for (int i = 0; i < array.size(); i++) {  
+            JSONObject jsonObject = array.getJSONObject(i);  
+            JqGridModel item = (JqGridModel) JSONObject.toBean(jsonObject, JqGridModel.class);
+            if(item != null){
+                dtoList.add(item);  
+            }
+        }  
+
+		if(null != dtoList && dtoList.size() > 0){
+			jqGridExtendService.updateAll(dtoList);
+			pd.put("msg", "ok");
+		}else{
+			pd.put("msg", "no");
+		}
+		List<PageData> pdList = new ArrayList<PageData>();
 		pdList.add(pd);
 		map.put("list", pdList);
 		return AppUtil.returnObject(pd, map);

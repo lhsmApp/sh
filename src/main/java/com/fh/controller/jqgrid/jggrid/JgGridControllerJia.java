@@ -15,19 +15,26 @@ import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fh.controller.base.BaseController;
 import com.fh.entity.CommonBase;
+import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
 import com.fh.entity.PageResult;
+import com.fh.entity.RequestBase;
 import com.fh.service.jqgrid.jggrid.JgGridManagerJia;
 import com.fh.util.AppUtil;
 import com.fh.util.Jurisdiction;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
+import com.fh.util.SqlTools;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 /**
  * JqGrid测试练习
@@ -80,6 +87,11 @@ public class JgGridControllerJia extends BaseController {
 		if(null != keywords && !"".equals(keywords)){
 			pd.put("keywords", keywords.trim());
 		}
+		String filters = pd.getString("filters");				//多条件过滤条件
+		if(null != filters && !"".equals(filters)){
+			pd.put("filterWhereResult", SqlTools.constructWhere(filters,null));
+		}
+		
 		page.setPd(pd);
 		List<PageData> varList = jqgridServiceJia.list(page);	//列出Betting列表
 		int records = jqgridServiceJia.countJqGrid(pd);
@@ -179,6 +191,36 @@ public class JgGridControllerJia extends BaseController {
 			commonBase.setCode(0);
 		}
 		return commonBase;	
+	}
+	
+	/**批量修改
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/updateAll")
+	/*@RequestBody RequestBase<JqGridModel> jqGridModel*/
+	public @ResponseBody CommonBase updateAll() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"批量删除JgGrid");
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "del")){return null;} //校验权限	
+		CommonBase commonBase = new CommonBase();
+		commonBase.setCode(-1);
+		PageData pd = this.getPageData();
+		String strDataRows = pd.getString("DATA_ROWS");
+        JSONArray array = JSONArray.fromObject(strDataRows);  
+        List<JqGridModel> listData = (List<JqGridModel>) JSONArray.toCollection(array,JqGridModel.class);// 过时方法
+        /*List<JqGridModel>  dtoList=new ArrayList<JqGridModel>();  
+        for (int i = 0; i < array.size(); i++) {  
+            JSONObject jsonObject = array.getJSONObject(i);  
+            JqGridModel item = (JqGridModel) JSONObject.toBean(jsonObject, JqGridModel.class);
+            if(item != null){
+                dtoList.add(item);  
+            }
+        }  */
+		if(null != listData && listData.size() > 0){
+			jqgridServiceJia.updateAll(listData);
+			commonBase.setCode(0);
+		}
+		return commonBase;
 	}
 	
 	 /**导出到excel
