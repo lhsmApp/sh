@@ -49,6 +49,11 @@ public interface JqGridExtendManager{
 	 * @throws Exception
 	 */
 	public List<PageData> list(JqPage page)throws Exception;
+	/**明细
+	 * @param
+	 * @throws Exception
+	 */
+	public List<PageData> getDetailList(PageData pd)throws Exception;
 	
 	/**获取记录数量
 	 * @param pd

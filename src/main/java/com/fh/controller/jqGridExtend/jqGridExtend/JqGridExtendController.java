@@ -145,6 +145,22 @@ public class JqGridExtendController extends BaseController {
 		
 		return result;
 	}
+	/**明细
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/getDetailList")
+	public @ResponseBody PageResult<PageData> getDetailList() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"明细Betting");
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		
+		List<PageData> varList = jqGridExtendService.getDetailList(pd);	//列出Betting列表
+		PageResult<PageData> result = new PageResult<PageData>();
+		result.setRows(varList);
+		
+		return result;
+	}
 	
 	/**去新增页面
 	 * @param

@@ -74,6 +74,15 @@ public class JqGridExtendService implements JqGridExtendManager{
 		return (List<PageData>)dao.findForList("JqGridExtendMapper.datalistJqPage", page);
 	}
 	
+	/**明细
+	 * @param
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PageData> getDetailList(PageData pd)throws Exception{
+		return (List<PageData>)dao.findForList("JqGridExtendMapper.getDetailList", pd);
+	}
+	
 	/**获取记录数量
 	 * @param pd
 	 * @throws Exception

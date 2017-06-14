@@ -40,8 +40,9 @@
 				
 					<div class="row">
 						<div class="col-xs-12">
-						    <table id="jqGrid"></table>
-						    <div id="jqGridPager"></div>
+						    <table id="jqGridBase"></table>
+						    <div id="jqGridBasePager"></div>
+						    <table id="jqGridDetail"></table>
 						</div>
 					</div>
 				</div>
@@ -82,15 +83,19 @@
 		//$.jgrid.defaults.styleUI = 'Bootstrap'; 
 		
 		$(top.hangge());//关闭加载状态
+        var gridBase_selector = "#jqGridBase";  
+        var pagerBase_selector = "#jqGridBasePager";  
+        var gridDetail_selector = "#jqGridDetail";  
 		
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
-			$("#jqGrid").jqGrid( 'setGridWidth', $(".page-content").width());
+			$(gridBase_selector).jqGrid( 'setGridWidth', $(".page-content").width());
+			$(gridDetail_selector).jqGrid( 'setGridWidth', $(".page-content").width());
 			//console.log("ccc"+$("iframe").height());
-			//$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - 138);
+			//$(gridBase_selector).jqGrid( 'setGridHeight', $(window).height() - 138);
 	    })
 		
-		$("#jqGrid").jqGrid({
+		$(gridBase_selector).jqGrid({
 			url: '<%=basePath%>jqGridExtend/getPageList.do',
 			datatype: "json",
 			colModel: [
@@ -121,15 +126,15 @@
 			],
 			caption: "jqGrid with inline editing",
 			viewrecords: true, 
-			emptyrecords: 'Nothing to display',
 			rowNum: 30,
 			height: 340, 
             multiselect: true,
             sortable: true,
             sortname: 'CATEGORYNAME',
 			sortorder: 'asc',
+			editurl: '<%=basePath%>jqGridExtend/edit.do?',
 			
-			pager: "#jqGridPager",
+			pager: pagerBase_selector,
 			footerrow: true,
 			userDataOnFooter: true,
 			grouping: true,
@@ -143,6 +148,19 @@
 				groupCollapse: false,
 			},
 			
+			subGrid: true,
+			subGridOptions: {
+				plusicon: "glyphicon-hand-right",
+				minusicon: "glyphicon-hand-down"
+            },
+            subGridRowExpanded: showChildGrid,
+			
+			//onSelectRow : function(id){
+			//	alert(id);
+			//	$(gridDetail_selector).jqGrid('setGridParam',{url:'<%=basePath%>jqGridExtend/getDetailList.do?parentId='+id+''}).trigger("reloadGrid");                 
+			//	//$(gridDetail_selector).jqGrid('setGridParam',{editurl:"servlet/SampleReceiveDetailUpdate?sampleReceiveNo="+id});
+			//}, 
+			
 			loadComplete : function() {
 				var table = this;
 				setTimeout(function(){
@@ -152,30 +170,76 @@
 					enableTooltips(table);
 				}, 0);
 			},
-			editurl: '<%=basePath%>jqGridExtend/edit.do?',
-		});
-		
-		$('#jqGrid').jqGrid('setFrozenColumns');
-		
-		//navButtons
-		$("#jqGrid").navGrid("#jqGridPager", 
-			{
-		        //navbar options
-		        edit: false,
-		        editicon : 'ace-icon fa fa-pencil blue',
-		        add: true,
-		        addicon : 'ace-icon fa fa-plus-circle purple',
-		        del: false,
-		        delicon : 'ace-icon fa fa-trash-o red',
-		        search: true,
-		        searchicon : 'ace-icon fa fa-search orange',
-		        refresh: false,
-		        refreshicon : 'ace-icon fa fa-refresh green',
-		        view: false,
-		        viewicon : 'ace-icon fa fa-search-plus grey',
-	        });
-		
-		 $("#jqGrid").navButtonAdd('#jqGridPager', {
+		}).navGrid(pagerBase_selector, 
+			{//navButtons
+	            //navbar options
+	            edit: false,
+	            editicon : 'ace-icon fa fa-pencil blue',
+	            add: true,
+	            addicon : 'ace-icon fa fa-plus-circle purple',
+	            del: false,
+	            delicon : 'ace-icon fa fa-trash-o red',
+	            search: true,
+	            searchicon : 'ace-icon fa fa-search orange',
+	            refresh: false,
+	            refreshicon : 'ace-icon fa fa-refresh green',
+	            view: false,
+	            viewicon : 'ace-icon fa fa-search-plus grey',
+        });
+
+        // the event handler on expanding parent row receives two parameters
+        // the ID of the grid tow  and the primary key of the row
+        function showChildGrid(parentRowID, parentRowKey) {
+        	alert(parentRowID+"  "+parentRowKey);
+            var childGridID = parentRowID + "_table";
+            var childGridPagerID = parentRowID + "_pager";
+
+            // send the parent row primary key to the server so that we know which grid to show
+            var childGridURL = '<%=basePath%>jqGridExtend/getDetailList.do?parentId='+parentRowKey+'';
+            //childGridURL = childGridURL + "&parentRowID=" + encodeURIComponent(parentRowKey)
+
+            // add a table and pager HTML elements to the parent grid row - we will render the child grid here
+            $('#' + parentRowID).append('<table id=' + childGridID + '></table><div id=' + childGridPagerID + ' class=scroll></div>');
+
+            $("#" + childGridID).jqGrid({
+                url: childGridURL,
+                datatype: "json",
+                colModel: [
+				           {lable: 'ParentID', name: 'ParentID', width: 80},
+				           {lable: 'ID', name: 'ID', width: 80},
+				           {lable: 'Name', name: 'Name'},
+				           {lable: 'Qty', name: 'Qty', width: 100},
+				           {lable: 'SaleDate', name: 'SaleDate', width: 100}
+                ],
+                page: 1,
+                //viewrecords: true,
+                //pager: "#" + childGridPagerID,
+    			
+    			loadComplete : function() {
+    				var table = this;
+    				setTimeout(function(){
+    					styleCheckbox(table);
+    					updateActionIcons(table);
+    					updatePagerIcons(table);
+    					enableTooltips(table);
+    				}, 0);
+    			},
+            });
+        }
+
+		/* 
+		$(gridBase_selector).setGroupHeaders({
+			useColSpanStyle: false, //定义没有分组的列表头上是否增加一个空白的行， false添加空白行，否则此列的表头作为一个整体
+			groupHeaders: [
+			               {startColumnName: 'CATEGORYNAME', numberOfColumns: 2, titleText: '<b>name</b>'},
+			               {startColumnName: 'PRICE', numberOfColumns: 2, titleText: 'num'}
+			               ]
+		    //startColumnName	string	colModel中的name值，页头分组开始的列
+		    //numberOfColumns	integer	页头分组的列数。包含startColumnName配置的列。如果遇到隐藏的列，不包含此列列头，但是还是计算到总数里面
+		    //titleText	string	页头分组显示的内容，可以包含html标签
+		}); */
+		$(gridBase_selector).jqGrid('setFrozenColumns');
+		$(gridBase_selector).navButtonAdd(pagerBase_selector, {
              caption : "",
              buttonicon : "ace-icon fa fa-save green",
              onClickButton : saveRows,
@@ -183,10 +247,29 @@
              title : "",
              cursor : "pointer"
          });
+		 $(gridBase_selector).navButtonAdd(pagerBase_selector, {
+            caption : "",
+            buttonicon : "ace-icon fa fa-trash-o red",
+            onClickButton : deleteRows,
+            position : "last",
+            title : "",
+            cursor : "pointer"
+        });
+		 
+		$(gridDetail_selector).jqGrid({
+            datatype: 'json',
+			colModel: [
+			           {lable: 'ParentID', name: 'ParentID', width: 80},
+			           {lable: 'ID', name: 'ID', width: 80},
+			           {lable: 'Name', name: 'Name'},
+			           {lable: 'Qty', name: 'Qty', width: 100},
+			           {lable: 'SaleDate', name: 'SaleDate', width: 100}
+		        ],
+		});
 
 	    function saveRows(){
 	    	//获得选中行ids的方法
-            var ids = $("#jqGrid").jqGrid("getGridParam", "selarrrow");  
+            var ids = $(gridBase_selector).jqGrid("getGridParam", "selarrrow");  
 	    	
 			if(!(ids!=null&&ids.length>0)){
 				bootbox.dialog({
@@ -202,8 +285,8 @@
     			    	listJson+='[';
     					//遍历访问这个集合  
     					$(ids).each(function (index, id){  
-    			            $("#jqGrid").saveRow(id, false, 'clientArray');
-    			            var rowData = $("#jqGrid").getRowData(id);
+    			            $(gridBase_selector).saveRow(id, false, 'clientArray');
+    			            var rowData = $(gridBase_selector).getRowData(id);
     			            
     			            listJson+='{'
     			            	+'\"ID\":' + rowData.ID +','
@@ -234,19 +317,10 @@
                 });
 			}
 	    }
-	    
-		 $("#jqGrid").navButtonAdd('#jqGridPager', {
-             caption : "",
-             buttonicon : "ace-icon fa fa-trash-o red",
-             onClickButton : deleteRows,
-             position : "last",
-             title : "",
-             cursor : "pointer"
-         });
 
 	    function deleteRows(){
 	    	//获得选中的行ids的方法
-	    	var ids = $("#jqGrid").getGridParam("selarrrow");  
+	    	var ids = $(gridBase_selector).getGridParam("selarrrow");  
 
 			var str = '';
 			//遍历访问这个集合  
@@ -284,7 +358,7 @@
 		}
 
 		function refreshJqGrid(){
-			$("#jqGrid").trigger("reloadGrid");  
+			$(gridBase_selector).trigger("reloadGrid");  
 			$(top.hangge());//关闭加载状态
 		}
 	    

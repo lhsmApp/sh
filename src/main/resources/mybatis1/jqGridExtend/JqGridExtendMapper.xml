@@ -159,6 +159,11 @@
         </where> -->
 	</select>
 	
+	<!-- 明细 -->
+	<select id="getDetailList" parameterType="pd" resultType="pd">
+		select * from tb_jqgrid_detail
+	</select>
+	
 	<!-- 列表(全部) -->
 	<select id="listAll" parameterType="pd" resultType="pd">
 		select
