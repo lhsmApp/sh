@@ -336,8 +336,103 @@
 			}
 		);
 	
+		
+		// 批量编辑
+        $('#jqGrid').navButtonAdd('#jqGridPager',
+        {
+            buttonicon: "ace-icon fa fa-pencil-square-o purple",
+            title: "批量编辑",
+            caption: "",
+            position: "last",
+            onClickButton: batchEdit
+        });
+		
+     	// 批量编辑
+        $('#jqGrid').navButtonAdd('#jqGridPager',
+        {
+            buttonicon: "ace-icon fa fa-undo",
+            title: "取消批量编辑",
+            caption: "",
+            position: "last",
+            onClickButton: batchCancelEdit
+        });
+
+       //批量保存
+       $('#jqGrid').navButtonAdd('#jqGridPager',
+       {
+    	   /* bigger-150 */
+           buttonicon: "ace-icon fa fa-save green",
+           title: "批量保存",
+           caption: "",
+           position: "last",
+           onClickButton: batchSave
+       });
 	});
 
+	//批量编辑
+	function batchEdit(e) {
+		var grid = $("#jqGrid");
+        var ids = grid.jqGrid('getDataIDs');
+        for (var i = 0; i < ids.length; i++) {
+            grid.jqGrid('editRow',ids[i]);
+        }
+    }
+	
+	//取消批量编辑
+	function batchCancelEdit(e) {
+		var grid = $("#jqGrid");
+        var ids = grid.jqGrid('getDataIDs');
+        for (var i = 0; i < ids.length; i++) {
+            grid.jqGrid('restoreRow',ids[i]);
+        }
+    }
+	
+	//批量保存
+	function batchSave(e) {
+		var listData =new Array();
+		var ids = $("#jqGrid").jqGrid('getDataIDs');
+		console.log(ids);
+		//遍历访问这个集合  
+		var rowData;
+		$(ids).each(function (index, id){  
+            $("#jqGrid").saveRow(id, false, 'clientArray');
+             rowData = $("#jqGrid").getRowData(id);
+            listData.push(rowData);
+		});
+		top.jzts();
+		$.ajax({
+			type: "POST",
+			url: '<%=basePath%>jqgridJia/updateAll.do?',
+	    	//data: rowData,//可以单独传入一个对象，后台可以直接通过对应模型接受参数。但是传入Array（listData）就不好用了，所以传list方式需将List转为Json字符窜。
+			//data: '{"rows":listData}',
+			data:{DATA_ROWS:JSON.stringify(listData)},
+	    	dataType:'json',
+			cache: false,
+			success: function(response){
+				if(response.code==0){
+					$("#jqGrid").trigger("reloadGrid");  
+					$(top.hangge());//关闭加载状态
+					$("#subTitle").tips({
+						side:3,
+			            msg:'保存成功',
+			            bg:'#009933',
+			            time:3
+			        });
+				}else{
+					$(top.hangge());//关闭加载状态
+					$("#subTitle").tips({
+						side:3,
+			            msg:'保存失败,'+response.responseJSON.message,
+			            bg:'#cc0033',
+			            time:3
+			        });
+				}
+			},
+	    	error: function(e) {
+				$(top.hangge());//关闭加载状态
+	    	}
+		});
+    }
  	</script>
 </body>
 </html>

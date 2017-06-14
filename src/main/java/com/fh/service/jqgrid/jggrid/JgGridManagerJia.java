@@ -2,6 +2,7 @@ package com.fh.service.jqgrid.jggrid;
 
 import java.util.List;
 
+import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
 import com.fh.util.PageData;
 
@@ -61,5 +62,10 @@ public interface JgGridManagerJia{
 	 */
 	public void deleteAll(String[] ArrayDATA_IDS)throws Exception;
 	
+	/**批量修改
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void updateAll(List<JqGridModel> pd)throws Exception;
 }
 
