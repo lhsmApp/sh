@@ -113,8 +113,48 @@
 							formatter:'actions', 
 							formatoptions:{ 
 								keys:true,
+		                        onSuccess: function(response) {
+									
+		                        	//var jsonResponse = $.parseJSON(response.responseText);
+									//console.log(response.responseJSON);
+									if(response.responseJSON.code==0){
+										return [true];
+									}else{
+										return [false, response.responseJSON.message];
+									}
+									
+		                            /* if (jsonResponse.State != 'Success') {
+		                                return [false, jsonResponse.ResponseMessage];
+		                            } else {
+		                                return [true];
+		                            }  */                    
+		                        },
+		                        onError :function(rowid, res, stat, err) {
+		                        	if(err!=null)
+		                        		console.log(err);
+		                        },
+		                        
+		                        afterSave:function(rowid, res){
+		                        	//console.log("afterSave");
+		                        	$(gridBase_selector).trigger("reloadGrid");
+		                        },
+		                        
+								//delbutton: false,//disable delete button
+								delOptions:{
+									recreateForm: true, 
+									beforeShowForm:beforeDeleteCallback,
+									afterSubmit: function(response, postData) {
+										if(response.responseJSON.code==0){
+											console.log("sss");
+											return [true];
+										}else{
+											console.log("rsdf");
+											return [false, response.responseJSON.message];
+										}
+		                            },
+								}
 							},
-							frozen: true
+							frozen: true,
 						},
 						{ name: 'ID', hidden: true, key: true, frozen: true},
 						{ label: 'Category Name', name: 'CATEGORYNAME', width: 75, frozen: true,
@@ -140,6 +180,7 @@
 						    searchrules: {interger: true}
 						}
 			],
+			reloadAfterSubmit: true, 
 			//caption: "jqGrid with inline editing",
 			viewrecords: true, 
 			rowNum: 10,
@@ -205,7 +246,35 @@
 	            refreshicon : 'ace-icon fa fa-refresh green',
 	            view: false,
 	            viewicon : 'ace-icon fa fa-search-plus grey',
-        },{},{},{},
+        },
+        {
+			//edit record form
+			//closeAfterEdit: true,
+			recreateForm: true,
+			beforeShowForm :beforeEditOrAddCallback
+        },
+        {
+			//new record form
+			//width: 700,
+			closeAfterAdd: true,
+			recreateForm: true,
+			viewPagerButtons: false,
+			//reloadAfterSubmit: true,
+			beforeShowForm : beforeEditOrAddCallback,
+		    onclickSubmit: function(params, posdata) {
+				console.log("onclickSubmit");
+                //console.log(posdata	);
+            } , 
+            afterSubmit: fn_addSubmit
+        },
+        {
+			//delete record form
+			recreateForm: true,
+			beforeShowForm : beforeDeleteCallback,
+			onClick : function(e) {
+				
+			}
+        },
         {
         	multipleSearch:true, 
         	multipleGroup:true,
@@ -235,7 +304,7 @@
 				           {lable: 'Name', name: 'Name', width: 200},
 				           {lable: 'Qty', name: 'Qty', width: 200, sorttype: 'integer'},
 				           {lable: 'SaleDate', name: 'SaleDate', width: 150, 
-				        	   formatter: 'date', formatoptions: {srcformat:'Y-m-d',newformat:'Y-m-d'}, unformat:unFormateUpdateDate
+				        	   formatter: getLocalTime, unformat:unFormateUpdateDate
 				           }
                 ],
                 page: 1,
@@ -257,7 +326,23 @@
     				}, 0);
     			},
             });
+        };
+        
+        function getLocalTime(value, row, index) {
+            var a = new Date(value);
+            return formatDate(a);
         }
+    //时间格式
+    function formatDate(now) {
+        var year = now.getFullYear();
+        var month = now.getMonth() + 1;
+        var date = now.getDate();
+        var hour = now.getHours();
+        var minute = now.getMinutes();
+        var second = now.getSeconds();
+        return year + "-" + month + "-" + date;
+        
+    }
 
 		/* 
 		$(gridBase_selector).setGroupHeaders({
@@ -313,33 +398,41 @@
                 var msg = '确定要保存选中的数据吗?';
                 bootbox.confirm(msg, function(result) {
     				if(result) {
-    			    	var listJson = "";
-    			    	listJson+='[';
+    					var listData =new Array();
+    					
     					//遍历访问这个集合  
     					$(ids).each(function (index, id){  
     			            $(gridBase_selector).saveRow(id, false, 'clientArray');
     			            var rowData = $(gridBase_selector).getRowData(id);
-    			            
-    			            listJson+='{'
-    			            	+'\"ID\":' + rowData.ID +','
-    			            	+'\"CATEGORYNAME\":\"' + rowData.CATEGORYNAME +'\",'
-    			            	+'\"PRODUCTNAME\":\"' + rowData.PRODUCTNAME +'\",'
-    			            	+'\"COUNTRY\":\"' + rowData.COUNTRY +'\",'
-    			            	+'\"PRICE\":' + rowData.PRICE +','
-    			            	+'\"QUANTITY\":' + rowData.QUANTITY +''
-    			            	+'},';
+    			            listData.push(rowData);
     					});
-    			    	listJson+=']';
     					
     					top.jzts();
     					$.ajax({
     						type: "POST",
     						url: '<%=basePath%>jqGridExtend/updateAll.do?',
-    				    	data: {DATA_ROWS:listJson},
+    				    	data: {DATA_ROWS:JSON.stringify(listData)},
     						dataType:'json',
     						cache: false,
-    						success: function(data){
-    							refreshJqGrid();
+    						success: function(response){
+    							if(response.code==0){
+    								$(gridBase_selector).trigger("reloadGrid");  
+    								$(top.hangge());//关闭加载状态
+    								$("#subTitle").tips({
+    									side:3,
+    						            msg:'保存成功',
+    						            bg:'#009933',
+    						            time:3
+    						        });
+    							}else{
+    								$(top.hangge());//关闭加载状态
+    								$("#subTitle").tips({
+    									side:3,
+    						            msg:'保存失败,'+response.responseJSON.message,
+    						            bg:'#cc0033',
+    						            time:3
+    						        });
+    							}
     						},
     				    	error: function(e) {
     							$(top.hangge());//关闭加载状态
