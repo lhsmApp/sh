@@ -133,11 +133,9 @@
 					)
 			</if>
 		</where>
-		<if test="sidx != null and sidx != ''" >           
-              order by #{sidx}
-        </if>
+		order by CATEGORYNAME
 		<if test="sord != null and sord != ''" >           
-              #{sord}
+              ${pd.sord}
         </if>
 		<if test="currentResult != null and rowNum != null" >           
               limit #{currentResult}, #{rowNum} 
