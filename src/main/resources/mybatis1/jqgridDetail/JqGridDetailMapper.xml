@@ -1,38 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="JgGridMapper">
+<mapper namespace="JqGridDetailMapper">
 	
 	<!--表名 -->
 	<sql id="tableName">
-		TB_JQGRID
+		TB_JQGRID_DETAIL
 	</sql>
 	
 	<!-- 字段 -->
 	<sql id="Field">
-		CATEGORYNAME,	
-		PRODUCTNAME,	
-		COUNTRY,	
-		PRICE,	
-		QUANTITY,	
-		ID
-	</sql>
-	
-	<!-- 字段 -->
-	<sql id="insertField">
-		CATEGORYNAME,	
-		PRODUCTNAME,	
-		COUNTRY,	
-		PRICE,	
-		QUANTITY
+		ID,	
+		PARENTID,	
+		NAME,	
+		QTY,	
+		SALEDATE
 	</sql>
 	
 	<!-- 字段值 -->
 	<sql id="FieldValue">
-		#{CATEGORYNAME},	
-		#{PRODUCTNAME},	
-		#{COUNTRY},	
-		#{PRICE},	
-		#{QUANTITY}
+		#{ID},	
+		#{PARENTID},	
+		#{NAME},	
+		#{QTY},	
+		#{SALEDATE}
 	</sql>
 	
 	<!-- 新增-->
@@ -40,7 +30,7 @@
 		insert into 
 	<include refid="tableName"></include>
 		(
-	<include refid="insertField"></include>
+	<include refid="Field"></include>
 		) values (
 	<include refid="FieldValue"></include>
 		)
@@ -59,11 +49,11 @@
 		update
 		<include refid="tableName"></include>
 		set 
-			CATEGORYNAME = #{CATEGORYNAME},
-			PRODUCTNAME = #{PRODUCTNAME},
-			COUNTRY = #{COUNTRY},
-			PRICE = #{PRICE},
-			QUANTITY = #{QUANTITY}
+			ID = #{ID},
+			PARENTID = #{PARENTID},
+			NAME = #{NAME},
+			QTY = #{QTY},
+			SALEDATE = #{SALEDATE}
 		where 
 		ID = #{ID}
 	</update>
@@ -84,20 +74,17 @@
 		<include refid="Field"></include>
 		from 
 		<include refid="tableName"></include>
-		<where>
-			<if test="pd._search != 'false'"><!-- 关键词检索 -->
-				and
-					(
-					#{pd.searchField} #{pd.searchOper} #{pd.searchString}
-					<!--	根据需求自己加检索条件
-						字段1 LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
-						 or 
-						字段2 LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') 
-					-->
-					)
-			</if>
-		</where>
-		
+		where 1=1
+		<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
+			and
+				(
+				<!--	根据需求自己加检索条件
+					字段1 LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+					 or 
+					字段2 LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') 
+				-->
+				)
+		</if>
 	</select>
 	
 	<!-- Jq分页列表 -->
@@ -107,40 +94,23 @@
 		from 
 		<include refid="tableName"></include>
 		<where>
-			<if test="pd._search != 'false'"><!-- 关键词检索 -->
-				<if test="pd.searchOper == 'cn'">
+			PARENTID = #{pd.ParentId}
+			<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
 				and
 					(
-					${pd.searchField} LIKE CONCAT(CONCAT('%', #{pd.searchString}),'%')
+					
+					<!--	根据需求自己加检索条件
+						字段1 LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+						 or 
+						字段2 LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') 
+					-->
 					)
-					</if>
-				<if test="pd.searchOper == 'eq'">
-				and
-					(
-					${pd.searchField} = #{pd.searchString}
-					)
-				</if>	
-				<if test="pd.searchOper == 'ne'">
-				and
-					(
-					${pd.searchField} != #{pd.searchString}
-					)
-				</if>	
 			</if>
 		</where>
-		order by CATEGORYNAME ${pd.sord} 
+				
 		<if test="currentResult != null and rowNum != null" >           
               limit #{currentResult}, #{rowNum} 
         </if>
-	</select>
-	
-	<select id="countJqGrid" parameterType="pd" resultType="int">
-		select count(*) from <include refid="tableName"></include> 
-		<!-- <where>
-			<if test="menuId != null and '' != menuId" >           
-	          AND   menuId = #{menuId}
-	        </if>
-        </where> -->
 	</select>
 	
 	<!-- 列表(全部) -->
@@ -161,6 +131,10 @@
                  #{item}
 		</foreach>
 	</delete>
+	
+	
+	
+	
 	
 	<!-- fh313596790qq(青苔) -->
 </mapper>

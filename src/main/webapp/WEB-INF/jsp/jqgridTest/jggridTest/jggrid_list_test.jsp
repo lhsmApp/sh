@@ -4,23 +4,22 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%
 	String path = request.getContextPath();
-	String basePath = request.getScheme() + "://"
-			+ request.getServerName() + ":" + request.getServerPort()
+	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
 			+ path + "/";
 %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<base href="<%=basePath%>">
-	<!-- 下拉框 -->
-	<link rel="stylesheet" href="static/ace/css/chosen.css" />
-	<!-- jsp文件头和头部 ，其中包含旧版本（Ace）Jqgrid Css-->
-	<%@ include file="../../system/index/topWithJqgrid.jsp"%>
-	<!-- 日期框 -->
-	<link rel="stylesheet" href="static/ace/css/datepicker.css" />
-	
-	<!-- 最新版的Jqgrid Css，如果旧版本（Ace）某些方法不好用，尝试用此版本Css，替换旧版本Css -->
-	<!-- <link rel="stylesheet" type="text/css" media="screen" href="static/ace/css/ui.jqgrid-bootstrap.css" /> -->
+<base href="<%=basePath%>">
+<!-- 下拉框 -->
+<link rel="stylesheet" href="static/ace/css/chosen.css" />
+<!-- jsp文件头和头部 ，其中包含旧版本（Ace）Jqgrid Css-->
+<%@ include file="../../system/index/topWithJqgrid.jsp"%>
+<!-- 日期框 -->
+<link rel="stylesheet" href="static/ace/css/datepicker.css" />
+
+<!-- 最新版的Jqgrid Css，如果旧版本（Ace）某些方法不好用，尝试用此版本Css，替换旧版本Css -->
+<!-- <link rel="stylesheet" type="text/css" media="screen" href="static/ace/css/ui.jqgrid-bootstrap.css" /> -->
 </head>
 <body class="no-skin">
 	<div class="main-container" id="main-container">
@@ -30,14 +29,13 @@
 					<!-- /section:settings.box -->
 					<div class="page-header">
 						<h1>
-							东部管道
-							<small>
-								<i class="ace-icon fa fa-angle-double-right"></i>
+							东部管道 <small> <i class="ace-icon fa fa-angle-double-right"></i>
 								成本核算
 							</small>
 						</h1>
-					</div><!-- /.page-header -->
-				
+					</div>
+					<!-- /.page-header -->
+
 					<div class="row">
 						<div class="col-xs-12">
 							<!-- PAGE CONTENT BEGINS -->
@@ -48,35 +46,32 @@
 									<i class="fa fa-external-link bigger-110"></i>
 								</a>
 							</div> -->
-						
-						    <table id="jqGrid"></table>
-						    <div id="jqGridPager"></div>
+
+							<table id="jqGrid"></table>
+							<div id="jqGridPager"></div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-	
-		<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
-			<i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
-		</a>
-		
-		<br /><br />
 
-    <input class="btn btn-default" type="button" value="Get Selected Rows" onclick="getSelectedRows()" />   
-    <br /><br /> 
-		
+		<a href="#" id="btn-scroll-up"
+			class="btn-scroll-up btn btn-sm btn-inverse"> <i
+			class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
+		</a> <br /> <br /> <input class="btn btn-default" type="button"
+			value="Get Selected Rows" onclick="getSelectedRows()" /> <br /> <br />
+
 	</div>
-	
-	
+
+
 	<!-- basic scripts -->
 	<!-- 页面底部js¨ -->
 	<%@ include file="../../system/index/foot.jsp"%>
-	
+
 	<!-- 最新版的Jqgrid Js，如果旧版本（Ace）某些方法不好用，尝试用此版本Js，替换旧版本JS -->
 	<!-- <script src="static/ace/js/jquery.jqGrid.min.js" type="text/javascript"></script>
 	<script src="static/ace/js/grid.locale-cn.js" type="text/javascript"></script> -->
-	
+
 	<!-- 旧版本（Ace）Jqgrid Js -->
 	<script src="static/ace/js/jqGrid/jquery.jqGrid.src.js"></script>
 	<script src="static/ace/js/jqGrid/i18n/grid.locale-cn.js"></script>
@@ -90,7 +85,7 @@
 	<script src="static/ace/js/date-time/bootstrap-datepicker.js"></script>
 	<!--提示框-->
 	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
-		
+
 	<script type="text/javascript"> 
 	$(document).ready(function () {
 		/* $.jgrid.defaults.width = 780;*/
@@ -104,8 +99,34 @@
 			//console.log("ccc"+$("iframe").height());
 			//$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - 138);
 	    })
+	    
 		
-		$("#jqGrid").jqGrid({
+		$("#jqGrid").jqGrid({	
+			//subgrid options
+			subGrid : true,
+			//subGridModel: [{ name : ['No','Item Name','Qty'], width : [55,200,80] }],
+			//datatype: "xml",
+			subGridOptions : {
+				plusicon : "ace-icon fa fa-plus center bigger-110 blue",
+				minusicon  : "ace-icon fa fa-minus center bigger-110 blue",
+				openicon : "ace-icon fa fa-chevron-right center orange"
+			},
+			//for this example we are using local data
+			subGridRowExpanded: function (subgridDivId, rowId) {
+				var subgridTableId = subgridDivId + "_t";
+				$("#" + subgridDivId).html("<table id='" + subgridTableId + "'></table>");
+				$("#" + subgridTableId).jqGrid({
+					datatype: 'json',
+					url: '<%=basePath%>jqgriddetail/detailList.do?ParentId='+rowId,
+					colNames: ['Name','Qty','SaleDate'],
+					colModel: [
+						{ name: 'NAME', width: 50 },
+						{ name: 'QTY', width: 150 },
+						{ name: 'SALEDATE', width: 50 }
+					]
+				});
+			},
+		
 			<%-- url: '<%=basePath%>static/data/data.json', --%>
 			url: '<%=basePath%>jqgrid/getPageList.do',
 			editurl: '<%=basePath%>jqgrid/edit.do',
@@ -155,11 +176,7 @@
 			rowNum: 30,
 			//loadonce: true, // this is just for the demo
 			height: 340, 
-			
 
-			
-				
-			
             //shrinkToFit: false, // must be set with frozen columns, otherwise columns will be shrank to fit the grid width
 				/* rowList : [20,30,50],
                 rownumbers: true, 
@@ -196,8 +213,24 @@
 		//导航栏添加，编辑，删除等
 		$('#jqGrid').navGrid('#jqGridPager',
                 // the buttons to appear on the toolbar of the grid
-                { edit: true, add: true, del: true, search: true, refresh: true, view: false, position: "left", cloneToTop: false },
-                // options for the Edit Dialog
+			{ 	//navbar options
+				edit: false,
+				editicon : 'ace-icon fa fa-pencil blue',
+				add: true,
+				addicon : 'ace-icon fa fa-plus-circle purple',
+				del: true,
+				delicon : 'ace-icon fa fa-trash-o red',
+				search: true,
+				searchicon : 'ace-icon fa fa-search orange',
+				refresh: true,
+				refreshicon : 'ace-icon fa fa-refresh green',
+				view: false,
+				viewicon : 'ace-icon fa fa-search-plus grey',
+			},              
+			
+			
+			
+			// options for the Edit Dialog
                 {
                     editCaption: "The Edit Dialog",
                     recreateForm: true,

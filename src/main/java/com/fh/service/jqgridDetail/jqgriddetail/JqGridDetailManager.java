@@ -1,4 +1,4 @@
-package com.fh.service.jqgrid.jggrid;
+package com.fh.service.jqgridDetail.jqgriddetail;
 
 import java.util.List;
 
@@ -7,12 +7,12 @@ import com.fh.entity.Page;
 import com.fh.util.PageData;
 
 /** 
- * 说明： jqtest接口
+ * 说明： jqgrid详情接口
  * 创建人：FH Q313596790
- * 创建时间：2017-06-08
+ * 创建时间：2017-06-14
  * @version
  */
-public interface JgGridManager{
+public interface JqGridDetailManager{
 
 	/**新增
 	 * @param pd
@@ -50,18 +50,11 @@ public interface JgGridManager{
 	 */
 	public PageData findById(PageData pd)throws Exception;
 	
-	/**获取记录数量
-	 * @param pd
-	 * @throws Exception
-	 */
-	public int countJqGrid(PageData pd)throws Exception;
-	
 	/**批量删除
 	 * @param ArrayDATA_IDS
 	 * @throws Exception
 	 */
 	public void deleteAll(String[] ArrayDATA_IDS)throws Exception;
-	
 	
 	
 	

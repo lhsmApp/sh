@@ -25,9 +25,11 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.fh.controller.base.BaseController;
 import com.fh.entity.JqPage;
+import com.fh.entity.Page;
 import com.fh.entity.PageResult;
 import com.fh.entity.jqGrid;
 import com.fh.service.jqgrid.jggrid.JgGridManager;
+import com.fh.service.jqgridDetail.jqgriddetail.impl.JqGridDetailService;
 import com.fh.util.AppUtil;
 import com.fh.util.Jurisdiction;
 import com.fh.util.ObjectExcelView;
@@ -177,6 +179,12 @@ public class JgGridController extends BaseController {
 		PageData userdata = new PageData();
 		userdata.put("PRICE", "2000");
 		result.setUserdata(userdata);
+		//搜索
+		String search = pd.getString("_search");
+		String searchField = pd.getString("searchField");
+		String searchString = pd.getString("searchString");
+		String searchOper = pd.getString("searchOper");
+		
 		
 		result.setRows(varList);
 		result.setRecords(records);
@@ -292,6 +300,27 @@ public class JgGridController extends BaseController {
 		DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		binder.registerCustomEditor(Date.class, new CustomDateEditor(format,true));
 	}
+	
+	
+//	@RequestMapping(value="/detailList")
+//	public Object getDetailList(Page page) throws Exception{
+//		PageData pd = new PageData();
+//		Map<String,Object> map = new HashMap<String,Object>();
+//		pd = this.getPageData();
+//		page.setPd(pd);
+//		List<PageData> pdList = new ArrayList<PageData>();
+//		String ParentId = pd.getString("ParentId");
+//		if (null != ParentId && !"".equals(ParentId)) {
+//			List<PageData> varList = jqgridService.detailList(page);
+//			return varList;
+//		}
+//		pdList.add(pd);
+//		map.put("list", pdList);
+//		return AppUtil.returnObject(pd, map);
+//	}
+//	
+	
+	
 	
 	/**列表(练习）
 	 * @param page
