@@ -6,7 +6,6 @@ import java.util.Map;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion.Static;
 
 /**
  * JqGrid multipleSearch后台根据Request的Filters字段自动组装Where条件
