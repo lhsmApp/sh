@@ -122,21 +122,17 @@
 		from 
 		<include refid="tableName"></include>
 		<where>
-			<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
-				and
-					(
-					<!--	根据需求自己加检索条件
-						字段1 LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
-						 or 
-						字段2 LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') 
-					-->
-					)
+			<if test="pd.search!= null and pd.search != ''"><!-- 关键词检索 -->
+				and #{pd.search}
 			</if>
 		</where>
-		order by CATEGORYNAME
+		<if test="sidx != null" >
+			order by ${sidx} ${sord} 
+    	</if>
+		<!-- order by CATEGORYNAME
 		<if test="sord != null and sord != ''" >           
               ${pd.sord}
-        </if>
+        </if> -->
 		<if test="currentResult != null and rowNum != null" >           
               limit #{currentResult}, #{rowNum} 
         </if>
@@ -161,7 +157,7 @@
 	
 	<!-- 明细 -->
 	<select id="getDetailList" parameterType="pd" resultType="pd">
-		select * from tb_jqgrid_detail
+		select * from tb_jqgrid_detail where PARENTID = #{PARENTID}
 	</select>
 	
 	<!-- 列表(全部) -->

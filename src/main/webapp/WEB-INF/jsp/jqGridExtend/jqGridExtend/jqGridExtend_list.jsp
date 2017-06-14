@@ -21,6 +21,13 @@
 	
 	<!-- 最新版的Jqgrid Css，如果旧版本（Ace）某些方法不好用，尝试用此版本Css，替换旧版本Css -->
 	<!-- <link rel="stylesheet" type="text/css" media="screen" href="static/ace/css/ui.jqgrid-bootstrap.css" /> -->
+    <style>
+		.page-header{
+			padding-top: 9px;
+			padding-bottom: 9px;
+			margin: 0 0 8px;
+		}
+	</style>
 </head>
 <body class="no-skin">
 	<div class="main-container" id="main-container">
@@ -42,7 +49,7 @@
 						<div class="col-xs-12">
 						    <table id="jqGridBase"></table>
 						    <div id="jqGridBasePager"></div>
-						    <table id="jqGridDetail"></table>
+						    <!-- <table id="jqGridDetail"></table> -->
 						</div>
 					</div>
 				</div>
@@ -76,6 +83,8 @@
 	<script src="static/ace/js/date-time/bootstrap-datepicker.js"></script>
 	<!--提示框-->
 	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
+	<!-- JqGrid统一样式统一操作 -->
+	<script type="text/javascript" src="static/js/common/jqgrid_style.js"></script>
 		
 	<script type="text/javascript"> 
 	$(document).ready(function () {
@@ -85,12 +94,13 @@
 		$(top.hangge());//关闭加载状态
         var gridBase_selector = "#jqGridBase";  
         var pagerBase_selector = "#jqGridBasePager";  
-        var gridDetail_selector = "#jqGridDetail";  
+        //var gridDetail_selector = "#jqGridDetail";  
 		
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
 			$(gridBase_selector).jqGrid( 'setGridWidth', $(".page-content").width());
-			$(gridDetail_selector).jqGrid( 'setGridWidth', $(".page-content").width());
+			$(gridBase_selector).jqGrid( 'setGridHeight', $(window).height() - 200);
+			//$(gridDetail_selector).jqGrid( 'setGridWidth', $(".page-content").width());
 			//console.log("ccc"+$("iframe").height());
 			//$(gridBase_selector).jqGrid( 'setGridHeight', $(window).height() - 138);
 	    })
@@ -114,24 +124,32 @@
 							editable: true, edittype:'textarea', editoptions:{maxlength:'100'} //, rows:'2', cols:'20'
 						},
 						{ label: 'Country', name: 'COUNTRY', width: 100,
-							editable: true, edittype:'select', editoptions:{value:'USA:USA;UK:UK;CHI:CHINA'} 
+							//选择
+							editable: true, edittype:'select', editoptions:{value:'USA:USA;UK:UK;CHI:CHINA'},
+						    //翻译
+						    formatter: 'select', formatoptions: {value: 'USA:USA;UK:UK;CHI:CHINA'},
+							stype: 'select', searchoptions: {value: ':[All];USA:USA;UK:UK;CHI:CHINA'}
 						},
-						{ label: 'Price', name: 'PRICE', width: 80, sorttype: 'integer', align: 'right', summaryType:'sum', summaryTpl:'<b>{0}</b>',
-							editable: true, edittype:'text', editoptions:{maxlength:'10', number: true} 
+						{ label: 'Price', name: 'PRICE', width: 80, sorttype: 'number', align: 'right', summaryType:'sum', summaryTpl:'<b>sum:{0}</b>',
+							editable: true, edittype:'text', editoptions:{maxlength:'10', number: true},
+						    searchrules: {number: true}
 						},
 						// sorttype is used only if the data is loaded locally or loadonce is set to true
-						{ label: 'Quantity', name: 'QUANTITY', width: 80, sorttype: 'number',
-							editable: true, edittype:'text', editoptions:{maxlength:'11', integer: true} 
+						{ label: 'Quantity', name: 'QUANTITY', width: 80, sorttype: 'integer',
+							editable: true, edittype:'text', editoptions:{maxlength:'11', integer: true},
+						    searchrules: {interger: true}
 						}
 			],
-			caption: "jqGrid with inline editing",
+			//caption: "jqGrid with inline editing",
 			viewrecords: true, 
-			rowNum: 30,
-			height: 340, 
+			rowNum: 10,
+			//height: 340, 
             multiselect: true,
+            multiboxonly: true,
             sortable: true,
             sortname: 'CATEGORYNAME',
 			sortorder: 'asc',
+			altRows: true, //斑马条纹
 			editurl: '<%=basePath%>jqGridExtend/edit.do?',
 			
 			pager: pagerBase_selector,
@@ -144,8 +162,10 @@
 				groupColumnShow: [true],
 				groupText: ['<b>{0}</b>'],
 				groupSummary: [true],
-				groupSummaryPos: ['header'],
+				groupSummaryPos: ['footer'], //header
 				groupCollapse: false,
+                plusicon : 'fa fa-chevron-down bigger-110',
+				minusicon : 'fa fa-chevron-up bigger-110'
 			},
 			
 			subGrid: true,
@@ -157,7 +177,7 @@
 			
 			//onSelectRow : function(id){
 			//	alert(id);
-			//	$(gridDetail_selector).jqGrid('setGridParam',{url:'<%=basePath%>jqGridExtend/getDetailList.do?parentId='+id+''}).trigger("reloadGrid");                 
+			//	$(gridDetail_selector).jqGrid('setGridParam',{url:'<%=basePath%>jqGridExtend/getDetailList.do?PARENTID='+id+''}).trigger("reloadGrid");                 
 			//	//$(gridDetail_selector).jqGrid('setGridParam',{editurl:"servlet/SampleReceiveDetailUpdate?sampleReceiveNo="+id});
 			//}, 
 			
@@ -185,17 +205,22 @@
 	            refreshicon : 'ace-icon fa fa-refresh green',
 	            view: false,
 	            viewicon : 'ace-icon fa fa-search-plus grey',
-        });
+        },{},{},{},
+        {
+        	multipleSearch:true, 
+        	multipleGroup:true,
+        	showQuery: true
+        },
+        {},{});
 
         // the event handler on expanding parent row receives two parameters
         // the ID of the grid tow  and the primary key of the row
         function showChildGrid(parentRowID, parentRowKey) {
-        	alert(parentRowID+"  "+parentRowKey);
             var childGridID = parentRowID + "_table";
             var childGridPagerID = parentRowID + "_pager";
 
             // send the parent row primary key to the server so that we know which grid to show
-            var childGridURL = '<%=basePath%>jqGridExtend/getDetailList.do?parentId='+parentRowKey+'';
+            var childGridURL = '<%=basePath%>jqGridExtend/getDetailList.do?PARENTID='+parentRowKey+'';
             //childGridURL = childGridURL + "&parentRowID=" + encodeURIComponent(parentRowKey)
 
             // add a table and pager HTML elements to the parent grid row - we will render the child grid here
@@ -205,15 +230,21 @@
                 url: childGridURL,
                 datatype: "json",
                 colModel: [
-				           {lable: 'ParentID', name: 'ParentID', width: 80},
-				           {lable: 'ID', name: 'ID', width: 80},
-				           {lable: 'Name', name: 'Name'},
-				           {lable: 'Qty', name: 'Qty', width: 100},
-				           {lable: 'SaleDate', name: 'SaleDate', width: 100}
+				           {lable: 'ParentID', name: 'ParentID', width: 80, hidden: true},
+				           {lable: 'ID', name: 'ID', width: 80, hidden: true, key: true},
+				           {lable: 'Name', name: 'Name', width: 200},
+				           {lable: 'Qty', name: 'Qty', width: 200, sorttype: 'integer'},
+				           {lable: 'SaleDate', name: 'SaleDate', width: 150, 
+				        	   formatter: 'date', formatoptions: {srcformat:'Y-m-d',newformat:'Y-m-d'}, unformat:unFormateUpdateDate
+				           }
                 ],
                 page: 1,
-                //viewrecords: true,
-                //pager: "#" + childGridPagerID,
+                rowNum: 10,	
+                scrollPopUp:true,
+				scrollLeftOffset: "83%",
+                scroll: 1, 
+                viewrecords: true,
+                pager: "#" + childGridPagerID,
     			
     			loadComplete : function() {
     				var table = this;
@@ -222,6 +253,7 @@
     					updateActionIcons(table);
     					updatePagerIcons(table);
     					enableTooltips(table);
+    					//$("#" + childGridID).jqGrid( 'setGridWidth', $(".page-content").width() - 100);
     				}, 0);
     			},
             });
@@ -256,7 +288,7 @@
             cursor : "pointer"
         });
 		 
-		$(gridDetail_selector).jqGrid({
+		/* $(gridDetail_selector).jqGrid({
             datatype: 'json',
 			colModel: [
 			           {lable: 'ParentID', name: 'ParentID', width: 80},
@@ -265,7 +297,7 @@
 			           {lable: 'Qty', name: 'Qty', width: 100},
 			           {lable: 'SaleDate', name: 'SaleDate', width: 100}
 		        ],
-		});
+		}); */
 
 	    function saveRows(){
 	    	//获得选中行ids的方法
@@ -361,67 +393,15 @@
 			$(gridBase_selector).trigger("reloadGrid");  
 			$(top.hangge());//关闭加载状态
 		}
+		
+		//日期反格式化  
+		function unFormateUpdateDate(cellValue, options, rowObject){  
+		    var updateDate = new Date(cellValue);  
+		    return updateDate;  
+		}  
 	    
 		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
 		
-		//it causes some flicker when reloading or navigating grid
-		//it may be possible to have some custom formatter to do this as the grid is being created to prevent this
-		//or go back to default browser checkbox styles for the grid
-		function styleCheckbox(table) {
-		/**
-			$(table).find('input:checkbox').addClass('ace')
-			.wrap('<label />')
-			.after('<span class="lbl align-top" />')
-	
-	
-			$('.ui-jqgrid-labels th[id*="_cb"]:first-child')
-			.find('input.cbox[type=checkbox]').addClass('ace')
-			.wrap('<label />').after('<span class="lbl align-top" />');
-		*/
-		}
-		
-	
-		//unlike navButtons icons, action icons in rows seem to be hard-coded
-		//you can change them like this in here if you want
-		function updateActionIcons(table) {
-			/**
-			var replacement = 
-			{
-				'ui-ace-icon fa fa-pencil' : 'ace-icon fa fa-pencil blue',
-				'ui-ace-icon fa fa-trash-o' : 'ace-icon fa fa-trash-o red',
-				'ui-icon-disk' : 'ace-icon fa fa-check green',
-				'ui-icon-cancel' : 'ace-icon fa fa-times red'
-			};
-			$(table).find('.ui-pg-div span.ui-icon').each(function(){
-				var icon = $(this);
-				var $class = $.trim(icon.attr('class').replace('ui-icon', ''));
-				if($class in replacement) icon.attr('class', 'ui-icon '+replacement[$class]);
-			})
-			*/
-		}
-		
-		//replace icons with FontAwesome icons like above
-		function updatePagerIcons(table) {
-			var replacement = 
-			{
-				'ui-icon-seek-first' : 'ace-icon fa fa-angle-double-left bigger-140',
-				'ui-icon-seek-prev' : 'ace-icon fa fa-angle-left bigger-140',
-				'ui-icon-seek-next' : 'ace-icon fa fa-angle-right bigger-140',
-				'ui-icon-seek-end' : 'ace-icon fa fa-angle-double-right bigger-140'
-			};
-			$('.ui-pg-table:not(.navtable) > tbody > tr > .ui-pg-button > .ui-icon').each(function(){
-				var icon = $(this);
-				var $class = $.trim(icon.attr('class').replace('ui-icon', ''));
-				
-				if($class in replacement) icon.attr('class', 'ui-icon '+replacement[$class]);
-			})
-		}
-	
-		function enableTooltips(table) {
-			$('.navtable .ui-pg-button').tooltip({container:'body'});
-			$(table).find('.ui-pg-div').tooltip({container:'body'});
-		}
-	
 	});
 
  	</script>
