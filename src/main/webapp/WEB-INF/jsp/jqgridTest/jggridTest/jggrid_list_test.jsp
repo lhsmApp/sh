@@ -35,6 +35,26 @@
 						</h1>
 					</div>
 					<!-- /.page-header -->
+					
+					
+					<!-- 检索  -->
+						<table style="margin-top:5px;">
+							<tr>
+								<td>
+									<div class="nav-search">
+										<span class="input-icon">
+											<input type="text" placeholder="这里输入关键词" class="nav-search-input" id="keywords" autocomplete="off" name="keywords" value="${pd.keywords }" placeholder="这里输入关键词"/>
+											<i class="ace-icon fa fa-search nav-search-icon"></i>
+										</span>
+									</div>
+								</td>
+								
+								<td style="vertical-align:top;padding-left:2px"><a class="btn btn-light btn-xs" onclick="tosearch();"  title="检索"><i id="nav-search-icon" class="ace-icon fa fa-search bigger-110 nav-search-icon blue"></i></a></td>
+							</tr>
+						</table>
+						<!-- 检索  -->
+					
+					
 
 					<div class="row">
 						<div class="col-xs-12">
@@ -85,11 +105,31 @@
 	<script src="static/ace/js/date-time/bootstrap-datepicker.js"></script>
 	<!--提示框-->
 	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
+		<script src="static/ace/js/ace/elements.spinner.js"></script>
 
 	<script type="text/javascript"> 
 	$(document).ready(function () {
-		/* $.jgrid.defaults.width = 780;*/
-		//$.jgrid.defaults.styleUI = 'Bootstrap'; 
+		
+		//创建一个input输入框
+		function myelem (value, options) {
+		var el = document.createElement("input");
+		el.type="text";
+		$(el).ace_spinner({value:0,min:0,max:200,step:10, btn_up_class:'btn-info' , btn_down_class:'btn-info'});
+		/* .closest('.ace-spinner')
+		.on('changed.fu.spinbox', function(){
+			//alert($('#spinner1').val())
+			return $(el).val();
+		});  */
+		/* el.value = value;
+		return el; */
+		}
+	/* 	 */
+		//获取值
+		function myvalue(elem) {
+		return $(elem).val();
+		}
+		
+		
 		
 		$(top.hangge());//关闭加载状态
 		
@@ -160,7 +200,7 @@
                     summaryType: "sum", // set the formula to calculate the summary type
                     formatter:'number', editable: true },
 				// sorttype is used only if the data is loaded locally or loadonce is set to true
-				{ label: 'Quantity', name: 'QUANTITY', width: 80, sorttype: 'number',summaryType: 'sum', formatter:'number', editable: true }                   
+				{ label: 'Quantity', name: 'QUANTITY', width: 80, sorttype: 'number',summaryType: 'sum', formatter:'number', editable: true,edittype:'custom', editoptions:{custom_element: myelem, custom_value:myvalue} }                   
 			],
 			caption: "jqGrid with inline editing",
 			
@@ -410,6 +450,17 @@
         }                
     }
 	
+	
+	 function tosearch() {
+			var keywords = $("#keywords").val();
+			$("#jqGrid").jqGrid('setGridParam',{  // 重新加载数据
+				url:'<%=basePath%>jqgrid/getPageList.do?keywords='+keywords,  
+				datatype:'json',
+			      page:1
+			}).trigger("reloadGrid");
+			
+		}  
+	
 	function startEdit() {
         var grid = $("#jqGrid");
         var ids = grid.jqGrid('getDataIDs');
@@ -439,6 +490,14 @@
 		        }
 			 }	
 		}); 
+         
+         
+         
+       /*  //检索
+ 		function tosearch(){
+ 			top.jzts();
+ 			$("#Form").submit();
+ 		}  */
        
         
     }

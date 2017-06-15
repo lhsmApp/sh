@@ -107,6 +107,15 @@
 		from 
 		<include refid="tableName"></include>
 		<where>
+		
+			<if test="pd.keywords != null and pd.keywords!= ''"><!-- 关键词检索 -->
+				and (
+					CATEGORYNAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+					or
+					COUNTRY LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+					)
+			</if>
+		
 			<if test="pd._search != 'false'"><!-- 关键词检索 -->
 				<if test="pd.searchOper == 'cn'">
 				and
