@@ -102,7 +102,9 @@
 	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
 	<!-- JqGrid统一样式统一操作 -->
 	<script type="text/javascript" src="static/js/common/jqgrid_style.js"></script>
-		
+	<script type="text/javascript" src="static/js/util/toolkit.js"></script>
+	<script src="static/ace/js/ace/elements.spinner.js"></script>
+	<script src="static/ace/js/fuelux/fuelux.spinner.js"></script>
 	<script type="text/javascript"> 
 	$(document).ready(function () {
 		/* $.jgrid.defaults.width = 780;*/
@@ -195,7 +197,7 @@
 				{ label: 'Country', name: 'COUNTRY', width: 100,editable: true,edittype:"select",editoptions:{value:"FE:FedEx;IN:InTime;TN:TNT;AR:ARAMEX"}},
 				{ label: 'Price', name: 'PRICE', width: 80, formatter: 'number',sorttype: 'number',summaryTpl: "sum: {0}", summaryType: "sum",editable: true,align:'right'},
 				// sorttype is used only if the data is loaded locally or loadonce is set to true
-				{ label: 'Quantity', name: 'QUANTITY', width: 80, sorttype: 'integer',editable: true,align:'right'  }                   
+				{ label: 'Quantity', name: 'QUANTITY', width: 80, sorttype: 'integer',editable: true,align:'right' ,edittype:'custom', editoptions:{custom_element: myelem, custom_value:myvalue} }                   
 			],
 			reloadAfterSubmit: true, 
 			//caption: "jqGrid with inline editing",
@@ -454,7 +456,7 @@
         var childGridID = parentRowID + "_table";
         var childGridPagerID = parentRowID + "_pager";
      // send the parent row primary key to the server so that we know which grid to show
-        var childGridURL = '<%=basePath%>jqGridExtend/getDetailList.do?parentId='+parentRowKey+'';
+        var childGridURL = '<%=basePath%>jqGridExtend/getDetailList.do?PARENTID='+parentRowKey+'';
         //childGridURL = childGridURL + "&parentRowID=" + encodeURIComponent(parentRowKey)
 
         // add a table and pager HTML elements to the parent grid row - we will render the child grid here
@@ -469,8 +471,7 @@
 			           {lable: 'ID', name: 'ID', width: 80},
 			           {lable: 'Name', name: 'Name'},
 			           {lable: 'Qty', name: 'Qty', width: 100},
-			           {lable: 'SaleDate', name: 'SaleDate', width: 150,sorttype:'date',formatter: 'date',
-			        	   formatoptions: {srcformat:'u',newformat:'Y-m-d'}
+			           {lable: 'SaleDate', name: 'SaleDate', width: 150,sorttype:'date',formatter: formateDate,unformat:unformateDate
 			           }
             ],
             //width: '100%',
@@ -486,7 +487,38 @@
 					enableTooltips(table);
 				}, 0);
 			},
+			gridComplete:function(){
+
+			    $("#" + childGridID).parents(".ui-jqgrid-bdiv").css("overflow-x","hidden");}
         });
+	}
+
+	
+	//日期格式化
+    function formateDate(value, row, index) {
+        var formateNewDate=toolkit.dateFormat(new Date(value),"yyyy-MM-dd")
+        return formateNewDate;
+    }
+    
+  	//日期反格式化  
+	function unformateDate(cellValue, options, rowObject){  
+	    var updateDate = new Date(cellValue);  
+	    return updateDate;  
+	}
+  	
+	//创建一个input输入框
+	function myelem (value, options) {
+		var el = document.createElement("input");
+		el.type="number";
+		el.value = value;
+		return el;
+		/* $(el).ace_spinner({value:0,min:0,max:200,step:10, btn_up_class:'btn-info' , btn_down_class:'btn-info'});
+			return el; */
+	}
+/* 	 */
+	//获取值
+	function myvalue(elem) {
+		return $(elem).val();
 	}
  	</script>
 </body>
