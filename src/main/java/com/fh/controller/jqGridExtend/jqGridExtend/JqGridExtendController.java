@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fh.controller.base.BaseController;
+import com.fh.entity.CommonBase;
 import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
 import com.fh.entity.PageResult;
@@ -48,56 +49,6 @@ public class JqGridExtendController extends BaseController {
 	@Resource(name="jqGridExtendService")
 	private JqGridExtendManager jqGridExtendService;
 	
-	/**保存
-	 * @param
-	 * @throws Exception
-	 */
-	@RequestMapping(value="/save")
-	public ModelAndView save() throws Exception{
-		logBefore(logger, Jurisdiction.getUsername()+"新增JqGridExtend");
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;} //校验权限
-		ModelAndView mv = this.getModelAndView();
-		PageData pd = new PageData();
-		pd = this.getPageData();
-		pd.put("JGGRID_ID", this.get32UUID());	//主键
-		jqGridExtendService.save(pd);
-		mv.addObject("msg","success");
-		mv.setViewName("save_result");
-		return mv;
-	}
-	
-	/**删除
-	 * @param out
-	 * @throws Exception
-	 */
-	@RequestMapping(value="/delete")
-	public void delete(PrintWriter out) throws Exception{
-		logBefore(logger, Jurisdiction.getUsername()+"删除JqGridExtend");
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "del")){return;} //校验权限
-		PageData pd = new PageData();
-		pd = this.getPageData();
-		jqGridExtendService.delete(pd);
-		out.write("success");
-		out.close();
-	}
-	
-	/**修改
-	 * @param
-	 * @throws Exception
-	 */
-	@RequestMapping(value="/edit")
-	public ModelAndView edit() throws Exception{
-		logBefore(logger, Jurisdiction.getUsername()+"修改JqGridExtend");
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限
-		ModelAndView mv = this.getModelAndView();
-		PageData pd = new PageData();
-		pd = this.getPageData();
-		jqGridExtendService.edit(pd);
-		mv.addObject("msg","success");
-		mv.setViewName("save_result");
-		return mv;
-	}
-	
 	/**列表
 	 * @param page
 	 * @throws Exception
@@ -117,6 +68,23 @@ public class JqGridExtendController extends BaseController {
 		 * 
 		 */
 		return mv;
+	}
+	
+	/**修改
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/edit")
+	public @ResponseBody CommonBase edit() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"修改JqGridExtend");
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限	
+		CommonBase commonBase = new CommonBase();
+		commonBase.setCode(-1);
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		jqGridExtendService.edit(pd);
+		commonBase.setCode(0);
+		return commonBase;
 	}
 	
 	/**列表
@@ -162,61 +130,26 @@ public class JqGridExtendController extends BaseController {
 		return result;
 	}
 	
-	/**去新增页面
-	 * @param
-	 * @throws Exception
-	 */
-	@RequestMapping(value="/goAdd")
-	public ModelAndView goAdd()throws Exception{
-		ModelAndView mv = this.getModelAndView();
-		PageData pd = new PageData();
-		pd = this.getPageData();
-		mv.setViewName("jqGridExtend/jqGridExtend/jqGridExtend_edit");
-		mv.addObject("msg", "save");
-		mv.addObject("pd", pd);
-		return mv;
-	}	
-	
-	 /**去修改页面
-	 * @param
-	 * @throws Exception
-	 */
-	@RequestMapping(value="/goEdit")
-	public ModelAndView goEdit()throws Exception{
-		ModelAndView mv = this.getModelAndView();
-		PageData pd = new PageData();
-		pd = this.getPageData();
-		pd = jqGridExtendService.findById(pd);	//根据ID读取
-		mv.setViewName("jqGridExtend/jqGridExtend/jqGridExtend_edit");
-		mv.addObject("msg", "edit");
-		mv.addObject("pd", pd);
-		return mv;
-	}	
-	
 	 /**批量删除
 	 * @param
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/deleteAll")
-	@ResponseBody
-	public Object deleteAll() throws Exception{
+	public @ResponseBody CommonBase deleteAll() throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"批量删除JqGridExtend");
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "del")){return null;} //校验权限
-		PageData pd = new PageData();		
-		Map<String,Object> map = new HashMap<String,Object>();
-		pd = this.getPageData();
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "del")){return null;} //校验权限	
+		CommonBase commonBase = new CommonBase();
+		commonBase.setCode(-1);
+		PageData pd = this.getPageData();
 		List<PageData> pdList = new ArrayList<PageData>();
 		String DATA_IDS = pd.getString("DATA_IDS");
 		if(null != DATA_IDS && !"".equals(DATA_IDS)){
 			String ArrayDATA_IDS[] = DATA_IDS.split(",");
 			jqGridExtendService.deleteAll(ArrayDATA_IDS);
-			pd.put("msg", "ok");
-		}else{
-			pd.put("msg", "no");
+			commonBase.setCode(0);
 		}
 		pdList.add(pd);
-		map.put("list", pdList);
-		return AppUtil.returnObject(pd, map);
+		return commonBase;
 	}
 	
 	 /**批量修改
@@ -224,16 +157,17 @@ public class JqGridExtendController extends BaseController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/updateAll")
-	@ResponseBody
-	public Object updateAll() throws Exception{
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限
-		PageData pd = new PageData();		
-		Map<String,Object> map = new HashMap<String,Object>();
-		pd = this.getPageData();
+	public @ResponseBody CommonBase updateAll() throws Exception{
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限	
+		CommonBase commonBase = new CommonBase();
+		commonBase.setCode(-1);
+		PageData pd = this.getPageData();
 		Object DATA_ROWS = pd.get("DATA_ROWS");
 		String json = DATA_ROWS.toString();  
         JSONArray array = JSONArray.fromObject(json);  
-        List<JqGridModel>  dtoList=new ArrayList<JqGridModel>();  
+        List<JqGridModel> listData = (List<JqGridModel>) JSONArray.toCollection(array,JqGridModel.class);
+        
+        /* List<JqGridModel>  dtoList=new ArrayList<JqGridModel>();  
 
         for (int i = 0; i < array.size(); i++) {  
             JSONObject jsonObject = array.getJSONObject(i);  
@@ -241,18 +175,13 @@ public class JqGridExtendController extends BaseController {
             if(item != null){
                 dtoList.add(item);  
             }
-        }  
+        }  */
 
-		if(null != dtoList && dtoList.size() > 0){
-			jqGridExtendService.updateAll(dtoList);
-			pd.put("msg", "ok");
-		}else{
-			pd.put("msg", "no");
+		if(null != listData && listData.size() > 0){
+			jqGridExtendService.updateAll(listData);
+			commonBase.setCode(0);
 		}
-		List<PageData> pdList = new ArrayList<PageData>();
-		pdList.add(pd);
-		map.put("list", pdList);
-		return AppUtil.returnObject(pd, map);
+		return commonBase;
 	}
 	
 	 /**导出到excel
