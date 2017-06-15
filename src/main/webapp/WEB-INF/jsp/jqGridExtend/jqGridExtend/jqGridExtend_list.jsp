@@ -56,6 +56,7 @@
 			</div>
 		</div>
 	
+		<!-- 返回顶部 -->
 		<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
 			<i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
 		</a>
@@ -329,20 +330,23 @@
         };
         
         function getLocalTime(value, row, index) {
+            //var a = new Date(value);
+        	//var ret = DateFormatUtils.formatDate(value, DateFormatUtils.DATE_FORMAT1);
+        	//return ret;
+        	
             var a = new Date(value);
             return formatDate(a);
         }
-    //时间格式
-    function formatDate(now) {
-        var year = now.getFullYear();
-        var month = now.getMonth() + 1;
-        var date = now.getDate();
-        var hour = now.getHours();
-        var minute = now.getMinutes();
-        var second = now.getSeconds();
-        return year + "-" + month + "-" + date;
-        
-    }
+        //时间格式
+        function formatDate(now) {
+            var year = now.getFullYear();
+            var month = now.getMonth() + 1;
+            var date = now.getDate();
+            var hour = now.getHours();
+            var minute = now.getMinutes();
+            var second = now.getSeconds();
+            return year + "-" + month + "-" + date;
+        }
 
 		/* 
 		$(gridBase_selector).setGroupHeaders({
@@ -372,6 +376,22 @@
             title : "",
             cursor : "pointer"
         });
+			$(gridBase_selector).navButtonAdd(pagerBase_selector, {
+	             caption : "",
+	             buttonicon : "ace-icon fa fa-cloud-upload",
+	             onClickButton : importItems,
+	             position : "last",
+	             title : "",
+	             cursor : "pointer"
+	         });
+			$(gridBase_selector).navButtonAdd(pagerBase_selector, {
+	             caption : "",
+	             buttonicon : "ace-icon fa fa-cloud-download",
+	             onClickButton : exportItems,
+	             position : "last",
+	             title : "",
+	             cursor : "pointer"
+	         });
 		 
 		/* $(gridDetail_selector).jqGrid({
             datatype: 'json',
@@ -470,8 +490,25 @@
     				    	data: {DATA_IDS:str},
     						dataType:'json',
     						cache: false,
-    						success: function(data){
-    							refreshJqGrid();
+    						success: function(response){
+    							if(response.code==0){
+    								$(gridBase_selector).trigger("reloadGrid");  
+    								$(top.hangge());//关闭加载状态
+    								$("#subTitle").tips({
+    									side:3,
+    						            msg:'删除成功',
+    						            bg:'#009933',
+    						            time:3
+    						        });
+    							}else{
+    								$(top.hangge());//关闭加载状态
+    								$("#subTitle").tips({
+    									side:3,
+    						            msg:'删除失败,'+response.responseJSON.message,
+    						            bg:'#cc0033',
+    						            time:3
+    						        });
+    							}
     						},
     				    	error: function(e) {
     							$(top.hangge());//关闭加载状态
@@ -481,11 +518,32 @@
                 });
 			}
 		}
-
-		function refreshJqGrid(){
-			$(gridBase_selector).trigger("reloadGrid");  
-			$(top.hangge());//关闭加载状态
-		}
+	    
+	    function importItems(){
+	    	top.jzts();
+	    	var diag = new top.Dialog();
+	    	diag.Drag=true;
+	    	diag.Title ="EXCEL 导入到数据库";
+	    	diag.URL = '<%=basePath%>jqGridExtend/goUploadExcel.do';
+	    	diag.Width = 300;
+	    	diag.Height = 150;
+	    	diag.CancelEvent = function(){ //关闭事件
+	    		if(diag.innerFrame.contentWindow.document.getElementById('zhongxin').style.display == 'none'){
+	    			if('${page.currentPage}' == '0'){
+	    				top.jzts();
+	    				setTimeout("self.location.reload()",100);
+	    			}else{
+	    				nextPage(${page.currentPage});
+	    			}
+	    		}
+	    	diag.close();
+	    	};
+	    	diag.show();
+	    }
+	    
+	    function exportItems(){
+	    	window.location.href='<%=basePath%>jqGridExtend/excel.do?';
+	    }
 		
 		//日期反格式化  
 		function unFormateUpdateDate(cellValue, options, rowObject){  

@@ -1,6 +1,5 @@
 package com.fh.controller.jqGridExtend.jqGridExtend;
 
-import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,13 +9,17 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.crypto.hash.SimpleHash;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fh.controller.base.BaseController;
@@ -24,11 +27,23 @@ import com.fh.entity.CommonBase;
 import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
 import com.fh.entity.PageResult;
+import com.fh.entity.system.Role;
 import com.fh.service.jqGridExtend.jqGridExtend.JqGridExtendManager;
+import com.fh.service.system.fhlog.FHlogManager;
+import com.fh.service.system.menu.MenuManager;
+import com.fh.service.system.role.RoleManager;
+import com.fh.service.system.user.UserManager;
 import com.fh.util.AppUtil;
+import com.fh.util.Const;
+import com.fh.util.FileDownload;
+import com.fh.util.FileUpload;
+import com.fh.util.GetPinyin;
 import com.fh.util.Jurisdiction;
+import com.fh.util.ObjectExcelRead;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
+import com.fh.util.PathUtil;
+import com.fh.util.Tools;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -197,6 +212,7 @@ public class JqGridExtendController extends BaseController {
 		pd = this.getPageData();
 		Map<String,Object> dataMap = new HashMap<String,Object>();
 		List<String> titles = new ArrayList<String>();
+		titles.add("ID");	//
 		titles.add("CategoryName");	//1
 		titles.add("ProductName");	//2
 		titles.add("Country");	//3
@@ -207,16 +223,103 @@ public class JqGridExtendController extends BaseController {
 		List<PageData> varList = new ArrayList<PageData>();
 		for(int i=0;i<varOList.size();i++){
 			PageData vpd = new PageData();
-			vpd.put("var1", varOList.get(i).getString("CATEGORYNAME"));	    //1
-			vpd.put("var2", varOList.get(i).getString("PRODUCTNAME"));	    //2
-			vpd.put("var3", varOList.get(i).getString("COUNTRY"));	    //3
-			vpd.put("var4", varOList.get(i).getString("PRICE"));	    //4
-			vpd.put("var5", varOList.get(i).get("QUANTITY").toString());	//5
+			vpd.put("var1", varOList.get(i).get("ID").toString());	    //1
+			vpd.put("var2", varOList.get(i).getString("CATEGORYNAME"));	    //1
+			vpd.put("var3", varOList.get(i).getString("PRODUCTNAME"));	    //2
+			vpd.put("var4", varOList.get(i).getString("COUNTRY"));	    //3
+			vpd.put("var5", (varOList.get(i).get("PRICE") == null? 0 : varOList.get(i).get("PRICE")).toString());	    //4
+			vpd.put("var6", (varOList.get(i).get("QUANTITY") == null? 0 : varOList.get(i).get("QUANTITY")).toString());	//5
 			varList.add(vpd);
 		}
 		dataMap.put("varList", varList);
 		ObjectExcelView erv = new ObjectExcelView();
 		mv = new ModelAndView(erv,dataMap);
+		return mv;
+	}
+	
+	/**打开上传EXCEL页面
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/goUploadExcel")
+	public ModelAndView goUploadExcel()throws Exception{
+		ModelAndView mv = this.getModelAndView();
+		mv.setViewName("jqGridExtend/jqGridExtend/uploadExcel");
+		return mv;
+	}
+	
+	/**下载模版
+	 * @param response
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/downExcel")
+	public void downExcel(HttpServletResponse response)throws Exception{
+		FileDownload.fileDownload(response, PathUtil.getClasspath() + Const.FILEPATHFILE + "JqGrids.xls", "JqGrids.xls");
+	}
+
+	@Resource(name="userService")
+	private UserManager userService;
+	@Resource(name="roleService")
+	private RoleManager roleService;
+	@Resource(name="menuService")
+	private MenuManager menuService;
+	@Resource(name="fhlogService")
+	private FHlogManager FHLOG;
+	/**从EXCEL导入到数据库
+	 * @param file
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/readExcel")
+	public ModelAndView readExcel(@RequestParam(value="excel",required=false) MultipartFile file) throws Exception{
+		FHLOG.save(Jurisdiction.getUsername(), "从EXCEL导入到数据库");
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;}
+		if (null != file && !file.isEmpty()) {
+			String filePath = PathUtil.getClasspath() + Const.FILEPATHFILE;								//文件上传路径
+			String fileName =  FileUpload.fileUp(file, filePath, "jggridexcel");							//执行上传
+			List<PageData> listPd = (List)ObjectExcelRead.readExcel(filePath, fileName, 2, 0, 0);		//执行读EXCEL操作,读出的数据导入List 2:从第3行开始；0:从第A列开始；0:第0个sheet
+			/*存入数据库操作======================================*/
+			/**
+			 * var0 :编号
+			 * var1 :姓名
+			 * var2 :手机
+			 * var3 :邮箱
+			 * var4 :备注
+			 */
+			for(int i=0;i<listPd.size();i++){		
+				pd.put("USER_ID", this.get32UUID());										//ID
+				pd.put("NAME", listPd.get(i).getString("var1"));							//姓名
+				
+				String USERNAME = GetPinyin.getPingYin(listPd.get(i).getString("var1"));	//根据姓名汉字生成全拼
+				pd.put("USERNAME", USERNAME);	
+				if(userService.findByUsername(pd) != null){									//判断用户名是否重复
+					USERNAME = GetPinyin.getPingYin(listPd.get(i).getString("var1"))+Tools.getRandomNum();
+					pd.put("USERNAME", USERNAME);
+				}
+				pd.put("BZ", listPd.get(i).getString("var4"));								//备注
+				if(Tools.checkEmail(listPd.get(i).getString("var3"))){						//邮箱格式不对就跳过
+					pd.put("EMAIL", listPd.get(i).getString("var3"));						
+					if(userService.findByUE(pd) != null){									//邮箱已存在就跳过
+						continue;
+					}
+				}else{
+					continue;
+				}
+				pd.put("NUMBER", listPd.get(i).getString("var0"));							//编号已存在就跳过
+				pd.put("PHONE", listPd.get(i).getString("var2"));							//手机号
+				
+				pd.put("PASSWORD", new SimpleHash("SHA-1", USERNAME, "123").toString());	//默认密码123
+				if(userService.findByUN(pd) != null){
+					continue;
+				}
+				userService.saveU(pd);
+			}
+			/*存入数据库操作======================================*/
+			mv.addObject("msg","success");
+		}
+		mv.setViewName("save_result");
 		return mv;
 	}
 	
