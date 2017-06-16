@@ -4,30 +4,29 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%
 	String path = request.getContextPath();
-	String basePath = request.getScheme() + "://"
-			+ request.getServerName() + ":" + request.getServerPort()
+	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
 			+ path + "/";
 %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<base href="<%=basePath%>">
-	<!-- 下拉框 -->
-	<link rel="stylesheet" href="static/ace/css/chosen.css" />
-	<!-- jsp文件头和头部 ，其中包含旧版本（Ace）Jqgrid Css-->
-	<%@ include file="../../system/index/topWithJqgrid.jsp"%>
-	<!-- 日期框 -->
-	<link rel="stylesheet" href="static/ace/css/datepicker.css" />
-	
-	<!-- 最新版的Jqgrid Css，如果旧版本（Ace）某些方法不好用，尝试用此版本Css，替换旧版本Css -->
-	<!-- <link rel="stylesheet" type="text/css" media="screen" href="static/ace/css/ui.jqgrid-bootstrap.css" /> -->
-	<style>
-		.page-header{
-			padding-top: 9px;
-			padding-bottom: 9px;
-			margin: 0 0 8px;
-		}
-	</style>
+<base href="<%=basePath%>">
+<!-- 下拉框 -->
+<link rel="stylesheet" href="static/ace/css/chosen.css" />
+<!-- jsp文件头和头部 ，其中包含旧版本（Ace）Jqgrid Css-->
+<%@ include file="../../system/index/topWithJqgrid.jsp"%>
+<!-- 日期框 -->
+<link rel="stylesheet" href="static/ace/css/datepicker.css" />
+
+<!-- 最新版的Jqgrid Css，如果旧版本（Ace）某些方法不好用，尝试用此版本Css，替换旧版本Css -->
+<!-- <link rel="stylesheet" type="text/css" media="screen" href="static/ace/css/ui.jqgrid-bootstrap.css" /> -->
+<style>
+.page-header {
+	padding-top: 9px;
+	padding-bottom: 9px;
+	margin: 0 0 8px;
+}
+</style>
 </head>
 <body class="no-skin">
 	<div class="main-container" id="main-container">
@@ -36,24 +35,72 @@
 				<div class="page-content">
 					<!-- /section:settings.box -->
 					<div class="page-header">
-						<!-- <h1>
-							东部管道
-							<small>
-								<i class="ace-icon fa fa-angle-double-right"></i>
-								成本核算
-							</small>
-						</h1> -->
-						<table >
+						<table>
 							<tr>
-								<td>
-									<span class="label label-xlg label-success arrowed-right">东部管道</span>
-									<!-- arrowed-in-right -->
-									<span class="label label-xlg label-yellow arrowed-in arrowed-right" id="subTitle" style="margin-left:2px;">成本核算</span>
-								</td>
+								<td><span
+									class="label label-xlg label-success arrowed-right">东部管道</span>
+									<!-- arrowed-in-right --> <span
+									class="label label-xlg label-yellow arrowed-in arrowed-right"
+									id="subTitle" style="margin-left: 2px;">成本核算</span> <span
+									style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
+
+									<button id="btnQuery" class="btn btn-white btn-info btn-sm"
+										onclick="showQueryCondi()">
+										<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
+									</button></td>
 							</tr>
 						</table>
-					</div><!-- /.page-header -->
-				
+					</div>
+					<!-- /.page-header -->
+
+					<div class="row">
+						<div class="col-xs-12">
+							<div class="widget-box" style="display: none;">
+								<div class="widget-body">
+									<div class="widget-main">
+										<!-- <p class="alert alert-info">Nunc aliquam enim ut arcu.</p> -->
+										<form class="form-inline">
+											<!-- <input type="password" class="input-small"
+												placeholder="Password" /> <label class="inline"> <input
+												type="checkbox" class="ace" /> <span class="lbl">
+													remember me</span>
+											</label> -->
+											<%-- <div class="nav-search inline" >
+												<span class="input-icon"> <input type="text"
+													placeholder="这里输入关键词" class="nav-search-input"
+													id="nav-search-input" autocomplete="off" name="keywords"
+													value="${pd.keywords }" placeholder="这里输入关键词" /> <i
+													class="ace-icon fa fa-search nav-search-icon"></i>
+												</span>
+											</div> --%>
+											<span class="input-icon"> <input
+												id="form-field-icon-1" type="text" placeholder="这里输入关键词">
+												<i class="ace-icon fa fa-leaf blue"></i>
+											</span>
+											<!-- class="input-small" -->
+											<input type="text" placeholder="Username" /> 
+											<span>
+												<select class="chosen-select form-control" 
+													name="BELONG_AREA" id="belong_area"
+													data-placeholder="请选择所属区域"
+													style="vertical-align: top; height:32px;width: 150px;">
+													<option value=""></option>
+													<option value="">全部</option>
+													<c:forEach items="${areaList}" var="area">
+														<option value="${area.BIANMA }"
+															<c:if test="${pd.BELONG_AREA==area.BIANMA}">selected</c:if>>${area.NAME }</option>
+													</c:forEach>
+												</select>
+											</span>
+											<button type="button" class="btn btn-info btn-sm">
+												<i class="ace-icon fa fa-search bigger-110"></i>查询
+											</button>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 					<div class="row">
 						<div class="col-xs-12">
 							<!-- PAGE CONTENT BEGINS -->
@@ -64,29 +111,30 @@
 									<i class="fa fa-external-link bigger-110"></i>
 								</a>
 							</div> -->
-						
-						    <table id="jqGrid"></table>
-						    <div id="jqGridPager"></div>
+
+							<table id="jqGrid"></table>
+							<div id="jqGridPager"></div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-	
-		<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
-			<i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
+
+		<a href="#" id="btn-scroll-up"
+			class="btn-scroll-up btn btn-sm btn-inverse"> <i
+			class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
 		</a>
 	</div>
-	
-	
+
+
 	<!-- basic scripts -->
 	<!-- 页面底部js¨ -->
 	<%@ include file="../../system/index/foot.jsp"%>
-	
+
 	<!-- 最新版的Jqgrid Js，如果旧版本（Ace）某些方法不好用，尝试用此版本Js，替换旧版本JS -->
 	<!-- <script src="static/ace/js/jquery.jqGrid.min.js" type="text/javascript"></script>
 	<script src="static/ace/js/grid.locale-cn.js" type="text/javascript"></script> -->
-	
+
 	<!-- 旧版本（Ace）Jqgrid Js -->
 	<script src="static/ace/js/jqGrid/jquery.jqGrid.src.js"></script>
 	<script src="static/ace/js/jqGrid/i18n/grid.locale-cn.js"></script>
@@ -102,14 +150,16 @@
 	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
 	<!-- JqGrid统一样式统一操作 -->
 	<script type="text/javascript" src="static/js/common/jqgrid_style.js"></script>
+	<script type="text/javascript" src="static/js/common/cusElement_style.js"></script>
 	<script type="text/javascript" src="static/js/util/toolkit.js"></script>
-	<script src="static/ace/js/ace/elements.spinner.js"></script>
-	<script src="static/ace/js/fuelux/fuelux.spinner.js"></script>
+	<script src="static/ace/js/ace/ace.widget-box.js"></script>
 	<script type="text/javascript"> 
 	$(document).ready(function () {
 		/* $.jgrid.defaults.width = 780;*/
 		//$.jgrid.defaults.styleUI = 'Bootstrap'; 
 		$(top.hangge());//关闭加载状态
+		
+		//dropDownStyle();
 		
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
@@ -129,7 +179,7 @@
                         onSuccess: function(response) {
 							
                         	//var jsonResponse = $.parseJSON(response.responseText);
-							//console.log(response.responseJSON);
+							console.log(response);
 							if(response.responseJSON.code==0){
 								return [true];
 							}else{
@@ -205,6 +255,7 @@
 			//shrinkToFit:true,
 			viewrecords: true, // show the current page, data rang and total records on the toolbar
 			rowNum: 10,
+			rowList:[10,20,30,100000],
 			//loadonce: true, // this is just for the demo
 			//height: '100%', 
 			
@@ -519,6 +570,21 @@
 	//获取值
 	function myvalue(elem) {
 		return $(elem).val();
+	}
+	
+	//显示隐藏查询
+	function showQueryCondi(){
+		if($(".widget-box").css("display")=="block"){
+			$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass('fa-chevron-down');
+			$("#btnQuery").find("span").text("显示查询");
+			$(window).triggerHandler('resize.jqGrid');
+		}
+		else{
+			$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass('fa-chevron-up');
+			$("#btnQuery").find("span").text("隐藏查询");
+		}
+		$(".widget-box").toggle("fast");
+		
 	}
  	</script>
 </body>

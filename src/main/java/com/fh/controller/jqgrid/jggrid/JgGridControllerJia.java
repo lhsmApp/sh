@@ -97,6 +97,7 @@ public class JgGridControllerJia extends BaseController {
 		int records = jqgridServiceJia.countJqGrid(pd);
 		PageResult<PageData> result = new PageResult<PageData>();
 		result.setRows(varList);
+		result.setRowNum(page.getRowNum());
 		result.setRecords(records);
 		result.setPage(page.getPage());
 		PageData userData=new PageData();
