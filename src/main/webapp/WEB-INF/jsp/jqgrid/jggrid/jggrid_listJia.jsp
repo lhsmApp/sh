@@ -93,7 +93,7 @@
 												</select>
 											</span>
 											<button type="button" class="btn btn-info btn-sm">
-												<i class="ace-icon fa fa-search bigger-110"></i>查询
+												<i class="ace-icon fa fa-search bigger-110"></i>
 											</button>
 										</form>
 									</div>
