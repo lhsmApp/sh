@@ -25,18 +25,22 @@ public class PageResult<T> extends CommonBase{
 	//private PageData pageData;//返回的查询时的条件
 
 	public PageResult(){
-		try {
-			this.rowNum = Integer.parseInt(Tools.readTxtFile(Const.PAGE));
-		} catch (Exception e) {
-			this.rowNum = 15;
-		}
+		
 	}
 	
 	public int getRowNum() {
 		return rowNum;
 	}
 	public void setRowNum(int rowNum) {
-		this.rowNum = rowNum;
+		if (rowNum != 0)
+			this.rowNum = rowNum;
+		else {
+			try {
+				this.rowNum = Integer.parseInt(Tools.readTxtFile(Const.PAGE));
+			} catch (Exception e) {
+				this.rowNum = 15;
+			}
+		}
 	}
 	
 	public int getTotal() {

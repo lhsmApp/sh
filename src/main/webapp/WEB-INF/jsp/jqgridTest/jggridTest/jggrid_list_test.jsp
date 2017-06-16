@@ -27,7 +27,7 @@
 			<div class="main-content-inner">
 				<div class="page-content">
 					<!-- /section:settings.box -->
-					<div class="page-header">
+					<div class="page-header" style="float: left;">
 						<h1>
 							东部管道 <small> <i class="ace-icon fa fa-angle-double-right"></i>
 								成本核算
@@ -38,7 +38,7 @@
 					
 					
 					<!-- 检索  -->
-						<table style="margin-top:5px;">
+						<table style="margin-top:15px; float: right;">
 							<tr>
 								<td>
 									<div class="nav-search">
@@ -105,7 +105,6 @@
 	<script src="static/ace/js/date-time/bootstrap-datepicker.js"></script>
 	<!--提示框-->
 	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
-		<script src="static/ace/js/ace/elements.spinner.js"></script>
 
 	<script type="text/javascript"> 
 	$(document).ready(function () {
@@ -113,17 +112,15 @@
 		//创建一个input输入框
 		function myelem (value, options) {
 		var el = document.createElement("input");
-		el.type="text";
-		$(el).ace_spinner({value:0,min:0,max:200,step:10, btn_up_class:'btn-info' , btn_down_class:'btn-info'});
-		/* .closest('.ace-spinner')
+		el.type="number";
+		el.value = value;
+		return el;
+		}
+	/* 	$('#spinner1').ace_spinner({value:0,min:0,max:200,step:10, btn_up_class:'btn-info' , btn_down_class:'btn-info'})
+		.closest('.ace-spinner')
 		.on('changed.fu.spinbox', function(){
 			//alert($('#spinner1').val())
-			return $(el).val();
 		});  */
-		/* el.value = value;
-		return el; */
-		}
-	/* 	 */
 		//获取值
 		function myvalue(elem) {
 		return $(elem).val();
@@ -203,7 +200,7 @@
 				{ label: 'Quantity', name: 'QUANTITY', width: 80, sorttype: 'number',summaryType: 'sum', formatter:'number', editable: true,edittype:'custom', editoptions:{custom_element: myelem, custom_value:myvalue} }                   
 			],
 			caption: "jqGrid with inline editing",
-			
+			toolbar: [true, "top"],
             onSelectRow: editRow, // the javascript function to call on row click. will ues to to put the row in edit mode
 
 			
