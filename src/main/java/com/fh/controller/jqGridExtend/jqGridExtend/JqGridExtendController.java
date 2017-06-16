@@ -28,6 +28,7 @@ import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
 import com.fh.entity.PageResult;
 import com.fh.entity.system.Role;
+import com.fh.exception.CustomException;
 import com.fh.service.jqGridExtend.jqGridExtend.JqGridExtendManager;
 import com.fh.service.system.fhlog.FHlogManager;
 import com.fh.service.system.menu.MenuManager;
@@ -44,6 +45,8 @@ import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
 import com.fh.util.PathUtil;
 import com.fh.util.Tools;
+//import com.wordnik.swagger.annotations.ApiOperation;
+import com.fh.util.excel.LeadingInExcel;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -257,70 +260,82 @@ public class JqGridExtendController extends BaseController {
 		FileDownload.fileDownload(response, PathUtil.getClasspath() + Const.FILEPATHFILE + "JqGrids.xls", "JqGrids.xls");
 	}
 
-	@Resource(name="userService")
-	private UserManager userService;
-	@Resource(name="roleService")
-	private RoleManager roleService;
-	@Resource(name="menuService")
-	private MenuManager menuService;
-	@Resource(name="fhlogService")
-	private FHlogManager FHLOG;
 	/**从EXCEL导入到数据库
 	 * @param file
 	 * @return
 	 * @throws Exception
 	 */
-	@RequestMapping(value="/readExcel")
-	public ModelAndView readExcel(@RequestParam(value="excel",required=false) MultipartFile file) throws Exception{
-		FHLOG.save(Jurisdiction.getUsername(), "从EXCEL导入到数据库");
-		ModelAndView mv = this.getModelAndView();
-		PageData pd = new PageData();
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;}
+	//@ApiOperation(value = "导入Excel", httpMethod = "POST", response = CommonBase.class, notes = "导入Excel")
+	@RequestMapping(value = "/readExcel")
+	public @ResponseBody CommonBase readExcel(@RequestParam(value="excel",required=false) MultipartFile file) throws Exception{
+		CommonBase commonBase = new CommonBase();
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;}//校验权限
+		
+		// 局部变量
+		LeadingInExcel<JqGridModel> testExcel = null;
+		List<JqGridModel> uploadAndRead = null;
+		try {
+			// 定义需要读取的数据
+			String formart = "yyyy-MM-dd";
+			String propertiesFileName = "config";
+			String kyeName = "file_path";
+			int sheetIndex = 0;
+			Class<JqGridModel> clazz = JqGridModel.class;
+			Map<String, String> titleAndAttribute = null;
+			// 定义对应的标题名与对应属性名
+			titleAndAttribute = new HashMap<String, String>();
+			titleAndAttribute.put("ID", "ID");
+			titleAndAttribute.put("Category名", "CategoryName");
+			titleAndAttribute.put("Product名", "ProductName");
+			titleAndAttribute.put("Country", "Country");
+			titleAndAttribute.put("单价", "Price");
+			titleAndAttribute.put("Quantity", "Quantity");
+
+			// 调用解析工具包
+			testExcel = new LeadingInExcel<JqGridModel>(formart);
+			// 解析excel，获取客户信息集合
+
+			uploadAndRead = testExcel.uploadAndRead(file, propertiesFileName, kyeName, sheetIndex,
+					titleAndAttribute, clazz);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("读取Excel文件错误", e);
+			throw new CustomException("读取Excel文件错误");
+		}
+		boolean judgement = false;
+		if (uploadAndRead != null && !"[]".equals(uploadAndRead.toString()) && uploadAndRead.size() >= 1) {
+			judgement = true;
+		}
+		if (judgement) {
+			// 把客户信息分为没100条数据为一组迭代添加客户信息（注：将customerList集合作为参数，在Mybatis的相应映射文件中使用foreach标签进行批量添加。）
+			int listSize = uploadAndRead.size();
+			int toIndex = 100;
+			for (int i = 0; i < listSize; i += 100) {
+				if (i + 100 > listSize) {
+					toIndex = listSize - i;
+				}
+				List<JqGridModel> subList = uploadAndRead.subList(i, i + toIndex);
+
+				/** 此处执行集合添加 */
+				jqGridExtendService.batchImport(subList);
+			}
+		} else {
+			commonBase.setCode(-1);
+			commonBase.setMessage("TranslateUtil");
+		}
+		
+		
+		
+		
+		
+		
 		if (null != file && !file.isEmpty()) {
 			String filePath = PathUtil.getClasspath() + Const.FILEPATHFILE;								//文件上传路径
 			String fileName =  FileUpload.fileUp(file, filePath, "jggridexcel");							//执行上传
 			List<PageData> listPd = (List)ObjectExcelRead.readExcel(filePath, fileName, 2, 0, 0);		//执行读EXCEL操作,读出的数据导入List 2:从第3行开始；0:从第A列开始；0:第0个sheet
-			/*存入数据库操作======================================*/
-			/**
-			 * var0 :编号
-			 * var1 :姓名
-			 * var2 :手机
-			 * var3 :邮箱
-			 * var4 :备注
-			 */
-			for(int i=0;i<listPd.size();i++){		
-				pd.put("USER_ID", this.get32UUID());										//ID
-				pd.put("NAME", listPd.get(i).getString("var1"));							//姓名
-				
-				String USERNAME = GetPinyin.getPingYin(listPd.get(i).getString("var1"));	//根据姓名汉字生成全拼
-				pd.put("USERNAME", USERNAME);	
-				if(userService.findByUsername(pd) != null){									//判断用户名是否重复
-					USERNAME = GetPinyin.getPingYin(listPd.get(i).getString("var1"))+Tools.getRandomNum();
-					pd.put("USERNAME", USERNAME);
-				}
-				pd.put("BZ", listPd.get(i).getString("var4"));								//备注
-				if(Tools.checkEmail(listPd.get(i).getString("var3"))){						//邮箱格式不对就跳过
-					pd.put("EMAIL", listPd.get(i).getString("var3"));						
-					if(userService.findByUE(pd) != null){									//邮箱已存在就跳过
-						continue;
-					}
-				}else{
-					continue;
-				}
-				pd.put("NUMBER", listPd.get(i).getString("var0"));							//编号已存在就跳过
-				pd.put("PHONE", listPd.get(i).getString("var2"));							//手机号
-				
-				pd.put("PASSWORD", new SimpleHash("SHA-1", USERNAME, "123").toString());	//默认密码123
-				if(userService.findByUN(pd) != null){
-					continue;
-				}
-				userService.saveU(pd);
-			}
-			/*存入数据库操作======================================*/
-			mv.addObject("msg","success");
+			
 		}
-		mv.setViewName("save_result");
-		return mv;
+		return commonBase;
 	}
 	
 	@InitBinder

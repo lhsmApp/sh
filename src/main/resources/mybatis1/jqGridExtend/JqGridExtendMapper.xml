@@ -197,5 +197,51 @@
 		</foreach>
 	</update>
 	
+	<!-- 导入-->
+	<insert id="batchImport" parameterType="com.fh.entity.JqGridModel">
+		<foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
+		  <choose>
+		    <when test="item!=null and item.ID != null and item.ID != '' and item.ID != 0 ">
+		        insert into 
+		        <include refid="tableName"></include>
+			        (
+			        ID,
+		    	    CATEGORYNAME,
+			        PRODUCTNAME,
+			        COUNTRY,
+			        PRICE,
+			        QUANTITY
+			        ) 
+			    values (
+			        #{item.ID},
+		    	    #{item.CATEGORYNAME},
+			        #{item.PRODUCTNAME},
+			        #{item.COUNTRY},
+			        #{item.PRICE},
+			        #{item.QUANTITY}
+			        )
+		    </when>
+		    <otherwise>
+		        insert into 
+		        <include refid="tableName"></include>
+			        (
+		    	    CATEGORYNAME,
+			        PRODUCTNAME,
+			        COUNTRY,
+			        PRICE,
+			        QUANTITY
+			        ) 
+			    values (
+		    	    #{item.CATEGORYNAME},
+			        #{item.PRODUCTNAME},
+			        #{item.COUNTRY},
+			        #{item.PRICE},
+			        #{item.QUANTITY}
+			        )
+		    </otherwise>
+		  </choose>
+		</foreach>
+	</insert>
+	
 	<!-- fh313596790qq(青苔) -->
 </mapper>

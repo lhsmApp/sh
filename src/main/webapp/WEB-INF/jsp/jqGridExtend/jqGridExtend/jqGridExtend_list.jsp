@@ -21,6 +21,11 @@
 	
 	<!-- 最新版的Jqgrid Css，如果旧版本（Ace）某些方法不好用，尝试用此版本Css，替换旧版本Css -->
 	<!-- <link rel="stylesheet" type="text/css" media="screen" href="static/ace/css/ui.jqgrid-bootstrap.css" /> -->
+	
+	<link rel="stylesheet" type="text/css" href="jquery-easyui-1.5.1/themes/metro-gray/easyui.css">
+    <link rel="stylesheet" type="text/css" href="jquery-easyui-1.5.1/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="jquery-easyui-1.5.1/themes/color.css">
+
     <style>
 		.page-header{
 			padding-top: 9px;
@@ -56,32 +61,12 @@
 			</div>
 		</div>
 	
-	<!--上传Excel文件  -->
-	<div id="dlg_import"  class="easyui-dialog" style="width: 400px; padding: 20px 30px" closed="true">
-							<form action="jqGridExtend/readExcel.do" name="Form" id="Form" method="post" enctype="multipart/form-data">
-								<div id="zhongxin">
-								<table style="width:95%;" >
-									<tr>
-										<td style="padding-top: 20px;"><input type="file" id="excel" name="excel" style="width:50px;" onchange="fileType(this)" /></td>
-									</tr>
-									<tr>
-										<td style="text-align: center;padding-top: 10px;">
-											<a class="btn btn-mini btn-primary" onclick="save();">导入</a>
-											<a class="btn btn-mini btn-danger" onclick="top.Dialog.close();">取消</a>
-											<a class="btn btn-mini btn-success" onclick="window.location.href='<%=basePath%>/jqGridExtend/downExcel.do'">下载模版</a>
-										</td>
-									</tr>
-								</table>
-								</div>
-								<div id="zhongxin2" class="center" style="display:none"><br/><img src="static/images/jzx.gif" /><br/><h4 class="lighter block green"></h4></div>
-							</form>
-	</div>
-	
 		<!-- 返回顶部 -->
 		<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
 			<i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
 		</a>
 	</div>
+</body>
 	
 	
 	<!-- basic scripts -->
@@ -105,10 +90,13 @@
 	<script src="static/ace/js/date-time/bootstrap-datepicker.js"></script>
 	<!--提示框-->
 	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
-	<!-- 上传控件 -->
-	<script src="static/ace/js/ace/elements.fileinput.js"></script>
 	<!-- JqGrid统一样式统一操作 -->
 	<script type="text/javascript" src="static/js/common/jqgrid_style.js"></script>
+	<!-- 上传控件 -->
+	<script src="static/ace/js/ace/elements.fileinput.js"></script>
+	
+	<script type="text/javascript" src="jquery-easyui-1.5.1/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="jquery-easyui-1.5.1/locale/easyui-lang-zh_CN.js"></script>
 		
 	<script type="text/javascript"> 
 	$(document).ready(function () {
@@ -120,55 +108,6 @@
         var pagerBase_selector = "#jqGridBasePager";  
         //var gridDetail_selector = "#jqGridDetail";  
         
-        
-        
-        
-		$(function() {
-			//上传
-			$('#excel').ace_file_input({
-				no_file:'请选择EXCEL ...',
-				btn_choose:'选择',
-				btn_change:'更改',
-				droppable:false,
-				onchange:null,
-				thumbnail:false, //| true | large
-				whitelist:'xls|xls',
-				blacklist:'gif|png|jpg|jpeg'
-				//onchange:''
-			});
-		});
-		//保存
-		function save(){
-			if($("#excel").val()=="" || document.getElementById("excel").files[0] =='请选择xls格式的文件'){
-				
-				$("#excel").tips({
-					side:3,
-		            msg:'请选择文件',
-		            bg:'#AE81FF',
-		            time:3
-		        });
-				return false;
-			}
-			$("#Form").submit();
-			$("#zhongxin").hide();
-			$("#zhongxin2").show();
-		}
-		function fileType(obj){
-			var fileType=obj.value.substr(obj.value.lastIndexOf(".")).toLowerCase();//获得文件后缀名
-		    if(fileType != '.xls'){
-		    	$("#excel").tips({
-					side:3,
-		            msg:'请上传xls格式的文件',
-		            bg:'#AE81FF',
-		            time:3
-		        });
-		    	$("#excel").val('');
-		    	document.getElementById("excel").files[0] = '请选择xls格式的文件';
-		    }
-		}
-        
-        
-		
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
 			$(gridBase_selector).jqGrid( 'setGridWidth', $(".page-content").width());
@@ -590,33 +529,35 @@
                 });
 			}
 		}
-	    
+        
+		/**
+		 * 导入
+		 */
 	    function importItems(){
-	    	top.jzts();
-			$("#dlg_import").dialog("open").dialog('center').dialog("setTitle",
-			    "EXCEL 导入到数据库");
-	    	return;
-	    	
-	    	var diag = new top.Dialog();
-	    	diag.Drag=true;
-	    	diag.Title ="EXCEL 导入到数据库";
-	    	diag.URL = '<%=basePath%>jqGridExtend/goUploadExcel.do';
-	    	diag.Width = 300;
-	    	diag.Height = 150;
-	    	diag.CancelEvent = function(){ //关闭事件
-	    		if(diag.innerFrame.contentWindow.document.getElementById('zhongxin').style.display == 'none'){
-	    			if('${page.currentPage}' == '0'){
-	    				top.jzts();
-	    				setTimeout("self.location.reload()",100);
-	    			}else{
-	    				nextPage(${page.currentPage});
-	    			}
-	    		}
-	    	diag.close();
-	    	};
-	    	diag.show(); 
+	   	   top.jzts();
+	   	   var diag = new top.Dialog();
+	   	   diag.Drag=true;
+	   	   diag.Title ="EXCEL 导入到数据库";
+	   	   diag.URL = '<%=basePath%>jqGridExtend/goUploadExcel.do';
+	   	   diag.Width = 300;
+	   	   diag.Height = 150;
+	   	   diag.CancelEvent = function(){ //关闭事件
+			  if(diag.innerFrame.contentWindow.document.getElementById('zhongxin').style.display == 'none'){
+				 if('${page.currentPage}' == '0'){
+					 top.jzts();
+					 setTimeout("self.location.reload()",100);
+				 }else{
+					 nextPage(${page.currentPage});
+				 }
+			  }
+			diag.close();
+		   };
+		   diag.show();
 	    }
-	    
+
+		/**
+		 * 导出
+		 */
 	    function exportItems(){
 	    	window.location.href='<%=basePath%>jqGridExtend/excel.do?';
 	    }
@@ -632,5 +573,4 @@
 	});
 
  	</script>
-</body>
 </html>
