@@ -22,10 +22,6 @@
 	<!-- 最新版的Jqgrid Css，如果旧版本（Ace）某些方法不好用，尝试用此版本Css，替换旧版本Css -->
 	<!-- <link rel="stylesheet" type="text/css" media="screen" href="static/ace/css/ui.jqgrid-bootstrap.css" /> -->
 	
-	<link rel="stylesheet" type="text/css" href="jquery-easyui-1.5.1/themes/metro-gray/easyui.css">
-    <link rel="stylesheet" type="text/css" href="jquery-easyui-1.5.1/themes/icon.css">
-    <link rel="stylesheet" type="text/css" href="jquery-easyui-1.5.1/themes/color.css">
-
     <style>
 		.page-header{
 			padding-top: 9px;
@@ -95,9 +91,6 @@
 	<!-- 上传控件 -->
 	<script src="static/ace/js/ace/elements.fileinput.js"></script>
 	
-	<script type="text/javascript" src="jquery-easyui-1.5.1/jquery.easyui.min.js"></script>
-	<script type="text/javascript" src="jquery-easyui-1.5.1/locale/easyui-lang-zh_CN.js"></script>
-		
 	<script type="text/javascript"> 
 	$(document).ready(function () {
 		/* $.jgrid.defaults.width = 780;*/
