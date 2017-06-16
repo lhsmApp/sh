@@ -297,6 +297,7 @@
 	<script src="static/ace/js/ace/ace.widget-on-reload.js"></script>
 	<script src="static/ace/js/ace/ace.searchbox-autocomplete.js"></script> -->
 	
+	<script src="static/ace/js/ace/elements.colorpicker.js"></script>
 	<script src="static/ace/js/ace.js"></script>
 	<script src="static/ace/js/ace-elements.js"></script>
 	<!-- inline scripts related to this page -->
