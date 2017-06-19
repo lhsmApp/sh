@@ -285,11 +285,11 @@ public class JqGridExtendController extends BaseController {
 			// 定义对应的标题名与对应属性名
 			titleAndAttribute = new HashMap<String, String>();
 			titleAndAttribute.put("ID", "ID");
-			titleAndAttribute.put("Category名", "CategoryName");
-			titleAndAttribute.put("Product名", "ProductName");
-			titleAndAttribute.put("Country", "Country");
-			titleAndAttribute.put("单价", "Price");
-			titleAndAttribute.put("Quantity", "Quantity");
+			titleAndAttribute.put("CategoryName", "CATEGORYNAME");
+			titleAndAttribute.put("ProductName", "PRODUCTNAME");
+			titleAndAttribute.put("Country", "COUNTRY");
+			titleAndAttribute.put("Price", "PRICE");
+			titleAndAttribute.put("Quantity", "QUANTITY");
 
 			// 调用解析工具包
 			testExcel = new LeadingInExcel<JqGridModel>(formart);
@@ -324,17 +324,13 @@ public class JqGridExtendController extends BaseController {
 			commonBase.setMessage("TranslateUtil");
 		}
 		
-		
-		
-		
-		
-		
+		/*
 		if (null != file && !file.isEmpty()) {
 			String filePath = PathUtil.getClasspath() + Const.FILEPATHFILE;								//文件上传路径
 			String fileName =  FileUpload.fileUp(file, filePath, "jggridexcel");							//执行上传
 			List<PageData> listPd = (List)ObjectExcelRead.readExcel(filePath, fileName, 2, 0, 0);		//执行读EXCEL操作,读出的数据导入List 2:从第3行开始；0:从第A列开始；0:第0个sheet
 			
-		}
+		} */
 		return commonBase;
 	}
 	
