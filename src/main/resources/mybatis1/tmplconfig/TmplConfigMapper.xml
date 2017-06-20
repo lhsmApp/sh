@@ -20,6 +20,17 @@
 		COL_AVE,	
 		TMPLCONFIG_ID
 	</sql>
+	<sql id="FieldColumns">
+		DEPT_CODE,	
+		TABLE_CODE,	
+		COL_CODE,	
+		COL_NAME,	
+		DISP_ORDER,	
+		DICT_TRANS,	
+		COL_HIDE,	
+		COL_SUM,	
+		COL_AVE
+	</sql>
 	
 	<!-- 字段值 -->
 	<sql id="FieldValue">
@@ -120,6 +131,16 @@
                  #{item}
 		</foreach>
 	</delete>
+	
+	<!-- 根据当前单位编码及表名获取字段配置信息 -->
+	<select id="listNeed" parameterType="pd" resultType="pd">
+		select
+		<include refid="FieldColumns"></include>
+		from 
+		<include refid="tableName"></include>
+		where DEPT_CODE = #{DEPT_CODE}
+	    and TABLE_CODE = #{TABLE_CODE}
+	</select>
 	
 	<!-- fh313596790qq(青苔) -->
 </mapper>
