@@ -116,5 +116,13 @@ public class JqGridExtendService implements JqGridExtendManager{
 		dao.update("JqGridExtendMapper.updateAll", pd);
 	}
 	
+	/**导入
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void batchImport(List<JqGridModel> pd)throws Exception{
+		dao.update("JqGridExtendMapper.batchImport", pd);
+	}
+	
 }
 

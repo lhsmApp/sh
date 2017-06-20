@@ -79,5 +79,11 @@ public interface JqGridExtendManager{
 	 */
 	public void updateAll(List<JqGridModel> pd)throws Exception;
 	
+	/**导入
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void batchImport(List<JqGridModel> pd)throws Exception;
+	
 }
 

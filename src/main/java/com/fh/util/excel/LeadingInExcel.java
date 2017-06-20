@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import java.net.URL;
+
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
@@ -134,7 +136,11 @@ public class LeadingInExcel<T> {
         Properties properties=null;
         String filePath=null;//读取出的文件路径
         try {
-          inputStream= new FileInputStream(this.getClass().getClassLoader().getResource("/"+propertiesFileName+".properties").getPath());
+        	Class<?> ss=this.getClass();
+        	ClassLoader dd = ss.getClassLoader();
+        	URL ff = dd.getResource("/"+propertiesFileName+".properties");
+          String propertiesPath = ff .getPath();
+          inputStream= new FileInputStream(propertiesPath);
           properties=new Properties();
           properties.load(inputStream);
           filePath = properties.getProperty(kyeName);
@@ -174,7 +180,7 @@ public class LeadingInExcel<T> {
         CommonsMultipartFile commons=(CommonsMultipartFile) multipart;
         
         //判断所属路径是否存在、不存在新建
-        if(file.exists())file.mkdirs();
+        if(!file.exists())file.mkdirs();
         
         /*
          * 新建一个文件

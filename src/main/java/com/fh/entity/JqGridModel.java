@@ -9,16 +9,16 @@ public  class JqGridModel implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-    private int ID;
+    private Integer ID;
     private String CATEGORYNAME;
     private String PRODUCTNAME;
     private String COUNTRY;
-    private double PRICE;
-    private int QUANTITY;
-	public int getID() {
+    private Double PRICE;
+    private Integer QUANTITY;
+	public Integer getID() {
 		return ID;
 	}
-	public void setID(int iD) {
+	public void setID(Integer iD) {
 		ID = iD;
 	}
 	public String getCATEGORYNAME() {
@@ -39,16 +39,16 @@ public  class JqGridModel implements Serializable {
 	public void setCOUNTRY(String cOUNTRY) {
 		COUNTRY = cOUNTRY;
 	}
-	public double getPRICE() {
+	public Double getPRICE() {
 		return PRICE;
 	}
-	public void setPRICE(double pRICE) {
+	public void setPRICE(Double pRICE) {
 		PRICE = pRICE;
 	}
-	public int getQUANTITY() {
+	public Integer getQUANTITY() {
 		return QUANTITY;
 	}
-	public void setQUANTITY(int qUANTITY) {
+	public void setQUANTITY(Integer qUANTITY) {
 		QUANTITY = qUANTITY;
 	}
     
