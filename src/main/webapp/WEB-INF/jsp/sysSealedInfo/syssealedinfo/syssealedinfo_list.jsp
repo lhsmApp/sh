@@ -34,43 +34,84 @@
 	<div class="main-container" id="main-container">
 		<div class="main-content">
 			<div class="main-content-inner">
-				<div class="page-content">
+			
+			
+			<div class="page-content">
 					<!-- /section:settings.box -->
 					<div class="page-header">
-						<table >
+						<table>
 							<tr>
-								<td>
-									<span class="label label-xlg label-success arrowed-right">东部管道</span>
-									<!-- arrowed-in-right -->
-									<span class="label label-xlg label-yellow arrowed-in arrowed-right" id="subTitle" style="margin-left:2px;">成本核算</span>
-								</td>
+								<td><span
+									class="label label-xlg label-success arrowed-right">东部管道</span>
+									<!-- arrowed-in-right --> <span
+									class="label label-xlg label-yellow arrowed-in arrowed-right"
+									id="subTitle" style="margin-left: 2px;">业务封存</span> <span
+									style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
+
+									<button id="btnQuery" class="btn btn-white btn-info btn-sm"
+										onclick="showQueryCondi()">
+										<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
+									</button></td>
 							</tr>
 						</table>
-					</div><!-- /.page-header -->
-					<!-- 检索  -->
-						<table style="margin-top:15px;">
-							<tr>
-								<td>
-									<div class="nav-search">
-										<span class="input-icon">
-											<input type="text" placeholder="这里输入关键词" class="nav-search-input" id="keywords" autocomplete="off" name="keywords" value="${pd.keywords }" placeholder="这里输入关键词"/>
-											<i class="ace-icon fa fa-search nav-search-icon"></i>
-										</span>
+					</div>
+					<!-- /.page-header -->
+			
+						<div class="row">
+						<div class="col-xs-12">
+							<div class="widget-box" style="display: none;">
+								<div class="widget-body">
+									<div class="widget-main">
+										<!-- <p class="alert alert-info">Nunc aliquam enim ut arcu.</p> -->
+										<form class="form-inline">
+											
+											<span>
+												<select class="chosen-select form-control" 
+													name="RPT_DEPT" id="RPT_DEPT"
+													data-placeholder="请选单位"
+													style="vertical-align: top; height:32px;width: 150px;">
+													<option value=""></option>
+													<option value="">全部</option>
+													<c:forEach items="${deptList}" var="dept">
+														<option value="${dept}"
+															<c:if test="${pd.RPT_DEPT==dept}">selected</c:if>>${dept }</option>
+													</c:forEach>
+												</select>
+											</span>
+											<span>
+												<select class="chosen-select form-control" 
+													name="BILL_TYPE" id="BILL_TYPE"
+													data-placeholder="请选类型"
+													style="vertical-align: top; height:32px;width: 150px;">
+													<option value=""></option>
+													<option value="">全部</option>
+													<c:forEach items="${billTypeList}" var="billType">
+														<option value="${billType.nameValue}"
+															<c:if test="${pd.BILL_TYPE==billType.nameValue}">selected</c:if>>${billType.nameValue}</option>
+													</c:forEach>
+												</select>
+											</span>
+											
+											<span>
+												<select class="chosen-select form-control" 
+													name="STATUS" id="STATUS"
+													data-placeholder="请选状态"
+													style="vertical-align: top; height:32px;width: 150px;">
+													<option value=""></option>
+													<option value="0">解封</option>
+													<option value="1">封存</option>
+													
+												</select>
+											</span>
+											<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
+												<i class="ace-icon fa fa-search bigger-110"></i>
+											</button>
+										</form>
 									</div>
-								</td>
-								<td style="vertical-align:top;padding-left:2px;">
-								 	<select class="chosen-select form-control" name="BELONG_AREA" id="belong_area" data-placeholder="请选择所属区域" style="vertical-align:top;width: 120px;">
-									<option value=""></option>
-									<option value="">全部</option>
-									<c:forEach items="${deptList}" var="area">
-										<option value="${area }" <c:if test="${pd.BELONG_AREA==area}">selected</c:if>>${area }</option>
-									</c:forEach>
-								  	</select>
-								</td>
-								<td style="vertical-align:top;padding-left:2px"><a class="btn btn-light btn-xs" onclick="tosearch();"  title="检索"><i id="nav-search-icon" class="ace-icon fa fa-search bigger-110 nav-search-icon blue"></i></a></td>
-							</tr>
-						</table>
-						<!-- 检索  -->
+								</div>
+							</div>
+						</div>
+					</div>
 				
 					<div class="row">
 						<div class="col-xs-12">
@@ -158,13 +199,14 @@
 					}
 				},
 				{label: '单据编码',name:'BILL_CODE',index:'',key: true, width:100},
-				{ label: '单据单位', name: 'RPT_DEPT', width: 90},
+				{ label: '单据单位', name: 'RPT_DEPT', width: 90,formatter:customFmatterDept},
+				{ label: '单据单位', name: 'NAME', width: 90},
 				{ label: '单据期间', name: 'RPT_DUR', width: 75},
 				{ label: '上传人', name: 'RPT_USER', width: 75},
 				{ label: '上传时间', name: 'RPT_DATE', width: 80, formatter: 'data'},
 				// sorttype is used only if the data is loaded locally or loadonce is set to true
-				{ label: '单据类型', name: 'BILL_TYPE', width: 80,align:'center'  },                  
-				{ label: '状态', name: 'STATE', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch}                   
+				{ label: '单据类型', name: 'BILL_TYPE_TR', width: 80,align:'center'},                  
+				{ label: '状态', name: 'STATE', width: 80, editable: true,align:'center',formatter: customFmatterState,edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch}                   
 			],
 			reloadAfterSubmit: true, 
 			viewrecords: true, // show the current page, data rang and total records on the toolbar
@@ -255,7 +297,7 @@
             onClickButton: batchEdit
         });
 		
-     	// 批量编辑
+     	// 取消批量编辑
         $('#jqGrid').navButtonAdd('#jqGridPager',
         {
             buttonicon: "ace-icon fa fa-undo",
@@ -286,7 +328,7 @@
 		}, 0);
 	}
 	
-	//批量编辑
+	 //批量编辑
 	function batchEdit(e) {
 		var grid = $("#jqGrid");
         var ids = grid.jqGrid('getDataIDs');
@@ -319,7 +361,7 @@
 		top.jzts();
 		$.ajax({
 			type: "POST",
-			url: '<%=basePath%>jqgridJia/updateAll.do?',
+			url: '<%=basePath%>syssealedinfo/updateAll.do?',
 	    	//data: rowData,//可以单独传入一个对象，后台可以直接通过对应模型接受参数。但是传入Array（listData）就不好用了，所以传list方式需将List转为Json字符窜。
 			//data: '{"rows":listData}',
 			data:{DATA_ROWS:JSON.stringify(listData)},
@@ -348,8 +390,54 @@
 	    	error: function(e) {
 				$(top.hangge());//关闭加载状态
 	    	}
-		});
-    }
+		}); 
+	 }
+		//检索
+		function tosearch() {
+			var RPT_DEPT = $("#RPT_DEPT").val();
+			var STATUS = $("#STATUS").val();
+			var BILL_TYPE = $("#BILL_TYPE").val();
+			$("#jqGrid").jqGrid('setGridParam',{  // 重新加载数据
+				url:'<%=basePath%>syssealedinfo/getPageList.do?RPT_DEPT='+RPT_DEPT+'&STATUS='+STATUS+'&BILL_TYPE='+BILL_TYPE,  
+				datatype:'json',
+			      page:1
+			}).trigger("reloadGrid");
+			
+		}  
+		
+		//显示隐藏查询
+		function showQueryCondi(){
+			if($(".widget-box").css("display")=="block"){
+				$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass('fa-chevron-down');
+				$("#btnQuery").find("span").text("显示查询");
+				$(window).triggerHandler('resize.jqGrid');
+			}
+			else{
+				$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass('fa-chevron-up');
+				$("#btnQuery").find("span").text("隐藏查询");
+			}
+			$(".widget-box").toggle("fast");
+			
+		}
+		
+		
+		function customFmatterDept(cellvalue, options, rowObject){  
+			
+			
+				return '${deptList}';
+			
+		};
+		
+		
+		function customFmatterState(cellvalue, options, rowObject){  
+			if (cellvalue==1) {
+				 return '<span class="label label-important arrowed-in">封存</span>';
+			} else {
+				return '<span class="label label-success arrowed">解封</span>';
+			}
+		};
+   
+	
 	
 	
  	</script>
