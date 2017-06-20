@@ -6,7 +6,10 @@ import org.springframework.stereotype.Service;
 import com.fh.dao.DaoSupport;
 import com.fh.entity.JqPage;
 import com.fh.entity.Page;
+import com.fh.util.Const;
 import com.fh.util.PageData;
+import com.fh.util.StringUtil;
+import com.fh.util.enums.BillType;
 import com.fh.service.sysSealedInfo.syssealedinfo.SysSealedInfoManager;
 
 /** 
@@ -51,7 +54,15 @@ public class SysSealedInfoService implements SysSealedInfoManager{
 	 */
 	@SuppressWarnings("unchecked")
 	public List<PageData> list(JqPage page)throws Exception{
-		return (List<PageData>)dao.findForList("SysSealedInfoMapper.datalistJqPage", page);
+		List<PageData> listPageData = (List<PageData>)dao.findForList("SysSealedInfoMapper.datalistJqPage", page);
+		for (PageData pageData : listPageData) {
+			
+			pageData.put("BILL_TYPE_TR", BillType.getValueByKey(pageData.getString("BILL_TYPE")));
+			
+			
+		}
+		
+		return listPageData;
 	}
 	
 	/**获取记录数量

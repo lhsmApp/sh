@@ -27,6 +27,7 @@ import com.fh.util.PageData;
 import com.fh.util.SqlTools;
 import com.fh.util.Jurisdiction;
 import com.fh.util.Tools;
+import com.fh.util.enums.BillType;
 import com.fh.service.sysSealedInfo.syssealedinfo.SysSealedInfoManager;
 
 /** 
@@ -98,6 +99,7 @@ public class SysSealedInfoController extends BaseController {
 		List<String> deptList = syssealedinfoService.deptList();//单位列表
 		mv.setViewName("sysSealedInfo/syssealedinfo/syssealedinfo_list");
 		mv.addObject("deptList", deptList);
+		mv.addObject("billTypeList", BillType.values());
 		return mv;
 	}
 	
@@ -110,9 +112,22 @@ public class SysSealedInfoController extends BaseController {
 		logBefore(logger, Jurisdiction.getUsername()+"列表Betting");
 		PageData pd = new PageData();
 		pd = this.getPageData();
-		String keywords = pd.getString("keywords");				//关键词检索条件
-		if(null != keywords && !"".equals(keywords)){
-			pd.put("keywords", keywords.trim());
+//		String keywords = pd.getString("keywords");				//关键词检索条件
+//		if(null != keywords && !"".equals(keywords)){
+//			pd.put("keywords", keywords.trim());
+//		}
+		
+		String RPT_DEPT = pd.getString("RPT_DEPT");				//单位检索条件
+		if(null != RPT_DEPT && !"".equals(RPT_DEPT)){
+			pd.put("RPT_DEPT", RPT_DEPT.trim());
+		}
+		String BILL_TYPE = pd.getString("BILL_TYPE");				//单位检索条件
+		if(null != BILL_TYPE && !"".equals(BILL_TYPE)){
+			pd.put("BILL_TYPE", BILL_TYPE.trim());
+		}
+		String STATUS = pd.getString("STATUS");				//单位检索条件
+		if(null != STATUS && !"".equals(STATUS)){
+			pd.put("STATUS", STATUS.trim());
 		}
 		String filters = pd.getString("filters");				//多条件过滤条件
 		if(null != filters && !"".equals(filters)){
@@ -126,6 +141,7 @@ public class SysSealedInfoController extends BaseController {
 		
 		PageResult<PageData> result = new PageResult<PageData>();
 		result.setRows(varList);
+		result.setRowNum(page.getRowNum());
 		result.setRecords(records);
 		result.setPage(page.getPage());
 		
