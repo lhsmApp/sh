@@ -16,6 +16,16 @@
 <link rel="stylesheet" href="static/ace/css/chosen.css" />
 <!-- jsp文件头和头部 -->
 <%@ include file="../index/top.jsp"%>
+<script type="text/javascript" src="static/js/jquery-1.7.2.js"></script>
+<!-- 树形下拉框start -->
+<script type="text/javascript" src="plugins/selectZtree/selectTree.js"></script>
+<script type="text/javascript" src="plugins/selectZtree/framework.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="plugins/selectZtree/import_fh.css" />
+<script type="text/javascript" src="plugins/selectZtree/ztree/ztree.js"></script>
+<link type="text/css" rel="stylesheet"
+	href="plugins/selectZtree/ztree/ztree.css"></link>
+<!-- 树形下拉框end -->
 </head>
 <body class="no-skin">
 	<!-- /section:basics/navbar.layout -->
@@ -31,22 +41,30 @@
 									<div id="zhongxin" style="padding-top: 13px;">
 									<table id="table_report" class="table table-striped table-bordered table-hover">
 										<c:if test="${fx != 'head'}">
-										<%-- <tr>
-											<td style="width:79px;text-align: right;padding-top: 13px;">角色:</td>
-											<td id="juese">
-											<select class="chosen-select form-control" name="ROLE_ID" id="role_id" data-placeholder="请选择角色" style="vertical-align:top;" style="width:98%;" >
-											<option value=""></option>
-											<c:forEach items="${roleList}" var="role">
-												<option value="${role.ROLE_ID }" <c:if test="${role.ROLE_ID == pd.ROLE_ID }">selected</c:if>>${role.ROLE_NAME }</option>
-											</c:forEach>
-											</select>
-											</td>
-										</tr> --%>
-											<input name="ROLE_ID" id="role_id" value="68a2eb8394484984bb78338c05807533" type="hidden" />
+											<tr>
+												<td style="width:79px;text-align: right;padding-top: 13px;">角色:</td>
+												<td id="juese">
+												<select class="chosen-select form-control" name="ROLE_ID" id="role_id" data-placeholder="请选择角色" style="vertical-align:top;" style="width:98%;" >
+												<option value=""></option>
+												<c:forEach items="${roleList}" var="role">
+													<option value="${role.ROLE_ID }" <c:if test="${role.ROLE_ID == pd.ROLE_ID }">selected</c:if>>${role.ROLE_NAME }</option>
+												</c:forEach>
+												</select>
+												</td>
+											</tr>
+											<tr>
+												<td style="width:79px;text-align: right;padding-top: 13px;">单位:</td>
+												<td>
+													<input type="hidden" name="DEPARTMENT_ID" width="400px"
+														id="DEPARTMENT_ID" value="${pd.DEPARTMENT_ID}" />
+														<div class="selectTree" id="selectTree"></div>
+												</td>
+											</tr>
 										</c:if>
 										
 										<c:if test="${fx == 'head'}">
 											<input name="ROLE_ID" id="role_id" value="${pd.ROLE_ID }" type="hidden" />
+											<input name="DEPARTMENT_ID" id="department_id" value="${pd.DEPARTMENT_ID }" type="hidden" />
 										</c:if>
 										<tr>
 											<td style="width:79px;text-align: right;padding-top: 13px;">用户名:</td>
@@ -72,10 +90,10 @@
 											<td style="width:79px;text-align: right;padding-top: 13px;">手机号:</td>
 											<td><input type="number" name="PHONE" id="PHONE"  value="${pd.PHONE }"  maxlength="32" placeholder="这里输入手机号" title="手机号" style="width:98%;"/></td>
 										</tr>
-										<tr>
+										<%-- <tr>
 											<td style="width:79px;text-align: right;padding-top: 13px;">邮箱:</td>
 											<td><input type="email" name="EMAIL" id="EMAIL"  value="${pd.EMAIL }" maxlength="32" placeholder="这里输入邮箱" title="邮箱" onblur="hasE('${pd.USERNAME }')" style="width:98%;"/></td>
-										</tr>
+										</tr> --%>
 										<tr>
 											<td style="width:79px;text-align: right;padding-top: 13px;">备注:</td>
 											<td><input type="text" name="BZ" id="BZ"value="${pd.BZ }" placeholder="这里输入备注" maxlength="64" title="备注" style="width:98%;"/></td>
@@ -122,7 +140,7 @@
 	});
 	//保存
 	function save(){
-		/* if($("#role_id").val()==""){
+		if($("#role_id").val()==""){
 			$("#juese").tips({
 				side:3,
 	            msg:'选择角色',
@@ -131,7 +149,7 @@
 	        });
 			$("#role_id").focus();
 			return false;
-		} */
+		}
 		if($("#loginname").val()=="" || $("#loginname").val()=="此用户名已存在!"){
 			$("#loginname").tips({
 				side:3,
@@ -190,8 +208,18 @@
 			$("#name").focus();
 			return false;
 		}
-		var myreg = /^(((13[0-9]{1})|159)+\d{8})$/;
-		if($("#PHONE").val()==""){
+		if($("#department_id").val()==""){
+			$("#department_id").tips({
+				side:3,
+	            msg:'输入单位',
+	            bg:'#AE81FF',
+	            time:3
+	        });
+			$("#name").focus();
+			return false;
+		}
+		/*var myreg = /^(((13[0-9]{1})|159)+\d{8})$/;
+		 if($("#PHONE").val()==""){
 			
 			$("#PHONE").tips({
 				side:3,
@@ -201,7 +229,7 @@
 	        });
 			$("#PHONE").focus();
 			return false;
-		}else if($("#PHONE").val().length != 11 && !myreg.test($("#PHONE").val())){
+		} else if($("#PHONE").val().length != 11 && !myreg.test($("#PHONE").val())){
 			$("#PHONE").tips({
 				side:3,
 	            msg:'手机号格式不正确',
@@ -210,8 +238,8 @@
 	        });
 			$("#PHONE").focus();
 			return false;
-		}
-		if($("#EMAIL").val()==""){
+		}*/
+		/* if($("#EMAIL").val()==""){
 			
 			$("#EMAIL").tips({
 				side:3,
@@ -230,7 +258,7 @@
 	        });
 			$("#EMAIL").focus();
 			return false;
-		}
+		} */
 		if($("#user_id").val()==""){
 			hasU();
 		}else{
@@ -337,5 +365,26 @@
 			});
 		}
 	});
+	
+	//下拉树
+	var defaultNodes = {"treeNodes":${zTreeNodes}};
+	function initComplete(){
+		
+		//绑定change事件
+		$("#selectTree").bind("change",function(){
+			console.log($(this));
+			console.log($(this).attr("relValue"));
+			if(!$(this).attr("relValue")){
+		      //  top.Dialog.alert("没有选择节点");
+		    }else{
+				//alert("选中节点文本："+$(this).attr("relText")+"<br/>选中节点值："+$(this).attr("relValue"));
+				$("#DEPARTMENT_ID").val($(this).attr("relValue"));
+		    }
+		});
+		//赋给data属性
+		$("#selectTree").data("data",defaultNodes);  
+		$("#selectTree").render();
+		$("#selectTree2_input").val("${null==depname?'请选择':depname}");
+	}
 </script>
 </html>
