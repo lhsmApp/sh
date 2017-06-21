@@ -9,38 +9,16 @@
  * @version
  -->
  
-	<!--表名tb_staff_detail -->
+	<!--表名 -->
 	<sql id="tableName">
-		TB_JQGRID
+		tb_staff_detail
 	</sql>
 	
 	<!-- 字段 -->
-	<sql id="Field">
-		CATEGORYNAME,	
-		PRODUCTNAME,	
-		COUNTRY,	
-		IFNULL(PRICE, 0) PRICE,
-		IFNULL(QUANTITY, 0) QUANTITY,
-		ID
-	</sql>
-	
-	<!-- 字段 -->
-	<sql id="insertField">
-		CATEGORYNAME,	
-		PRODUCTNAME,	
-		COUNTRY,	
-		PRICE,	
-		QUANTITY
-	</sql>
-	
-	<!-- 字段值 -->
-	<sql id="FieldValue">
-		#{CATEGORYNAME},	
-		#{PRODUCTNAME},	
-		#{COUNTRY},	
-		#{PRICE},	
-		#{QUANTITY}
-	</sql>
+    <sql id="Field"> BILL_CODE, BUSI_DATE, USER_CODE, USER_NAME, STAFF_IDENT, BANK_CARD, USER_GROP, USER_CATG, DEPT_CODE, ORG_UNIT, SAL_RANGE, POST_SALY, BONUS, CASH_BONUS, WORK_OT, BACK_SALY, RET_SALY, CHK_CASH, INTR_SGL_AWAD, SENY_ALLE, POST_ALLE, NS_ALLE, AREA_ALLE, EXPT_ALLE, TECH_ALLE, LIVE_EXPE, LIVE_ALLE, LEAVE_DM, HOUSE_ALLE, ITEM_ALLE, MEAL_EXPE, TRF_ALLE, TEL_EXPE, HLDY_ALLE, KID_ALLE, COOL_EXPE, EXT_SGL_AWAD, PRE_TAX_PLUS, GROSS_PAY, ENDW_INS, UNEMPL_INS, MED_INS, CASD_INS, HOUSE_FUND, SUP_PESN, TAX_BASE_ADJ, ACCRD_TAX, AFTER_TAX, ACT_SALY, GUESS_DIFF, CUST_COL1, CUST_COL2, CUST_COL3, CUST_COL4, CUST_COL5, CUST_COL6, CUST_COL7, CUST_COL8, CUST_COL9, CUST_COL10, ESTB_DEPT </sql>
+
+    <!-- 字段值 -->
+    <sql id="FieldValue"> #{BILL_CODE}, #{BUSI_DATE}, #{USER_CODE}, #{USER_NAME}, #{STAFF_IDENT}, #{BANK_CARD}, #{USER_GROP}, #{USER_CATG}, #{DEPT_CODE}, #{ORG_UNIT}, #{SAL_RANGE}, #{POST_SALY}, #{BONUS}, #{CASH_BONUS}, #{WORK_OT}, #{BACK_SALY}, #{RET_SALY}, #{CHK_CASH}, #{INTR_SGL_AWAD}, #{SENY_ALLE}, #{POST_ALLE}, #{NS_ALLE}, #{AREA_ALLE}, #{EXPT_ALLE}, #{TECH_ALLE}, #{LIVE_EXPE}, #{LIVE_ALLE}, #{LEAVE_DM}, #{HOUSE_ALLE}, #{ITEM_ALLE}, #{MEAL_EXPE}, #{TRF_ALLE}, #{TEL_EXPE}, #{HLDY_ALLE}, #{KID_ALLE}, #{COOL_EXPE}, #{EXT_SGL_AWAD}, #{PRE_TAX_PLUS}, #{GROSS_PAY}, #{ENDW_INS}, #{UNEMPL_INS}, #{MED_INS}, #{CASD_INS}, #{HOUSE_FUND}, #{SUP_PESN}, #{TAX_BASE_ADJ}, #{ACCRD_TAX}, #{AFTER_TAX}, #{ACT_SALY}, #{GUESS_DIFF}, #{CUST_COL1}, #{CUST_COL2}, #{CUST_COL3}, #{CUST_COL4}, #{CUST_COL5}, #{CUST_COL6}, #{CUST_COL7}, #{CUST_COL8}, #{CUST_COL9}, #{CUST_COL10}, #{ESTB_DEPT} </sql>
 	
 	<!-- 获取系统期间-->
 	<select id="currentSection" parameterType="pd" resultType="String">
@@ -54,7 +32,7 @@
 		insert into 
 	<include refid="tableName"></include>
 		(
-	<include refid="insertField"></include>
+	<include refid="Field"></include>
 		) values (
 	<include refid="FieldValue"></include>
 		)

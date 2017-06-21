@@ -2,6 +2,7 @@ package com.fh.service.tmplconfig.tmplconfig;
 
 import java.util.List;
 import com.fh.entity.Page;
+import com.fh.entity.TmplConfigDetail;
 import com.fh.util.PageData;
 
 /** 
@@ -58,7 +59,7 @@ public interface TmplConfigManager{
 	 * @param pd
 	 * @throws Exception
 	 */
-	public List<PageData> listNeed(PageData pd)throws Exception;
+	public List<TmplConfigDetail> listNeed(TmplConfigDetail item)throws Exception;
 	
 }
 

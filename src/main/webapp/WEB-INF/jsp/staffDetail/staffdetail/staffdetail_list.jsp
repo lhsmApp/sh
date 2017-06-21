@@ -98,42 +98,27 @@
 		$(top.hangge());//关闭加载状态
         var gridBase_selector = "#jqGridBase";  
         var pagerBase_selector = "#jqGridBasePager";  
+	    
+		//当前期间,取自tb_system_config的SystemDateTime字段
+	    var SystemDateTime = '${SystemDateTime}';
+		//当前登录人所在二级单位
+	    var DepartName = '${DepartName}';
+		//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
+	    var State = '${State}';
+		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
+	    var jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
         
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
 			$(gridBase_selector).jqGrid( 'setGridWidth', $(".page-content").width());
-			$(gridBase_selector).jqGrid( 'setGridHeight', $(window).height() - 200);
+			$(gridBase_selector).jqGrid( 'setGridHeight', $(window).height() - 240);
 	    })
 		
 		$(gridBase_selector).jqGrid({
 			url: '<%=basePath%>staffdetail/getPageList.do',
 			datatype: "json",
-			colModel: [
-						{ name: 'ID', hidden: true, key: true, },
-						{ label: 'Category Name', name: 'CATEGORYNAME', width: 75, 
-							editable: true, edittype:'text', editoptions:{maxLength:'50'}, editrules:{required:true}
-						},
-						{ label: 'Product Name', name: 'PRODUCTNAME', width: 90,
-							editable: true, edittype:'textarea', editoptions:{maxlength:'100'} //, rows:'2', cols:'20'
-						},
-						{ label: 'Country', name: 'COUNTRY', width: 100,
-							//选择
-							editable: true, edittype:'select', editoptions:{value:'USA:USA;UK:UK;CHI:CHINA'},
-						    //翻译
-						    formatter: 'select', formatoptions: {value: 'USA:USA;UK:UK;CHI:CHINA'},
-							stype: 'select', searchoptions: {value: ':[All];USA:USA;UK:UK;CHI:CHINA'}
-						},
-						{ label: 'Price', name: 'PRICE', width: 80, sorttype: 'number', align: 'right', summaryType:'sum', summaryTpl:'<b>sum:{0}</b>',
-							editable: true, edittype:'text', editoptions:{maxlength:'10', number: true},
-						    searchrules: {number: true}
-						},
-						// sorttype is used only if the data is loaded locally or loadonce is set to true
-						{ label: 'Quantity', name: 'QUANTITY', width: 80, sorttype: 'integer',
-							editable: true, edittype:'text', editoptions:{maxlength:'11', integer: true},
-						    searchrules: {interger: true}
-						}
-			],
-			caption: '当前期间:' + ${SystemDateTime} + ', 当前单位:' + ${DepartName} + '',
+			colModel: jqGridColModel,
+			caption: '当前期间：' + SystemDateTime + '， 当前单位：' + DepartName + '',
 			reloadAfterSubmit: true, 
 			viewrecords: true, 
 			rowNum: 10,
@@ -145,8 +130,8 @@
 			editurl: '<%=basePath%>staffdetail/edit.do?',
 			
 			pager: pagerBase_selector,
-			//footerrow: true,
-			//userDataOnFooter: true,
+			footerrow: true,
+			userDataOnFooter: true,
 			
 			loadComplete : function() {
 				var table = this;
@@ -169,7 +154,7 @@
 	            delicon : 'ace-icon fa fa-trash-o red',
 	            search: true,
 	            searchicon : 'ace-icon fa fa-search orange',
-	            refresh: false,
+	            refresh: true,
 	            refreshicon : 'ace-icon fa fa-refresh green',
 	            view: false,
 	            viewicon : 'ace-icon fa fa-search-plus grey',
@@ -186,7 +171,7 @@
 			closeAfterAdd: true,
 			recreateForm: true,
 			viewPagerButtons: false,
-			reloadAfterSubmit: true,
+			//reloadAfterSubmit: true,
 			beforeShowForm : beforeEditOrAddCallback,
 		    onclickSubmit: function(params, posdata) {
 				console.log("onclickSubmit");
@@ -203,18 +188,40 @@
 			}
         },
         {
-        	multipleSearch:true, 
-        	multipleGroup:true,
-        	showQuery: true
+			//search form
+			recreateForm: true,
+			afterShowSearch: beforeSearchCallback,
+			afterRedraw: function(){
+				style_search_filters($(this));
+			},
+			multipleSearch: true,
+			//multipleGroup:true,
+			showQuery: true
         },
         {},{});
 
+        $(gridBase_selector).navButtonAdd(pagerBase_selector,
+        {
+            buttonicon: "ace-icon fa fa-pencil-square-o purple",
+            title: "批量编辑",
+            caption: "",
+            position: "last",
+            onClickButton: batchEdit
+        });
+        $(gridBase_selector).navButtonAdd(pagerBase_selector,
+        {
+            buttonicon: "ace-icon fa fa-undo",
+            title: "取消批量编辑",
+            caption: "",
+            position: "last",
+            onClickButton: batchCancelEdit
+        });
 		$(gridBase_selector).navButtonAdd(pagerBase_selector, {
              caption : "",
              buttonicon : "ace-icon fa fa-save green",
-             onClickButton : saveRows,
+             onClickButton : batchSave,
              position : "last",
-             title : "",
+             title : "批量保存",
              cursor : "pointer"
          });
 			$(gridBase_selector).navButtonAdd(pagerBase_selector, {
@@ -222,7 +229,7 @@
 	             buttonicon : "ace-icon fa fa-cloud-upload",
 	             onClickButton : importItems,
 	             position : "last",
-	             title : "",
+	             title : "导入",
 	             cursor : "pointer"
 	         });
 			$(gridBase_selector).navButtonAdd(pagerBase_selector, {
@@ -230,11 +237,40 @@
 	             buttonicon : "ace-icon fa fa-cloud-download",
 	             onClickButton : exportItems,
 	             position : "last",
-	             title : "",
+	             title : "导出",
+	             cursor : "pointer"
+	         });
+			$(gridBase_selector).navButtonAdd(pagerBase_selector, {
+	             caption : "",
+	             buttonicon : "ace-icon fa fa-check-square green",
+	             onClickButton : report,
+	             position : "last",
+	             title : "上报",
 	             cursor : "pointer"
 	         });
 
-	    function saveRows(){
+			//批量编辑
+			function batchEdit(e) {
+				var grid = $(gridBase_selector);
+		        var ids = grid.jqGrid('getDataIDs');
+		        for (var i = 0; i < ids.length; i++) {
+		            grid.jqGrid('editRow',ids[i]);
+		        }
+		    }
+			
+			//取消批量编辑
+			function batchCancelEdit(e) {
+				var grid = $(gridBase_selector);
+		        var ids = grid.jqGrid('getDataIDs');
+		        for (var i = 0; i < ids.length; i++) {
+		            grid.jqGrid('restoreRow',ids[i]);
+		        }
+		    }
+
+			/**
+			 * 批量保存
+			 */
+	    function batchSave(){
 	    	//获得选中行ids的方法
             var ids = $(gridBase_selector).jqGrid("getGridParam", "selarrrow");  
 	    	
@@ -324,6 +360,13 @@
 	    function exportItems(){
 	    	window.location.href='<%=basePath%>jqGridExtend/excel.do?';
 	    }
+
+		/**
+		 * 上报
+		 */
+		function report(){
+			
+		}
 	    
 		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
 		

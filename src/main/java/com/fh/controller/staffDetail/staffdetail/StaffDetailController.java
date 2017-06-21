@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
@@ -25,6 +27,7 @@ import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
 import com.fh.entity.Page;
 import com.fh.entity.PageResult;
+import com.fh.entity.TmplConfigDetail;
 import com.fh.exception.CustomException;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
@@ -106,16 +109,61 @@ public class StaffDetailController extends BaseController {
 		//当前登录人所在二级单位
 		String DepartCode = "001001";
 		String DepartName = "登录人单位";
-		mv.addObject("DepartName", DepartCode);
-		//封存状态,取自tb_sys_sealed_info表state字段
-		String State = "";
+		mv.addObject("DepartName", DepartName);
+		//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
+		String State = "0";
 		mv.addObject("State", State);
 		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-		pd.put("DEPT_CODE", DepartCode);
-		pd.put("TABLE_CODE", "TB_STAFF_DETAIL");
-		List<PageData> listColumns = tmplconfigService.listNeed(pd);
-		mv.addObject("listColumns", listColumns);
+		TmplConfigDetail item = new TmplConfigDetail();
+		item.setDEPT_CODE(DepartCode);
+		item.setTABLE_CODE("TB_STAFF_DETAIL");
+		List<TmplConfigDetail> listColumns = tmplconfigService.listNeed(item);
+		//mv.addObject("listColumns", listColumns);
+		String jqGridColModel = "[";
+		if(listColumns != null && listColumns.size() > 0){
+			for(int i=0; i < listColumns.size(); i++){
+				jqGridColModel += "{" 
+			            + " label: '" + listColumns.get(i).getCOL_NAME() + "', "
+					    + " name: '" + listColumns.get(i).getCOL_CODE() + "', "
+					    + " hidden: " + (Integer.parseInt(listColumns.get(i).getCOL_HIDE()) == 1 ? "false" : "true") + ", "
+						//+ " label: " + listColumns.get(i).getCOL_NAME() + ", "
+						//+ " label: " + listColumns.get(i).getCOL_NAME() + ", "
+						//+ " label: " + listColumns.get(i).getCOL_NAME() + ", "
+						+ " width: '180' "
+						+ "}";
+				if(i < listColumns.size() -1){
+					jqGridColModel += ",";
+				}
+			}
+		}
+		jqGridColModel += "]";
+		mv.addObject("jqGridColModel", jqGridColModel);
 		
+		/* 
+						{ name: 'ID', hidden: true, key: true, },
+						{ label: 'Category Name', name: 'CATEGORYNAME', width: 180, 
+							editable: true, edittype:'text', editoptions:{maxLength:'50'}, editrules:{required:true}
+						},
+						{ label: 'Product Name', name: 'PRODUCTNAME', width: 180,
+							editable: true, edittype:'textarea', editoptions:{maxlength:'100'} //, rows:'2', cols:'20'
+						},
+						{ label: 'Country', name: 'COUNTRY', width: 180,
+							//选择
+							editable: true, edittype:'select', editoptions:{value:'USA:USA;UK:UK;CHI:CHINA'},
+						    //翻译
+						    formatter: 'select', formatoptions: {value: 'USA:USA;UK:UK;CHI:CHINA'},
+							stype: 'select', searchoptions: {value: ':[All];USA:USA;UK:UK;CHI:CHINA'}
+						},
+						{ label: 'Price', name: 'PRICE', width: 180, sorttype: 'number', align: 'right', summaryType:'sum', summaryTpl:'<b>sum:{0}</b>',
+							editable: true, edittype:'text', editoptions:{maxlength:'10', number: true},
+						    searchrules: {number: true}
+						},
+						// sorttype is used only if the data is loaded locally or loadonce is set to true
+						{ label: 'Quantity', name: 'QUANTITY', width: 180, sorttype: 'integer',
+							editable: true, edittype:'text', editoptions:{maxlength:'11', integer: true},
+						    searchrules: {interger: true}
+						}
+						*/
 		return mv;
 	}
 	
@@ -139,12 +187,13 @@ public class StaffDetailController extends BaseController {
 		
 		page.setPd(pd);
 		List<PageData> varList = staffdetailService.JqPage(page);	//列出Betting列表
-		//int records = staffdetailService.countJqGridExtend(page);
+		int records = staffdetailService.countJqGridExtend(page);
 		PageData userdata=staffdetailService.getFooterSummary(page);
 		
 		PageResult<PageData> result = new PageResult<PageData>();
 		result.setRows(varList);
-		//result.setRecords(records);
+		result.setRowNum(page.getRowNum());
+		result.setRecords(records);
 		result.setPage(page.getPage());
 		result.setUserdata(userdata);
 		
