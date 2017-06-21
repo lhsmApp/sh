@@ -1,158 +1,202 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="TmplConfigMapper">
-	
+
 	<!--表名 -->
 	<sql id="tableName">
 		TB_TMPL_CONFIG_DETAIL
 	</sql>
-	
+
 	<!-- 字段 -->
 	<sql id="Field">
-		DEPT_CODE,	
-		TABLE_CODE,	
-		COL_CODE,	
-		COL_NAME,	
-		DISP_ORDER,	
-		DICT_TRANS,	
-		COL_HIDE,	
-		COL_SUM,	
+		DEPT_CODE,
+		TABLE_CODE,
+		COL_CODE,
+		COL_NAME,
+		DISP_ORDER,
+		DICT_TRANS,
+		COL_HIDE,
+		COL_SUM,
 		COL_AVE
 	</sql>
 	<sql id="FieldColumns">
-		DEPT_CODE,	
-		TABLE_CODE,	
-		COL_CODE,	
-		COL_NAME,	
-		DISP_ORDER,	
-		DICT_TRANS,	
-		COL_HIDE,	
-		COL_SUM,	
+		DEPT_CODE,
+		TABLE_CODE,
+		COL_CODE,
+		COL_NAME,
+		DISP_ORDER,
+		DICT_TRANS,
+		COL_HIDE,
+		COL_SUM,
 		COL_AVE
 	</sql>
-	
+
 	<!-- 字段值 -->
 	<sql id="FieldValue">
-		#{DEPT_CODE},	
-		#{TABLE_CODE},	
-		#{COL_CODE},	
-		#{COL_NAME},	
-		#{DISP_ORDER},	
-		#{DICT_TRANS},	
-		#{COL_HIDE},	
-		#{COL_SUM},	
+		#{DEPT_CODE},
+		#{TABLE_CODE},
+		#{COL_CODE},
+		#{COL_NAME},
+		#{DISP_ORDER},
+		#{DICT_TRANS},
+		#{COL_HIDE},
+		#{COL_SUM},
 		#{COL_AVE}
 	</sql>
-	
-	<!-- 新增-->
+
+	<!-- 新增 -->
 	<insert id="save" parameterType="pd">
-		insert into 
-	<include refid="tableName"></include>
+		insert into
+		<include refid="tableName"></include>
 		(
-	<include refid="Field"></include>
+		<include refid="Field"></include>
 		) values (
-	<include refid="FieldValue"></include>
+		<include refid="FieldValue"></include>
 		)
 	</insert>
-	
-	<!-- 删除-->
+
+	<!-- 删除 -->
 	<delete id="delete" parameterType="pd">
 		delete from
 		<include refid="tableName"></include>
-		where 
-			TABLE_CODE = #{TABLE_CODE}
+		where
+		TABLE_CODE = #{TABLE_CODE}
 	</delete>
-	
+
 	<!-- 修改 -->
 	<update id="edit" parameterType="pd">
 		update
 		<include refid="tableName"></include>
-		set 
-			DEPT_CODE = #{DEPT_CODE},
-			TABLE_CODE = #{TABLE_CODE},
-			COL_CODE = #{COL_CODE},
-			COL_NAME = #{COL_NAME},
-			DISP_ORDER = #{DISP_ORDER},
-			DICT_TRANS = #{DICT_TRANS},
-			COL_HIDE = #{COL_HIDE},
-			COL_SUM = #{COL_SUM},
-			COL_AVE = #{COL_AVE}
-		where 
+		set
+		<!-- DEPT_CODE = #{DEPT_CODE},
+		TABLE_CODE = #{TABLE_CODE},
+		COL_CODE = #{COL_CODE}, -->
+		COL_NAME = #{COL_NAME},
+		DISP_ORDER = #{DISP_ORDER},
+		DICT_TRANS = #{DICT_TRANS},
+		COL_HIDE = #{COL_HIDE},
+		COL_SUM = #{COL_SUM},
+		COL_AVE = #{COL_AVE}
+		where
+		DEPT_CODE = #{DEPT_CODE}
+		and
 		TABLE_CODE = #{TABLE_CODE}
+		and
+		COL_CODE = #{COL_CODE}
 	</update>
-	
+
 	<!-- 通过ID获取数据 -->
 	<select id="findById" parameterType="pd" resultType="pd">
-		select 
+		select
 		<include refid="Field"></include>
-		from 
+		from
 		<include refid="tableName"></include>
-		where 
-			TABLE_CODE = #{TABLE_CODE}
+		where
+		TABLE_CODE = #{TABLE_CODE}
 	</select>
-	
+
 	<!-- 列表 -->
 	<select id="datalistPage" parameterType="page" resultType="pd">
 		select
 		<include refid="Field"></include>
-		from 
+		from
 		<include refid="tableName"></include>
-		<where >
-		<if test="pd.DEPT_BIANMA!= null and pd.DEPT_BIANMA != ''"><!-- 检索 -->
-			and (
-			DEPT_CODE = #{pd.DEPT_BIANMA}
-			)
-		</if>
-		<if test="pd.TABLE_CODE!= null and pd.TABLE_CODE != ''"><!-- 检索 -->
-			and (
-			TABLE_CODE = #{pd.TABLE_CODE}
-			)
-		</if>
+		<where>
+			<if test="pd.DEPT_BIANMA!= null and pd.DEPT_BIANMA != ''"><!-- 检索 -->
+				and (
+				DEPT_CODE = #{pd.DEPT_BIANMA}
+				)
+			</if>
+			<if test="pd.TABLE_CODE!= null and pd.TABLE_CODE != ''"><!-- 检索 -->
+				and (
+				TABLE_CODE = #{pd.TABLE_CODE}
+				)
+			</if>
 		</where>
 	</select>
-	
+
 	<!-- 列表(全部) -->
-	<select id="listAll" parameterType="pd" resultType="pd">
-		select
-		<include refid="Field"></include>
-		from 
-		<include refid="tableName"></include>
+	<select id="listAll" parameterType="page" resultType="pd">
+		SELECT
+		a.DEPT_CODE,
+		a.TABLE_CODE,
+		a.COL_CODE,
+		a.COL_NAME,
+		a.DISP_ORDER,
+		a.DICT_TRANS,
+		a.COL_HIDE,
+		a.COL_SUM,
+		a.COL_AVE,
+		b.NAME DNAME,
+		c.TABLE_NAME
+		FROM
+		tb_tmpl_config_detail a LEFT JOIN oa_department b
+		on a.DEPT_CODE = b.DEPARTMENT_CODE
+		LEFT JOIN tb_tmpl_config_base c
+		on a.TABLE_CODE = c.TABLE_CODE
+		where 1=1
+			<if test="pd.DEPT_BIANMA!= null and pd.DEPT_BIANMA != ''">
+				and (
+				a.DEPT_CODE = #{pd.DEPARTMENT_CODE}
+				)
+			</if>
+			<if test="pd.TABLE_CODE!= null and pd.TABLE_CODE != ''">
+				and (
+				a.TABLE_CODE = #{pd.TABLE_CODE}
+				)
+			</if>
+		
 	</select>
-	
+
 	<!-- 批量删除 -->
 	<delete id="deleteAll" parameterType="String">
 		delete from
 		<include refid="tableName"></include>
-		where 
-			TABLE_CODE in
-		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
-                 #{item}
+		where
+		TABLE_CODE in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
 		</foreach>
 	</delete>
-		
-	
-	
+
+
+
 	<!-- 基本配置表 -->
 	<select id="listBase" parameterType="page" resultType="pd">
-		select * from TB_TMPL_CONFIG_BASE
+		select *
+		from TB_TMPL_CONFIG_BASE
 	</select>
-	
-	
-	
-	
-	
-	
-	
-	
-    <!-- 根据当前单位编码及表名获取字段配置信息 -->
+
+
+
+
+
+
+
+
+	<!-- 根据当前单位编码及表名获取字段配置信息 -->
 	<select id="listNeed" parameterType="pd" resultType="pd">
 		select
 		<include refid="FieldColumns"></include>
-		from 
+		from
 		<include refid="tableName"></include>
 		where DEPT_CODE = #{DEPT_CODE}
-	    and TABLE_CODE = #{TABLE_CODE}
+		and TABLE_CODE = #{TABLE_CODE}
 	</select>
 	
+	
+	<!-- 临时生成的数据表明细 -->
+	<select id="temporaryList" parameterType="page" resultType="pd">
+		SELECT column_name AS COL_CODE, column_comment AS COL_NAME,
+		'DB_FHDB' AS DEPT_CODE,'001' AS TABLE_CODE,'A公司' AS DNAME,'公积金' AS TABLE_NAME
+		FROM 
+ 		information_schema.columns 
+ 		WHERE 
+ 		table_schema ='dbgdhs' 
+ 		AND 
+ 		table_name = #{pd.TABLE_CODE}
+	</select>
+
 	<!-- fh313596790qq(青苔) -->
 </mapper>

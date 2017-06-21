@@ -80,8 +80,7 @@
 													name="TABLE_CODE" id=TABLE_CODE
 													data-placeholder="请选择表明称"
 													style="vertical-align: top; height:32px;width: 150px;">
-													<option value="null"></option>
-													<option value="">全部</option>
+													<option value="">请选择表名称</option>
 													<c:forEach items="${listBase}" var="tableName">
 														<option value="${tableName.TABLE_CODE }"
 															<c:if test="${pd.TABLE_CODE==tableName.TABLE_CODE}">selected</c:if>>${tableName.TABLE_NAME  }</option>
@@ -162,26 +161,31 @@
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
 			$("#jqGrid").jqGrid( 'setGridWidth', $(".page-content").width());
-			$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - 200);
+			$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - 230);
 	    })
 		
 		$("#jqGrid").jqGrid({
 			url: '<%=basePath%>tmplconfig/list.do',
 			datatype: "json",
 			 colModel: [
-				{label: '单位编码',name:'DEPT_CODE', width:100},
-				{ label: '表名', name: 'TABLE_CODE', width: 90},
+				//隐藏where条件
+				{ label: '单位编码', name: 'DEPT_CODE', width: 60,hidden : true,editable: true,},
+				{ label: '表编码', name: 'TABLE_CODE', width: 60,hidden : true,editable: true,},
+				{ label: '列编码', name: 'COL_CODE', width: 60,hidden : true,editable: true,},
+			
+				{label: '单位',name:'DNAME', width:100}, 
+				{ label: '表名', name: 'TABLE_NAME', width: 90},
 				{ label: '列编码', name: 'COL_CODE', width: 60},
-				{ label: '列名称', name: 'COL_NAME', width: 60},
-				{ label: '显示序号', name: 'DISP_ORDER', width: 80},
-				{ label: '字典翻译', name: 'DICT_TRANS', width: 80,align:'center'},                  
-				{ label: '列隐藏', name: 'COL_HIDE', width: 80, editable: true,align:'center',formatter: customFmatterState,edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch},                   
-				{ label: '列汇总', name: 'COL_SUM', width: 80, editable: true,align:'center'},                   
-				{ label: '列平均值', name: 'COL_AVE', width: 80, editable: true,align:'center'}                   
+				{ label: '列名称', name: 'COL_NAME', width: 60,editable: true,},
+				{ label: '显示序号', name: 'DISP_ORDER', width: 80, sorttype: 'number',editable: true,},
+				{ label: '字典翻译', name: 'DICT_TRANS', width: 80,align:'center',editable: true,},                  
+				{ label: '列隐藏', name: 'COL_HIDE', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch},                   
+				{ label: '列汇总', name: 'COL_SUM', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch},                   
+				{ label: '列平均值', name: 'COL_AVE', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch}                   
 			],
 			reloadAfterSubmit: true, 
 			viewrecords: true, // show the current page, data rang and total records on the toolbar
-			rowNum: 10,
+			rowNum: 1000,
 			sortname: 'DISP_ORDER',
 			pager: "#jqGridPager",
 			loadComplete : function() {
@@ -291,20 +295,7 @@
         });
  	});
 
-	//switch element when editing inline
-	function aceSwitch( cellvalue, options, cell ) {
-		setTimeout(function(){
-			$(cell) .find('input[type=checkbox]')
-				.addClass('ace ace-switch ace-switch-5')
-				.after('<span class="lbl"></span>');
-		}, 0);
-		
-		if (cellvalue==1) {
-			return 1;
-		}else if (cellvalue==0) {
-			return 0;
-		}
-	}
+	
 	
 	 //批量编辑
 	function batchEdit(e) {
@@ -377,10 +368,10 @@
 	
 		//检索
 		function tosearch() {
-			if($("#TABLE_CODE").val()=="null"){
+			if($("#TABLE_CODE").val()==""){
 				$("#TABLE_CODE").tips({
 					side:3,
-		            msg:'请输入表名',
+		            msg:'请选择表名称',
 		            bg:'#AE81FF',
 		            time:2
 		        });
@@ -420,10 +411,27 @@
 		function customFmatterState(cellvalue, options, rowObject){  
 			if (cellvalue==1) {
 				 return '<span class="label label-important arrowed-in">隐藏</span>';
-			} else {
+			} else if(cellvalue==0){
 				return '<span class="label label-success arrowed">不隐藏</span>';
 			}
 		};
+		
+		//switch element when editing inline
+		function aceSwitch( cellvalue, options, cell ) {
+			setTimeout(function(){
+				$(cell) .find('input[type=checkbox]')
+					.addClass('ace ace-switch ace-switch-5')
+					.after('<span class="lbl"></span>');
+			}, 0);
+			console.log(cellvalue);
+			console.log(options);
+			console.log(cell);
+			if (cellvalue=='隐藏') {			
+				return 1;
+			}else if (cellvalue=='不隐藏') {
+				return 0;
+			}
+		}
    
 		function initComplete(){
 			console.log("下拉树");
