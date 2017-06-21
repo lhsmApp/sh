@@ -372,8 +372,6 @@
 		
 		//绑定change事件
 		$("#selectTree").bind("change",function(){
-			console.log($(this));
-			console.log($(this).attr("relValue"));
 			if(!$(this).attr("relValue")){
 		      //  top.Dialog.alert("没有选择节点");
 		    }else{
@@ -384,7 +382,7 @@
 		//赋给data属性
 		$("#selectTree").data("data",defaultNodes);  
 		$("#selectTree").render();
-		$("#selectTree2_input").val("${null==depname?'请选择':depname}");
+		$("#selectTree2_input").val("${null==depname?'请选择单位':depname}");
 	}
 </script>
 </html>

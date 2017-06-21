@@ -549,15 +549,16 @@ function initComplete(){
 	//赋给data属性
 	$("#selectTree").data("data",defaultNodes);  
 	$("#selectTree").render();
-	$("#selectTree2_input").val("${'0'==depname?'请选择':depname}");
+	$("#selectTree2_input").val("${null==depname||''==depname?'请选择单位':depname}");
 	
-	$("#selectTree2_button").closest('.ali01').append("<input value='' class='selBtn' id='reset_button' type='button' onclick='reset()'>");
+	$("#selectTree2_button").closest('.ali01').append("<input value=''  id='reset_button' type='button' class='selBtn' style='background-image: url(plugins/selectZtree/ztree/img/diy/2.png);border: 1px solid rgb(124,193,235);border-left: 0;background-position: center;' onclick='reset1()'>");
 }
 
-function reset(){
-	$("#DEPARTMENT_ID").val(' ');
-	$("#selectTree2_input").val("请选择");
-	console.log('${pd.DEPARTMENT_ID}');
+function reset1(){
+	/* console.log(${pd.DEPARTMENT_ID });
+	console.log('${pd.DEPARTMENT_ID }'); */
+	$("#DEPARTMENT_ID").val('');
+	$("#selectTree2_input").val("请选择单位");
 }
 </script>
 </html>
