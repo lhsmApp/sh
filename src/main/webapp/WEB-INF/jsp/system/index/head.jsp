@@ -102,8 +102,7 @@
 					</span> <i class="ace-icon fa fa-caret-down"></i>
 				</a>
 
-					<ul
-						class="user-menu dropdown-menu-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+					<ul class="user-menu dropdown-menu-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
 						<!-- <li>
 									<a onclick="editPhoto();" style="cursor:pointer;"><i class="ace-icon glyphicon glyphicon-picture"></i>修改头像</a>editUserH()在 WebRoot\static\js\myjs\head.js中
 								</li>
@@ -114,8 +113,11 @@
 									<a onclick="editSys();" style="cursor:pointer;"><i class="ace-icon fa fa-cog"></i>系统设置</a>editSys()在 WebRoot\static\js\myjs\head.js中
 								</li>
 								<li class="divider"></li> -->
-						<li><a href="logout"><i class="ace-icon fa fa-power-off"></i>退出登录</a>
-						</li>
+							<li>
+								<a onclick="editUserH();" style="cursor:pointer;"><i class="ace-icon fa fa-user"></i>修改资料</a>
+							</li>
+							<li class="divider"></li>
+							<li><a href="logout"><i class="ace-icon fa fa-power-off"></i>退出登录</a></li>
 					</ul></li>
 
 				<!-- /section:basics/navbar.user_menu -->

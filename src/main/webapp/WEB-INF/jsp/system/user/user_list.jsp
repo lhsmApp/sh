@@ -65,6 +65,14 @@
 									</c:forEach>
 								  	</select>
 								</td>
+								<td style="vertical-align:top;padding-left:2px;"> 
+								 	<select class="chosen-select form-control" name="STATUS" id="STATUS" data-placeholder="状态" style="vertical-align:top;width: 79px;">
+									<option value=""></option>
+									<option value="">全部</option>
+									<option value="1" <c:if test="${pd.STATUS == '1' }">selected</c:if> >正常</option>
+									<option value="0" <c:if test="${pd.STATUS == '0' }">selected</c:if> >停用</option>
+									</select>
+								</td>
 								<td  style="padding-left:5px">
 									<div class="selectTree" id="selectTree"></div>
 								</td>
@@ -84,14 +92,17 @@
 									<label class="pos-rel"><input type="checkbox" class="ace" id="zcheckbox" /><span class="lbl"></span></label>
 									</th>
 									<th class="center" style="width:50px;">序号</th>
-									<th class="center">编号</th>
+									<!-- <th class="center">编号</th> -->
 									<th class="center">用户名</th>
 									<th class="center">姓名</th>
 									<th class="center">角色</th>
 									<th class="center">单位</th>
+									<th class="center">手机号</th>
 									<!-- <th class="center"><i class="ace-icon fa fa-envelope-o"></i>邮箱</th> -->
 									<th class="center"><i class="ace-icon fa fa-clock-o bigger-110 hidden-480"></i>最近登录</th>
 									<th class="center">上次登录IP</th>
+									<th class="center">备注</th>
+									<th class="center">状态</th>
 									<th class="center">操作</th>
 								</tr>
 							</thead>
@@ -110,14 +121,20 @@
 												<c:if test="${user.USERNAME == 'admin'}"><label><input type='checkbox' disabled="disabled" class="ace" /><span class="lbl"></span></label></c:if>
 											</td>
 											<td class='center' style="width: 30px;">${vs.index+1}</td>
-											<td class="center">${user.NUMBER }</td>
+											<%-- <td class="center">${user.NUMBER }</td> --%>
 											<td class="center">${user.USERNAME }<%-- <a onclick="viewUser('${user.USERNAME}')" style="cursor:pointer;">${user.USERNAME }</a> --%></td>
 											<td class="center">${user.NAME }</td>
 											<td class="center">${user.ROLE_NAME }</td>
 											<td class="center">${user.DEPARTMENT_NAME }</td>
+											<td class="center">${user.PHONE }</td>
 											<%-- <td class="center"><a title="发送电子邮件" style="text-decoration:none;cursor:pointer;" <c:if test="${QX.email == 1 }">onclick="sendEmail('${user.EMAIL }');"</c:if>>${user.EMAIL }&nbsp;<i class="ace-icon fa fa-envelope-o"></i></a></td> --%>
 											<td class="center">${user.LAST_LOGIN}</td>
 											<td class="center">${user.IP}</td>
+											<td class="center">${user.BZ }</td>
+											<td style="width: 60px;" class="center">
+												<c:if test="${user.STATUS == '0' }"><span class="label label-important arrowed-in">停用</span></c:if>
+												<c:if test="${user.STATUS == '1' }"><span class="label label-success arrowed">正常</span></c:if>
+											</td>
 											<td class="center">
 												<c:if test="${QX.edit != 1 && QX.del != 1 }">
 												<span class="label label-large label-grey arrowed-in-right arrowed-in"><i class="ace-icon fa fa-lock" title="无权限"></i></span>
@@ -138,11 +155,11 @@
 														<i class="ace-icon fa fa-pencil-square-o bigger-120" title="编辑"></i>
 													</a>
 													</c:if>
-													<c:if test="${QX.del == 1 }">
+													<%-- <c:if test="${QX.del == 1 }">
 													<a class="btn btn-xs btn-danger" onclick="delUser('${user.USER_ID }','${user.USERNAME }');">
 														<i class="ace-icon fa fa-trash-o bigger-120" title="删除"></i>
 													</a>
-													</c:if>
+													</c:if> --%>
 												</div>
 												<div class="hidden-md hidden-lg">
 													<div class="inline pos-rel">
@@ -177,7 +194,7 @@
 																</a>
 															</li>
 															</c:if>
-															<c:if test="${QX.del == 1 }">
+															<%-- <c:if test="${QX.del == 1 }">
 															<li>
 																<a style="cursor:pointer;" onclick="delUser('${user.USER_ID }','${user.USERNAME }');" class="tooltip-error" data-rel="tooltip" title="删除">
 																	<span class="red">
@@ -185,7 +202,7 @@
 																	</span>
 																</a>
 															</li>
-															</c:if>
+															</c:if> --%>
 														</ul>
 													</div>
 												</div>
@@ -219,16 +236,15 @@
 								<%-- <c:if test="${QX.FHSMS == 1 }"><a title="批量发送站内信" class="btn btn-mini btn-info" onclick="makeAll('确定要给选中的用户发送站内信吗?');"><i class="ace-icon fa fa-envelope-o bigger-120"></i></a></c:if>
 								<c:if test="${QX.email == 1 }"><a title="批量发送电子邮件" class="btn btn-mini btn-primary" onclick="makeAll('确定要给选中的用户发送邮件吗?');"><i class="ace-icon fa fa-envelope bigger-120"></i></a></c:if> 
 								<c:if test="${QX.sms == 1 }"><a title="批量发送短信" class="btn btn-mini btn-warning" onclick="makeAll('确定要给选中的用户发送短信吗?');"><i class="ace-icon fa fa-envelope-o bigger-120"></i></a></c:if>--%>
-								<c:if test="${QX.del == 1 }">
+								<%-- <c:if test="${QX.del == 1 }">
 								<a title="批量删除" class="btn btn-mini btn-danger" onclick="makeAll('确定要删除选中的数据吗?');" ><i class='ace-icon fa fa-trash-o bigger-120'></i></a>
-								</c:if>
+								</c:if> --%>
 							</td>
 							<td style="vertical-align:top;"><div class="pagination" style="float: right;padding-top: 0px;margin-top: 0px;">${page.pageStr}</div></td>
 						</tr>
 					</table>
 					</div>
 					</form>
-	
 						</div>
 						<!-- /.col -->
 					</div>
@@ -549,15 +565,16 @@ function initComplete(){
 	//赋给data属性
 	$("#selectTree").data("data",defaultNodes);  
 	$("#selectTree").render();
-	$("#selectTree2_input").val("${'0'==depname?'请选择':depname}");
+	$("#selectTree2_input").val("${null==depname||''==depname?'请选择单位':depname}");
 	
-	$("#selectTree2_button").closest('.ali01').append("<input value='' class='selBtn' id='reset_button' type='button' onclick='reset()'>");
+	$("#selectTree2_button").closest('.ali01').append("<input value=''  id='reset_button' type='button' class='selBtn' style='background-image: url(plugins/selectZtree/ztree/img/diy/2.png);border: 1px solid rgb(124,193,235);border-left: 0;background-position: center;' onclick='reset1()'>");
 }
 
-function reset(){
-	$("#DEPARTMENT_ID").val(' ');
-	$("#selectTree2_input").val("请选择");
-	console.log('${pd.DEPARTMENT_ID}');
+function reset1(){
+	/* console.log(${pd.DEPARTMENT_ID });
+	console.log('${pd.DEPARTMENT_ID }'); */
+	$("#DEPARTMENT_ID").val('');
+	$("#selectTree2_input").val("请选择单位");
 }
 </script>
 </html>

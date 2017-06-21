@@ -183,6 +183,24 @@
 		<include refid="tableName"></include>
 		where DEPT_CODE = #{DEPT_CODE}
 		and TABLE_CODE = #{TABLE_CODE}
+	
+	
+	
+	
+	
+	
+	
+	
+	<!-- 根据当前单位编码及表名获取字段配置信息 -->
+	<select id="listNeed" parameterType="com.fh.entity.TmplConfigDetail" 
+	        resultType="com.fh.entity.TmplConfigDetail">
+		select
+		    <include refid="FieldColumns"></include>
+		from 
+		    <include refid="tableName"></include>
+		where DEPT_CODE = #{DEPT_CODE}
+	    and TABLE_CODE = #{TABLE_CODE}
+	    order by DISP_ORDER
 	</select>
 	
 	

@@ -63,7 +63,7 @@ public class StaffController extends BaseController {
 		pd.put("STAFF_ID", this.get32UUID());	//主键
 		pd.put("USER_ID", "");					//绑定账号ID
 		staffService.save(pd);					//保存员工信息到员工表
-		String DEPARTMENT_IDS = departmentService.getDEPARTMENT_IDS(pd.getString("DEPARTMENT_ID"));//获取某个部门所有下级部门ID
+		String DEPARTMENT_IDS = departmentService.getDEPARTMENT_CODES(pd.getString("DEPARTMENT_ID"));//获取某个部门所有下级部门ID
 		pd.put("DATAJUR_ID", pd.getString("STAFF_ID")); //主键
 		pd.put("DEPARTMENT_IDS", DEPARTMENT_IDS);		//部门ID集
 		datajurService.save(pd);						//把此员工默认部门及以下部门ID保存到组织数据权限表
@@ -99,7 +99,7 @@ public class StaffController extends BaseController {
 		PageData pd = new PageData();
 		pd = this.getPageData();
 		staffService.edit(pd);
-		String DEPARTMENT_IDS = departmentService.getDEPARTMENT_IDS(pd.getString("DEPARTMENT_ID"));//获取某个部门所有下级部门ID
+		String DEPARTMENT_IDS = departmentService.getDEPARTMENT_CODES(pd.getString("DEPARTMENT_ID"));//获取某个部门所有下级部门ID
 		pd.put("DATAJUR_ID", pd.getString("STAFF_ID")); //主键
 		pd.put("DEPARTMENT_IDS", DEPARTMENT_IDS);		//部门ID集
 		datajurService.edit(pd);						//把此员工默认部门及以下部门ID保存到组织数据权限表
@@ -125,7 +125,7 @@ public class StaffController extends BaseController {
 		}
 		String DEPARTMENT_ID = pd.getString("DEPARTMENT_ID");
 		pd.put("DEPARTMENT_ID", null == DEPARTMENT_ID?Jurisdiction.getDEPARTMENT_ID():DEPARTMENT_ID);	//只有检索条件穿过值时，才不为null,否则读取缓存
-		pd.put("item", (null == pd.getString("DEPARTMENT_ID")?Jurisdiction.getDEPARTMENT_IDS():departmentService.getDEPARTMENT_IDS(pd.getString("DEPARTMENT_ID"))));	//部门检索条件,列出此部门下级所属部门的员工
+		pd.put("item", (null == pd.getString("DEPARTMENT_ID")?Jurisdiction.getDEPARTMENT_IDS():departmentService.getDEPARTMENT_CODES(pd.getString("DEPARTMENT_CODE"))));	//部门检索条件,列出此部门下级所属部门的员工
 	
 		/* 比如员工 张三 所有部门权限的部门为 A ， A 的下级有  C , D ,F ，那么当部门检索条件值为A时，只列出A以下部门的员工(自己不能修改自己的信息，只能上级部门修改)，不列出部门为A的员工，当部门检索条件值为C时，可以列出C及C以下员工 */
 		if(!(null == DEPARTMENT_ID || DEPARTMENT_ID.equals(Jurisdiction.getDEPARTMENT_ID()))){

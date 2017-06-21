@@ -84,8 +84,8 @@
 													name="BELONG_AREA" id="belong_area"
 													data-placeholder="请选择所属区域"
 													style="vertical-align: top; height:32px;width: 150px;">
-													<option value=""></option>
-													<option value="">全部</option>
+													<option value="" selected>请选择国家</option>
+													<option value="">USA</option>
 													<c:forEach items="${areaList}" var="area">
 														<option value="${area.BIANMA }"
 															<c:if test="${pd.BELONG_AREA==area.BIANMA}">selected</c:if>>${area.NAME }</option>

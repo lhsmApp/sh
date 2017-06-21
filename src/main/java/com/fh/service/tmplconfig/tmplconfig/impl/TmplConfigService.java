@@ -5,6 +5,7 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import com.fh.dao.DaoSupport;
 import com.fh.entity.Page;
+import com.fh.entity.TmplConfigDetail;
 import com.fh.util.PageData;
 import com.fh.service.tmplconfig.tmplconfig.TmplConfigManager;
 
@@ -93,8 +94,8 @@ public class TmplConfigService implements TmplConfigManager{
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	public List<PageData> listNeed(PageData pd)throws Exception{
-		return (List<PageData>)dao.findForList("TmplConfigMapper.listNeed", pd);
+	public List<TmplConfigDetail> listNeed(TmplConfigDetail item)throws Exception{
+		return (List<TmplConfigDetail>)dao.findForList("TmplConfigMapper.listNeed", item);
 	}
 
 	/**临时数据表明细 

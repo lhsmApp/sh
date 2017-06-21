@@ -95,8 +95,8 @@ public class DepartmentService implements DepartmentManager{
 	public List<Department> listAllDepartment(String parentId) throws Exception {
 		List<Department> departmentList = this.listSubDepartmentByParentId(parentId);
 		for(Department depar : departmentList){
-			depar.setTreeurl("department/list.do?DEPARTMENT_ID="+depar.getDEPARTMENT_ID());
-			depar.setSubDepartment(this.listAllDepartment(depar.getDEPARTMENT_ID()));
+			depar.setTreeurl("department/list.do?DEPARTMENT_CODE="+depar.getDEPARTMENT_CODE());
+			depar.setSubDepartment(this.listAllDepartment(depar.getDEPARTMENT_CODE()));
 			depar.setTarget("treeFrame");
 			depar.setIcon("static/images/user.gif");
 		}
@@ -129,8 +129,8 @@ public class DepartmentService implements DepartmentManager{
 		List<PageData> departmentPdList = new ArrayList<PageData>();
 		for(Department depar : departmentList){
 			PageData pd = new PageData();
-			pd.put("id", depar.getDEPARTMENT_ID());
-			pd.put("parentId", depar.getPARENT_ID());
+			pd.put("id", depar.getDEPARTMENT_CODE());
+			pd.put("parentId", depar.getPARENT_CODE());
 			pd.put("name", depar.getNAME());
 			pd.put("icon", "static/images/user.gif");
 			departmentPdList.add(pd);
@@ -147,10 +147,10 @@ public class DepartmentService implements DepartmentManager{
 	 * @return
 	 * @throws Exception
 	 */
-	public String getDEPARTMENT_IDS(String DEPARTMENT_ID) throws Exception {
-		DEPARTMENT_ID = Tools.notEmpty(DEPARTMENT_ID)?DEPARTMENT_ID:"0";
+	public String getDEPARTMENT_CODES(String DEPARTMENT_CODE) throws Exception {
+		DEPARTMENT_CODE = Tools.notEmpty(DEPARTMENT_CODE)?DEPARTMENT_CODE:"0";
 		List<PageData> zdepartmentPdList = new ArrayList<PageData>();
-		zdepartmentPdList = this.listAllDepartmentToSelect(DEPARTMENT_ID,zdepartmentPdList);
+		zdepartmentPdList = this.listAllDepartmentToSelect(DEPARTMENT_CODE,zdepartmentPdList);
 		StringBuffer sb = new StringBuffer();
 		sb.append("(");
 		for(PageData dpd : zdepartmentPdList){
