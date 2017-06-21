@@ -129,5 +129,22 @@ public class StaffDetailService implements StaffDetailManager{
 		dao.update("StaffDetailMapper.batchImport", pd);
 	}
 	
+	/**获取字典翻译类型
+	 * @param 
+	 * @throws Exception
+	 */
+	public String getDicType(String dicName)throws Exception{
+		return (String)dao.findForObject("StaffDetailMapper.getDicType", dicName);
+	}
+	
+	/**获取SysDictionaries字典
+	 * @param page
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PageData> getSysDictionaries(String dicName)throws Exception{
+		return (List<PageData>)dao.findForList("StaffDetailMapper.getSysDictionaries", dicName);
+	}
+	
 }
 

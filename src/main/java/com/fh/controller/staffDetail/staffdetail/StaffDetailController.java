@@ -238,14 +238,20 @@ public class StaffDetailController extends BaseController {
 		return ret;
 	}
 	
-	public String getDicValue(String trans){
+	public String getDicValue(String dicName) throws Exception{
 		StringBuilder ret = new StringBuilder();
-		//String strDicType = staffdetailService.getDicType(trans);
-		//if(strDicType.equals("1")){
+		String strDicType = staffdetailService.getDicType(dicName);
+		if(strDicType.equals("1")){
+			List<PageData> dicList = staffdetailService.getSysDictionaries(dicName);
+			for(PageData dic : dicList){
+				if(ret!=null && !ret.toString().trim().equals("")){
+					ret.append("; ");
+					ret.append(dic.getString("BIANMA") + ":" + dic.getString("NAME"));
+				}
+			}
+		} else if(strDicType.equals("2")){
 			
-		//} else if(strDicType.equals("2")){
-			
-		//}
+		}
 		
 		return ret.toString();
 	}

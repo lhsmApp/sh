@@ -46,11 +46,13 @@
 	    WHERE DICT_CODE = #{DICT_CODE}
 	</select>
 	
-	<!-- 获取字典-->
+	<!-- 获取SysDictionaries字典-->
 	<select id="getSysDictionaries" parameterType="String" resultType="pd">
-	    SELECT SRC_TYPE
-	    FROM tb_tmpl_config_dict
-	    WHERE DICT_CODE = #{DICT_CODE}
+	    SELECT r.*
+	    FROM sys_dictionaries p, sys_dictionaries r
+	    WHERE p.DICTIONARIES_ID = r.PARENT_ID
+	    and p.BIANMA = #{BIANMA}
+	    order by ORDER_BY
 	</select>
 	
 	<!-- 列表 -->

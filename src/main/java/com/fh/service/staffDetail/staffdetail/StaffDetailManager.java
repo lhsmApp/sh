@@ -93,6 +93,18 @@ public interface StaffDetailManager{
 	 */
 	public void batchImport(List<JqGridModel> pd)throws Exception;
 	
+	/**获取字典翻译类型
+	 * @param pd
+	 * @throws Exception
+	 */
+	public String getDicType(String dicName)throws Exception;
+	
+	/**获取SysDictionaries字典
+	 * @param page
+	 * @throws Exception
+	 */
+	public List<PageData> getSysDictionaries(String dicName)throws Exception;
+	
 	
 }
 
