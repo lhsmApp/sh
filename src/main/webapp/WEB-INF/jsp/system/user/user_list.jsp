@@ -19,6 +19,15 @@
 <%@ include file="../index/top.jsp"%>
 <!-- 日期框 -->
 <link rel="stylesheet" href="static/ace/css/datepicker.css" />
+
+<script type="text/javascript" src="static/js/jquery-1.7.2.js"></script>
+<!-- 树形下拉框start -->
+<script type="text/javascript" src="plugins/selectZtree/selectTree.js"></script>
+<script type="text/javascript" src="plugins/selectZtree/framework.js"></script>
+<link rel="stylesheet" type="text/css" href="plugins/selectZtree/import_fh.css"/>
+<script type="text/javascript" src="plugins/selectZtree/ztree/ztree.js"></script>
+<link type="text/css" rel="stylesheet" href="plugins/selectZtree/ztree/ztree.css"></link>
+<!-- 树形下拉框end -->
 </head>
 <body class="no-skin">
 
@@ -33,6 +42,8 @@
 						
 						<!-- 检索  -->
 						<form action="user/listUsers.do" method="post" name="userForm" id="userForm">
+						<input name="ZDEPARTMENT_ID" id="ZDEPARTMENT_ID" type="hidden" value="${pd.ZDEPARTMENT_ID }" />
+						<input name="DEPARTMENT_ID" id="DEPARTMENT_ID" type="hidden" value="${pd.DEPARTMENT_ID }" />
 						<table style="margin-top:5px;">
 							<tr>
 								<td>
@@ -43,9 +54,9 @@
 									</span>
 									</div>
 								</td>
-								<td style="padding-left:2px;"><input class="span10 date-picker" name="lastLoginStart" id="lastLoginStart"  value="${pd.lastLoginStart}" type="text" data-date-format="yyyy-mm-dd" readonly="readonly" style="width:88px;" placeholder="开始日期" title="最近登录开始"/></td>
-								<td style="padding-left:2px;"><input class="span10 date-picker" name="lastLoginEnd" name="lastLoginEnd"  value="${pd.lastLoginEnd}" type="text" data-date-format="yyyy-mm-dd" readonly="readonly" style="width:88px;" placeholder="结束日期" title="最近登录结束"/></td>
-								<%-- <td style="vertical-align:top;padding-left:2px;">
+								<%-- <td style="padding-left:2px;"><input class="span10 date-picker" name="lastLoginStart" id="lastLoginStart"  value="${pd.lastLoginStart}" type="text" data-date-format="yyyy-mm-dd" readonly="readonly" style="width:88px;" placeholder="开始日期" title="最近登录开始"/></td>
+								<td style="padding-left:2px;"><input class="span10 date-picker" name="lastLoginEnd" name="lastLoginEnd"  value="${pd.lastLoginEnd}" type="text" data-date-format="yyyy-mm-dd" readonly="readonly" style="width:88px;" placeholder="结束日期" title="最近登录结束"/></td> --%>
+								<td style="vertical-align:top;padding-left:2px;">
 								 	<select class="chosen-select form-control" name="ROLE_ID" id="role_id" data-placeholder="请选择角色" style="vertical-align:top;width: 120px;">
 									<option value=""></option>
 									<option value="">全部</option>
@@ -53,11 +64,14 @@
 										<option value="${role.ROLE_ID }" <c:if test="${pd.ROLE_ID==role.ROLE_ID}">selected</c:if>>${role.ROLE_NAME }</option>
 									</c:forEach>
 								  	</select>
-								</td> --%>
+								</td>
+								<td  style="padding-left:5px">
+									<div class="selectTree" id="selectTree"></div>
+								</td>
 								<c:if test="${QX.cha == 1 }">
 								<td style="vertical-align:top;padding-left:2px;"><a class="btn btn-light btn-xs" onclick="searchs();"  title="检索"><i id="nav-search-icon" class="ace-icon fa fa-search bigger-110 nav-search-icon blue"></i></a></td>
-								<c:if test="${QX.toExcel == 1 }"><td style="vertical-align:top;padding-left:2px;"><a class="btn btn-light btn-xs" onclick="toExcel();" title="导出到EXCEL"><i id="nav-search-icon" class="ace-icon fa fa-download bigger-110 nav-search-icon blue"></i></a></td></c:if>
-								<c:if test="${QX.FromExcel == 1 }"><td style="vertical-align:top;padding-left:2px;"><a class="btn btn-light btn-xs" onclick="fromExcel();" title="从EXCEL导入"><i id="nav-search-icon" class="ace-icon fa fa-cloud-upload bigger-110 nav-search-icon blue"></i></a></td></c:if>
+								<%-- <c:if test="${QX.toExcel == 1 }"><td style="vertical-align:top;padding-left:2px;"><a class="btn btn-light btn-xs" onclick="toExcel();" title="导出到EXCEL"><i id="nav-search-icon" class="ace-icon fa fa-download bigger-110 nav-search-icon blue"></i></a></td></c:if>
+								<c:if test="${QX.FromExcel == 1 }"><td style="vertical-align:top;padding-left:2px;"><a class="btn btn-light btn-xs" onclick="fromExcel();" title="从EXCEL导入"><i id="nav-search-icon" class="ace-icon fa fa-cloud-upload bigger-110 nav-search-icon blue"></i></a></td></c:if> --%>
 								</c:if>
 							</tr>
 						</table>
@@ -73,7 +87,8 @@
 									<th class="center">编号</th>
 									<th class="center">用户名</th>
 									<th class="center">姓名</th>
-									<!-- <th class="center">角色</th> -->
+									<th class="center">角色</th>
+									<th class="center">单位</th>
 									<!-- <th class="center"><i class="ace-icon fa fa-envelope-o"></i>邮箱</th> -->
 									<th class="center"><i class="ace-icon fa fa-clock-o bigger-110 hidden-480"></i>最近登录</th>
 									<th class="center">上次登录IP</th>
@@ -98,7 +113,8 @@
 											<td class="center">${user.NUMBER }</td>
 											<td class="center">${user.USERNAME }<%-- <a onclick="viewUser('${user.USERNAME}')" style="cursor:pointer;">${user.USERNAME }</a> --%></td>
 											<td class="center">${user.NAME }</td>
-											<%-- <td class="center">${user.ROLE_NAME }</td> --%>
+											<td class="center">${user.ROLE_NAME }</td>
+											<td class="center">${user.DEPARTMENT_NAME }</td>
 											<%-- <td class="center"><a title="发送电子邮件" style="text-decoration:none;cursor:pointer;" <c:if test="${QX.email == 1 }">onclick="sendEmail('${user.EMAIL }');"</c:if>>${user.EMAIL }&nbsp;<i class="ace-icon fa fa-envelope-o"></i></a></td> --%>
 											<td class="center">${user.LAST_LOGIN}</td>
 											<td class="center">${user.IP}</td>
@@ -276,7 +292,7 @@ function add(){
 	 diag.Title ="新增";
 	 diag.URL = '<%=basePath%>user/goAddU.do';
 	 diag.Width = 469;
-	 diag.Height = 510;
+	 diag.Height = 505;
 	 diag.CancelEvent = function(){ //关闭事件
 		 if(diag.innerFrame.contentWindow.document.getElementById('zhongxin').style.display == 'none'){
 			 if('${page.currentPage}' == '0'){
@@ -299,7 +315,7 @@ function editUser(user_id){
 	 diag.Title ="资料";
 	 diag.URL = '<%=basePath%>user/goEditU.do?USER_ID='+user_id;
 	 diag.Width = 469;
-	 diag.Height = 510;
+	 diag.Height = 505;
 	 diag.CancelEvent = function(){ //关闭事件
 		 if(diag.innerFrame.contentWindow.document.getElementById('zhongxin').style.display == 'none'){
 			nextPage(${page.currentPage});
@@ -518,5 +534,30 @@ function viewUser(USERNAME){
 	 diag.show();
 }
 		
+function initComplete(){
+	//下拉树
+	var defaultNodes = {"treeNodes":${zTreeNodes}};
+	//绑定change事件
+	$("#selectTree").bind("change",function(){
+		if(!$(this).attr("relValue")){
+	      //  top.Dialog.alert("没有选择节点");
+	    }else{
+			//alert("选中节点文本："+$(this).attr("relText")+"<br/>选中节点值："+$(this).attr("relValue"));
+			$("#DEPARTMENT_ID").val($(this).attr("relValue"));
+	    }
+	});
+	//赋给data属性
+	$("#selectTree").data("data",defaultNodes);  
+	$("#selectTree").render();
+	$("#selectTree2_input").val("${'0'==depname?'请选择':depname}");
+	
+	$("#selectTree2_button").closest('.ali01').append("<input value='' class='selBtn' id='reset_button' type='button' onclick='reset()'>");
+}
+
+function reset(){
+	$("#DEPARTMENT_ID").val(' ');
+	$("#selectTree2_input").val("请选择");
+	console.log('${pd.DEPARTMENT_ID}');
+}
 </script>
 </html>

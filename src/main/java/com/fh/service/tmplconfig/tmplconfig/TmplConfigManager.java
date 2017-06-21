@@ -61,6 +61,12 @@ public interface TmplConfigManager{
 	 * @throws Exception
 	 */
 	public List<PageData> listBase(Page pd) throws Exception;
+
+    /**根据当前单位编码及表名获取字段配置信息
+	 * @param pd
+	 * @throws Exception
+	 */
+	public List<PageData> listNeed(PageData pd)throws Exception;
 	
 }
 

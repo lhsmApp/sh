@@ -94,73 +94,14 @@
 	<canvas class="cavs"></canvas>
 	<div
 		style="width: 100%; text-align: center; margin: 0 auto; position: absolute;">
-		<!-- Guest登录 -->
-		<div id="windowsGuest">
-			<div id="loginbox">
-				<form action="" method="post" name="loginForm" id="loginForm">
-					<div class="control-group normal_text">
-						<h3>
-							<img src="static/login/logo.png" alt="东部管道人工成本核算系统" />
-						</h3>
-						
-						<h2 class="title">
-			        		<a href="#" onclick="changepage(3)" class="guest">Guest入口</a>
-			        		<a href="#" onclick="changepage(2)" class="admin last">管理员入口</a>
-      					</h2>
-					</div>
-					<div class="control-group">
-						<div class="controls">
-							<div class="main_input_box">
-								<span class="add-on bg_lg"> <i><img height="37"
-										src="static/login/user.png" /></i>
-								</span><input type="text" name="loginnameGuest" id="loginnameGuest" value="Guest" disabled/>
-							</div>
-						</div>
-					</div>
-					<div class="form-actions">
-						<div style="width: 86%; padding-left: 8%;">
-
-							<div style="float: left; padding-top: 2px;">
-								<i><img src="static/login/yan.png" /></i>
-							</div>
-							<div style="float: left;" class="codediv">
-								<input type="text" name="codeGuest" id="codeGuest" class="login_code"
-									style="height: 16px; padding-top: 4px;" />
-							</div>
-							<div style="float: left;">
-								<i><img style="height: 22px;" id="guestcodeImg" alt="点击更换"
-									title="点击更换" src="" /></i>
-							</div>
-							<c:if test="${pd.isZhuce == 'yes' }">
-								<span class="pull-right" style="padding-right: 3%;"><a
-									href="javascript:changepage(1);" class="btn btn-success">注册</a></span>
-							</c:if>
-							<span class="pull-right"><a onclick="severCheckGuest();"
-								class="flip-link btn btn-info" id="to-recover-guest">登录</a></span>
-						</div>
-					</div>
-				</form>
-				<div class="controls">
-					<div class="main_input_box">
-						<font color="white"><span id="nameerr">Copyright ©
-								lhsm 2017</span></font>
-					</div>
-				</div>
-			</div>
-		</div>
 		<!-- 管理员登录 -->
-		<div id="windows1" style="display: none;">
+		<div id="windows1">
 			<div id="loginbox">
 				<form action="" method="post" name="loginForm" id="loginForm">
 					<div class="control-group normal_text">
 						<h3>
 							<img src="static/login/logo.png" alt="东部管道人工成本核算系统" />
 						</h3>
-						
-						<h2 class="title">
-			        		<a href="#" onclick="changepage(3)" class="guest">Guest入口</a>
-			        		<a href="#" onclick="changepage(2)" class="admin last">管理员入口</a>
-      					</h2>
 					</div>
 					<div class="control-group">
 						<div class="controls">
@@ -303,7 +244,7 @@
 				<div class="controls">
 					<div class="main_input_box">
 						<font color="white"><span id="nameerr">Copyright ©
-								FHqq313596790 2100</span></font>
+								lhsm</span></font>
 					</div>
 				</div>
 			</div>
@@ -383,56 +324,16 @@
 				});
 			}
 		}
-		
-		function severCheckGuest() {		
-			if (checkGuest()) {
-				var loginname = $("#loginnameGuest").val();
-				var code = loginname + ",fh," + "123456"+ ",fh," + $("#codeGuest").val();
-				console.log(code);
-				$.ajax({
-					type : "POST",
-					url : 'login_login_guest',
-					data : {
-						KEYDATA : code,
-						tm : new Date().getTime()
-					},
-					dataType : 'json',
-					cache : false,
-					success : function(data) {
-						if ("success" == data.result) {
-							saveCookie();
-							window.location.href = "main/index";
-						}else if ("codeerror" == data.result) {
-							$("#code").tips({
-								side : 1,
-								msg : "验证码输入有误",
-								bg : '#FF5080',
-								time : 15
-							});
-							showfh();
-							$("#code").focus();
-						}
-					}
-				});
-			}
-		}
 
 		$(document).ready(function() {
-			changeCode3();
+			changeCode1();
 			$("#codeImg").bind("click", changeCode1);
 			$("#zcodeImg").bind("click", changeCode2);
-			$("#guestcodeImg").bind("click", changeCode3);
 		});
 
 		$(document).keyup(function(event) {
 			if (event.keyCode == 13) {
-				if((document.getElementById('windowsGuest').style.display == 'none')==false){
-					console.log("guest");
-					$("#to-recover-guest").trigger("click");
-				}else{
-					console.log("admin");
-					$("#to-recover").trigger("click");
-				}
+				$("#to-recover").trigger("click");
 			}
 		});
 
@@ -446,9 +347,6 @@
 		}
 		function changeCode2() {
 			$("#zcodeImg").attr("src", "code.do?t=" + genTimestamp());
-		}
-		function changeCode3() {
-			$("#guestcodeImg").attr("src", "code.do?t=" + genTimestamp());
 		}
 		//客户端校验
 		function check() {
@@ -486,29 +384,6 @@
 				});
 				showfh();
 				$("#code").focus();
-				return false;
-			}
-			$("#loginbox").tips({
-				side : 1,
-				msg : '正在登录 , 请稍后 ...',
-				bg : '#68B500',
-				time : 10
-			});
-
-			return true;
-		}
-		
-		//客户端校验
-		function checkGuest() {
-			if ($("#codeGuest").val() == "") {
-				$("#codeGuest").tips({
-					side : 1,
-					msg : '验证码不得为空',
-					bg : '#AE81FF',
-					time : 3
-				});
-				showfh();
-				$("#codeGuest").focus();
 				return false;
 			}
 			$("#loginbox").tips({
