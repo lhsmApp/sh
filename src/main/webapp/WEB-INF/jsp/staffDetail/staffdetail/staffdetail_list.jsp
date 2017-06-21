@@ -121,6 +121,7 @@
 			caption: '当前期间：' + SystemDateTime + '， 当前单位：' + DepartName + '',
 			reloadAfterSubmit: true, 
 			viewrecords: true, 
+			shrinkToFit: false,
 			rowNum: 10,
 			rowList: [10,20,30],
             multiselect: true,

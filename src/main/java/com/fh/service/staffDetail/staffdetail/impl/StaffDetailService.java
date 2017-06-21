@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.fh.dao.DaoSupport;
 import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
+import com.fh.entity.TableColumns;
 import com.fh.util.PageData;
 import com.fh.service.staffDetail.staffdetail.StaffDetailManager;
 
@@ -27,6 +28,15 @@ public class StaffDetailService implements StaffDetailManager{
 	 */
 	public String currentSection(PageData pd)throws Exception{
 		return (String) dao.findForObject("StaffDetailMapper.currentSection", pd);
+	}
+	
+	/**获取某表的所有列
+	 * @param 
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<TableColumns> getTableColumns(PageData pd)throws Exception{
+		return (List<TableColumns>)dao.findForList("StaffDetailMapper.getTableColumns", pd);
 	}
 	
 	/**新增
