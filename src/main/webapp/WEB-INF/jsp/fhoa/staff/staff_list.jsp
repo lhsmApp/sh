@@ -356,6 +356,7 @@
 		
 		
 		function initComplete(){
+			console.log("下拉树");
 			//下拉树
 			var defaultNodes = {"treeNodes":${zTreeNodes}};
 			//绑定change事件

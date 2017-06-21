@@ -26,6 +26,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
 import com.fh.entity.Page;
 import com.fh.entity.system.Role;
+import com.fh.service.fhoa.department.DepartmentManager;
 import com.fh.service.system.fhlog.FHlogManager;
 import com.fh.service.system.menu.MenuManager;
 import com.fh.service.system.role.RoleManager;
@@ -41,6 +42,8 @@ import com.fh.util.PageData;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PathUtil;
 import com.fh.util.Tools;
+
+import net.sf.json.JSONArray;
 
 /** 
  * 类名称：UserController
@@ -61,6 +64,9 @@ public class UserController extends BaseController {
 	private MenuManager menuService;
 	@Resource(name="fhlogService")
 	private FHlogManager FHLOG;
+	
+	@Resource(name="departmentService")
+	private DepartmentManager departmentService;
 	
 	/**显示用户列表
 	 * @param page
@@ -84,15 +90,37 @@ public class UserController extends BaseController {
 		if(lastLoginEnd != null && !"".equals(lastLoginEnd)){
 			pd.put("lastLoginEnd", lastLoginEnd+" 00:00:00");
 		} 
+		PageData pdDepart=new PageData();
+		pdDepart.put("DEPARTMENT_ID", pd.getString("DEPARTMENT_ID"));
+		PageData pdDepartResult=departmentService.findById(pdDepart);
+		if(pdDepartResult!=null)
+			pd.put("DEPARTMENT_ID", pdDepartResult.getString("BIANMA")); 
+		
+		
 		page.setPd(pd);
 		List<PageData>	userList = userService.listUsers(page);	//列出用户列表
 		pd.put("ROLE_ID", "1");
+		pd.put("DEPARTMENT_ID", pdDepart.getString("DEPARTMENT_ID"));
 		List<Role> roleList = roleService.listAllRolesByPId(pd);//列出所有系统用户角色
+		
+		//列表页面树形下拉框用(保持下拉树里面的数据不变)
+		String ZDEPARTMENT_ID = pd.getString("ZDEPARTMENT_ID");
+		PageData dpd = departmentService.findById(pdDepart);
+		if(null != dpd){
+			ZDEPARTMENT_ID = dpd.getString("NAME");
+		}
+		mv.addObject("depname", ZDEPARTMENT_ID);
+		
+		
 		mv.setViewName("system/user/user_list");
 		mv.addObject("userList", userList);
 		mv.addObject("roleList", roleList);
 		mv.addObject("pd", pd);
 		mv.addObject("QX",Jurisdiction.getHC());	//按钮权限
+		
+		List<PageData> zdepartmentPdList = new ArrayList<PageData>();
+		JSONArray arr = JSONArray.fromObject(departmentService.listAllDepartmentToSelect("0",zdepartmentPdList));
+		mv.addObject("zTreeNodes", (null == arr ?"":arr.toString()));
 		return mv;
 	}
 	
@@ -128,6 +156,10 @@ public class UserController extends BaseController {
 		mv.addObject("msg", "saveU");
 		mv.addObject("pd", pd);
 		mv.addObject("roleList", roleList);
+		
+		List<PageData> zdepartmentPdList = new ArrayList<PageData>();
+		JSONArray arr = JSONArray.fromObject(departmentService.listAllDepartmentToSelect("0",zdepartmentPdList));
+		mv.addObject("zTreeNodes", (null == arr ?"":arr.toString()));
 		return mv;
 	}
 	
@@ -149,6 +181,10 @@ public class UserController extends BaseController {
 		pd.put("SKIN", "default");
 		pd.put("RIGHTS", "");		
 		pd.put("PASSWORD", new SimpleHash("SHA-1", pd.getString("USERNAME"), pd.getString("PASSWORD")).toString());	//密码加密
+		PageData pdDepart=new PageData();
+		pdDepart.put("DEPARTMENT_ID", pd.getString("DEPARTMENT_ID"));
+		pd.put("DEPARTMENT_ID", departmentService.findById(pdDepart).getString("BIANMA")); 
+		
 		if(null == userService.findByUsername(pd)){	//判断用户名是否存在
 			userService.saveU(pd); 					//执行保存
 			FHLOG.save(Jurisdiction.getUsername(), "新增系统用户："+pd.getString("USERNAME"));
@@ -237,11 +273,21 @@ public class UserController extends BaseController {
 		pd.put("ROLE_ID", "1");
 		List<Role> roleList = roleService.listAllRolesByPId(pd);	//列出所有系统用户角色
 		mv.addObject("fx", "user");
-		pd = userService.findById(pd);								//根据ID读取
+		pd = userService.findById(pd);	
+		String departBianma=pd.getString("DEPARTMENT_ID");//对DEPARTMENT_ID还原本人DEPARTMENT_ID
+		PageData pdDepart=new PageData();
+		pdDepart.put("BIANMA", departBianma);
+		PageData pdDepartResult=departmentService.findByBianma(pdDepart);
+		pd.put("DEPARTMENT_ID", pdDepartResult.getString("DEPARTMENT_ID")); //根据编码读取ID
 		mv.setViewName("system/user/user_edit");
+		mv.addObject("depname", pdDepartResult.getString("NAME"));
 		mv.addObject("msg", "editU");
 		mv.addObject("pd", pd);
 		mv.addObject("roleList", roleList);
+		
+		List<PageData> zdepartmentPdList = new ArrayList<PageData>();
+		JSONArray arr = JSONArray.fromObject(departmentService.listAllDepartmentToSelect("0",zdepartmentPdList));
+		mv.addObject("zTreeNodes", (null == arr ?"":arr.toString()));
 		return mv;
 	}
 	
@@ -320,8 +366,19 @@ public class UserController extends BaseController {
 			if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}  //校验权限 判断当前操作者有无用户管理查看权限
 			if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限判断当前操作者有无用户管理修改权限
 			if("admin".equals(pd.getString("USERNAME")) && !"admin".equals(Jurisdiction.getUsername())){return null;}	//非admin用户不能修改admin
+			
+			String departmentID=pd.getString("DEPARTMENT_ID");//对DEPARTMENT_ID还原本人DEPARTMENT_ID
+			PageData pdDepart=new PageData();
+			pdDepart.put("DEPARTMENT_ID", departmentID);
+			pd.put("DEPARTMENT_ID", departmentService.findById(pdDepart).getString("BIANMA")); 
+			
 		}else{	//如果当前登录用户修改用户资料提交的用户名是本人，则不能修改本人的角色ID
-			pd.put("ROLE_ID", userService.findByUsername(pd).getString("ROLE_ID")); //对角色ID还原本人角色ID
+			PageData temUser= userService.findByUsername(pd);
+			pd.put("ROLE_ID", temUser.getString("ROLE_ID")); //对角色ID还原本人角色ID
+			String departmentID=temUser.getString("DEPARTMENT_ID");//对DEPARTMENT_ID还原本人DEPARTMENT_ID
+			PageData pdDepart=new PageData();
+			pdDepart.put("DEPARTMENT_ID", departmentID);
+			pd.put("DEPARTMENT_ID", departmentService.findById(pdDepart).getString("BIANMA")); 
 		}
 		if(pd.getString("PASSWORD") != null && !"".equals(pd.getString("PASSWORD"))){
 			pd.put("PASSWORD", new SimpleHash("SHA-1", pd.getString("USERNAME"), pd.getString("PASSWORD")).toString());

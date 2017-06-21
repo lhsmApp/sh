@@ -55,7 +55,15 @@ public interface TmplConfigManager{
 	 */
 	public void deleteAll(String[] ArrayDATA_IDS)throws Exception;
 	
-	/**根据当前单位编码及表名获取字段配置信息 
+	/**
+	 * 基本配置表
+	 * @param pd
+	 * @return
+	 * @throws Exception
+	 */
+	public List<PageData> listBase(Page pd) throws Exception;
+
+    /**根据当前单位编码及表名获取字段配置信息
 	 * @param pd
 	 * @throws Exception
 	 */

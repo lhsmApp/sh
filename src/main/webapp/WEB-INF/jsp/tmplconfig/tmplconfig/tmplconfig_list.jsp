@@ -12,195 +12,136 @@
 <html lang="en">
 <head>
 <base href="<%=basePath%>">
-<!-- 下拉框 -->
-<link rel="stylesheet" href="static/ace/css/chosen.css" />
+<script type="text/javascript" src="static/js/jquery-1.7.2.js"></script>
 <!-- jsp文件头和头部 -->
 <%@ include file="../../system/index/top.jsp"%>
+<!-- 树形下拉框start -->
+<script type="text/javascript" src="plugins/selectZtree/selectTree.js"></script>
+<script type="text/javascript" src="plugins/selectZtree/framework.js"></script>
+<link rel="stylesheet" type="text/css" href="plugins/selectZtree/import_fh.css"/>
+<script type="text/javascript" src="plugins/selectZtree/ztree/ztree.js"></script>
+<link type="text/css" rel="stylesheet" href="plugins/selectZtree/ztree/ztree.css"></link>
+<!-- 树形下拉框end -->
+<!-- 下拉框 -->
+<link rel="stylesheet" href="static/ace/css/chosen.css" />
+<!-- jsp文件头和头部 ，其中包含旧版本（Ace）Jqgrid Css-->
+<%@ include file="../../system/index/topWithJqgrid.jsp"%>
 <!-- 日期框 -->
 <link rel="stylesheet" href="static/ace/css/datepicker.css" />
+
+<!-- 最新版的Jqgrid Css，如果旧版本（Ace）某些方法不好用，尝试用此版本Css，替换旧版本Css -->
+<!-- <link rel="stylesheet" type="text/css" media="screen" href="static/ace/css/ui.jqgrid-bootstrap.css" /> -->
+<style>
+.page-header {
+	padding-top: 9px;
+	padding-bottom: 9px;
+	margin: 0 0 8px;
+}
+</style>
 </head>
 <body class="no-skin">
-
-	<!-- /section:basics/navbar.layout -->
 	<div class="main-container" id="main-container">
-		<!-- /section:basics/sidebar -->
 		<div class="main-content">
 			<div class="main-content-inner">
 				<div class="page-content">
+					<!-- /section:settings.box -->
+					<div class="page-header">
+						<table>
+							<tr>
+								<td><span
+									class="label label-xlg label-success arrowed-right">东部管道</span>
+									<!-- arrowed-in-right --> <span
+									class="label label-xlg label-yellow arrowed-in arrowed-right"
+									id="subTitle" style="margin-left: 2px;">数据配置</span> <span
+									style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
+
+									<button id="btnQuery" class="btn btn-white btn-info btn-sm"
+										onclick="showQueryCondi()">
+										<i class="ace-icon fa fa-chevron-up bigger-120 blue"></i> <span>隐藏查询</span>
+									</button></td>
+							</tr>
+						</table>
+					</div>
+					<!-- /.page-header -->
+
 					<div class="row">
 						<div class="col-xs-12">
-							
-						<!-- 检索  -->
-						<form action="tmplconfig/list.do" method="post" name="Form" id="Form">
-						<table style="margin-top:5px;">
+							<div class="widget-box" >
+								<div class="widget-body">
+									<div class="widget-main">
+										<form class="form-inline">
+										
+										<table style="margin-top:5px;">
 							<tr>
+							<td><input name="DEPARTMENT_ID" id="DEPARTMENT_ID" type="hidden" value="${pd.DEPARTMENT_ID }" /></td>
 								<td>
-									<div class="nav-search">
-										<span class="input-icon">
-											<input type="text" placeholder="这里输入关键词" class="nav-search-input" id="nav-search-input" autocomplete="off" name="keywords" value="${pd.keywords }" placeholder="这里输入关键词"/>
-											<i class="ace-icon fa fa-search nav-search-icon"></i>
-										</span>
+											<span>
+												<select class="chosen-select form-control" 
+													name="TABLE_CODE" id=TABLE_CODE
+													data-placeholder="请选择表明称"
+													style="vertical-align: top; height:32px;width: 150px;">
+													<option value="null"></option>
+													<option value="">全部</option>
+													<c:forEach items="${listBase}" var="tableName">
+														<option value="${tableName.TABLE_CODE }"
+															<c:if test="${pd.TABLE_CODE==tableName.TABLE_CODE}">selected</c:if>>${tableName.TABLE_NAME  }</option>
+													</c:forEach>
+												</select>
+											</span>
+											</td>
+										
+											<td style="padding-left:5px">
+											<div class="selectTree" id="selectTree"></div>
+											</td>
+											<td style="padding-left:5px">
+											<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
+												<i class="ace-icon fa fa-search bigger-110"></i>
+											</button>
+											</td>
+												</tr>
+						</table>
+										</form>
 									</div>
-								</td>
-								<td style="padding-left:2px;"><input class="span10 date-picker" name="lastStart" id="lastStart"  value="" type="text" data-date-format="yyyy-mm-dd" readonly="readonly" style="width:88px;" placeholder="开始日期" title="开始日期"/></td>
-								<td style="padding-left:2px;"><input class="span10 date-picker" name="lastEnd" name="lastEnd"  value="" type="text" data-date-format="yyyy-mm-dd" readonly="readonly" style="width:88px;" placeholder="结束日期" title="结束日期"/></td>
-								<td style="vertical-align:top;padding-left:2px;">
-								 	<select class="chosen-select form-control" name="name" id="id" data-placeholder="请选择" style="vertical-align:top;width: 120px;">
-									<option value=""></option>
-									<option value="">全部</option>
-									<option value="">1</option>
-									<option value="">2</option>
-								  	</select>
-								</td>
-								<c:if test="${QX.cha == 1 }">
-								<td style="vertical-align:top;padding-left:2px"><a class="btn btn-light btn-xs" onclick="tosearch();"  title="检索"><i id="nav-search-icon" class="ace-icon fa fa-search bigger-110 nav-search-icon blue"></i></a></td>
-								</c:if>
-								<c:if test="${QX.toExcel == 1 }"><td style="vertical-align:top;padding-left:2px;"><a class="btn btn-light btn-xs" onclick="toExcel();" title="导出到EXCEL"><i id="nav-search-icon" class="ace-icon fa fa-download bigger-110 nav-search-icon blue"></i></a></td></c:if>
-							</tr>
-						</table>
-						<!-- 检索  -->
-					
-						<table id="simple-table" class="table table-striped table-bordered table-hover" style="margin-top:5px;">	
-							<thead>
-								<tr>
-									<th class="center" style="width:35px;">
-									<label class="pos-rel"><input type="checkbox" class="ace" id="zcheckbox" /><span class="lbl"></span></label>
-									</th>
-									<th class="center" style="width:50px;">序号</th>
-									<th class="center">单位编码</th>
-									<th class="center">表名</th>
-									<th class="center">列编码</th>
-									<th class="center">列名称</th>
-									<th class="center">显示序号</th>
-									<th class="center">字典翻译</th>
-									<th class="center">列隐藏</th>
-									<th class="center">列汇总</th>
-									<th class="center">列平均值</th>
-									<th class="center">操作</th>
-								</tr>
-							</thead>
-													
-							<tbody>
-							<!-- 开始循环 -->	
-							<c:choose>
-								<c:when test="${not empty varList}">
-									<c:if test="${QX.cha == 1 }">
-									<c:forEach items="${varList}" var="var" varStatus="vs">
-										<tr>
-											<td class='center'>
-												<label class="pos-rel"><input type='checkbox' name='ids' value="${var.TMPLCONFIG_ID}" class="ace" /><span class="lbl"></span></label>
-											</td>
-											<td class='center' style="width: 30px;">${vs.index+1}</td>
-											<td class='center'>${var.DEPT_CODE}</td>
-											<td class='center'>${var.TABLE_CODE}</td>
-											<td class='center'>${var.COL_CODE}</td>
-											<td class='center'>${var.COL_NAME}</td>
-											<td class='center'>${var.DISP_ORDER}</td>
-											<td class='center'>${var.DICT_TRANS}</td>
-											<td class='center'>${var.COL_HIDE}</td>
-											<td class='center'>${var.COL_SUM}</td>
-											<td class='center'>${var.COL_AVE}</td>
-											<td class="center">
-												<c:if test="${QX.edit != 1 && QX.del != 1 }">
-												<span class="label label-large label-grey arrowed-in-right arrowed-in"><i class="ace-icon fa fa-lock" title="无权限"></i></span>
-												</c:if>
-												<div class="hidden-sm hidden-xs btn-group">
-													<c:if test="${QX.edit == 1 }">
-													<a class="btn btn-xs btn-success" title="编辑" onclick="edit('${var.TMPLCONFIG_ID}');">
-														<i class="ace-icon fa fa-pencil-square-o bigger-120" title="编辑"></i>
-													</a>
-													</c:if>
-													<c:if test="${QX.del == 1 }">
-													<a class="btn btn-xs btn-danger" onclick="del('${var.TMPLCONFIG_ID}');">
-														<i class="ace-icon fa fa-trash-o bigger-120" title="删除"></i>
-													</a>
-													</c:if>
-												</div>
-												<div class="hidden-md hidden-lg">
-													<div class="inline pos-rel">
-														<button class="btn btn-minier btn-primary dropdown-toggle" data-toggle="dropdown" data-position="auto">
-															<i class="ace-icon fa fa-cog icon-only bigger-110"></i>
-														</button>
-			
-														<ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
-															<c:if test="${QX.edit == 1 }">
-															<li>
-																<a style="cursor:pointer;" onclick="edit('${var.TMPLCONFIG_ID}');" class="tooltip-success" data-rel="tooltip" title="修改">
-																	<span class="green">
-																		<i class="ace-icon fa fa-pencil-square-o bigger-120"></i>
-																	</span>
-																</a>
-															</li>
-															</c:if>
-															<c:if test="${QX.del == 1 }">
-															<li>
-																<a style="cursor:pointer;" onclick="del('${var.TMPLCONFIG_ID}');" class="tooltip-error" data-rel="tooltip" title="删除">
-																	<span class="red">
-																		<i class="ace-icon fa fa-trash-o bigger-120"></i>
-																	</span>
-																</a>
-															</li>
-															</c:if>
-														</ul>
-													</div>
-												</div>
-											</td>
-										</tr>
-									
-									</c:forEach>
-									</c:if>
-									<c:if test="${QX.cha == 0 }">
-										<tr>
-											<td colspan="100" class="center">您无权查看</td>
-										</tr>
-									</c:if>
-								</c:when>
-								<c:otherwise>
-									<tr class="main_info">
-										<td colspan="100" class="center" >没有相关数据</td>
-									</tr>
-								</c:otherwise>
-							</c:choose>
-							</tbody>
-						</table>
-						<div class="page-header position-relative">
-						<table style="width:100%;">
-							<tr>
-								<td style="vertical-align:top;">
-									<c:if test="${QX.add == 1 }">
-									<a class="btn btn-mini btn-success" onclick="add();">新增</a>
-									</c:if>
-									<c:if test="${QX.del == 1 }">
-									<a class="btn btn-mini btn-danger" onclick="makeAll('确定要删除选中的数据吗?');" title="批量删除" ><i class='ace-icon fa fa-trash-o bigger-120'></i></a>
-									</c:if>
-								</td>
-								<td style="vertical-align:top;"><div class="pagination" style="float: right;padding-top: 0px;margin-top: 0px;">${page.pageStr}</div></td>
-							</tr>
-						</table>
+								</div>
+							</div>
 						</div>
-						</form>
-					
-						</div>
-						<!-- /.col -->
 					</div>
-					<!-- /.row -->
+					<div class="row">
+						<div class="col-xs-12">
+							<!-- PAGE CONTENT BEGINS -->
+							<!-- <div class="well well-sm">
+								You can have a custom jqGrid download here:
+								<a href="http://www.trirand.com/blog/?page_id=6" target="_blank">
+									
+									<i class="fa fa-external-link bigger-110"></i>
+								</a>
+							</div> -->
+
+							<table id="jqGrid"></table>
+							<div id="jqGridPager"></div>
+						</div>
+					</div>
 				</div>
-				<!-- /.page-content -->
 			</div>
 		</div>
-		<!-- /.main-content -->
 
-		<!-- 返回顶部 -->
-		<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
-			<i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
+		<a href="#" id="btn-scroll-up"
+			class="btn-scroll-up btn btn-sm btn-inverse"> <i
+			class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
 		</a>
-
 	</div>
-	<!-- /.main-container -->
 
 	<!-- basic scripts -->
 	<!-- 页面底部js¨ -->
 	<%@ include file="../../system/index/foot.jsp"%>
+	<!-- ace scripts -->
+	<script src="static/ace/js/ace/ace.js"></script>
+	<!-- 最新版的Jqgrid Js，如果旧版本（Ace）某些方法不好用，尝试用此版本Js，替换旧版本JS -->
+	<!-- <script src="static/ace/js/jquery.jqGrid.min.js" type="text/javascript"></script>
+	<script src="static/ace/js/grid.locale-cn.js" type="text/javascript"></script> -->
+	<!-- 旧版本（Ace）Jqgrid Js -->
+	<script src="static/ace/js/jqGrid/jquery.jqGrid.src.js"></script>
+	<script src="static/ace/js/jqGrid/i18n/grid.locale-cn.js"></script>
 	<!-- 删除时确认窗口 -->
 	<script src="static/ace/js/bootbox.js"></script>
 	<!-- ace scripts -->
@@ -211,171 +152,313 @@
 	<script src="static/ace/js/date-time/bootstrap-datepicker.js"></script>
 	<!--提示框-->
 	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
-	<script type="text/javascript">
-		$(top.hangge());//关闭加载状态
-		//检索
-		function tosearch(){
-			top.jzts();
-			$("#Form").submit();
-		}
-		$(function() {
+	<!-- JqGrid统一样式统一操作 -->
+	<script type="text/javascript" src="static/js/common/jqgrid_style.js"></script>
 		
-			//日期框
-			$('.date-picker').datepicker({
-				autoclose: true,
-				todayHighlight: true
-			});
+	<script type="text/javascript"> 
+	$(document).ready(function () {
+		
+		$(top.hangge());//关闭加载状态
+		//resize to fit page size
+		$(window).on('resize.jqGrid', function () {
+			$("#jqGrid").jqGrid( 'setGridWidth', $(".page-content").width());
+			$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - 200);
+	    })
+		
+		$("#jqGrid").jqGrid({
+			url: '<%=basePath%>tmplconfig/list.do',
+			datatype: "json",
+			 colModel: [
+				{label: '单位编码',name:'DEPT_CODE', width:100},
+				{ label: '表名', name: 'TABLE_CODE', width: 90},
+				{ label: '列编码', name: 'COL_CODE', width: 60},
+				{ label: '列名称', name: 'COL_NAME', width: 60},
+				{ label: '显示序号', name: 'DISP_ORDER', width: 80},
+				{ label: '字典翻译', name: 'DICT_TRANS', width: 80,align:'center'},                  
+				{ label: '列隐藏', name: 'COL_HIDE', width: 80, editable: true,align:'center',formatter: customFmatterState,edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch},                   
+				{ label: '列汇总', name: 'COL_SUM', width: 80, editable: true,align:'center'},                   
+				{ label: '列平均值', name: 'COL_AVE', width: 80, editable: true,align:'center'}                   
+			],
+			reloadAfterSubmit: true, 
+			viewrecords: true, // show the current page, data rang and total records on the toolbar
+			rowNum: 10,
+			sortname: 'DISP_ORDER',
+			pager: "#jqGridPager",
+			loadComplete : function() {
+				var table = this;
+				setTimeout(function(){
+					styleCheckbox(table);
+					updateActionIcons(table);
+					updatePagerIcons(table);
+					enableTooltips(table);
+				}, 0);
+			},
 			
-			//下拉框
-			if(!ace.vars['touch']) {
-				$('.chosen-select').chosen({allow_single_deselect:true}); 
-				$(window)
-				.off('resize.chosen')
-				.on('resize.chosen', function() {
-					$('.chosen-select').each(function() {
-						 var $this = $(this);
-						 $this.next().css({'width': $this.parent().width()});
-					});
-				}).trigger('resize.chosen');
-				$(document).on('settings.ace.chosen', function(e, event_name, event_val) {
-					if(event_name != 'sidebar_collapsed') return;
-					$('.chosen-select').each(function() {
-						 var $this = $(this);
-						 $this.next().css({'width': $this.parent().width()});
-					});
-				});
-				$('#chosen-multiple-style .btn').on('click', function(e){
-					var target = $(this).find('input[type=radio]');
-					var which = parseInt(target.val());
-					if(which == 2) $('#form-field-select-4').addClass('tag-input-style');
-					 else $('#form-field-select-4').removeClass('tag-input-style');
-				});
-			}
-			
-			
-			//复选框全选控制
-			var active_class = 'active';
-			$('#simple-table > thead > tr > th input[type=checkbox]').eq(0).on('click', function(){
-				var th_checked = this.checked;//checkbox inside "TH" table header
-				$(this).closest('table').find('tbody > tr').each(function(){
-					var row = this;
-					if(th_checked) $(row).addClass(active_class).find('input[type=checkbox]').eq(0).prop('checked', true);
-					else $(row).removeClass(active_class).find('input[type=checkbox]').eq(0).prop('checked', false);
-				});
-			});
+			altRows: true,
+			rownumbers: true, // show row numbers
+            rownumWidth: 35, // the width of the row numbers columns			
+			/* multiselect: true,
+	        multiboxonly: true, */
+	        onSelectRow: editRow,
+	        editurl: "<%=basePath%>tmplconfig/edit.do",//nothing is save
 		});
 		
-		//新增
-		function add(){
-			 top.jzts();
-			 var diag = new top.Dialog();
-			 diag.Drag=true;
-			 diag.Title ="新增";
-			 diag.URL = '<%=basePath%>tmplconfig/goAdd.do';
-			 diag.Width = 450;
-			 diag.Height = 355;
-			 diag.Modal = true;				//有无遮罩窗口
-			 diag. ShowMaxButton = true;	//最大化按钮
-		     diag.ShowMinButton = true;		//最小化按钮
-			 diag.CancelEvent = function(){ //关闭事件
-				 if(diag.innerFrame.contentWindow.document.getElementById('zhongxin').style.display == 'none'){
-					 if('${page.currentPage}' == '0'){
-						 top.jzts();
-						 setTimeout("self.location=self.location",100);
-					 }else{
-						 nextPage(${page.currentPage});
-					 }
+		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
+	
+		//navButtons
+		jQuery("#jqGrid").jqGrid('navGrid',"#jqGridPager",
+			{ 	//navbar options
+				edit: false,
+				editicon : 'ace-icon fa fa-pencil blue',
+				add: false,
+				addicon : 'ace-icon fa fa-plus-circle purple',
+				del: false,
+				delicon : 'ace-icon fa fa-trash-o red', 
+				search: true,
+				searchicon : 'ace-icon fa fa-search orange',
+				refresh: true,
+				refreshicon : 'ace-icon fa fa-refresh green',
+				view: false,
+				viewicon : 'ace-icon fa fa-search-plus grey',
+			},
+			{
+				//edit record form
+				//closeAfterEdit: true,
+				//width: 700,
+				recreateForm: true,
+				beforeShowForm :beforeEditOrAddCallback
+			},
+			 {
+				//new record form
+				//width: 700,
+				closeAfterAdd: true,
+				recreateForm: true,
+				viewPagerButtons: false,
+				//reloadAfterSubmit: true,
+				beforeShowForm : beforeEditOrAddCallback,
+			    onclickSubmit: function(params, posdata) {
+					console.log("onclickSubmit");
+                    //console.log(posdata	);
+                } , 
+                afterSubmit: fn_addSubmit
+			},
+			
+			{
+				//search form
+				recreateForm: true,
+				afterShowSearch: beforeSearchCallback,
+				afterRedraw: function(){
+					style_search_filters($(this));
+				},
+				multipleSearch: true,
+				
+				//multipleGroup:true,
+				showQuery: true
+				
+			}
+		);
+	
+		
+		// 批量编辑
+        $('#jqGrid').navButtonAdd('#jqGridPager',
+        {
+            buttonicon: "ace-icon fa fa-pencil-square-o purple",
+            title: "批量编辑",
+            caption: "",
+            position: "last",
+            onClickButton: batchEdit
+        });
+		
+     	// 取消批量编辑
+        $('#jqGrid').navButtonAdd('#jqGridPager',
+        {
+            buttonicon: "ace-icon fa fa-undo",
+            title: "取消批量编辑",
+            caption: "",
+            position: "last",
+            onClickButton: batchCancelEdit
+        });
+
+        //批量保存
+        $('#jqGrid').navButtonAdd('#jqGridPager',
+        {
+     	   /* bigger-150 */
+            buttonicon: "ace-icon fa fa-save green",
+            title: "批量保存",
+            caption: "",
+            position: "last",
+            onClickButton: batchSave
+        });
+ 	});
+
+	//switch element when editing inline
+	function aceSwitch( cellvalue, options, cell ) {
+		setTimeout(function(){
+			$(cell) .find('input[type=checkbox]')
+				.addClass('ace ace-switch ace-switch-5')
+				.after('<span class="lbl"></span>');
+		}, 0);
+		
+		if (cellvalue==1) {
+			return 1;
+		}else if (cellvalue==0) {
+			return 0;
+		}
+	}
+	
+	 //批量编辑
+	function batchEdit(e) {
+		var grid = $("#jqGrid");
+        var ids = grid.jqGrid('getDataIDs');
+        for (var i = 0; i < ids.length; i++) {
+            grid.jqGrid('editRow',ids[i]);
+        }
+    }
+	
+	//取消批量编辑
+	function batchCancelEdit(e) {
+		var grid = $("#jqGrid");
+        var ids = grid.jqGrid('getDataIDs');
+        for (var i = 0; i < ids.length; i++) {
+            grid.jqGrid('restoreRow',ids[i]);
+        }
+    }
+	
+	//批量保存
+	function batchSave(e) {
+		var listData =new Array();
+		var ids = $("#jqGrid").jqGrid('getDataIDs');
+		console.log(ids);
+		//遍历访问这个集合  
+		var rowData;
+		$(ids).each(function (index, id){  
+            $("#jqGrid").saveRow(id, false, 'clientArray');
+             rowData = $("#jqGrid").getRowData(id);
+            listData.push(rowData);
+		});
+		top.jzts();
+		$.ajax({
+			type: "POST",
+			url: '<%=basePath%>tmplconfig/updateAll.do?',
+	    	//data: rowData,//可以单独传入一个对象，后台可以直接通过对应模型接受参数。但是传入Array（listData）就不好用了，所以传list方式需将List转为Json字符窜。
+			//data: '{"rows":listData}',
+			data:{DATA_ROWS:JSON.stringify(listData)},
+	    	dataType:'json',
+			cache: false,
+			success: function(response){
+				if(response.code==0){
+					$("#jqGrid").trigger("reloadGrid");  
+					$(top.hangge());//关闭加载状态
+					$("#subTitle").tips({
+						side:3,
+			            msg:'保存成功',
+			            bg:'#009933',
+			            time:3
+			        });
+				}else{
+					$(top.hangge());//关闭加载状态
+					$("#subTitle").tips({
+						side:3,
+			            msg:'保存失败,'+response.responseJSON.message,
+			            bg:'#cc0033',
+			            time:3
+			        });
 				}
-				diag.close();
-			 };
-			 diag.show();
+			},
+	    	error: function(e) {
+				$(top.hangge());//关闭加载状态
+	    	}
+		}); 
+	 }
+	
+	
+	
+	
+	
+		//检索
+		function tosearch() {
+			if($("#TABLE_CODE").val()=="null"){
+				$("#TABLE_CODE").tips({
+					side:3,
+		            msg:'请输入表名',
+		            bg:'#AE81FF',
+		            time:2
+		        });
+				$("#TABLE_CODE").focus();
+			return false;
+			}
+			/* var RPT_DEPT = $("#RPT_DEPT").val();
+			var STATUS = $("#STATUS").val();
+			var BILL_TYPE = $("#BILL_TYPE").val(); */
+			var TABLE_CODE = $("#TABLE_CODE").val(); 
+			var DEPARTMENT_ID = $("#DEPARTMENT_ID").val(); 
+			console.log("哈哈");
+			$("#jqGrid").jqGrid('setGridParam',{  // 重新加载数据
+				url:'<%=basePath%>tmplconfig/getPageList.do?TABLE_CODE='+TABLE_CODE+'&DEPARTMENT_ID='+DEPARTMENT_ID,  
+				datatype:'json',
+			      page:1
+			}).trigger("reloadGrid");
+			
+		}  
+		
+		//显示隐藏查询
+		function showQueryCondi(){
+			if($(".widget-box").css("display")=="block"){
+				$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass('fa-chevron-down');
+				$("#btnQuery").find("span").text("显示查询");
+				$(window).triggerHandler('resize.jqGrid');
+			}
+			else{
+				$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass('fa-chevron-up');
+				$("#btnQuery").find("span").text("隐藏查询");
+			}
+			$(".widget-box").toggle("fast");
+			
 		}
 		
-		//删除
-		function del(Id){
-			bootbox.confirm("确定要删除吗?", function(result) {
-				if(result) {
-					top.jzts();
-					var url = "<%=basePath%>tmplconfig/delete.do?TMPLCONFIG_ID="+Id+"&tm="+new Date().getTime();
-					$.get(url,function(data){
-						nextPage(${page.currentPage});
-					});
-				}
-			});
-		}
 		
-		//修改
-		function edit(Id){
-			 top.jzts();
-			 var diag = new top.Dialog();
-			 diag.Drag=true;
-			 diag.Title ="编辑";
-			 diag.URL = '<%=basePath%>tmplconfig/goEdit.do?TMPLCONFIG_ID='+Id;
-			 diag.Width = 450;
-			 diag.Height = 355;
-			 diag.Modal = true;				//有无遮罩窗口
-			 diag. ShowMaxButton = true;	//最大化按钮
-		     diag.ShowMinButton = true;		//最小化按钮 
-			 diag.CancelEvent = function(){ //关闭事件
-				 if(diag.innerFrame.contentWindow.document.getElementById('zhongxin').style.display == 'none'){
-					 nextPage(${page.currentPage});
-				}
-				diag.close();
-			 };
-			 diag.show();
-		}
-		
-		//批量操作
-		function makeAll(msg){
-			bootbox.confirm(msg, function(result) {
-				if(result) {
-					var str = '';
-					for(var i=0;i < document.getElementsByName('ids').length;i++){
-					  if(document.getElementsByName('ids')[i].checked){
-					  	if(str=='') str += document.getElementsByName('ids')[i].value;
-					  	else str += ',' + document.getElementsByName('ids')[i].value;
-					  }
-					}
-					if(str==''){
-						bootbox.dialog({
-							message: "<span class='bigger-110'>您没有选择任何内容!</span>",
-							buttons: 			
-							{ "button":{ "label":"确定", "className":"btn-sm btn-success"}}
-						});
-						$("#zcheckbox").tips({
-							side:1,
-				            msg:'点这里全选',
-				            bg:'#AE81FF',
-				            time:8
-				        });
-						return;
-					}else{
-						if(msg == '确定要删除选中的数据吗?'){
-							top.jzts();
-							$.ajax({
-								type: "POST",
-								url: '<%=basePath%>tmplconfig/deleteAll.do?tm='+new Date().getTime(),
-						    	data: {DATA_IDS:str},
-								dataType:'json',
-								//beforeSend: validateData,
-								cache: false,
-								success: function(data){
-									 $.each(data.list, function(i, list){
-											nextPage(${page.currentPage});
-									 });
-								}
-							});
-						}
-					}
-				}
-			});
+		function customFmatterState(cellvalue, options, rowObject){  
+			if (cellvalue==1) {
+				 return '<span class="label label-important arrowed-in">隐藏</span>';
+			} else {
+				return '<span class="label label-success arrowed">不隐藏</span>';
+			}
 		};
-		
-		//导出excel
-		function toExcel(){
-			window.location.href='<%=basePath%>tmplconfig/excel.do';
+   
+		function initComplete(){
+			console.log("下拉树");
+			//下拉树
+			var defaultNodes = {"treeNodes":${zTreeNodes}};
+			//绑定change事件
+			$("#selectTree").bind("change",function(){
+				if(!$(this).attr("relValue")){
+			      //  top.Dialog.alert("没有选择节点");
+			    }else{
+					//alert("选中节点文本："+$(this).attr("relText")+"<br/>选中节点值："+$(this).attr("relValue"));
+					$("#DEPARTMENT_ID").val($(this).attr("relValue"));
+			    }
+			});
+			//赋给data属性
+			$("#selectTree").data("data",defaultNodes);  
+			$("#selectTree").render();
+			$("#selectTree2_input").val("${'0'==depname?'请选择':depname}");
 		}
-	</script>
+		
+		var lastSelection;
+
+        function editRow(id) {
+            if (id && id !== lastSelection) {
+                var grid = $("#jqGrid");
+                grid.jqGrid('restoreRow',lastSelection);
+                grid.jqGrid('editRow',id, {keys: true} );
+                lastSelection = id;
+            }
+        }
+		
+		
+	
+	
+ 	</script>
 
 
 </body>
