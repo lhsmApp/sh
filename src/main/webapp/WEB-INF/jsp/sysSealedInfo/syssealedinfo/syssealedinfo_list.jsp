@@ -167,7 +167,7 @@
 			url: '<%=basePath%>syssealedinfo/getPageList.do',
 			datatype: "json",
 			 colModel: [
-				{label: ' ',name:'myac',index:'', width:40, fixed:true, sortable:false, resize:false,
+				{label: ' ',name:'myac',index:'', width:70, fixed:true, sortable:false, resize:false,
 					formatter:'actions', 
 					formatoptions:{ 
                         onSuccess: function(response) {
@@ -199,10 +199,9 @@
 					}
 				},
 				{label: '单据编码',name:'BILL_CODE',index:'',key: true, width:100},
-				{ label: '单据单位', name: 'RPT_DEPT', width: 90,formatter:customFmatterDept},
 				{ label: '单据单位', name: 'NAME', width: 90},
-				{ label: '单据期间', name: 'RPT_DUR', width: 75},
-				{ label: '上传人', name: 'RPT_USER', width: 75},
+				{ label: '单据期间', name: 'RPT_DUR', width: 60},
+				{ label: '上传人', name: 'RPT_USER', width: 60},
 				{ label: '上传时间', name: 'RPT_DATE', width: 80, formatter: 'data'},
 				// sorttype is used only if the data is loaded locally or loadonce is set to true
 				{ label: '单据类型', name: 'BILL_TYPE_TR', width: 80,align:'center'},                  
@@ -226,8 +225,8 @@
 			altRows: true,
 			rownumbers: true, // show row numbers
             rownumWidth: 35, // the width of the row numbers columns			
-			multiselect: true,
-	        multiboxonly: true,
+			/* multiselect: true,
+	        multiboxonly: true, */
 	        editurl: "<%=basePath%>syssealedinfo/edit.do",//nothing is save
 		});
 		
@@ -419,14 +418,6 @@
 			$(".widget-box").toggle("fast");
 			
 		}
-		
-		
-		function customFmatterDept(cellvalue, options, rowObject){  
-			
-			
-				return '${deptList}';
-			
-		};
 		
 		
 		function customFmatterState(cellvalue, options, rowObject){  

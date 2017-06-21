@@ -77,6 +77,16 @@ public class TmplConfigService implements TmplConfigManager{
 	public void deleteAll(String[] ArrayDATA_IDS)throws Exception{
 		dao.delete("TmplConfigMapper.deleteAll", ArrayDATA_IDS);
 	}
+
+	/**列表
+	 * @param page
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PageData> listBase(Page pd) throws Exception {
+		return (List<PageData>)dao.findForList("TmplConfigMapper.listBase", pd);
+	}
+	
 	
 }
 

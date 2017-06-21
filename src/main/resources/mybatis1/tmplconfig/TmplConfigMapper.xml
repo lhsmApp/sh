@@ -17,8 +17,7 @@
 		DICT_TRANS,	
 		COL_HIDE,	
 		COL_SUM,	
-		COL_AVE,	
-		TMPLCONFIG_ID
+		COL_AVE
 	</sql>
 	
 	<!-- 字段值 -->
@@ -31,8 +30,7 @@
 		#{DICT_TRANS},	
 		#{COL_HIDE},	
 		#{COL_SUM},	
-		#{COL_AVE},	
-		#{TMPLCONFIG_ID}
+		#{COL_AVE}
 	</sql>
 	
 	<!-- 新增-->
@@ -51,7 +49,7 @@
 		delete from
 		<include refid="tableName"></include>
 		where 
-			TMPLCONFIG_ID = #{TMPLCONFIG_ID}
+			TABLE_CODE = #{TABLE_CODE}
 	</delete>
 	
 	<!-- 修改 -->
@@ -67,10 +65,9 @@
 			DICT_TRANS = #{DICT_TRANS},
 			COL_HIDE = #{COL_HIDE},
 			COL_SUM = #{COL_SUM},
-			COL_AVE = #{COL_AVE},
-		TMPLCONFIG_ID = TMPLCONFIG_ID
+			COL_AVE = #{COL_AVE}
 		where 
-		TMPLCONFIG_ID = #{TMPLCONFIG_ID}
+		TABLE_CODE = #{TABLE_CODE}
 	</update>
 	
 	<!-- 通过ID获取数据 -->
@@ -80,7 +77,7 @@
 		from 
 		<include refid="tableName"></include>
 		where 
-			TMPLCONFIG_ID = #{TMPLCONFIG_ID}
+			TABLE_CODE = #{TABLE_CODE}
 	</select>
 	
 	<!-- 列表 -->
@@ -89,17 +86,18 @@
 		<include refid="Field"></include>
 		from 
 		<include refid="tableName"></include>
-		where 1=1
-		<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
-			and
-				(
-				<!--	根据需求自己加检索条件
-					字段1 LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
-					 or 
-					字段2 LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') 
-				-->
-				)
+		<where >
+		<if test="pd.DEPT_BIANMA!= null and pd.DEPT_BIANMA != ''"><!-- 检索 -->
+			and (
+			DEPT_CODE = #{pd.DEPT_BIANMA}
+			)
 		</if>
+		<if test="pd.TABLE_CODE!= null and pd.TABLE_CODE != ''"><!-- 检索 -->
+			and (
+			TABLE_CODE = #{pd.TABLE_CODE}
+			)
+		</if>
+		</where>
 	</select>
 	
 	<!-- 列表(全部) -->
@@ -115,11 +113,27 @@
 		delete from
 		<include refid="tableName"></include>
 		where 
-			TMPLCONFIG_ID in
+			TABLE_CODE in
 		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
                  #{item}
 		</foreach>
 	</delete>
+	
+	
+	
+	
+	<!-- 基本配置表 -->
+	<select id="listBase" parameterType="page" resultType="pd">
+		select * from TB_TMPL_CONFIG_BASE
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	<!-- fh313596790qq(青苔) -->
 </mapper>

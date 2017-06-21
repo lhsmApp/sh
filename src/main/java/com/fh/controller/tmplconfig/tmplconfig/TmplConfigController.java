@@ -1,5 +1,6 @@
 package com.fh.controller.tmplconfig.tmplconfig;
 
+import java.io.Console;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -20,12 +21,19 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fh.controller.base.BaseController;
+import com.fh.entity.JqPage;
 import com.fh.entity.Page;
+import com.fh.entity.PageResult;
+import com.fh.service.fhoa.department.DepartmentManager;
 import com.fh.service.tmplconfig.tmplconfig.TmplConfigManager;
 import com.fh.util.AppUtil;
 import com.fh.util.Jurisdiction;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
+import com.fh.util.SqlTools;
+import com.fh.util.Tools;
+
+import net.sf.json.JSONArray;
 
 /**
  * 数据模板详情
@@ -42,6 +50,8 @@ public class TmplConfigController extends BaseController {
 	String menuUrl = "tmplconfig/list.do"; //菜单地址(权限用)
 	@Resource(name="tmplconfigService")
 	private TmplConfigManager tmplconfigService;
+	@Resource(name="departmentService")
+	private DepartmentManager departmentService;
 	
 	/**保存
 	 * @param
@@ -99,22 +109,58 @@ public class TmplConfigController extends BaseController {
 	 */
 	@RequestMapping(value="/list")
 	public ModelAndView list(Page page) throws Exception{
-		logBefore(logger, Jurisdiction.getUsername()+"列表TmplConfig");
-		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
 		ModelAndView mv = this.getModelAndView();
 		PageData pd = new PageData();
 		pd = this.getPageData();
-		String keywords = pd.getString("keywords");				//关键词检索条件
-		if(null != keywords && !"".equals(keywords)){
-			pd.put("keywords", keywords.trim());
-		}
 		page.setPd(pd);
-		List<PageData>	varList = tmplconfigService.list(page);	//列出TmplConfig列表
+		List<PageData>	varList = tmplconfigService.list(page);	//列出TmplConfigBase列表
+		List<PageData>	listBase = tmplconfigService.listBase(page);	//列出TmplConfigBase列表
+		String TABLE_CODE = pd.getString("TABLE_CODE");				//关键词检索条件
+		if(null != TABLE_CODE && !"".equals(TABLE_CODE)){
+			pd.put("TABLE_CODE", TABLE_CODE.trim());
+		} 
+		//列表页面树形下拉框用(保持下拉树里面的数据不变)
+				String ZDEPARTMENT_ID = pd.getString("ZDEPARTMENT_ID");
+				ZDEPARTMENT_ID = Tools.notEmpty(ZDEPARTMENT_ID)?ZDEPARTMENT_ID:Jurisdiction.getDEPARTMENT_ID();
+				pd.put("ZDEPARTMENT_ID", ZDEPARTMENT_ID);
+				List<PageData> zdepartmentPdList = new ArrayList<PageData>();
+				JSONArray arr = JSONArray.fromObject(departmentService.listAllDepartmentToSelect(ZDEPARTMENT_ID,zdepartmentPdList));
+				mv.addObject("zTreeNodes", arr.toString());
+				PageData dpd = departmentService.findById(pd);
+				if(null != dpd){
+					ZDEPARTMENT_ID = dpd.getString("NAME");
+				}
+				mv.addObject("depname", ZDEPARTMENT_ID);
+		
+				
+		
+				
 		mv.setViewName("tmplconfig/tmplconfig/tmplconfig_list");
 		mv.addObject("varList", varList);
+		mv.addObject("listBase", listBase);
 		mv.addObject("pd", pd);
-		mv.addObject("QX",Jurisdiction.getHC());	//按钮权限
 		return mv;
+	}
+	
+	/**列表
+	 * @param page
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/getPageList")
+	public @ResponseBody PageResult<PageData> getPageList(Page page) throws Exception{
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		PageData dpd = departmentService.findById(pd);
+		pd.put("DEPT_BIANMA", dpd.getString("BIANMA"));
+		page.setPd(pd);
+		List<PageData> varList = tmplconfigService.list(page);	//列出Betting列表
+		
+		
+		
+		PageResult<PageData> result = new PageResult<PageData>();
+		result.setRows(varList);
+		
+		return result;
 	}
 	
 	/**去新增页面
