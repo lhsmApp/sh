@@ -94,6 +94,18 @@ public interface UserManager {
 	 */
 	public void editU(PageData pd)throws Exception;
 	
+	/**修改用户
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void editUMy(PageData pd)throws Exception;
+	
+	/**修改个人状态
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void editState(PageData pd)throws Exception;
+	
 	/**保存用户
 	 * @param pd
 	 * @throws Exception

@@ -23,7 +23,7 @@
 			</div>
 		</td>
 		<td style="width:85%;" valign="top" >
-			<iframe name="treeFrame" id="treeFrame" frameborder="0" src="<%=basePath%>/department/list.do?DEPARTMENT_ID=${'' == DEPARTMENT_ID?'0':DEPARTMENT_ID}&currentPage=${null == pd.dnowPage || '' == pd.dnowPage?'1':pd.dnowPage}" style="margin:0 auto;width:100%;height:100%;"></iframe>
+			<iframe name="treeFrame" id="treeFrame" frameborder="0" src="<%=basePath%>/department/list.do?DEPARTMENT_CODE=${'' == DEPARTMENT_CODE?'0':DEPARTMENT_CODE}&currentPage=${null == pd.dnowPage || '' == pd.dnowPage?'1':pd.dnowPage}" style="margin:0 auto;width:100%;height:100%;"></iframe>
 		</td>
 	</tr>
 </table>

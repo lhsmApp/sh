@@ -16,8 +16,8 @@ public class Department {
 
 	private String NAME;			//名称
 	private String NAME_EN;			//英文名称
-	private String BIANMA;			//编码
-	private String PARENT_ID;		//上级ID
+	private String DEPARTMENT_CODE;			//编码
+	private String PARENT_CODE;		//上级ID
 	private String HEADMAN;			//负责人
 	private String TEL;				//电话
 	private String FUNCTIONS;		//部门职能
@@ -49,17 +49,18 @@ public class Department {
 	public void setNAME_EN(String nAME_EN) {
 		NAME_EN = nAME_EN;
 	}
-	public String getBIANMA() {
-		return BIANMA;
+	
+	public String getDEPARTMENT_CODE() {
+		return DEPARTMENT_CODE;
 	}
-	public void setBIANMA(String bIANMA) {
-		BIANMA = bIANMA;
+	public void setDEPARTMENT_CODE(String dEPARTMENT_CODE) {
+		DEPARTMENT_CODE = dEPARTMENT_CODE;
 	}
-	public String getPARENT_ID() {
-		return PARENT_ID;
+	public String getPARENT_CODE() {
+		return PARENT_CODE;
 	}
-	public void setPARENT_ID(String pARENT_ID) {
-		PARENT_ID = pARENT_ID;
+	public void setPARENT_CODE(String pARENT_CODE) {
+		PARENT_CODE = pARENT_CODE;
 	}
 	public String getHEADMAN() {
 		return HEADMAN;

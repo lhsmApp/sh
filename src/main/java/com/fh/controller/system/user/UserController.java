@@ -177,7 +177,7 @@ public class UserController extends BaseController {
 		pd.put("USER_ID", this.get32UUID());	//ID 主键
 		pd.put("LAST_LOGIN", "");				//最后登录时间
 		pd.put("IP", "");						//IP
-		pd.put("STATUS", "0");					//状态
+		pd.put("STATUS", "1");					//状态
 		pd.put("SKIN", "default");
 		pd.put("RIGHTS", "");		
 		pd.put("PASSWORD", new SimpleHash("SHA-1", pd.getString("USERNAME"), pd.getString("PASSWORD")).toString());	//密码加密
@@ -312,6 +312,23 @@ public class UserController extends BaseController {
 		return mv;
 	}
 	
+	/**去修改用户页面(个人修改)
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/goEditMy")
+	public ModelAndView goEditMy() throws Exception{
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		pd.put("USERNAME", Jurisdiction.getUsername());
+		pd = userService.findByUsername(pd);						//根据用户名读取
+		mv.setViewName("system/user/user_edit_my");
+		mv.addObject("msg", "editUMy");
+		mv.addObject("pd", pd);
+		return mv;
+	}
+	
 	/**查看用户
 	 * @return
 	 * @throws Exception
@@ -385,6 +402,25 @@ public class UserController extends BaseController {
 		}
 		userService.editU(pd);	//执行修改
 		FHLOG.save(Jurisdiction.getUsername(), "修改系统用户："+pd.getString("USERNAME"));
+		mv.addObject("msg","success");
+		mv.setViewName("save_result");
+		return mv;
+	}
+	
+	/**
+	 * 修改个人用户
+	 */
+	@RequestMapping(value="/editUMy")
+	public ModelAndView editUMy() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"修改个人信息");
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		if(pd.getString("PASSWORD") != null && !"".equals(pd.getString("PASSWORD"))){
+			pd.put("PASSWORD", new SimpleHash("SHA-1", pd.getString("USERNAME"), pd.getString("PASSWORD")).toString());
+		}
+		userService.editUMy(pd);//执行修改
+		FHLOG.save(Jurisdiction.getUsername(), "修改个人用户："+pd.getString("USERNAME"));
 		mv.addObject("msg","success");
 		mv.setViewName("save_result");
 		return mv;

@@ -40,9 +40,9 @@
 									</div>
 								</td>
 								<td>&nbsp;
-									<select name="DEPARTMENT_ID" id="DEPARTMENT_ID">
-										<option value="${DEPARTMENT_ID}" <c:if test="${DEPARTMENT_ID != ''}">selected</c:if>>本级</option>
-										<option value="" <c:if test="${DEPARTMENT_ID == ''}">selected</c:if>>全部</option>
+									<select name="DEPARTMENT_CODE" id="DEPARTMENT_CODE">
+										<option value="${DEPARTMENT_CODE}" <c:if test="${DEPARTMENT_CODE != ''}">selected</c:if>>本级</option>
+										<option value="" <c:if test="${DEPARTMENT_CODE == ''}">selected</c:if>>全部</option>
 									</select>
 								</td>
 								<c:if test="${QX.cha == 1 }">
@@ -57,9 +57,10 @@
 								<tr>
 									<th class="center" style="width:50px;">序号</th>
 									<th class="center">名称</th>
-									<th class="center">英文</th>
+									<!-- <th class="center">英文</th> -->
 									<th class="center">编码</th>
 									<th class="center">负责人</th>
+									<th class="center">单位职能</th>
 									<th class="center">操作</th>
 								</tr>
 							</thead>
@@ -72,10 +73,11 @@
 									<c:forEach items="${varList}" var="var" varStatus="vs">
 										<tr>
 											<td class='center' style="width: 30px;">${vs.index+1}</td>
-											<td class='center'><a href="javascript:goSondict('${var.DEPARTMENT_ID }')"><i class="ace-icon fa fa-share bigger-100"></i>&nbsp;${var.NAME}</a></td>
-											<td class='center'><a href="javascript:goSondict('${var.DEPARTMENT_ID }')">${var.NAME_EN}</a></td>
-											<td class='center'>${var.BIANMA}</td>
+											<td class='center'><a href="javascript:goSondict('${var.DEPARTMENT_CODE }')"><i class="ace-icon fa fa-share bigger-100"></i>&nbsp;${var.NAME}</a></td>
+											<%-- <td class='center'><a href="javascript:goSondict('${var.DEPARTMENT_CODE }')">${var.NAME_EN}</a></td> --%>
+											<td class='center'>${var.DEPARTMENT_CODE}</td>
 											<td class='center'>${var.HEADMAN}</td>
+											<td class='center'>${var.FUNCTIONS}</td>
 											<td class="center">
 												<c:if test="${QX.edit != 1 && QX.del != 1 }">
 												<span class="label label-large label-grey arrowed-in-right arrowed-in"><i class="ace-icon fa fa-lock" title="无权限"></i></span>
@@ -144,10 +146,10 @@
 							<tr>
 								<td style="vertical-align:top;">
 									<c:if test="${QX.add == 1 }">
-									<a class="btn btn-sm btn-success" onclick="add('${DEPARTMENT_ID}');">新增</a>
+										<a class="btn btn-sm btn-success" onclick="add('${DEPARTMENT_CODE}');">新增</a>
 									</c:if>
-									<c:if test="${null != pd.DEPARTMENT_ID && pd.DEPARTMENT_ID != ''}">
-									<a class="btn btn-sm btn-success" onclick="goSondict('${pd.PARENT_ID}');">返回</a>
+									<c:if test="${null != pd.DEPARTMENT_CODE && pd.DEPARTMENT_CODE != ''}">
+										<a class="btn btn-sm btn-success" onclick="goSondict('${pd.PARENT_CODE}');">返回</a>
 									</c:if>
 								</td>
 								<td style="vertical-align:top;"><div class="pagination" style="float: right;padding-top: 0px;margin-top: 0px;">${page.pageStr}</div></td>
@@ -193,23 +195,23 @@
 		}
 		
 		//去此ID下子级列表
-		function goSondict(DEPARTMENT_ID){
+		function goSondict(DEPARTMENT_CODE){
 			top.jzts();
-			window.location.href="<%=basePath%>department/list.do?DEPARTMENT_ID="+DEPARTMENT_ID;
+			window.location.href="<%=basePath%>department/list.do?DEPARTMENT_CODE="+DEPARTMENT_CODE;
 		};
 		
 		//新增
-		function add(DEPARTMENT_ID){
+		function add(DEPARTMENT_CODE){
 			 top.jzts();
 			 var diag = new top.Dialog();
 			 diag.Drag=true;
 			 diag.Title ="新增";
-			 diag.URL = '<%=basePath%>department/goAdd.do?DEPARTMENT_ID='+DEPARTMENT_ID;
+			 diag.URL = '<%=basePath%>department/goAdd.do?DEPARTMENT_CODE='+DEPARTMENT_CODE;
 			 diag.Width = 700;
-			 diag.Height = 550;
+			 diag.Height = 505;
 			 diag.CancelEvent = function(){ //关闭事件
 				 if('none' == diag.innerFrame.contentWindow.document.getElementById('zhongxin').style.display){
-					 parent.location.href="<%=basePath%>department/listAllDepartment.do?DEPARTMENT_ID=${DEPARTMENT_ID}&dnowPage=${page.currentPage}";
+					 parent.location.href="<%=basePath%>department/listAllDepartment.do?DEPARTMENT_CODE=${DEPARTMENT_CODE}&dnowPage=${page.currentPage}";
 				}
 				diag.close();
 			 };
@@ -224,7 +226,7 @@
 					var url = "<%=basePath%>department/delete.do?DEPARTMENT_ID="+Id+"&tm="+new Date().getTime();
 					$.get(url,function(data){
 						if("success" == data.result){
-							parent.location.href="<%=basePath%>department/listAllDepartment.do?DEPARTMENT_ID=${DEPARTMENT_ID}&dnowPage=${page.currentPage}";
+							parent.location.href="<%=basePath%>department/listAllDepartment.do?DEPARTMENT_CODE=${DEPARTMENT_CODE}&dnowPage=${page.currentPage}";
 						}else if("false" == data.result){
 							top.hangge();
 							bootbox.dialog({
@@ -252,10 +254,10 @@
 			 diag.Title ="编辑";
 			 diag.URL = '<%=basePath%>department/goEdit.do?DEPARTMENT_ID='+Id;
 			 diag.Width = 700;
-			 diag.Height = 550;
+			 diag.Height = 505;
 			 diag.CancelEvent = function(){ //关闭事件
 				 if(diag.innerFrame.contentWindow.document.getElementById('zhongxin').style.display == 'none'){
-					 parent.location.href="<%=basePath%>department/listAllDepartment.do?DEPARTMENT_ID=${DEPARTMENT_ID}&dnowPage=${page.currentPage}";
+					 parent.location.href="<%=basePath%>department/listAllDepartment.do?DEPARTMENT_CODE=${DEPARTMENT_CODE}&dnowPage=${page.currentPage}";
 				}
 				diag.close();
 			 };

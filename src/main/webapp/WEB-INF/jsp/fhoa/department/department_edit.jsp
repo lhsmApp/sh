@@ -27,7 +27,7 @@
 					
 					<form action="department/${msg }.do" name="Form" id="Form" method="post">
 						<input type="hidden" name="DEPARTMENT_ID" id="DEPARTMENT_ID" value="${pd.DEPARTMENT_ID}"/>
-						<input type="hidden" name="PARENT_ID" id="PARENT_ID" value="${null == pd.PARENT_ID ? DEPARTMENT_ID:pd.PARENT_ID}"/>
+						<input type="hidden" name="PARENT_CODE" id="PARENT_CODE" value="${null == pd.PARENT_CODE ? DEPARTMENT_CODE:pd.PARENT_CODE}"/>
 						<div id="zhongxin">
 						<table id="table_report" class="table table-striped table-bordered table-hover" style="margin-top:15px;">
 							<tr>
@@ -42,13 +42,13 @@
 								<td style="width:70px;text-align: right;padding-top: 13px;">名称:</td>
 								<td><input type="text" name="NAME" id="NAME" value="${pd.NAME}" maxlength="50" placeholder="这里输入名称" title="名称" style="width:98%;"/></td>
 							</tr>
-							<tr>
+							<%-- <tr>
 								<td style="width:70px;text-align: right;padding-top: 13px;">英文:</td>
 								<td><input type="text" name="NAME_EN" id="NAME_EN" value="${pd.NAME_EN}" maxlength="50" placeholder="这里输入英文" title="英文" style="width:98%;"/></td>
-							</tr>
+							</tr> --%>
 							<tr>
 								<td style="width:70px;text-align: right;padding-top: 13px;">编码:</td>
-								<td><input type="text" name="BIANMA" id="BIANMA" value="${pd.BIANMA}" maxlength="32" placeholder="这里输入编码 (不重复, 禁止修改)" title="编码" style="width:76%;" onblur="hasBianma();" <c:if test="${null != pd.BIANMA}">readonly="readonly"</c:if>/></td>
+								<td><input type="text" name="DEPARTMENT_CODE" id="DEPARTMENT_CODE" value="${pd.DEPARTMENT_CODE}" maxlength="32" placeholder="这里输入编码 (不重复, 禁止修改)" title="编码" style="width:76%;" onblur="hasBianma();" <c:if test="${null != pd.DEPARTMENT_CODE}">readonly="readonly"</c:if>/></td>
 							</tr>
 							<tr>
 								<td style="width:70px;text-align: right;padding-top: 13px;">负责人:</td>
@@ -69,7 +69,7 @@
 							<tr>
 								<td style="width:70px;text-align: right;padding-top: 13px;">备注:</td>
 								<td>
-									<textarea rows="3" cols="46" name="BZ" id="BZ" placeholder="这里输入备注" title="备注"  style="width:98%;">${pd.BZ}</textarea>
+									<textarea rows="2" cols="46" name="BZ" id="BZ" placeholder="这里输入备注" title="备注"  style="width:98%;">${pd.BZ}</textarea>
 								</td>
 							</tr>
 							<tr>
@@ -115,54 +115,43 @@
 		            time:2
 		        });
 				$("#NAME").focus();
-			return false;
-		}
-			if($("#NAME_EN").val()==""){
-				$("#NAME_EN").tips({
-					side:3,
-		            msg:'请输入英文',
-		            bg:'#AE81FF',
-		            time:2
-		        });
-				$("#NAME_EN").focus();
-			return false;
-		}
-			if($("#BIANMA").val()==""){
-				$("#BIANMA").tips({
+				return false;
+			}
+			if($("#DEPARTMENT_CODE").val()==""){
+				$("#DEPARTMENT_CODE").tips({
 					side:3,
 		            msg:'请输入编码',
 		            bg:'#AE81FF',
 		            time:2
 		        });
-				$("#BIANMA").focus();
-			return false;
-		}
+				$("#DEPARTMENT_CODE").focus();
+				return false;
+			}
 			$("#Form").submit();
 			$("#zhongxin").hide();
 			$("#zhongxin2").show();
-			
 		}
 		
 		//判断编码是否存在
 		function hasBianma(){
-			var BIANMA = $.trim($("#BIANMA").val());
-			if("" == BIANMA)return;
+			var DEPARTMENT_CODE = $.trim($("#DEPARTMENT_CODE").val());
+			if("" == DEPARTMENT_CODE)return;
 			$.ajax({
 				type: "POST",
 				url: '<%=basePath%>department/hasBianma.do',
-		    	data: {BIANMA:BIANMA,tm:new Date().getTime()},
+		    	data: {DEPARTMENT_CODE:DEPARTMENT_CODE,tm:new Date().getTime()},
 				dataType:'json',
 				cache: false,
 				success: function(data){
 					 if("success" == data.result){
 					 }else{
-						$("#BIANMA").tips({
+						$("#DEPARTMENT_CODE").tips({
 							side:1,
-				            msg:'编码'+BIANMA+'已存在,重新输入',
+				            msg:'编码'+DEPARTMENT_CODE+'已存在,重新输入',
 				            bg:'#AE81FF',
 				            time:5
 				        });
-						$('#BIANMA').val('');
+						$('#DEPARTMENT_CODE').val('');
 					 }
 				}
 			});
