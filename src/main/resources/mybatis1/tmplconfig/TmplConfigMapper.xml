@@ -183,7 +183,7 @@
 		<include refid="tableName"></include>
 		where DEPT_CODE = #{DEPT_CODE}
 		and TABLE_CODE = #{TABLE_CODE}
-	
+	</select>
 	
 	
 	
