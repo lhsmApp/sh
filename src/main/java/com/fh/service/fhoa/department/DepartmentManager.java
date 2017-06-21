@@ -79,7 +79,7 @@ public interface DepartmentManager{
 	 * @return
 	 * @throws Exception
 	 */
-	public String getDEPARTMENT_IDS(String DEPARTMENT_ID) throws Exception;
+	public String getDEPARTMENT_CODES(String DEPARTMENT_ID) throws Exception;
 	
 }
 

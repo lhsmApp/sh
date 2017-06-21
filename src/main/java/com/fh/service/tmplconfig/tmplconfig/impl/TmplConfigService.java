@@ -59,7 +59,7 @@ public class TmplConfigService implements TmplConfigManager{
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	public List<PageData> listAll(PageData pd)throws Exception{
+	public List<PageData> listAll(Page pd)throws Exception{
 		return (List<PageData>)dao.findForList("TmplConfigMapper.listAll", pd);
 	}
 	
@@ -96,6 +96,15 @@ public class TmplConfigService implements TmplConfigManager{
 	@SuppressWarnings("unchecked")
 	public List<TmplConfigDetail> listNeed(TmplConfigDetail item)throws Exception{
 		return (List<TmplConfigDetail>)dao.findForList("TmplConfigMapper.listNeed", item);
+	}
+
+	/**临时数据表明细 
+	 * @param pd
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PageData> temporaryList(Page pd) throws Exception {
+		return (List<PageData>)dao.findForList("TmplConfigMapper.temporaryList", pd);
 	}
 	
 }

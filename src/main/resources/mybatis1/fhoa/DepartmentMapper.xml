@@ -4,8 +4,9 @@
 	
 	<resultMap type="Department" id="departmentResultMap">
 		<id column="DEPARTMENT_ID" property="DEPARTMENT_ID"/>
+		<result column="DEPARTMENT_CODE" property="DEPARTMENT_CODE"/>
 		<result column="NAME" property="NAME"/>
-		<result column="PARENT_ID" property="PARENT_ID"/>
+		<result column="PARENT_CODE" property="PARENT_CODE"/>
 	</resultMap>
 	
 	<!--表名 -->
@@ -17,8 +18,8 @@
 	<sql id="Field">
 		NAME,	
 		NAME_EN,	
-		BIANMA,	
-		PARENT_ID,
+		DEPARTMENT_CODE,	
+		PARENT_CODE,
 		HEADMAN,
 		TEL,
 		FUNCTIONS,
@@ -31,8 +32,8 @@
 	<sql id="FieldValue">
 		#{NAME},	
 		#{NAME_EN},	
-		#{BIANMA},	
-		#{PARENT_ID},
+		#{DEPARTMENT_CODE},	
+		#{PARENT_CODE},
 		#{HEADMAN},
 		#{TEL},
 		#{FUNCTIONS},
@@ -72,7 +73,7 @@
 			TEL = #{TEL},
 			FUNCTIONS = #{FUNCTIONS},
 			ADDRESS = #{ADDRESS},
-			DEPARTMENT_ID = DEPARTMENT_ID
+			DEPARTMENT_CODE = DEPARTMENT_CODE
 		where 
 		DEPARTMENT_ID = #{DEPARTMENT_ID}
 	</update>
@@ -94,7 +95,7 @@
 		from 
 		<include refid="tableName"></include>
 		where 
-			BIANMA = #{BIANMA}
+			DEPARTMENT_CODE = #{DEPARTMENT_CODE}
 	</select>
 	
 	<!-- 列表 -->
@@ -105,8 +106,8 @@
 		<include refid="tableName"></include>
 		where
 			1=1
-		<if test="pd.DEPARTMENT_ID!= null and pd.DEPARTMENT_ID != ''"><!-- 检索 -->
-		and PARENT_ID = #{pd.DEPARTMENT_ID}
+		<if test="pd.DEPARTMENT_CODE!= null and pd.DEPARTMENT_CODE != ''"><!-- 检索 -->
+		and PARENT_CODE = #{pd.DEPARTMENT_CODE}
 		</if>
 		<if test="pd.keywords != null and pd.keywords != ''"><!-- 关键词检索 -->
 			and
@@ -115,10 +116,10 @@
 				 or 
 				 NAME_EN LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') 
 				 or
-				 BIANMA LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				 DEPARTMENT_CODE LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
 				)
 		</if>
-		order by NAME
+		order by DEPARTMENT_CODE
 	</select>
 	
 	<!-- 通过ID获取其子级列表 -->
@@ -128,8 +129,6 @@
 		from 
 		<include refid="tableName"></include>
 		where 
-			PARENT_ID = #{parentId} order by NAME 
+			PARENT_CODE = #{parentId} order by DEPARTMENT_CODE 
 	</select>
-	
-	<!-- fh313596790qq(青苔) -->
 </mapper>

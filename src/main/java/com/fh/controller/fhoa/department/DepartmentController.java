@@ -114,15 +114,15 @@ public class DepartmentController extends BaseController {
 		if(null != keywords && !"".equals(keywords)){
 			pd.put("keywords", keywords.trim());
 		}
-		String DEPARTMENT_ID = null == pd.get("DEPARTMENT_ID")?"":pd.get("DEPARTMENT_ID").toString();
+		String DEPARTMENT_CODE = null == pd.get("DEPARTMENT_CODE")?"":pd.get("DEPARTMENT_CODE").toString();
 		if(null != pd.get("id") && !"".equals(pd.get("id").toString())){
-			DEPARTMENT_ID = pd.get("id").toString();
+			DEPARTMENT_CODE = pd.get("id").toString();
 		}
-		pd.put("DEPARTMENT_ID", DEPARTMENT_ID);					//上级ID
+		pd.put("DEPARTMENT_CODE", DEPARTMENT_CODE);					//上级ID
 		page.setPd(pd);
 		List<PageData>	varList = departmentService.list(page);	//列出Dictionaries列表
-		mv.addObject("pd", departmentService.findById(pd));		//传入上级所有信息
-		mv.addObject("DEPARTMENT_ID", DEPARTMENT_ID);			//上级ID
+		mv.addObject("pd", departmentService.findByBianma(pd));		//传入上级所有信息
+		mv.addObject("DEPARTMENT_CODE", DEPARTMENT_CODE);			//上级ID
 		mv.setViewName("fhoa/department/department_list");
 		mv.addObject("varList", varList);
 		mv.addObject("QX",Jurisdiction.getHC());				//按钮权限
@@ -135,16 +135,16 @@ public class DepartmentController extends BaseController {
 	 * @return
 	 */
 	@RequestMapping(value="/listAllDepartment")
-	public ModelAndView listAllDepartment(Model model,String DEPARTMENT_ID)throws Exception{
+	public ModelAndView listAllDepartment(Model model,String DEPARTMENT_CODE)throws Exception{
 		ModelAndView mv = this.getModelAndView();
 		PageData pd = new PageData();
 		pd = this.getPageData();
 		try{
 			JSONArray arr = JSONArray.fromObject(departmentService.listAllDepartment("0"));
 			String json = arr.toString();
-			json = json.replaceAll("DEPARTMENT_ID", "id").replaceAll("PARENT_ID", "pId").replaceAll("NAME", "name").replaceAll("subDepartment", "nodes").replaceAll("hasDepartment", "checked").replaceAll("treeurl", "url");
+			json = json.replaceAll("DEPARTMENT_CODE", "id").replaceAll("PARENT_CODE", "pId").replaceAll("NAME", "name").replaceAll("subDepartment", "nodes").replaceAll("hasDepartment", "checked").replaceAll("treeurl", "url");
 			model.addAttribute("zTreeNodes", json);
-			mv.addObject("DEPARTMENT_ID",DEPARTMENT_ID);
+			mv.addObject("DEPARTMENT_CODE",DEPARTMENT_CODE);
 			mv.addObject("pd", pd);	
 			mv.setViewName("fhoa/department/department_ztree");
 		} catch(Exception e){
@@ -162,10 +162,10 @@ public class DepartmentController extends BaseController {
 		ModelAndView mv = this.getModelAndView();
 		PageData pd = new PageData();
 		pd = this.getPageData();
-		String DEPARTMENT_ID = null == pd.get("DEPARTMENT_ID")?"":pd.get("DEPARTMENT_ID").toString();
-		pd.put("DEPARTMENT_ID", DEPARTMENT_ID);					//上级ID
-		mv.addObject("pds",departmentService.findById(pd));		//传入上级所有信息
-		mv.addObject("DEPARTMENT_ID", DEPARTMENT_ID);			//传入ID，作为子级ID用
+		String DEPARTMENT_CODE = null == pd.get("DEPARTMENT_CODE")?"":pd.get("DEPARTMENT_CODE").toString();
+		pd.put("DEPARTMENT_CODE", DEPARTMENT_CODE);					//上级ID
+		mv.addObject("pds",departmentService.findByBianma(pd));		//传入上级所有信息
+		mv.addObject("DEPARTMENT_CODE", DEPARTMENT_CODE);			//传入ID，作为子级ID用
 		mv.setViewName("fhoa/department/department_edit");
 		mv.addObject("msg", "save");
 		return mv;
@@ -180,13 +180,14 @@ public class DepartmentController extends BaseController {
 		ModelAndView mv = this.getModelAndView();
 		PageData pd = new PageData();
 		pd = this.getPageData();
-		String DEPARTMENT_ID = pd.getString("DEPARTMENT_ID");
 		pd = departmentService.findById(pd);	//根据ID读取
 		mv.addObject("pd", pd);					//放入视图容器
-		pd.put("DEPARTMENT_ID",pd.get("PARENT_ID").toString());			//用作上级信息
-		mv.addObject("pds",departmentService.findById(pd));				//传入上级所有信息
-		mv.addObject("DEPARTMENT_ID", pd.get("PARENT_ID").toString());	//传入上级ID，作为子ID用
-		pd.put("DEPARTMENT_ID",DEPARTMENT_ID);							//复原本ID
+		/*****获取上级所有信息******************/
+		PageData pdParent = new PageData();
+		pdParent.put("DEPARTMENT_CODE",pd.get("PARENT_CODE").toString());			
+		mv.addObject("pds",departmentService.findByBianma(pdParent));	
+		/**********************************/
+		mv.addObject("DEPARTMENT_CODE", pd.get("PARENT_CODE").toString());	//传入上级ID，作为子ID用
 		mv.setViewName("fhoa/department/department_edit");
 		mv.addObject("msg", "edit");
 		return mv;

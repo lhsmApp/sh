@@ -120,7 +120,9 @@
 				r.ROLE_NAME,
 				r.RIGHTS as ROLE_RIGHTS,
 				d.NAME DEPARTMENT_NAME,
-				u.DEPARTMENT_ID  
+				u.DEPARTMENT_ID,
+				u.STATUS,
+				u.BZ  
 		from 
 		<include refid="tableName"></include> u 
 		left join 
@@ -128,7 +130,7 @@
 		on u.ROLE_ID=r.ROLE_ID 
 		left join 
 		oa_department d
-		on u.DEPARTMENT_ID=d.BIANMA 
+		on u.DEPARTMENT_ID=d.DEPARTMENT_CODE 
 		where u.STATUS=0 
 		and u.USER_ID=#{USER_ID}
 	</select>
@@ -173,6 +175,8 @@
 				u.EMAIL,
 				u.NUMBER,
 				u.PHONE,
+				u.STATUS,
+				u.BZ,
 				r.ROLE_ID,
 				r.ROLE_NAME,
 				u.DEPARTMENT_ID,
@@ -183,7 +187,7 @@
 		on u.ROLE_ID = r.ROLE_ID 
 		left join
 		oa_department d 
-		on u.DEPARTMENT_ID = d.BIANMA 
+		on u.DEPARTMENT_ID = d.DEPARTMENT_CODE 
 		<where>
 			and u.USERNAME != 'admin'
 			and r.PARENT_ID = '1'
@@ -208,6 +212,9 @@
 			<if test="pd.DEPARTMENT_ID != null and pd.DEPARTMENT_ID != ''"><!-- 单位检索 -->
 				and u.DEPARTMENT_ID=#{pd.DEPARTMENT_ID} 
 			</if>
+			<if test="pd.STATUS != null and pd.STATUS != ''"><!-- 状态检索 -->
+				and u.STATUS=#{pd.STATUS} 
+			</if>
 			<if test="pd.lastLoginStart!=null and pd.lastLoginStart!=''"><!-- 登录时间检索 -->
 				and u.LAST_LOGIN &gt;= #{pd.lastLoginStart} 
 			</if>
@@ -229,6 +236,8 @@
 				u.EMAIL,
 				u.NUMBER,
 				u.PHONE,
+				u.STATUS,
+				u.BZ,
 				r.ROLE_ID,
 				r.ROLE_NAME
 		from <include refid="tableName"></include> u, <include refid="roleTableName"></include> r 
@@ -316,10 +325,31 @@
 				BZ						= #{BZ},
 				EMAIL					= #{EMAIL},
 				NUMBER					= #{NUMBER},
+				PHONE					= #{PHONE},
+				STATUS					= #{STATUS}
+			<if test="PASSWORD != null and PASSWORD != ''">
+				,PASSWORD				= #{PASSWORD}
+			</if>
+			where 
+				USER_ID = #{USER_ID}
+	</update>
+	
+	<!-- 修改 -->
+	<update id="editUMy" parameterType="pd" >
+		update  <include refid="tableName"></include>
+			set NAME 					= #{NAME},
 				PHONE					= #{PHONE}
 			<if test="PASSWORD != null and PASSWORD != ''">
 				,PASSWORD				= #{PASSWORD}
 			</if>
+			where 
+				USER_ID = #{USER_ID}
+	</update>
+	
+	<!-- 修改 状态-->
+	<update id="editState" parameterType="pd" >
+		update  <include refid="tableName"></include>
+			set STATUS = #{STATUS }
 			where 
 				USER_ID = #{USER_ID}
 	</update>
@@ -356,6 +386,8 @@
 				u.EMAIL,
 				u.NUMBER,
 				u.PHONE,
+				u.STATUS,
+				u.BZ,
 				r.ROLE_ID,
 				r.ROLE_NAME,
 				u.DEPARTMENT_ID,
@@ -366,7 +398,7 @@
 		on u.ROLE_ID = r.ROLE_ID 
 		left join
 		oa_department d 
-		on u.DEPARTMENT_ID = d.BIANMA 
+		on u.DEPARTMENT_ID = d.DEPARTMENT_CODE 
 		<where> 
 			and u.USERNAME != 'admin'
 			and r.PARENT_ID = '1'
@@ -390,6 +422,9 @@
 			<if test="DEPARTMENT_ID != null and DEPARTMENT_ID != ''"><!-- 单位检索 -->
 				and u.DEPARTMENT_ID=#{DEPARTMENT_ID} 
 			</if>
+			<if test="STATUS != null and STATUS != ''"><!-- 状态检索 -->
+				and u.STATUS=#{STATUS} 
+			</if>
 			<if test="lastLoginStart!=null and lastLoginStart!=''"><!-- 登录时间检索 -->
 				and u.LAST_LOGIN &gt;= #{lastLoginStart} 
 			</if>
@@ -407,6 +442,4 @@
 		from 
 		<include refid="tableName"></include>
 	</select>
-	
-	<!-- fh313596790qq(青苔) -->
 </mapper>

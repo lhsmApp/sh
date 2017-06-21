@@ -41,7 +41,7 @@ public interface TmplConfigManager{
 	 * @param pd
 	 * @throws Exception
 	 */
-	public List<PageData> listAll(PageData pd)throws Exception;
+	public List<PageData> listAll(Page pd)throws Exception;
 	
 	/**通过id获取数据
 	 * @param pd
@@ -68,6 +68,14 @@ public interface TmplConfigManager{
 	 * @throws Exception
 	 */
 	public List<TmplConfigDetail> listNeed(TmplConfigDetail item)throws Exception;
+	
+	/**
+	 * 临时数据表明细
+	 * @param pd
+	 * @return
+	 * @throws Exception
+	 */
+	public List<PageData> temporaryList(Page pd) throws Exception; 
 	
 }
 

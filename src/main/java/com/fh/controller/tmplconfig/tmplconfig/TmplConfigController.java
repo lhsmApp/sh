@@ -32,6 +32,7 @@ import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
 import com.fh.util.SqlTools;
 import com.fh.util.Tools;
+import com.sun.tools.corba.se.idl.constExpr.And;
 
 import net.sf.json.JSONArray;
 
@@ -153,14 +154,20 @@ public class TmplConfigController extends BaseController {
 		PageData dpd = departmentService.findById(pd);
 		pd.put("DEPT_BIANMA", dpd.getString("BIANMA"));
 		page.setPd(pd);
-		List<PageData> varList = tmplconfigService.list(page);	//列出Betting列表
-		
-		
-		
+		List<PageData> varList = tmplconfigService.listAll(page);	//列出Betting列表
 		PageResult<PageData> result = new PageResult<PageData>();
-		result.setRows(varList);
+		if (varList.size()!=0) {
+			
+			result.setRows(varList);
+			
+			
+		} else {
+			List<PageData> temporaryList = tmplconfigService.temporaryList(page);	//列出Betting列表
+			result.setRows(temporaryList);
+		}
 		
 		return result;
+		
 	}
 	
 	/**去新增页面
@@ -243,24 +250,24 @@ public class TmplConfigController extends BaseController {
 		titles.add("列汇总");	//8
 		titles.add("列平均值");	//9
 		dataMap.put("titles", titles);
-		List<PageData> varOList = tmplconfigService.listAll(pd);
-		List<PageData> varList = new ArrayList<PageData>();
-		for(int i=0;i<varOList.size();i++){
-			PageData vpd = new PageData();
-			vpd.put("var1", varOList.get(i).getString("DEPT_CODE"));	    //1
-			vpd.put("var2", varOList.get(i).getString("TABLE_CODE"));	    //2
-			vpd.put("var3", varOList.get(i).getString("COL_CODE"));	    //3
-			vpd.put("var4", varOList.get(i).getString("COL_NAME"));	    //4
-			vpd.put("var5", varOList.get(i).get("DISP_ORDER").toString());	//5
-			vpd.put("var6", varOList.get(i).getString("DICT_TRANS"));	    //6
-			vpd.put("var7", varOList.get(i).getString("COL_HIDE"));	    //7
-			vpd.put("var8", varOList.get(i).getString("COL_SUM"));	    //8
-			vpd.put("var9", varOList.get(i).getString("COL_AVE"));	    //9
-			varList.add(vpd);
-		}
-		dataMap.put("varList", varList);
-		ObjectExcelView erv = new ObjectExcelView();
-		mv = new ModelAndView(erv,dataMap);
+////		List<PageData> varOList = tmplconfigService.listAll(pd);
+//		List<PageData> varList = new ArrayList<PageData>();
+//		for(int i=0;i<varOList.size();i++){
+//			PageData vpd = new PageData();
+//			vpd.put("var1", varOList.get(i).getString("DEPT_CODE"));	    //1
+//			vpd.put("var2", varOList.get(i).getString("TABLE_CODE"));	    //2
+//			vpd.put("var3", varOList.get(i).getString("COL_CODE"));	    //3
+//			vpd.put("var4", varOList.get(i).getString("COL_NAME"));	    //4
+//			vpd.put("var5", varOList.get(i).get("DISP_ORDER").toString());	//5
+//			vpd.put("var6", varOList.get(i).getString("DICT_TRANS"));	    //6
+//			vpd.put("var7", varOList.get(i).getString("COL_HIDE"));	    //7
+//			vpd.put("var8", varOList.get(i).getString("COL_SUM"));	    //8
+//			vpd.put("var9", varOList.get(i).getString("COL_AVE"));	    //9
+//			varList.add(vpd);
+//		}
+//		dataMap.put("varList", varList);
+//		ObjectExcelView erv = new ObjectExcelView();
+//		mv = new ModelAndView(erv,dataMap);
 		return mv;
 	}
 	
