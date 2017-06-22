@@ -152,15 +152,14 @@ public class TmplConfigController extends BaseController {
 		PageData pd = new PageData();
 		pd = this.getPageData();
 		//PageData dpd = departmentService.findById(pd);
-//		pd.put("DEPT_BIANMA", dpd.getString("BIANMA"));
+		//pd.put("DEPT_BIANMA", dpd.getString("BIANMA"));
+		PageData tpd = tmplconfigService.findTableCodeByTableNo(pd);
+		pd.put("TABLE_CODE", tpd.getString("TABLE_CODE"));
 		page.setPd(pd);
 		List<PageData> varList = tmplconfigService.listAll(page);	//列出Betting列表
 		PageResult<PageData> result = new PageResult<PageData>();
 		if (varList.size()!=0) {
-			
 			result.setRows(varList);
-			    
-			
 		} else {
 			List<PageData> temporaryList = tmplconfigService.temporaryList(page);	//列出Betting列表
 			result.setRows(temporaryList);
@@ -168,6 +167,19 @@ public class TmplConfigController extends BaseController {
 		
 		return result;
 		
+	}
+	
+	/**
+	 * 获取字典集合
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/getDictList")
+	public List<PageData> getDictList() throws Exception {
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		List<PageData> dictList = tmplconfigService.dictList(pd);
+		return dictList;
 	}
 	
 	/**去新增页面

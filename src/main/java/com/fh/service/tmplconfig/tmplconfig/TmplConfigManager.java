@@ -77,5 +77,21 @@ public interface TmplConfigManager{
 	 */
 	public List<PageData> temporaryList(Page pd) throws Exception; 
 	
+	/**
+	 * 根据TABLE_NO获取TABLE_CODE
+	 * @param pd
+	 * @return
+	 * @throws Exception
+	 */
+	public PageData findTableCodeByTableNo(PageData pd) throws Exception;
+	
+	/**
+	 * 字典翻译集合
+	 * @param pd
+	 * @return
+	 * @throws Exception
+	 */
+	public List<PageData> dictList(PageData pd) throws Exception;
+	
 }
 

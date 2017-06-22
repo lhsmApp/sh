@@ -106,6 +106,22 @@ public class TmplConfigService implements TmplConfigManager{
 	public List<PageData> temporaryList(Page pd) throws Exception {
 		return (List<PageData>)dao.findForList("TmplConfigMapper.temporaryList", pd);
 	}
+
+	/**根据TABLE_NO获取TABLE_CODE
+	 * @param pd
+	 * @throws Exception
+	 */
+	public PageData findTableCodeByTableNo(PageData pd) throws Exception {
+		return (PageData)dao.findForObject("TmplConfigMapper.findTableCodeByTableNo", pd);
+	}
+
+	/**
+	 * 字典翻译集合
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PageData> dictList(PageData pd) throws Exception {
+		return (List<PageData>)dao.findForList("TmplConfigMapper.dictList", pd);
+	}
 	
 }
 

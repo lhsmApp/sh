@@ -128,12 +128,15 @@
 		a.COL_SUM,
 		a.COL_AVE,
 		b.NAME DNAME,
-		c.TABLE_NAME
+		c.TABLE_NAME,
+		d.DICT_NAME
 		FROM
 		tb_tmpl_config_detail a LEFT JOIN oa_department b
 		on a.DEPT_CODE = b.DEPARTMENT_CODE
 		LEFT JOIN tb_tmpl_config_base c
 		on a.TABLE_CODE = c.TABLE_CODE
+		LEFT JOIN tb_tmpl_config_dict d
+		on a.DICT_TRANS = d.DICT_CODE
 		where 1=1
 			<if test="pd.DEPARTMENT_CODE!= null and pd.DEPARTMENT_CODE != ''">
 				and (
@@ -178,17 +181,30 @@
 	    order by DISP_ORDER
 	</select>
 	
+	<!-- 根据TABLE_NO获取TABLE_CODE -->
+	<select id="findTableCodeByTableNo" parameterType="String" resultType="pd">
+		select TABLE_CODE
+		from TB_TMPL_CONFIG_BASE
+		where
+		TB_TMPL_CONFIG_BASE.TABLE_NO = #{TABLE_NO}
+	</select>
 	
 	<!-- 临时生成的数据表明细 -->
 	<select id="temporaryList" parameterType="page" resultType="pd">
 		SELECT column_name AS COL_CODE, column_comment AS COL_NAME,
-		'DB_FHDB' AS DEPT_CODE,'001' AS TABLE_CODE,'A公司' AS DNAME,'公积金' AS TABLE_NAME
+		#{pd.DEPARTMENT_CODE} AS DEPT_CODE,#{pd.TABLE_CODE} AS TABLE_CODE,#{pd.DNAME} AS DNAME,#{pd.TABLE_NAME} AS TABLE_NAME,
+		'0' AS DISP_ORDER,'0' AS DICT_TRANS,'0' AS COL_HIDE,'0' AS COL_SUM,'0' AS COL_AVE
 		FROM 
  		information_schema.columns 
  		WHERE 
  		table_schema ='dbgdhs' 
  		AND 
  		table_name = #{pd.TABLE_CODE}
+	</select>
+	<!-- 字典翻译集合 -->
+	<select id="dictList" parameterType="pd" resultType="pd">
+		select * 
+		from tb_tmpl_config_dict
 	</select>
 
 	<!-- fh313596790qq(青苔) -->

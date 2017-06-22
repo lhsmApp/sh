@@ -58,6 +58,11 @@
 									<button id="btnQuery" class="btn btn-white btn-info btn-sm"
 										onclick="showQueryCondi()">
 										<i class="ace-icon fa fa-chevron-up bigger-120 blue"></i> <span>隐藏查询</span>
+									</button>
+									
+									<button id="btnCopy" class="btn btn-white btn-info btn-sm" style="margin-left: 10px;"
+										onclick="copyData()">
+										 <span>复制</span>
 									</button></td>
 							</tr>
 						</table>
@@ -73,22 +78,22 @@
 										
 										<table style="margin-top:5px;">
 							<tr>
-							<td><input name="DEPARTMENT_ID" id="DEPARTMENT_ID" type="hidden" value="${pd.DEPARTMENT_ID }" /></td>
+							<td><input name="DEPARTMENT_CODE" id="DEPARTMENT_CODE" type="hidden" value="${pd.DEPARTMENT_CODE }" /></td>
+							<td><input name="DNAME" id="DNAME" type="hidden" value="${pd.DNAME }" /></td>
 								<td>
 											<span>
 												<select class="chosen-select form-control" 
-													name="TABLE_CODE" id=TABLE_CODE
+													name="TABLE_NO" id=TABLE_NO
 													data-placeholder="请选择表明称"
 													style="vertical-align: top; height:32px;width: 150px;">
 													<option value="">请选择表名称</option>
 													<c:forEach items="${listBase}" var="tableName">
-														<option value="${tableName.TABLE_CODE }"
-															<c:if test="${pd.TABLE_CODE==tableName.TABLE_CODE}">selected</c:if>>${tableName.TABLE_NAME  }</option>
+														<option value="${tableName.TABLE_NO}"
+															<c:if test="${pd.TABLE_NO==tableName.TABLE_NO}">selected</c:if>>${tableName.TABLE_NAME  }</option>
 													</c:forEach>
 												</select>
 											</span>
-											</td>
-										
+											</td>			
 											<td style="padding-left:5px">
 											<div class="selectTree" id="selectTree"></div>
 											</td>
@@ -107,15 +112,6 @@
 					</div>
 					<div class="row">
 						<div class="col-xs-12">
-							<!-- PAGE CONTENT BEGINS -->
-							<!-- <div class="well well-sm">
-								You can have a custom jqGrid download here:
-								<a href="http://www.trirand.com/blog/?page_id=6" target="_blank">
-									
-									<i class="fa fa-external-link bigger-110"></i>
-								</a>
-							</div> -->
-
 							<table id="jqGrid"></table>
 							<div id="jqGridPager"></div>
 						</div>
@@ -172,13 +168,14 @@
 				{ label: '单位编码', name: 'DEPT_CODE', width: 60,hidden : true,editable: true,},
 				{ label: '表编码', name: 'TABLE_CODE', width: 60,hidden : true,editable: true,},
 				{ label: '列编码', name: 'COL_CODE', width: 60,hidden : true,editable: true,},
+				//{ label: '列编码', name: 'DICT_TRANS', width: 60,hidden : true,editable: true,},
 			
 				{label: '单位',name:'DNAME', width:100}, 
 				{ label: '表名', name: 'TABLE_NAME', width: 90},
 				{ label: '列编码', name: 'COL_CODE', width: 60},
 				{ label: '列名称', name: 'COL_NAME', width: 60,editable: true,},
 				{ label: '显示序号', name: 'DISP_ORDER', width: 80, sorttype: 'number',editable: true,},
-				{ label: '字典翻译', name: 'DICT_TRANS', width: 80,align:'center',editable: true,},                  
+				{ label: '字典翻译', name: 'DICT_NAME', width: 80,align:'center',editable: true,edittype: 'select', editoptions: { dataUrl: '<%=basePath%>tmplconfig/getDictList.do'}},                  
 				{ label: '列隐藏', name: 'COL_HIDE', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch},                   
 				{ label: '列汇总', name: 'COL_SUM', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch},                   
 				{ label: '列平均值', name: 'COL_AVE', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch}                   
@@ -368,24 +365,33 @@
 	
 		//检索
 		function tosearch() {
-			if($("#TABLE_CODE").val()==""){
-				$("#TABLE_CODE").tips({
+			
+			if($("#TABLE_NO").val()==""){
+				$("#TABLE_NO").tips({
 					side:3,
 		            msg:'请选择表名称',
 		            bg:'#AE81FF',
 		            time:2
 		        });
-				$("#TABLE_CODE").focus();
+				$("#TABLE_NO").focus();
 			return false;
+			}
+			if($("#selectTree2_input").val()=="请选择"){
+				document.getElementById("DEPARTMENT_CODE").value="001"; 
+				document.getElementById("DNAME").value="总部"; 
+				
 			}
 			/* var RPT_DEPT = $("#RPT_DEPT").val();
 			var STATUS = $("#STATUS").val();
 			var BILL_TYPE = $("#BILL_TYPE").val(); */
-			var TABLE_CODE = $("#TABLE_CODE").val(); 
-			var DEPARTMENT_CODE = $("#DEPARTMENT_ID").val(); 
+			var TABLE_NO = $("#TABLE_NO").val(); 
+			var DEPARTMENT_CODE = $("#DEPARTMENT_CODE").val(); 
+			var TABLE_NAME = $("#TABLE_NO").find("option:selected").text();
+			var DNAME = $("#DNAME").val(); 
+			console.log(Text);
 			console.log("哈哈");
 			$("#jqGrid").jqGrid('setGridParam',{  // 重新加载数据
-				url:'<%=basePath%>tmplconfig/getPageList.do?TABLE_CODE='+TABLE_CODE+'&DEPARTMENT_CODE='+DEPARTMENT_CODE,  
+				url:'<%=basePath%>tmplconfig/getPageList.do?TABLE_NO='+TABLE_NO+'&DEPARTMENT_CODE='+DEPARTMENT_CODE+'&TABLE_NAME='+TABLE_NAME+'&DNAME='+DNAME,  
 				datatype:'json',
 			      page:1
 			}).trigger("reloadGrid");
@@ -407,7 +413,7 @@
 			
 		}
 		
-		
+		//自定义列隐藏样式
 		function customFmatterState(cellvalue, options, rowObject){  
 			if (cellvalue==1) {
 				 return '<span class="label label-important arrowed-in">隐藏</span>';
@@ -439,11 +445,13 @@
 			var defaultNodes = {"treeNodes":${zTreeNodes}};
 			//绑定change事件
 			$("#selectTree").bind("change",function(){
+				console.log($(this));
 				if(!$(this).attr("relValue")){
 			      //  top.Dialog.alert("没有选择节点");
 			    }else{
 					//alert("选中节点文本："+$(this).attr("relText")+"<br/>选中节点值："+$(this).attr("relValue"));
-					$("#DEPARTMENT_ID").val($(this).attr("relValue"));
+					$("#DEPARTMENT_CODE").val($(this).attr("relValue"));
+					$("#DNAME").val($(this).attr("relText"));
 			    }
 			});
 			//赋给data属性
@@ -462,8 +470,30 @@
                 lastSelection = id;
             }
         }
+        
+        function copyData() {
+			console.log("复制");
+		}
 		
-		
+		<%-- function getDictList() {
+			$.ajax({
+				type: "POST",
+				url: '<%=basePath%>tmplconfig/getDictList.do?',
+		    	dataType:'json',
+				cache: false,
+				success: function(response){
+					if(response.code==0){
+						
+					}else{
+						
+					}
+				},
+		    	error: function(e) {
+					$(top.hangge());//关闭加载状态
+		    	}
+			}); 
+			
+		} --%>
 	
 	
  	</script>
