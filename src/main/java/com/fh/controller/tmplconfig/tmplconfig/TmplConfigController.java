@@ -159,7 +159,7 @@ public class TmplConfigController extends BaseController {
 		if (varList.size()!=0) {
 			
 			result.setRows(varList);
-			
+			    
 			
 		} else {
 			List<PageData> temporaryList = tmplconfigService.temporaryList(page);	//列出Betting列表
