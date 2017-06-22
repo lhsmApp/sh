@@ -185,7 +185,6 @@
 		and TABLE_CODE = #{TABLE_CODE}
 	</select>
 	
-	</select>
 	
 	
 	
