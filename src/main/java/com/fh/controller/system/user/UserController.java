@@ -90,22 +90,16 @@ public class UserController extends BaseController {
 		if(lastLoginEnd != null && !"".equals(lastLoginEnd)){
 			pd.put("lastLoginEnd", lastLoginEnd+" 00:00:00");
 		} 
-		PageData pdDepart=new PageData();
-		pdDepart.put("DEPARTMENT_ID", pd.getString("DEPARTMENT_ID"));
-		PageData pdDepartResult=departmentService.findById(pdDepart);
-		if(pdDepartResult!=null)
-			pd.put("DEPARTMENT_ID", pdDepartResult.getString("BIANMA")); 
-		
 		
 		page.setPd(pd);
 		List<PageData>	userList = userService.listUsers(page);	//列出用户列表
 		pd.put("ROLE_ID", "1");
-		pd.put("DEPARTMENT_ID", pdDepart.getString("DEPARTMENT_ID"));
 		List<Role> roleList = roleService.listAllRolesByPId(pd);//列出所有系统用户角色
 		
 		//列表页面树形下拉框用(保持下拉树里面的数据不变)
 		String ZDEPARTMENT_ID = pd.getString("ZDEPARTMENT_ID");
-		PageData dpd = departmentService.findById(pdDepart);
+		pd.put("DEPARTMENT_CODE", pd.getString("DEPARTMENT_ID"));
+		PageData dpd = departmentService.findByBianma(pd);
 		if(null != dpd){
 			ZDEPARTMENT_ID = dpd.getString("NAME");
 		}
@@ -181,9 +175,6 @@ public class UserController extends BaseController {
 		pd.put("SKIN", "default");
 		pd.put("RIGHTS", "");		
 		pd.put("PASSWORD", new SimpleHash("SHA-1", pd.getString("USERNAME"), pd.getString("PASSWORD")).toString());	//密码加密
-		PageData pdDepart=new PageData();
-		pdDepart.put("DEPARTMENT_ID", pd.getString("DEPARTMENT_ID"));
-		pd.put("DEPARTMENT_ID", departmentService.findById(pdDepart).getString("BIANMA")); 
 		
 		if(null == userService.findByUsername(pd)){	//判断用户名是否存在
 			userService.saveU(pd); 					//执行保存
@@ -274,13 +265,17 @@ public class UserController extends BaseController {
 		List<Role> roleList = roleService.listAllRolesByPId(pd);	//列出所有系统用户角色
 		mv.addObject("fx", "user");
 		pd = userService.findById(pd);	
-		String departBianma=pd.getString("DEPARTMENT_ID");//对DEPARTMENT_ID还原本人DEPARTMENT_ID
+		/*String departBianma=pd.getString("DEPARTMENT_ID");//对DEPARTMENT_ID还原本人DEPARTMENT_ID
 		PageData pdDepart=new PageData();
-		pdDepart.put("BIANMA", departBianma);
-		PageData pdDepartResult=departmentService.findByBianma(pdDepart);
-		pd.put("DEPARTMENT_ID", pdDepartResult.getString("DEPARTMENT_ID")); //根据编码读取ID
+		pdDepart.put("BIANMA", departBianma);*/
+		pd.put("DEPARTMENT_CODE", pd.getString("DEPARTMENT_ID"));
+		PageData pdDepartResult=departmentService.findByBianma(pd);
+		//pd.put("DEPARTMENT_ID", pdDepartResult.getString("DEPARTMENT_ID")); //根据编码读取ID
 		mv.setViewName("system/user/user_edit");
-		mv.addObject("depname", pdDepartResult.getString("NAME"));
+		if(pdDepartResult!=null)
+			mv.addObject("depname", pdDepartResult.getString("NAME"));
+		else
+			mv.addObject("depname", null);
 		mv.addObject("msg", "editU");
 		mv.addObject("pd", pd);
 		mv.addObject("roleList", roleList);
@@ -384,18 +379,18 @@ public class UserController extends BaseController {
 			if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限判断当前操作者有无用户管理修改权限
 			if("admin".equals(pd.getString("USERNAME")) && !"admin".equals(Jurisdiction.getUsername())){return null;}	//非admin用户不能修改admin
 			
-			String departmentID=pd.getString("DEPARTMENT_ID");//对DEPARTMENT_ID还原本人DEPARTMENT_ID
+			/*String departmentID=pd.getString("DEPARTMENT_ID");//对DEPARTMENT_ID还原本人DEPARTMENT_ID
 			PageData pdDepart=new PageData();
 			pdDepart.put("DEPARTMENT_ID", departmentID);
-			pd.put("DEPARTMENT_ID", departmentService.findById(pdDepart).getString("BIANMA")); 
+			pd.put("DEPARTMENT_ID", departmentService.findById(pdDepart).getString("BIANMA")); */
 			
 		}else{	//如果当前登录用户修改用户资料提交的用户名是本人，则不能修改本人的角色ID
 			PageData temUser= userService.findByUsername(pd);
 			pd.put("ROLE_ID", temUser.getString("ROLE_ID")); //对角色ID还原本人角色ID
-			String departmentID=temUser.getString("DEPARTMENT_ID");//对DEPARTMENT_ID还原本人DEPARTMENT_ID
+			/*String departmentID=temUser.getString("DEPARTMENT_ID");//对DEPARTMENT_ID还原本人DEPARTMENT_ID
 			PageData pdDepart=new PageData();
 			pdDepart.put("DEPARTMENT_ID", departmentID);
-			pd.put("DEPARTMENT_ID", departmentService.findById(pdDepart).getString("BIANMA")); 
+			pd.put("DEPARTMENT_ID", departmentService.findById(pdDepart).getString("BIANMA")); */
 		}
 		if(pd.getString("PASSWORD") != null && !"".equals(pd.getString("PASSWORD"))){
 			pd.put("PASSWORD", new SimpleHash("SHA-1", pd.getString("USERNAME"), pd.getString("PASSWORD")).toString());

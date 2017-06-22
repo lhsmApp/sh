@@ -160,37 +160,12 @@
 		</foreach>
 	</delete>
 
-
-
 	<!-- 基本配置表 -->
 	<select id="listBase" parameterType="page" resultType="pd">
 		select *
 		from TB_TMPL_CONFIG_BASE
 	</select>
 
-
-
-
-
-
-
-
-	<!-- 根据当前单位编码及表名获取字段配置信息 -->
-	<select id="listNeed" parameterType="pd" resultType="pd">
-		select
-		<include refid="FieldColumns"></include>
-		from
-		<include refid="tableName"></include>
-		where DEPT_CODE = #{DEPT_CODE}
-		and TABLE_CODE = #{TABLE_CODE}
-	</select>
-	
-	
-	
-	
-	
-	
-	
 	<!-- 根据当前单位编码及表名获取字段配置信息 -->
 	<select id="listNeed" parameterType="com.fh.entity.TmplConfigDetail" 
 	        resultType="com.fh.entity.TmplConfigDetail">
