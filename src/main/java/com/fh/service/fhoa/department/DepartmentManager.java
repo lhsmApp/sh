@@ -50,6 +50,12 @@ public interface DepartmentManager{
 	 */
 	public PageData findByBianma(PageData pd)throws Exception;
 	
+	/**是否有相同编码 
+	 * @param pd
+	 * @throws Exception
+	 */
+	public PageData hasSameDepartmentCode(PageData pd)throws Exception;
+	
 	/**
 	 * 通过ID获取其子级列表
 	 * @param parentId

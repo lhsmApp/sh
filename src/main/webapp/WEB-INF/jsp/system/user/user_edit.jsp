@@ -68,7 +68,7 @@
 										</c:if>
 										<tr>
 											<td style="width:79px;text-align: right;padding-top: 13px;">用户名:</td>
-											<td><input type="text" name="USERNAME" id="loginname" value="${pd.USERNAME }" maxlength="32" placeholder="这里输入用户名" title="用户名" style="width:98%;"/></td>
+											<td><input type="text" name="USERNAME" id="loginname" value="${pd.USERNAME }" maxlength="32" placeholder="这里输入用户名" title="用户名" onblur="hasU('${pd.USER_ID }')" style="width:98%;"/></td>
 										</tr>
 										<%-- <tr>
 											<td style="width:79px;text-align: right;padding-top: 13px;">编号:</td>
@@ -268,35 +268,44 @@
 			$("#EMAIL").focus();
 			return false;
 		} */
-		if($("#user_id").val()==""){
+		/* if($("#user_id").val()==""){
 			hasU();
-		}else{
+		}else{ */
 			$("#userForm").submit();
 			$("#zhongxin").hide();
 			$("#zhongxin2").show();
-		}
+		/* } */
 	}
 	function ismail(mail){
 		return(new RegExp(/^(?:[a-zA-Z0-9]+[_\-\+\.]?)*[a-zA-Z0-9]+@(?:([a-zA-Z0-9]+[_\-]?)*[a-zA-Z0-9]+\.)+([a-zA-Z]{2,})+$/).test(mail));
 		}
 	
 	//判断用户名是否存在
-	function hasU(){
+	function hasU(userID){
 		var USERNAME = $.trim($("#loginname").val());
 		$.ajax({
 			type: "POST",
 			url: '<%=basePath%>user/hasU.do',
-	    	data: {USERNAME:USERNAME,tm:new Date().getTime()},
+	    	data: {USERNAME:USERNAME,USER_ID:userID,tm:new Date().getTime()},
 			dataType:'json',
 			cache: false,
 			success: function(data){
-				 if("success" == data.result){
+				 /* if("success" == data.result){
 					$("#userForm").submit();
 					$("#zhongxin").hide();
 					$("#zhongxin2").show();
 				 }else{
 					$("#loginname").css("background-color","#D16E6C");
 					setTimeout("$('#loginname').val('此用户名已存在!')",500);
+				 } */
+				if("success" != data.result){
+					 $("#loginname").tips({
+							side:3,
+				            msg:'用户名 '+USERNAME+' 已存在',
+				            bg:'#AE81FF',
+				            time:3
+				        });
+					 $("#loginname").val('');
 				 }
 			}
 		});

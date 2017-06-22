@@ -98,6 +98,19 @@
 			DEPARTMENT_CODE = #{DEPARTMENT_CODE}
 	</select>
 	
+	<!-- 是否有相同编码 -->
+	<select id="hasSameDepartmentCode" parameterType="pd" resultType="pd">
+		select 
+		1
+		from 
+		<include refid="tableName"></include>
+		where 
+			DEPARTMENT_CODE = #{DEPARTMENT_CODE}
+		<if test="DEPARTMENT_ID != null and DEPARTMENT_ID != ''">
+			and DEPARTMENT_ID != #{DEPARTMENT_ID} 
+		</if>
+	</select>
+	
 	<!-- 列表 -->
 	<select id="datalistPage" parameterType="page" resultType="pd">
 		select

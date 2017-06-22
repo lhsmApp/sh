@@ -204,7 +204,7 @@ public class DepartmentController extends BaseController {
 		PageData pd = new PageData();
 		try{
 			pd = this.getPageData();
-			if(departmentService.findByBianma(pd) != null){
+			if(departmentService.hasSameDepartmentCode(pd) != null){
 				errInfo = "error";
 			}
 		} catch(Exception e){

@@ -75,6 +75,14 @@ public class DepartmentService implements DepartmentManager{
 		return (PageData)dao.findForObject("DepartmentMapper.findByBianma", pd);
 	}
 	
+	/**是否有相同编码 
+	 * @param pd
+	 * @throws Exception
+	 */
+	public PageData hasSameDepartmentCode(PageData pd)throws Exception{
+		return (PageData)dao.findForObject("DepartmentMapper.hasSameDepartmentCode", pd);
+	}
+
 	/**
 	 * 通过ID获取其子级列表
 	 * @param parentId
