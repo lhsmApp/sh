@@ -151,8 +151,8 @@ public class TmplConfigController extends BaseController {
 	public @ResponseBody PageResult<PageData> getPageList(Page page) throws Exception{
 		PageData pd = new PageData();
 		pd = this.getPageData();
-		PageData dpd = departmentService.findById(pd);
-		pd.put("DEPT_BIANMA", dpd.getString("BIANMA"));
+		//PageData dpd = departmentService.findById(pd);
+//		pd.put("DEPT_BIANMA", dpd.getString("BIANMA"));
 		page.setPd(pd);
 		List<PageData> varList = tmplconfigService.listAll(page);	//列出Betting列表
 		PageResult<PageData> result = new PageResult<PageData>();

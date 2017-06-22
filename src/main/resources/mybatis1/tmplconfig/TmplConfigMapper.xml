@@ -135,7 +135,7 @@
 		LEFT JOIN tb_tmpl_config_base c
 		on a.TABLE_CODE = c.TABLE_CODE
 		where 1=1
-			<if test="pd.DEPT_BIANMA!= null and pd.DEPT_BIANMA != ''">
+			<if test="pd.DEPARTMENT_CODE!= null and pd.DEPARTMENT_CODE != ''">
 				and (
 				a.DEPT_CODE = #{pd.DEPARTMENT_CODE}
 				)

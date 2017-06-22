@@ -382,10 +382,10 @@
 			var STATUS = $("#STATUS").val();
 			var BILL_TYPE = $("#BILL_TYPE").val(); */
 			var TABLE_CODE = $("#TABLE_CODE").val(); 
-			var DEPARTMENT_ID = $("#DEPARTMENT_ID").val(); 
+			var DEPARTMENT_CODE = $("#DEPARTMENT_ID").val(); 
 			console.log("哈哈");
 			$("#jqGrid").jqGrid('setGridParam',{  // 重新加载数据
-				url:'<%=basePath%>tmplconfig/getPageList.do?TABLE_CODE='+TABLE_CODE+'&DEPARTMENT_ID='+DEPARTMENT_ID,  
+				url:'<%=basePath%>tmplconfig/getPageList.do?TABLE_CODE='+TABLE_CODE+'&DEPARTMENT_CODE='+DEPARTMENT_CODE,  
 				datatype:'json',
 			      page:1
 			}).trigger("reloadGrid");
