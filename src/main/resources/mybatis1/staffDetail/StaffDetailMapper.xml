@@ -27,63 +27,30 @@
 		where KEY_CODE = 'SystemDataTime'
 	</select>
 	
-	<!-- 新增-->
-	<insert id="save" parameterType="pd">
-		insert into 
-	<include refid="tableName"></include>
-		(
-	<include refid="Field"></include>
-		) values (
-	<include refid="FieldValue"></include>
-		)
-	</insert>
-	
-	<!-- 删除-->
-	<delete id="delete" parameterType="pd">
-		delete from
-		<include refid="tableName"></include>
-		where 
-			ID = #{ID}
-	</delete>
-	
-	<!-- 修改 -->
-	<update id="edit" parameterType="pd">
-		    update
-	    	<include refid="tableName"></include>
-		    set 
-			    CATEGORYNAME = #{CATEGORYNAME},
-			    PRODUCTNAME = #{PRODUCTNAME},
-			    COUNTRY = #{COUNTRY},
-			    PRICE = #{PRICE},
-			    QUANTITY = #{QUANTITY}
-		    where 
-		    ID = #{ID}
-	</update>
-	
-	<!-- 通过ID获取数据 -->
-	<select id="findById" parameterType="pd" resultType="pd">
-		select 
-		<include refid="Field"></include>
-		from 
-		<include refid="tableName"></include>
-		where 
-			ID = #{ID}
+	<!-- 获取数据库中表结构-->
+	<select id="getTableColumns" parameterType="pd" resultType="com.fh.entity.TableColumns">
+	    SELECT UPPER(column_name) column_name, 
+	           column_comment, 
+	           UPPER(data_type) data_type, 
+	           UPPER(column_type) column_type,
+	           UPPER(column_key) column_key, 
+	           column_default 
+	    FROM information_schema.columns 
+	    WHERE table_name = 'tb_staff_detail'
 	</select>
 	
-	<!-- 导出列表 -->
-	<select id="exportList" parameterType="jqPage" resultType="pd">
-		select
-		<include refid="Field"></include>
-		from 
-		<include refid="tableName"></include>
-		<where>
-			<if test="pd.search!= null and pd.search != ''"><!-- 关键词检索 -->
-				and #{pd.search}
-			</if>
-		</where>
-		<if test="sidx != null" >
-			order by ${sidx} ${sord} 
-    	</if>
+	<!-- 获取字典翻译类型-->
+	<select id="getDicType" parameterType="String" resultType="String">
+	    SELECT SRC_TYPE
+	    FROM tb_tmpl_config_dict
+	    WHERE DICT_CODE = #{DICT_CODE}
+	</select>
+	
+	<!-- 获取字典-->
+	<select id="getSysDictionaries" parameterType="String" resultType="pd">
+	    SELECT SRC_TYPE
+	    FROM tb_tmpl_config_dict
+	    WHERE DICT_CODE = #{DICT_CODE}
 	</select>
 	
 	<!-- 列表 -->
@@ -104,7 +71,6 @@
               limit #{currentResult}, #{rowNum} 
         </if>
 	</select>
-	
 	<select id="countJqGridExtend" parameterType="jqPage" resultType="int">
 		select count(*) from <include refid="tableName"></include> 
 		<where>
@@ -114,7 +80,7 @@
 		</where>
 	</select>
 	<select id="getFooterSummary" parameterType="jqPage" resultType="pd">
-		select sum(IFNULL(PRICE, 0)) PRICE from <include refid="tableName"></include> 
+		select #{pd.Userdata} from <include refid="tableName"></include> 
 		<where>
 			<if test="pd.search!= null and pd.search != ''"><!-- 关键词检索 -->
 				and #{pd.search}
@@ -122,20 +88,63 @@
 		</where>
 	</select>
 	
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		<!-- insert into 
+	    <include refid="tableName"></include>
+		(
+	    <include refid="Field"></include>
+		) values (
+	    <include refid="FieldValue"></include>
+		) -->
+	</insert>
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		<!-- delete from
+		<include refid="tableName"></include>
+		where 
+			ID = #{ID} -->
+	</delete>
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		<!-- update
+	    <include refid="tableName"></include>
+		set 
+			CATEGORYNAME = #{CATEGORYNAME},
+			PRODUCTNAME = #{PRODUCTNAME},
+			COUNTRY = #{COUNTRY},
+			PRICE = #{PRICE},
+			QUANTITY = #{QUANTITY}
+		where 
+		    ID = #{ID} -->
+	</update>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		<!-- select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 
+			ID = #{ID} -->
+	</select>
+	
 	<!-- 批量删除 -->
 	<delete id="deleteAll" parameterType="String">
-		delete from
+		<!-- delete from
 		<include refid="tableName"></include>
 		where 
 			ID in
 		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
                  #{item}
-		</foreach>
+		</foreach> -->
 	</delete>
 	
 	<!-- 批量保存 -->
 	<update id="updateAll" parameterType="com.fh.entity.JqGridModel">
-		<foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
+		<!-- <foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
 		    <if test="item!=null">
 		        update
 		        <include refid="tableName"></include>
@@ -148,12 +157,28 @@
 		        where 
 		        ID = #{item.ID}
 		    </if>
-		</foreach>
+		</foreach> -->
 	</update>
+	
+	<!-- 导出列表 -->
+	<select id="exportList" parameterType="jqPage" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		<where>
+			<if test="pd.search!= null and pd.search != ''"><!-- 关键词检索 -->
+				and #{pd.search}
+			</if>
+		</where>
+		<if test="sidx != null" >
+			order by ${sidx} ${sord} 
+    	</if>
+	</select>
 	
 	<!-- 导入-->
 	<insert id="batchImport" parameterType="com.fh.entity.JqGridModel">
-		<foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
+		<!-- <foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
 		  <choose>
 		    <when test="item!=null and item.ID != null and item.ID != '' and item.ID != 0 ">
 		        insert into 
@@ -194,7 +219,7 @@
 			        )
 		    </otherwise>
 		  </choose>
-		</foreach>
+		</foreach> -->
 	</insert>
 	
 </mapper>

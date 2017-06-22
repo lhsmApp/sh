@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
+import com.fh.entity.TableColumns;
 import com.fh.util.PageData;
 
 /** 
@@ -19,6 +20,12 @@ public interface StaffDetailManager{
 	 * @throws Exception
 	 */
 	public String currentSection(PageData pd)throws Exception;
+	
+	/**获取某表的所有列
+	 * @param 
+	 * @throws Exception
+	 */
+	public List<TableColumns> getTableColumns(PageData pd)throws Exception;
 
 	/**新增
 	 * @param pd
