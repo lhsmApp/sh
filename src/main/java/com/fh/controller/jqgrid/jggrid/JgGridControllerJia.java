@@ -1,6 +1,5 @@
 package com.fh.controller.jqgrid.jggrid;
 
-import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -15,7 +14,6 @@ import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -24,17 +22,17 @@ import com.fh.controller.base.BaseController;
 import com.fh.entity.CommonBase;
 import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
+import com.fh.entity.Page;
 import com.fh.entity.PageResult;
-import com.fh.entity.RequestBase;
 import com.fh.service.jqgrid.jggrid.JgGridManagerJia;
-import com.fh.util.AppUtil;
+import com.fh.util.DateUtil;
 import com.fh.util.Jurisdiction;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
 import com.fh.util.SqlTools;
+import com.fh.util.enums.BillNumType;
 
 import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
 /**
  * JqGrid测试练习
@@ -51,6 +49,9 @@ public class JgGridControllerJia extends BaseController {
 	String menuUrl = "jqgridJia/list.do"; //菜单地址(权限用)
 	@Resource(name="jqgridServiceJia")
 	private JgGridManagerJia jqgridServiceJia;
+	
+	@Resource(name="sysbillnumService")
+	private JgGridManagerJia sysbillnumService;
 	
 	/**列表
 	 * @param page
@@ -71,6 +72,13 @@ public class JgGridControllerJia extends BaseController {
 		 * 
 		 */
 		return mv;
+		
+		//PageData pdBillNum=new PageData();
+		//pdBillNum.put("BILL_CODE", BillNumType.SHBX);
+		//pdBillNum.put("BILL_DATE", DateUtil.getMonth());
+		//PageData pdBillNumResult=sysbillnumService.findById(pdBillNum);
+		//int billNum=pdBillNumResult.get("BILL_NUMBER");
+		//sysbillnumService.updateLastLogin(pd);
 	}
 	
 	/**列表

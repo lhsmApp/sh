@@ -6,15 +6,18 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-/** 
- * 说明：日期处理
- * 创建人：FH Q313596790
- * 修改时间：2015年11月24日
- * @version
+/**
+ * 日期处理
+* @ClassName: DateUtil
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月22日
+*
  */
 public class DateUtil {
 	
 	private final static SimpleDateFormat sdfYear = new SimpleDateFormat("yyyy");
+	private final static SimpleDateFormat sdfMonth = new SimpleDateFormat("yyyyMM");
 	private final static SimpleDateFormat sdfDay = new SimpleDateFormat("yyyy-MM-dd");
 	private final static SimpleDateFormat sdfDays = new SimpleDateFormat("yyyyMMdd");
 	private final static SimpleDateFormat sdfTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -34,6 +37,14 @@ public class DateUtil {
 	 */
 	public static String getYear() {
 		return sdfYear.format(new Date());
+	}
+	
+	/**
+	 * 获取YYYYMM格式
+	 * @return
+	 */
+	public static String getMonth() {
+		return sdfMonth.format(new Date());
 	}
 
 	/**
