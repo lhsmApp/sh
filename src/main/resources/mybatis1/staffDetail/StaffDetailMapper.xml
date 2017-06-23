@@ -16,7 +16,7 @@
 	
 	<!-- 字段 -->
     <sql id="Field"> BILL_CODE, BUSI_DATE, USER_CODE, USER_NAME, STAFF_IDENT, BANK_CARD, USER_GROP, USER_CATG, DEPT_CODE, ORG_UNIT, SAL_RANGE, POST_SALY, BONUS, CASH_BONUS, WORK_OT, BACK_SALY, RET_SALY, CHK_CASH, INTR_SGL_AWAD, SENY_ALLE, POST_ALLE, NS_ALLE, AREA_ALLE, EXPT_ALLE, TECH_ALLE, LIVE_EXPE, LIVE_ALLE, LEAVE_DM, HOUSE_ALLE, ITEM_ALLE, MEAL_EXPE, TRF_ALLE, TEL_EXPE, HLDY_ALLE, KID_ALLE, COOL_EXPE, EXT_SGL_AWAD, PRE_TAX_PLUS, GROSS_PAY, ENDW_INS, UNEMPL_INS, MED_INS, CASD_INS, HOUSE_FUND, SUP_PESN, TAX_BASE_ADJ, ACCRD_TAX, AFTER_TAX, ACT_SALY, GUESS_DIFF, CUST_COL1, CUST_COL2, CUST_COL3, CUST_COL4, CUST_COL5, CUST_COL6, CUST_COL7, CUST_COL8, CUST_COL9, CUST_COL10, ESTB_DEPT </sql>
-
+    
     <!-- 字段值 -->
     <sql id="FieldValue"> #{BILL_CODE}, #{BUSI_DATE}, #{USER_CODE}, #{USER_NAME}, #{STAFF_IDENT}, #{BANK_CARD}, #{USER_GROP}, #{USER_CATG}, #{DEPT_CODE}, #{ORG_UNIT}, #{SAL_RANGE}, #{POST_SALY}, #{BONUS}, #{CASH_BONUS}, #{WORK_OT}, #{BACK_SALY}, #{RET_SALY}, #{CHK_CASH}, #{INTR_SGL_AWAD}, #{SENY_ALLE}, #{POST_ALLE}, #{NS_ALLE}, #{AREA_ALLE}, #{EXPT_ALLE}, #{TECH_ALLE}, #{LIVE_EXPE}, #{LIVE_ALLE}, #{LEAVE_DM}, #{HOUSE_ALLE}, #{ITEM_ALLE}, #{MEAL_EXPE}, #{TRF_ALLE}, #{TEL_EXPE}, #{HLDY_ALLE}, #{KID_ALLE}, #{COOL_EXPE}, #{EXT_SGL_AWAD}, #{PRE_TAX_PLUS}, #{GROSS_PAY}, #{ENDW_INS}, #{UNEMPL_INS}, #{MED_INS}, #{CASD_INS}, #{HOUSE_FUND}, #{SUP_PESN}, #{TAX_BASE_ADJ}, #{ACCRD_TAX}, #{AFTER_TAX}, #{ACT_SALY}, #{GUESS_DIFF}, #{CUST_COL1}, #{CUST_COL2}, #{CUST_COL3}, #{CUST_COL4}, #{CUST_COL5}, #{CUST_COL6}, #{CUST_COL7}, #{CUST_COL8}, #{CUST_COL9}, #{CUST_COL10}, #{ESTB_DEPT} </sql>
 	
@@ -47,7 +47,7 @@
 	</select>
 	
 	<!-- 获取SysDictionaries字典-->
-	<select id="getSysDictionaries" parameterType="String" resultType="pd">
+	<select id="getSysDictionaries" parameterType="String" resultType="com.fh.entity.system.Dictionaries">
 	    SELECT r.*
 	    FROM sys_dictionaries p, sys_dictionaries r
 	    WHERE p.DICTIONARIES_ID = r.PARENT_ID
@@ -55,10 +55,19 @@
 	    order by ORDER_BY
 	</select>
 	
+	<!-- 获取单位人员-->
+	<select id="getUsersInDepart" parameterType="String" resultType="com.fh.entity.system.User">
+	    SELECT *
+	    FROM sys_user
+	    WHERE DEPARTMENT_ID = #{DEPARTMENT_ID}
+	    order by USER_ID
+	</select>
+	
 	<!-- 列表 -->
 	<select id="datalistJqPage" parameterType="jqPage" resultType="pd">
-		select
-		<include refid="Field"></include>
+		select 
+		    #{pd.KeyList}
+		    <include refid="Field"></include>
 		from 
 		<include refid="tableName"></include>
 		<where>
@@ -101,44 +110,28 @@
 		) -->
 	</insert>
 	
-	<!-- 删除-->
-	<delete id="delete" parameterType="pd">
-		<!-- delete from
-		<include refid="tableName"></include>
-		where 
-			ID = #{ID} -->
-	</delete>
-	
 	<!-- 修改 -->
 	<update id="edit" parameterType="pd">
-		<!-- update
+		update
 	    <include refid="tableName"></include>
 		set 
-			CATEGORYNAME = #{CATEGORYNAME},
-			PRODUCTNAME = #{PRODUCTNAME},
-			COUNTRY = #{COUNTRY},
-			PRICE = #{PRICE},
-			QUANTITY = #{QUANTITY}
-		where 
-		    ID = #{ID} -->
+			USER_CODE = #{USER_CODE},
+			STAFF_IDENT = #{STAFF_IDENT},
+			BANK_CARD = #{BANK_CARD},
+			USER_GROP = #{USER_GROP}
+		where BILL_CODE = #{BILL_CODE__}
+		and BUSI_DATE = #{BUSI_DATE__}
+		and USER_CODE = #{USER_CODE__}
 	</update>
 	
-	<!-- 通过ID获取数据 -->
-	<select id="findById" parameterType="pd" resultType="pd">
-		<!-- select 
-		<include refid="Field"></include>
-		from 
-		<include refid="tableName"></include>
-		where 
-			ID = #{ID} -->
-	</select>
-	
 	<!-- 批量删除 -->
-	<delete id="deleteAll" parameterType="String">
+	<delete id="deleteAll" parameterType="pd">
 		<!-- delete from
 		<include refid="tableName"></include>
 		where 
 			ID in
+			
+			 collection="jobCategorys"
 		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
                  #{item}
 		</foreach> -->
@@ -161,6 +154,16 @@
 		    </if>
 		</foreach> -->
 	</update>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		<!-- select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 
+			ID = #{ID} -->
+	</select>
 	
 	<!-- 导出列表 -->
 	<select id="exportList" parameterType="jqPage" resultType="pd">

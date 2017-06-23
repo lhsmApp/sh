@@ -151,7 +151,7 @@
 	            editicon : 'ace-icon fa fa-pencil blue',
 	            add: true,
 	            addicon : 'ace-icon fa fa-plus-circle purple',
-	            del: true,
+	            del: false,
 	            delicon : 'ace-icon fa fa-trash-o red',
 	            search: true,
 	            searchicon : 'ace-icon fa fa-search orange',
@@ -185,7 +185,7 @@
 			recreateForm: true,
 			beforeShowForm : beforeDeleteCallback,
 			onClick : function(e) {
-				
+				alert("ss");
 			}
         },
         {
@@ -225,6 +225,14 @@
              title : "批量保存",
              cursor : "pointer"
          });
+		$(gridBase_selector).navButtonAdd(pagerBase_selector, {
+            caption : "",
+            buttonicon : "ace-icon fa fa-trash-o red",
+            onClickButton : batchDelete,
+            position : "last",
+            title : "批量删除",
+            cursor : "pointer"
+        });
 			$(gridBase_selector).navButtonAdd(pagerBase_selector, {
 	             caption : "",
 	             buttonicon : "ace-icon fa fa-cloud-upload",
@@ -267,6 +275,67 @@
 		            grid.jqGrid('restoreRow',ids[i]);
 		        }
 		    }
+
+			/**
+			 * 批量删除
+			 */
+		    function batchDelete(){
+		    	//获得选中的行ids的方法
+		    	var ids = $(gridBase_selector).getGridParam("selarrrow");  
+		    	
+				if(!(ids!=null && ids.length>0)){
+					bootbox.dialog({
+						message: "<span class='bigger-110'>您没有选择任何内容!</span>",
+						buttons: 			
+						{ "button":{ "label":"确定", "className":"btn-sm btn-success"}}
+					});
+				}else{
+	                var msg = '确定要删除选中的数据吗??';
+	                bootbox.confirm(msg, function(result) {
+	    				if(result) {
+	    					var listData =new Array();
+	    					
+	    					//遍历访问这个集合  
+	    					$(ids).each(function (index, id){  
+	    			            var rowData = $(gridBase_selector).getRowData(id);
+	    			            listData.push(rowData);
+	    					});
+	    					
+	    					top.jzts();
+	    					$.ajax({
+	    						type: "POST",
+	    						url: '<%=basePath%>jqGridExtend/deleteAll.do?',
+	    				    	data: {DATA_ROWS:JSON.stringify(listData)},
+	    						dataType:'json',
+	    						cache: false,
+	    						success: function(response){
+	    							if(response.code==0){
+	    								$(gridBase_selector).trigger("reloadGrid");  
+	    								$(top.hangge());//关闭加载状态
+	    								$("#subTitle").tips({
+	    									side:3,
+	    						            msg:'删除成功',
+	    						            bg:'#009933',
+	    						            time:3
+	    						        });
+	    							}else{
+	    								$(top.hangge());//关闭加载状态
+	    								$("#subTitle").tips({
+	    									side:3,
+	    						            msg:'删除失败,'+response.responseJSON.message,
+	    						            bg:'#cc0033',
+	    						            time:3
+	    						        });
+	    							}
+	    						},
+	    				    	error: function(e) {
+	    							$(top.hangge());//关闭加载状态
+	    				    	}
+	    					});
+	    				}
+	                });
+				}
+			}
 
 			/**
 			 * 批量保存

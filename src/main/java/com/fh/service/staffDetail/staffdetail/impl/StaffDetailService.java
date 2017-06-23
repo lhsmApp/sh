@@ -7,6 +7,8 @@ import com.fh.dao.DaoSupport;
 import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
 import com.fh.entity.TableColumns;
+import com.fh.entity.system.Dictionaries;
+import com.fh.entity.system.User;
 import com.fh.util.PageData;
 import com.fh.service.staffDetail.staffdetail.StaffDetailManager;
 
@@ -106,11 +108,11 @@ public class StaffDetailService implements StaffDetailManager{
 	}
 	
 	/**批量删除
-	 * @param ArrayDATA_IDS
+	 * @param 
 	 * @throws Exception
 	 */
-	public void deleteAll(String[] ArrayDATA_IDS)throws Exception{
-		dao.delete("StaffDetailMapper.deleteAll", ArrayDATA_IDS);
+	public void deleteAll(PageData pd)throws Exception{
+		dao.delete("StaffDetailMapper.deleteAll", pd);
 	}
 	
 	/**批量修改
@@ -138,12 +140,21 @@ public class StaffDetailService implements StaffDetailManager{
 	}
 	
 	/**获取SysDictionaries字典
-	 * @param page
+	 * @param 
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	public List<PageData> getSysDictionaries(String dicName)throws Exception{
-		return (List<PageData>)dao.findForList("StaffDetailMapper.getSysDictionaries", dicName);
+	public List<Dictionaries> getSysDictionaries(String dicName)throws Exception{
+		return (List<Dictionaries>)dao.findForList("StaffDetailMapper.getSysDictionaries", dicName);
+	}
+	
+	/**获取单位人员
+	 * @param 
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<User> getUsersInDepart(String department)throws Exception{
+		return (List<User>)dao.findForList("StaffDetailMapper.getUsersInDepart", department);
 	}
 	
 }

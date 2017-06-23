@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -29,6 +28,8 @@ import com.fh.entity.Page;
 import com.fh.entity.PageResult;
 import com.fh.entity.TableColumns;
 import com.fh.entity.TmplConfigDetail;
+import com.fh.entity.system.Dictionaries;
+import com.fh.entity.system.User;
 import com.fh.exception.CustomException;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
@@ -55,6 +56,17 @@ public class StaffDetailController extends BaseController {
 	private StaffDetailManager staffdetailService;
 	@Resource(name="tmplconfigService")
 	private TmplConfigService tmplconfigService;
+
+	//底行显示的求和与平均值字段
+	String SqlUserdata = "";
+	//页面显示数据的年月
+	String SystemDateTime = "";
+	//页面显示数据的二级单位
+	String DepartCode = "";
+	//查询表的主键字段后缀，区别于主键字段，用于修改或删除
+	String strKeyExtra = "__";
+	//查询表的主键字段
+	List<String> KeyList = new ArrayList<String>();
 	
 	/**修改
 	 * @param
@@ -75,14 +87,15 @@ public class StaffDetailController extends BaseController {
 			staffdetailService.save(pd);
 			commonBase.setCode(0);
 		}
-		else if(pd.getString("oper").equals("del")){
-			String [] ids=pd.getString("id").split(",");
+		/* else if(pd.getString("oper").equals("del")){
+			String strId = pd.get("id").toString();
+			String [] ids=strId.split(",");
 			if(ids.length==1)
 				staffdetailService.delete(pd);
 			else
 				staffdetailService.deleteAll(ids);
 			commonBase.setCode(0);
-		}
+		} */
 		
 		/**此处为业务错误返回值，例如返回当前删除的信息含有业务关联字段，不能删除，自行设定setCode(返回码，客户端按码抓取并返回提示信息)和setMessage("自定义提示信息，提示给用户的")信息，并由界面进行展示。
 		 * 此处不是异常返回的错误信息，异常返回错误信息统一由框架抓取异常。
@@ -105,27 +118,36 @@ public class StaffDetailController extends BaseController {
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("staffDetail/staffdetail/staffdetail_list");
 		//当前期间,取自tb_system_config的SystemDateTime字段
-		String SystemDateTime = staffdetailService.currentSection(pd);
+		SystemDateTime = staffdetailService.currentSection(pd);
 		mv.addObject("SystemDateTime", SystemDateTime);
 		//当前登录人所在二级单位
-		String DepartCode = "001001";//Jurisdiction.getCurrentDepartmentID();
+		DepartCode = "001001";//Jurisdiction.getCurrentDepartmentID();
 		String DepartName = "登录人单位";
 		mv.addObject("DepartName", DepartName);
 		//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
 		String State = "0";
 		mv.addObject("State", State);
 		
-		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
+		//用语句查询出数据库表的所有字段及其属性；拼接成jqgrid全部列
 		List<TableColumns> tableColumns = staffdetailService.getTableColumns(pd);
 		Map<String, Map<String, Object>> listColModelAll = jqGridColModelAll(tableColumns);
+		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 		TmplConfigDetail item = new TmplConfigDetail();
 		item.setDEPT_CODE(DepartCode);
 		item.setTABLE_CODE("TB_STAFF_DETAIL");
 		List<TmplConfigDetail> listColumns = tmplconfigService.listNeed(item);
-		//mv.addObject("listColumns", listColumns);
+		//底行显示的求和与平均值字段
 		SqlUserdata = "";
+		//拼接真正设置的jqGrid的ColModel
 		StringBuilder jqGridColModel = new StringBuilder();
 		jqGridColModel.append("[");
+		//添加关键字的保存列
+		if(KeyList!=null && KeyList.size()>0){
+			for(String key : KeyList){
+				jqGridColModel.append(" {name: '").append(key).append(strKeyExtra).append("', hidden: true, editable: true, editrules: {edithidden: false}}, ");
+			}
+		}
+		//添加配置表设置列，字典（未设置就使用表默认，text或number）、隐藏、表头显示
 		if(listColumns != null && listColumns.size() > 0){
 			for(int i=0; i < listColumns.size(); i++){
 				if(listColModelAll.containsKey(listColumns.get(i).getCOL_CODE())){
@@ -133,11 +155,13 @@ public class StaffDetailController extends BaseController {
 					jqGridColModel.append("{");
 					String name = (String) itemColModel.get("name");
 					String edittype = (String) itemColModel.get("edittype");
+					String notedit = (String) itemColModel.get("notedit");
 					if(name != null && name.trim() != ""){
 						jqGridColModel.append(name).append(", ");
 					}
+					//配置表中的字典
 					if(listColumns.get(i).getDICT_TRANS()!=null && !listColumns.get(i).getDICT_TRANS().trim().equals("")){
-						String strDicValue = getDicValue(listColumns.get(i).getDICT_TRANS());
+						String strDicValue = getDicValue(listColumns.get(i).getDICT_TRANS(), pd);
 						//选择
 						jqGridColModel.append(" edittype:'select', ");
 						   jqGridColModel.append(" editoptions:{value:'" + strDicValue + "'}, ");
@@ -152,13 +176,23 @@ public class StaffDetailController extends BaseController {
 							jqGridColModel.append(edittype).append(", ");
 						}
 					}
-					jqGridColModel.append(" label: '").append(listColumns.get(i).getCOL_NAME()).append("', ");
-					jqGridColModel.append(" hidden: ").append(Integer.parseInt(listColumns.get(i).getCOL_HIDE()) == 1 ? "false" : "true").append(" ");
+					//配置表中的隐藏
+					int intHide = Integer.parseInt(listColumns.get(i).getCOL_HIDE());
+					jqGridColModel.append(" hidden: ").append(intHide == 1 ? "false" : "true").append(", ");
+					if(intHide != 1){
+						jqGridColModel.append(" editable:true, editrules: {edithidden: false}, ");
+					}
+					if(notedit != null && notedit.trim() != ""){
+						jqGridColModel.append(notedit).append(", ");
+					}
+					//配置表中的表头显示
+					jqGridColModel.append(" label: '").append(listColumns.get(i).getCOL_NAME()).append("' ");
 					
 					jqGridColModel.append("}");
 					if(i < listColumns.size() -1){
 						jqGridColModel.append(",");
 					}
+					//底行显示的求和与平均值字段
 					// 1汇总 0不汇总,默认0
 					if(Integer.parseInt(listColumns.get(i).getCOL_SUM()) == 1){
 						if(SqlUserdata!=null && SqlUserdata.trim()!=""){
@@ -180,25 +214,31 @@ public class StaffDetailController extends BaseController {
 		mv.addObject("jqGridColModel", jqGridColModel.toString());
 		return mv;
 	}
-	
-	public Map<String, Map<String, Object>> jqGridColModelAll(List<TableColumns> columns){
+
+	//用语句查询出数据库表的所有字段及其属性；拼接成jqgrid全部列
+	public Map<String, Map<String, Object>> jqGridColModelAll(List<TableColumns> columns) throws Exception{
 		Map<String, Map<String, Object>> list = new HashMap<String, Map<String, Object>>();
+		KeyList = new ArrayList<String>();
 
 		for(TableColumns col : columns){
 			Map<String, Object> MapAdd = new HashMap<String, Object>();
 			
 			StringBuilder model_name = new StringBuilder();
 			StringBuilder model_edittype = new StringBuilder();
+			StringBuilder model_notedit = new StringBuilder();
+
+			//主键
 			if(col.getColumn_key() != null && col.getColumn_key().trim().equals("PRI")){
-				model_name.append(" key: true, ");
+				KeyList.add(col.getColumn_name());
 			}
+			//设置必定不用编辑的列
 			if(col.getColumn_name().equals("BILL_CODE") || 
 					col.getColumn_name().equals("BUSI_DATE") ||
-					col.getColumn_name().equals("USER_NAME") ||
+					col.getColumn_name().equals("USER_CODE") ||
 					col.getColumn_name().equals("DEPT_CODE")){
-				model_name.append(" editable: false, ");
+				model_notedit.append(" editable: false ");
 			} else{
-				model_name.append(" editable: true, ");
+				model_notedit.append(" editable: true ");
 			}
 			int intLength = getColumnLength(col.getColumn_type(), col.getData_type());
 			if(col.getData_type() != null 
@@ -206,23 +246,41 @@ public class StaffDetailController extends BaseController {
 					    col.getData_type().trim().equals("DOUBLE") || 
 						col.getData_type().trim().equals("INT") || 
 					    col.getData_type().trim().equals("FLOAT"))){
-				model_name.append(" width: '180', ");
+				model_name.append(" width: '150', ");
 				model_name.append(" align: 'right', searchrules: {number: true}, sorttype: 'number', ");
-				model_edittype.append(" edittype:'text', editoptions:{maxlength:'" + intLength + "', number: true} ");
+				model_edittype.append(" edittype:'text', formatter: 'number', editoptions:{maxlength:'" + intLength + "', number: true} ");
 			} else{
-				if(intLength > 50){
-					model_name.append(" width: '220', ");
-					model_edittype.append(" edittype:'textarea', ");
-				} else{
-					model_name.append(" width: '150', ");
-					model_edittype.append(" edittype:'text', ");
+				if(col.getColumn_name().equals("USER_NAME")){
+					String strUserValue = getUserDic(DepartCode);
+					//选择
+					model_edittype.append(" edittype:'select', ");
+					model_edittype.append(" editoptions:{value:'" + strUserValue + "'}, ");
+					//翻译
+					model_edittype.append(" formatter: 'select', ");
+					model_edittype.append(" formatoptions: {value: '" + strUserValue + "'}, ");
+					//查询
+					model_edittype.append(" stype: 'select', ");
+					model_edittype.append(" searchoptions: {value: ':[All];" + strUserValue + "'} ");
+				} else {
+					if(intLength > 50){
+						model_name.append(" width: '200', ");
+						model_edittype.append(" edittype:'textarea', ");
+					} else{
+						model_name.append(" width: '130', ");
+						model_edittype.append(" edittype:'text', ");
+					}
+					model_edittype.append(" editoptions:{maxlength:'" + intLength + "'} ");
 				}
-				model_edittype.append(" editoptions:{maxlength:'" + intLength + "'} ");
 			}
 
-			model_name.append(" name: '"+ col.getColumn_name() +"' ");
+			if(col.getColumn_name().equals("USER_NAME")){
+				model_name.append(" name: 'USER_CODE' ");
+			} else {
+				model_name.append(" name: '"+ col.getColumn_name() +"' ");
+			}
 			MapAdd.put("name", model_name.toString());
 			MapAdd.put("edittype", model_edittype.toString());
+			MapAdd.put("notedit", model_notedit.toString());
 			list.put(col.getColumn_name(), MapAdd);
 		}
 		
@@ -238,24 +296,40 @@ public class StaffDetailController extends BaseController {
 		return ret;
 	}
 	
-	public String getDicValue(String dicName) throws Exception{
+	public String getUserDic(String department) throws Exception{
+		StringBuilder ret = new StringBuilder();
+		List<User> dicList = staffdetailService.getUsersInDepart(department);
+		for(User dic : dicList){
+			if(ret!=null && !ret.toString().trim().equals("")){
+				ret.append("; ");
+			}
+			ret.append(dic.getUSER_ID() + ":" + dic.getUSERNAME());
+		}
+		return ret.toString();
+	}
+	
+	public String getDicValue(String dicName, PageData pd) throws Exception{
 		StringBuilder ret = new StringBuilder();
 		String strDicType = staffdetailService.getDicType(dicName);
 		if(strDicType.equals("1")){
-			List<PageData> dicList = staffdetailService.getSysDictionaries(dicName);
-			for(PageData dic : dicList){
+			List<Dictionaries> dicList = staffdetailService.getSysDictionaries(dicName);
+			for(Dictionaries dic : dicList){
 				if(ret!=null && !ret.toString().trim().equals("")){
 					ret.append("; ");
-					ret.append(dic.getString("BIANMA") + ":" + dic.getString("NAME"));
 				}
+				ret.append(dic.getBIANMA() + ":" + dic.getNAME());
 			}
 		} else if(strDicType.equals("2")){
-			
+			if(dicName.equals("oa_department")){
+				List<String> listPara = new ArrayList<String>();
+				pd.put("", dicName);
+				pd.put("", dicName);
+				pd.put("", dicName);
+				
+			}
 		}
-		
 		return ret.toString();
 	}
-	//USA:USA;UK:UK;CHI:CHINA
 	
 	
 	
@@ -263,7 +337,6 @@ public class StaffDetailController extends BaseController {
 	
 	
 
-	String SqlUserdata = "";
 	/**列表
 	 * @param page
 	 * @throws Exception
@@ -282,17 +355,24 @@ public class StaffDetailController extends BaseController {
 			pd.put("filterWhereResult", SqlTools.constructWhere(filters,null));
 		}
 		pd.put("Userdata", SqlUserdata);
+		String strKeyList = "";
+		if(KeyList != null && KeyList.size() > 0){
+			for(String key : KeyList){
+				strKeyList += key + " " + key + strKeyExtra + ", ";
+			}
+		}
+		pd.put("KeyList", strKeyList);
 		page.setPd(pd);
 		List<PageData> varList = staffdetailService.JqPage(page);	//列出Betting列表
 		int records = staffdetailService.countJqGridExtend(page);
-		PageData userdata=staffdetailService.getFooterSummary(page);
+		//PageData userdata=staffdetailService.getFooterSummary(page);
 		
 		PageResult<PageData> result = new PageResult<PageData>();
 		result.setRows(varList);
 		result.setRowNum(page.getRowNum());
 		result.setRecords(records);
 		result.setPage(page.getPage());
-		result.setUserdata(userdata);
+		//result.setUserdata(userdata);
 		
 		return result;
 	}
@@ -309,11 +389,34 @@ public class StaffDetailController extends BaseController {
 		PageData pd = this.getPageData();
 		Object DATA_ROWS = pd.get("DATA_ROWS");
 		String json = DATA_ROWS.toString();  
-       JSONArray array = JSONArray.fromObject(json);  
-       List<JqGridModel> listData = (List<JqGridModel>) JSONArray.toCollection(array,JqGridModel.class);
+        JSONArray array = JSONArray.fromObject(json);  
+        List<JqGridModel> listData = (List<JqGridModel>) JSONArray.toCollection(array,JqGridModel.class);
        
 		if(null != listData && listData.size() > 0){
 			staffdetailService.updateAll(listData);
+			commonBase.setCode(0);
+		}
+		return commonBase;
+	}
+	
+	 /**批量删除
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/deleteAll")
+	public @ResponseBody CommonBase deleteAll() throws Exception{
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "delete")){return null;} //校验权限	
+		CommonBase commonBase = new CommonBase();
+		commonBase.setCode(-1);
+		PageData pd = this.getPageData();
+		Object DATA_ROWS = pd.get("DATA_ROWS");
+		String json = DATA_ROWS.toString();  
+        JSONArray array = JSONArray.fromObject(json);  
+        List<JqGridModel> listData = (List<JqGridModel>) JSONArray.toCollection(array,JqGridModel.class);
+        
+        
+	    if(null != listData && listData.size() > 0){
+			//staffdetailService.deleteAll(listData);
 			commonBase.setCode(0);
 		}
 		return commonBase;
