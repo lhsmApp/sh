@@ -30,6 +30,8 @@ import com.fh.util.Jurisdiction;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
 import com.fh.util.SqlTools;
+import com.fh.util.StringUtil;
+import com.fh.util.base.ConvertUtils;
 import com.fh.util.enums.BillNumType;
 
 import net.sf.json.JSONArray;
@@ -50,8 +52,8 @@ public class JgGridControllerJia extends BaseController {
 	@Resource(name="jqgridServiceJia")
 	private JgGridManagerJia jqgridServiceJia;
 	
-	@Resource(name="sysbillnumService")
-	private JgGridManagerJia sysbillnumService;
+	/*@Resource(name="sysbillnumService")
+	private JgGridManagerJia sysbillnumService;*/
 	
 	/**列表
 	 * @param page
@@ -59,6 +61,16 @@ public class JgGridControllerJia extends BaseController {
 	 */
 	@RequestMapping(value="/list")
 	public ModelAndView list() throws Exception{
+		/***************获取最大单号及更新最大单号********************
+		PageData pdBillNum=new PageData();
+		pdBillNum.put("BILL_CODE", BillNumType.SHBX);
+		pdBillNum.put("BILL_DATE", DateUtil.getMonth());
+		PageData pdBillNumResult=sysbillnumService.findById(pdBillNum);
+		int billNum=ConvertUtils.strToInt(pdBillNumResult.getString("BILL_NUMBER"),0);
+		pdBillNum.put("BILL_NUMBER", billNum++);
+		sysbillnumService.edit(pdBillNum);
+		/***************************************************/
+		
 		logBefore(logger, Jurisdiction.getUsername()+"列表JgGrid");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
 		ModelAndView mv = this.getModelAndView();
@@ -72,13 +84,6 @@ public class JgGridControllerJia extends BaseController {
 		 * 
 		 */
 		return mv;
-		
-		//PageData pdBillNum=new PageData();
-		//pdBillNum.put("BILL_CODE", BillNumType.SHBX);
-		//pdBillNum.put("BILL_DATE", DateUtil.getMonth());
-		//PageData pdBillNumResult=sysbillnumService.findById(pdBillNum);
-		//int billNum=pdBillNumResult.get("BILL_NUMBER");
-		//sysbillnumService.updateLastLogin(pd);
 	}
 	
 	/**列表
