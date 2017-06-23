@@ -48,7 +48,7 @@
 							</tr> --%>
 							<tr>
 								<td style="width:70px;text-align: right;padding-top: 13px;">编码:</td>
-								<td><input type="text" name="DEPARTMENT_CODE" id="DEPARTMENT_CODE" value="${pd.DEPARTMENT_CODE}" maxlength="32" placeholder="这里输入编码 (不重复, 禁止修改)" title="编码" style="width:76%;" onblur="hasBianma();" <c:if test="${null != pd.DEPARTMENT_CODE}">readonly="readonly"</c:if>/></td>
+								<td><input type="text" name="DEPARTMENT_CODE" id="DEPARTMENT_CODE" value="${pd.DEPARTMENT_CODE}" maxlength="32" placeholder="这里输入编码 (不重复)" title="编码" style="width:76%;" onblur="hasBianma('${pd.DEPARTMENT_ID }');" <c:if test="${null != pd.DEPARTMENT_CODE}">readonly="readonly"</c:if>/></td>
 							</tr>
 							<tr>
 								<td style="width:70px;text-align: right;padding-top: 13px;">负责人:</td>
@@ -133,13 +133,13 @@
 		}
 		
 		//判断编码是否存在
-		function hasBianma(){
+		function hasBianma(departmentID){
 			var DEPARTMENT_CODE = $.trim($("#DEPARTMENT_CODE").val());
 			if("" == DEPARTMENT_CODE)return;
 			$.ajax({
 				type: "POST",
 				url: '<%=basePath%>department/hasBianma.do',
-		    	data: {DEPARTMENT_CODE:DEPARTMENT_CODE,tm:new Date().getTime()},
+		    	data: {DEPARTMENT_CODE:DEPARTMENT_CODE,DEPARTMENT_ID:departmentID,tm:new Date().getTime()},
 				dataType:'json',
 				cache: false,
 				success: function(data){

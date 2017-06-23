@@ -143,6 +143,9 @@
 			<include refid="tableName"></include>
 		where 
 			USERNAME = #{USERNAME}
+		<if test="USER_ID != null and USER_ID != ''">
+			and USER_ID != #{USER_ID} 
+		</if>
 	</select>
 	
 	<!-- 存入IP -->
