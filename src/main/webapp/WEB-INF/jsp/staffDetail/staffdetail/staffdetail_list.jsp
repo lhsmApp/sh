@@ -304,7 +304,7 @@
 	    					top.jzts();
 	    					$.ajax({
 	    						type: "POST",
-	    						url: '<%=basePath%>jqGridExtend/deleteAll.do?',
+	    						url: '<%=basePath%>staffdetail/deleteAll.do?',
 	    				    	data: {DATA_ROWS:JSON.stringify(listData)},
 	    						dataType:'json',
 	    						cache: false,
@@ -366,7 +366,7 @@
     					top.jzts();
     					$.ajax({
     						type: "POST",
-    						url: '<%=basePath%>jqGridExtend/updateAll.do?',
+    						url: '<%=basePath%>staffdetail/updateAll.do?',
     				    	data: {DATA_ROWS:JSON.stringify(listData)},
     						dataType:'json',
     						cache: false,
@@ -407,7 +407,7 @@
 	   	   var diag = new top.Dialog();
 	   	   diag.Drag=true;
 	   	   diag.Title ="EXCEL 导入到数据库";
-	   	   diag.URL = '<%=basePath%>jqGridExtend/goUploadExcel.do';
+	   	   diag.URL = '<%=basePath%>staffdetail/goUploadExcel.do';
 	   	   diag.Width = 300;
 	   	   diag.Height = 150;
 	   	   diag.CancelEvent = function(){ //关闭事件
@@ -428,7 +428,7 @@
 		 * 导出
 		 */
 	    function exportItems(){
-	    	window.location.href='<%=basePath%>jqGridExtend/excel.do?';
+	    	window.location.href='<%=basePath%>staffdetail/excel.do?';
 	    }
 
 		/**
