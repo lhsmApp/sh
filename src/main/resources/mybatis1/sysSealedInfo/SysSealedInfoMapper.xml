@@ -82,7 +82,7 @@
 		from 
 		<include refid="tableName"></include>, OA_DEPARTMENT
 		<where>
-		    		RPT_DEPT = OA_DEPARTMENT.BIANMA
+		    		RPT_DEPT = OA_DEPARTMENT.DEPARTMENT_CODE
 			<if test="pd.RPT_DEPT!= null and pd.RPT_DEPT != ''"><!-- 根据本门单位检索 -->
 					and (
 					RPT_DEPT LIKE CONCAT(CONCAT('%', #{pd.RPT_DEPT}),'%')

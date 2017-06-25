@@ -74,8 +74,7 @@
 							<div class="widget-box" >
 								<div class="widget-body">
 									<div class="widget-main">
-										<form class="form-inline">
-										
+										<form class="form-inline">		
 										<table style="margin-top:5px;">
 							<tr>
 							<td><input name="DEPARTMENT_CODE" id="DEPARTMENT_CODE" type="hidden" value="${pd.DEPARTMENT_CODE }" /></td>
@@ -151,6 +150,7 @@
 	<script type="text/javascript" src="static/js/common/jqgrid_style.js"></script>
 		
 	<script type="text/javascript"> 
+	
 	$(document).ready(function () {
 		
 		$(top.hangge());//关闭加载状态
@@ -175,7 +175,7 @@
 				{ label: '列编码', name: 'COL_CODE', width: 60},
 				{ label: '列名称', name: 'COL_NAME', width: 60,editable: true,},
 				{ label: '显示序号', name: 'DISP_ORDER', width: 80, sorttype: 'number',editable: true,},
-				{ label: '字典翻译', name: 'DICT_NAME', width: 80,align:'center',editable: true,edittype: 'select', editoptions: { dataUrl: '<%=basePath%>tmplconfig/getDictList.do'}},                  
+				{ label: '字典翻译', name: 'DICT_NAME', width: 80,align:'center',editable: true,edittype: 'select',editoptions:{value:"${dictString}"},unformat: unformatSelect},                  
 				{ label: '列隐藏', name: 'COL_HIDE', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch},                   
 				{ label: '列汇总', name: 'COL_SUM', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch},                   
 				{ label: '列平均值', name: 'COL_AVE', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch}                   
@@ -200,8 +200,9 @@
             rownumWidth: 35, // the width of the row numbers columns			
 			/* multiselect: true,
 	        multiboxonly: true, */
-	        onSelectRow: editRow,
-	        editurl: "<%=basePath%>tmplconfig/edit.do",//nothing is save
+	        //onSelectRow: editRow,
+	       <%--  editurl: "<%=basePath%>tmplconfig/edit.do", --%>
+	        ondblClickRow: dbClickRow,//双击表格编辑
 		});
 		
 		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
@@ -298,6 +299,7 @@
 	function batchEdit(e) {
 		var grid = $("#jqGrid");
         var ids = grid.jqGrid('getDataIDs');
+        console.log("批量编辑"+ids);
         for (var i = 0; i < ids.length; i++) {
             grid.jqGrid('editRow',ids[i]);
         }
@@ -314,16 +316,21 @@
 	
 	//批量保存
 	function batchSave(e) {
-		var listData =new Array();
+		 var listData =new Array();
 		var ids = $("#jqGrid").jqGrid('getDataIDs');
-		console.log(ids);
+		//console.log("ids"+ids);
 		//遍历访问这个集合  
 		var rowData;
 		$(ids).each(function (index, id){  
-            $("#jqGrid").saveRow(id, false, 'clientArray');
+			console.log("index"+index);
+			console.log("id"+id);
+
+           $("#jqGrid").saveRow(id, false, 'clientArray');
+            
              rowData = $("#jqGrid").getRowData(id);
+     		console.log("rowData"+rowData);
             listData.push(rowData);
-		});
+		}); 
 		top.jzts();
 		$.ajax({
 			type: "POST",
@@ -438,7 +445,33 @@
 				return 0;
 			}
 		}
-   
+		
+		
+		
+		 function unformatSelect(cellvalue, options, cellobject ) {
+			 var unformatValue = '';
+			 
+			 var strs= new Array(); 
+			 var str = options.colModel.editoptions.value;
+			 strs=str.split(";");
+
+			  $.each(strs, function (index, value)
+			  {
+				  var lastStrs = new Array();
+				  var lastStr = value;
+				  lastStrs=lastStr.split(":");
+				 
+			   if (cellvalue == lastStrs[1])
+			   {
+			    unformatValue = lastStrs[0];
+			    console.log(unformatValue);
+			   }
+			  });
+			  return unformatValue;
+		}
+		 
+		
+    
 		function initComplete(){
 			console.log("下拉树");
 			//下拉树
@@ -460,19 +493,11 @@
 			$("#selectTree2_input").val("${'0'==depname?'请选择':depname}");
 		}
 		
-		var lastSelection;
-
-        function editRow(id) {
-            if (id && id !== lastSelection) {
-                var grid = $("#jqGrid");
-                grid.jqGrid('restoreRow',lastSelection);
-                grid.jqGrid('editRow',id, {keys: true} );
-                lastSelection = id;
-            }
-        }
+		
         
         function copyData() {
-			console.log("复制");
+        	var allRows=$("#jqGrid").jqGrid("getRowData");
+			console.log("复制"+allRows);
 		}
 		
 		<%-- function getDictList() {
@@ -494,6 +519,16 @@
 			}); 
 			
 		} --%>
+		var lastSelection;
+		function dbClickRow(rowId, rowIndex, colnumIndex, event){ 
+			if (rowId && rowId !== lastSelection) {
+                var grid = $("#jqGrid");
+                grid.jqGrid('restoreRow',lastSelection);
+                grid.jqGrid('editRow',rowId, {keys: true} );
+                lastSelection = rowId;
+            }
+			console.log("双击表格");
+		}
 	
 	
  	</script>

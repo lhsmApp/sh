@@ -1,6 +1,8 @@
 package com.fh.service.tmplconfig.tmplconfig;
 
 import java.util.List;
+
+import com.fh.entity.JqGridModel;
 import com.fh.entity.Page;
 import com.fh.entity.TmplConfigDetail;
 import com.fh.util.PageData;
@@ -24,6 +26,13 @@ public interface TmplConfigManager{
 	 * @throws Exception
 	 */
 	public void delete(PageData pd)throws Exception;
+	
+	/**
+	 * 保存之前删除表
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void deleteTable(PageData pd) throws Exception;
 	
 	/**修改
 	 * @param pd
@@ -92,6 +101,12 @@ public interface TmplConfigManager{
 	 * @throws Exception
 	 */
 	public List<PageData> dictList(PageData pd) throws Exception;
+	
+	/**批量修改
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void updateAll(List<PageData> pd)throws Exception;
 	
 }
 

@@ -462,6 +462,8 @@
 		$(ids).each(function (index, id){  
             $("#jqGrid").saveRow(id, false, 'clientArray');
              rowData = $("#jqGrid").getRowData(id);
+      		console.log("rowData"+rowData);
+
             listData.push(rowData);
 		});
 		top.jzts();
