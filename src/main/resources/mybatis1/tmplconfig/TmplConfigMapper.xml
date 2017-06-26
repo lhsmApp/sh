@@ -207,5 +207,17 @@
 		from tb_tmpl_config_dict
 	</select>
 
-	<!-- fh313596790qq(青苔) -->
+	<!-- 获取数据库中表结构-->
+	<select id="getTableColumns" parameterType="String" resultType="com.fh.entity.TableColumns">
+	    SELECT UPPER(column_name) column_name, 
+	           column_comment, 
+	           UPPER(data_type) data_type, 
+	           UPPER(column_type) column_type,
+	           UPPER(column_key) column_key, 
+	           column_default 
+	    FROM information_schema.columns 
+	    WHERE table_schema ='dbgdhs' 
+ 		AND  
+	    table_name = '#{tableCode}'
+	</select>
 </mapper>

@@ -2,6 +2,7 @@ package com.fh.service.tmplconfig.tmplconfig;
 
 import java.util.List;
 import com.fh.entity.Page;
+import com.fh.entity.TableColumns;
 import com.fh.entity.TmplConfigDetail;
 import com.fh.util.PageData;
 
@@ -93,5 +94,10 @@ public interface TmplConfigManager{
 	 */
 	public List<PageData> dictList(PageData pd) throws Exception;
 	
+	/**获取某表的所有列
+	 * @param 
+	 * @throws Exception
+	 */
+	public List<TableColumns> getTableColumns(String tableCode)throws Exception;
 }
 

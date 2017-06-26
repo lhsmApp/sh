@@ -35,21 +35,32 @@
 				<div class="page-content">
 					<!-- /section:settings.box -->
 					<div class="page-header">
-						<table>
-							<tr>
-								<td><span
-									class="label label-xlg label-success arrowed-right">东部管道</span>
-									<!-- arrowed-in-right --> <span
-									class="label label-xlg label-yellow arrowed-in arrowed-right"
-									id="subTitle" style="margin-left: 2px;">成本核算</span> <span
-									style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
+						<span class="label label-xlg label-success arrowed-right">财务核算</span>
+						<!-- arrowed-in-right -->
+						<span
+							class="label label-xlg label-yellow arrowed-in arrowed-right"
+							id="subTitle" style="margin-left: 2px;">凭证传输</span> <span
+							style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
 
-									<button id="btnQuery" class="btn btn-white btn-info btn-sm"
-										onclick="showQueryCondi()">
-										<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
-									</button></td>
-							</tr>
-						</table>
+						<button id="btnQuery" class="btn btn-white btn-info btn-sm"
+							onclick="showQueryCondi()">
+							<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
+						</button>
+						<div class="pull-right">
+							<span class="green middle bolder">凭证数据类型: &nbsp;</span>
+
+							<div class="btn-toolbar inline middle no-margin">
+								<div data-toggle="buttons" class="btn-group no-margin">
+									<label class="btn btn-sm btn-yellow active"> <span
+										class="bigger-110">工资</span> <input type="radio" value="1" />
+									</label> <label class="btn btn-sm btn-yellow"> <span
+										class="bigger-110">社保</span> <input type="radio" value="2" />
+									</label> <label class="btn btn-sm btn-yellow"> <span
+										class="bigger-110">公积金</span> <input type="radio" value="3" />
+									</label>
+								</div>
+							</div>
+						</div>
 					</div>
 					<!-- /.page-header -->
 
@@ -58,39 +69,23 @@
 							<div class="widget-box" style="display: none;">
 								<div class="widget-body">
 									<div class="widget-main">
-										<!-- <p class="alert alert-info">Nunc aliquam enim ut arcu.</p> -->
 										<form class="form-inline">
-											<!-- <input type="password" class="input-small"
-												placeholder="Password" /> <label class="inline"> <input
-												type="checkbox" class="ace" /> <span class="lbl">
-													remember me</span>
-											</label> -->
-											<%-- <div class="nav-search inline" >
-												<span class="input-icon"> <input type="text"
-													placeholder="这里输入关键词" class="nav-search-input"
-													id="nav-search-input" autocomplete="off" name="keywords"
-													value="${pd.keywords }" placeholder="这里输入关键词" /> <i
-													class="ace-icon fa fa-search nav-search-icon"></i>
-												</span>
-											</div> --%>
 											<span class="input-icon"> <input
 												id="form-field-icon-1" type="text" placeholder="这里输入关键词">
 												<i class="ace-icon fa fa-leaf blue"></i>
 											</span>
 											<!-- class="input-small" -->
-											<input type="text" placeholder="Username" /> 
-											<span>
-												<select class="chosen-select form-control" 
-													name="BELONG_AREA" id="belong_area"
-													data-placeholder="请选择所属区域"
-													style="vertical-align: top; height:32px;width: 150px;">
+											<input type="text" placeholder="Username" /> <span> <select
+												class="chosen-select form-control" name="BELONG_AREA"
+												id="belong_area" data-placeholder="请选择所属区域"
+												style="vertical-align: top; height: 32px; width: 150px;">
 													<option value="" selected>请选择国家</option>
 													<option value="">USA</option>
 													<c:forEach items="${areaList}" var="area">
 														<option value="${area.BIANMA }"
 															<c:if test="${pd.BELONG_AREA==area.BIANMA}">selected</c:if>>${area.NAME }</option>
 													</c:forEach>
-												</select>
+											</select>
 											</span>
 											<button type="button" class="btn btn-info btn-sm">
 												<i class="ace-icon fa fa-search bigger-110"></i>
@@ -103,17 +98,21 @@
 					</div>
 					<div class="row">
 						<div class="col-xs-12">
-							<!-- PAGE CONTENT BEGINS -->
-							<!-- <div class="well well-sm">
-								You can have a custom jqGrid download here:
-								<a href="http://www.trirand.com/blog/?page_id=6" target="_blank">
-									
-									<i class="fa fa-external-link bigger-110"></i>
-								</a>
-							</div> -->
+							<div class="tabbable">
+								<ul class="nav nav-tabs padding-18">
+									<li class="active"><a data-toggle="tab" href="#home">
+											<i class="green ace-icon fa fa-user bigger-120"></i> 凭证数据传输
+									</a></li>
 
-							<table id="jqGrid"></table>
-							<div id="jqGridPager"></div>
+									<li><a data-toggle="tab" href="#feed"> <i
+											class="orange ace-icon fa fa-rss bigger-120"></i> 凭证管理
+									</a></li>
+								</ul>
+								<div class="tab-content no-border ">
+									<table id="jqGrid"></table>
+									<div id="jqGridPager"></div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -150,26 +149,32 @@
 	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
 	<!-- JqGrid统一样式统一操作 -->
 	<script type="text/javascript" src="static/js/common/jqgrid_style.js"></script>
-	<script type="text/javascript" src="static/js/common/cusElement_style.js"></script>
+	<script type="text/javascript"
+		src="static/js/common/cusElement_style.js"></script>
 	<script type="text/javascript" src="static/js/util/toolkit.js"></script>
 	<script src="static/ace/js/ace/ace.widget-box.js"></script>
 	<script type="text/javascript"> 
 	$(document).ready(function () {
-		/* $.jgrid.defaults.width = 780;*/
-		//$.jgrid.defaults.styleUI = 'Bootstrap'; 
 		$(top.hangge());//关闭加载状态
-		
 		//dropDownStyle();
 		
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
-			$("#jqGrid").jqGrid( 'setGridWidth', $(".page-content").width());
+			//$("#jqGrid").jqGrid( 'setGridWidth', $(".page-content").width());
 			//console.log("ccc"+$("iframe").height());
-			$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - 200);
-	    })
+			$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - 213);
+	    });
+	    
+		//凭证类型变化
+		$('[data-toggle="buttons"] .btn').on('click', function(e){
+			var target = $(this).find('input[type=radio]');
+			var which = parseInt(target.val());
+			console.log(which);
+			/* $('.user-profile').parent().addClass('hide');
+			$('#user-profile-'+which).parent().removeClass('hide'); */
+		});
 		
 		$("#jqGrid").jqGrid({
-			<%-- url: '<%=basePath%>static/data/data.json', --%>
 			url: '<%=basePath%>jqgridJia/getPageList.do',
 			datatype: "json",
 			 colModel: [
@@ -177,20 +182,12 @@
 					formatter:'actions', 
 					formatoptions:{ 
                         onSuccess: function(response) {
-							
-                        	//var jsonResponse = $.parseJSON(response.responseText);
 							console.log(response);
 							if(response.responseJSON.code==0){
 								return [true];
 							}else{
 								return [false, response.responseJSON.message];
-							}
-							
-                            /* if (jsonResponse.State != 'Success') {
-                                return [false, jsonResponse.ResponseMessage];
-                            } else {
-                                return [true];
-                            }  */                    
+							}                
                         },
                         onError :function(rowid, res, stat, err) {
                         	if(err!=null)
@@ -198,12 +195,11 @@
                         },
                         
                         afterSave:function(rowid, res){
-                        	//console.log("afterSave");
                         	$("#jqGrid").trigger("reloadGrid");
                         },
 					
 						keys:true,
-						//delbutton: false,//disable delete button
+
 						delOptions:{
 							recreateForm: true, 
 							beforeShowForm:beforeDeleteCallback,
@@ -217,37 +213,13 @@
 								}
                             },
 						}
-						//editformbutton:true, editOptions:{recreateForm: true, beforeShowForm:beforeEditCallback}
-						 
-						/* editformbutton:true, 
-						editOptions:{
-							onclickSubmit: function(params, posdata) {
-								console.log("submit");
-                                console.log(posdata	);
-                            } , 
-                            afterSubmit: fn_editSubmit
-						} */ 
-						
-						//editformbutton:true,
-						/*editOptions: {  //编辑操作，这个很重要，实现编辑时传送参数什么的。  
-                            //reloadAfterSubmit: true,
-                             editData: {  
-                                editkey: function () {  
-                                    var sel_id = $('#TblClassTypeId').jqGrid('getGridParam', 'selrow');  
-                                    var value = $('#TblClassTypeId').jqGrid('getCell', sel_id, 'Id_Key');  
-                                    return value;  
-                                }  
-                            }   
-						}*/
 					}
 				},
 				{label: 'id',name:'ID',index:'',key: true, width:30, sorttype:"int", editable: false},
 				{ label: 'Category Name', name: 'CATEGORYNAME', width: 75,editable: true,editoptions:{size:"20",maxlength:"30"} },
 				{ label: 'Product Name', name: 'PRODUCTNAME', width: 90,editable: true,editoptions:{size:"20",maxlength:"30"} },
-				{ label: 'Country', name: 'COUNTRY', width: 100,editable: true,edittype:"select",editoptions:{value:"FE:FedEx;IN:InTime;TN:TNT;AR:ARAMEX"},
-				    formatter: 'select', formatoptions: {value: 'FE:FedEx;IN:InTime;TN:TNT;AR:ARAMEX'}},
+				{ label: 'Country', name: 'COUNTRY', width: 100,editable: true,edittype:"select",editoptions:{value:"FE:FedEx;IN:InTime;TN:TNT;AR:ARAMEX"}},
 				{ label: 'Price', name: 'PRICE', width: 80, formatter: 'number',sorttype: 'number',summaryTpl: "sum: {0}", summaryType: "sum",editable: true,align:'right'},
-				// sorttype is used only if the data is loaded locally or loadonce is set to true
 				{ label: 'Quantity', name: 'QUANTITY', width: 80, sorttype: 'integer',editable: true,align:'right' ,edittype:'custom', editoptions:{custom_element: myelem, custom_value:myvalue} }                   
 			],
 			reloadAfterSubmit: true, 
@@ -257,15 +229,14 @@
 			viewrecords: true, // show the current page, data rang and total records on the toolbar
 			rowNum: 10,
 			rowList:[10,20,30,100000],
-			//loadonce: true, // this is just for the demo
 			//height: '100%', 
-			
+			width:'100%',
 			sortname: 'PRODUCTNAME',
 			
-			footerrow: true,
-			userDataOnFooter: true, // the calculated sums and/or strings from server are put at footer row.
-			grouping: true,
-			groupingView: {
+			//footerrow: true,
+			//userDataOnFooter: true, // the calculated sums and/or strings from server are put at footer row.
+			/*grouping: true,
+			 groupingView: {
                 groupField: ["CATEGORYNAME"],
                 groupColumnShow: [true],
                 groupText: ["<b>{0}</b>"],
@@ -275,14 +246,7 @@
                 groupCollapse: false,
                 plusicon : 'fa fa-chevron-down bigger-110',
 				minusicon : 'fa fa-chevron-up bigger-110'
-            },
-            
-            /* groupingView : { 
-				 groupField : ['name'],
-				 groupDataSorted : true,
-				 plusicon : 'fa fa-chevron-down bigger-110',
-				 minusicon : 'fa fa-chevron-up bigger-110'
-			}, */
+            }, */
 			
 			pager: "#jqGridPager",
 			loadComplete : function() {
@@ -353,38 +317,13 @@
 				beforeShowForm : beforeEditOrAddCallback,
 			    onclickSubmit: function(params, posdata) {
 					console.log("onclickSubmit");
-                    //console.log(posdata	);
-                } , 
+                }, 
                 afterSubmit: fn_addSubmit
 			},
 			{
 				//delete record form
 				recreateForm: true,
-				beforeShowForm : beforeDeleteCallback,
-				onClick : function(e) {
-					<%-- console.log("BatchDelete");
-					//alert(1);
-					var ids = grid.jqGrid('getDataIDs');
-					var strIds="";
-					for (var i = 0; i < ids.length; i++) {
-						if(strIds=='')
-							strIds+= ids[i];
-						else
-							strIds+= ','+ids[i];
-                		//grid.jqGrid('editRow',ids[i]);
-            		}
-					$.ajax({
-						type: "POST",
-						url: '<%=basePath%>jqgridJia/deleteAll.do?tm='+new Date().getTime(),
-				    	data: {DATA_IDS:str},
-						dataType:'json',
-						//beforeSend: validateData,
-						cache: false,
-						success: function(data){
-							 
-						}
-					}); --%>
-				}
+				beforeShowForm : beforeDeleteCallback
 			},
 			{
 				//search form
@@ -394,11 +333,8 @@
 					style_search_filters($(this));
 				},
 				multipleSearch: true,
-				
-				
 				//multipleGroup:true,
 				showQuery: true
-				
 			}
 		);
 	
@@ -462,9 +398,7 @@
 		var rowData;
 		$(ids).each(function (index, id){  
             $("#jqGrid").saveRow(id, false, 'clientArray');
-            
              rowData = $("#jqGrid").getRowData(id);
-             console.log(rowData);
             listData.push(rowData);
 		});
 		top.jzts();
@@ -560,13 +494,6 @@
 	    return updateDate;  
 	}
   	
-	function unformateSelect(cellValue, options, rowObject){  
-		/* console.log(cellValue);
-		console.log(rowObject);
-		console.log(options); */
-	    return cellValue; 
-	}
-  	
 	//创建一个input输入框
 	function myelem (value, options) {
 		var el = document.createElement("input");
@@ -594,7 +521,6 @@
 			$("#btnQuery").find("span").text("隐藏查询");
 		}
 		$(".widget-box").toggle("fast");
-		
 	}
  	</script>
 </body>
