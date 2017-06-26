@@ -8,6 +8,7 @@ import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
 import com.fh.entity.StaffDetailModel;
 import com.fh.entity.TableColumns;
+import com.fh.entity.system.Department;
 import com.fh.entity.system.Dictionaries;
 import com.fh.entity.system.User;
 import com.fh.util.PageData;
@@ -153,17 +154,8 @@ public class StaffDetailService implements StaffDetailManager{
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Dictionaries> getTableDic(PageData pd)throws Exception{
-		return (List<Dictionaries>)dao.findForList("StaffDetailMapper.getTableDic", pd);
-	}
-	
-	/**获取单位人员
-	 * @param 
-	 * @throws Exception
-	 */
-	@SuppressWarnings("unchecked")
-	public List<User> getUsersInDepart(String department)throws Exception{
-		return (List<User>)dao.findForList("StaffDetailMapper.getUsersInDepart", department);
+	public List<Department> getDepartDic(PageData pd)throws Exception{
+		return (List<Department>)dao.findForList("StaffDetailMapper.getDepartDic", pd);
 	}
 	
 }

@@ -319,8 +319,9 @@ public class LeadingInExcel<T> {
                 
                 // 3.单元格中的值等于null或等于"" 就放弃整行数据
                 if(value == null || "".equals(value)){
-                    judge = false;
-                    break;
+                    //judge = false;
+                    //break;
+                	continue;
                 }
                 
                 /*

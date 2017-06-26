@@ -6,6 +6,7 @@ import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
 import com.fh.entity.StaffDetailModel;
 import com.fh.entity.TableColumns;
+import com.fh.entity.system.Department;
 import com.fh.entity.system.Dictionaries;
 import com.fh.entity.system.User;
 import com.fh.util.PageData;
@@ -111,13 +112,7 @@ public interface StaffDetailManager{
 	 * @param 
 	 * @throws Exception
 	 */
-	public List<Dictionaries> getTableDic(PageData pd)throws Exception;
-	
-	/**获取单位人员
-	 * @param 
-	 * @throws Exception
-	 */
-	public List<User> getUsersInDepart(String department)throws Exception;
+	public List<Department> getDepartDic(PageData pd)throws Exception;
 	
 	
 }

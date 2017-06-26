@@ -57,20 +57,9 @@
 	    order by ORDER_BY
 	</select>
 	<!-- 获取表字典-->
-	<select id="getTableDic" parameterType="pd" resultType="com.fh.entity.system.Dictionaries">
-	    SELECT ${ColumnName}
-	    FROM ${DicName}
-	    <if test = "${order_by} != null">
-	        order by ${order_by}
-	    </if>
-	</select>
-	
-	<!-- 获取单位人员-->
-	<select id="getUsersInDepart" parameterType="String" resultType="com.fh.entity.system.User">
-	    SELECT *
-	    FROM sys_user
-	    WHERE DEPARTMENT_ID = #{DEPARTMENT_ID}
-	    order by USER_ID
+	<select id="getDepartDic" parameterType="pd" resultType="com.fh.entity.system.Department">
+	    SELECT * 
+	    FROM oa_department
 	</select>
 	
 	<!-- 列表 -->
@@ -135,7 +124,7 @@
 	    <include refid="Field"></include>
 		) values (
 	    <include refid="FieldValueDefine"></include>
-		)
+		);
 	</update>
 	
 	<!-- 批量删除 -->
@@ -171,12 +160,13 @@
 	
 	<!-- 通过ID获取数据 -->
 	<select id="findById" parameterType="pd" resultType="pd">
-		<!-- select 
-		<include refid="Field"></include>
+		select 
+		    <include refid="FieldSelectKey"></include>
+		    <include refid="Field"></include>
 		from 
-		<include refid="tableName"></include>
-		where 
-			ID = #{ID} -->
+		    <include refid="tableName"></include>
+		where BUSI_DATE = ${pd.SystemDateTime}
+		and DEPT_CODE = ${pd.DepartCode}
 	</select>
 	
 	<!-- 导出列表 -->
@@ -185,11 +175,11 @@
 		<include refid="Field"></include>
 		from 
 		<include refid="tableName"></include>
-		<where>
+		where BUSI_DATE = ${pd.SystemDateTime}
+		and DEPT_CODE = ${pd.DepartCode}
 			<if test="pd.search!= null and pd.search != ''"><!-- 关键词检索 -->
 				and #{pd.search}
 			</if>
-		</where>
 		<if test="sidx != null" >
 			order by ${sidx} ${sord} 
     	</if>
@@ -197,48 +187,26 @@
 	
 	<!-- 导入-->
 	<insert id="batchImport" parameterType="com.fh.entity.StaffDetailModel">
-		<!-- <foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
-		  <choose>
-		    <when test="item!=null and item.ID != null and item.ID != '' and item.ID != 0 ">
+		<foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
+		    <if test="item!=null">
+		        delete from
+	            <include refid="tableName"></include>
+		        where BILL_CODE = #{item.BILL_CODE} 
+		        and BUSI_DATE = #{item.BUSI_DATE} 
+		        and USER_CODE = #{item.USER_CODE};
+		    </if>
+		</foreach>
+		<foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
+		    <if test="item!=null">
 		        insert into 
-		        <include refid="tableName"></include>
-			        (
-			        ID,
-		    	    CATEGORYNAME,
-			        PRODUCTNAME,
-			        COUNTRY,
-			        PRICE,
-			        QUANTITY
-			        ) 
-			    values (
-			        #{item.ID},
-		    	    #{item.CATEGORYNAME},
-			        #{item.PRODUCTNAME},
-			        #{item.COUNTRY},
-			        #{item.PRICE},
-			        #{item.QUANTITY}
-			        )
-		    </when>
-		    <otherwise>
-		        insert into 
-		        <include refid="tableName"></include>
-			        (
-		    	    CATEGORYNAME,
-			        PRODUCTNAME,
-			        COUNTRY,
-			        PRICE,
-			        QUANTITY
-			        ) 
-			    values (
-		    	    #{item.CATEGORYNAME},
-			        #{item.PRODUCTNAME},
-			        #{item.COUNTRY},
-			        #{item.PRICE},
-			        #{item.QUANTITY}
-			        )
-		    </otherwise>
-		  </choose>
-		</foreach> -->
+	            <include refid="tableName"></include>
+		        (
+	            <include refid="Field"></include>
+		        ) values (
+	            <include refid="FieldValueItem"></include>
+		        );
+		    </if>
+		</foreach>
 	</insert>
 	
 </mapper>

@@ -22,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
 import com.fh.entity.CommonBase;
-import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
 import com.fh.entity.Page;
 import com.fh.entity.PageResult;
@@ -34,7 +33,10 @@ import com.fh.entity.system.Dictionaries;
 import com.fh.exception.CustomException;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
+import com.fh.util.PathUtil;
 import com.fh.util.SqlTools;
+import com.fh.util.Const;
+import com.fh.util.FileDownload;
 import com.fh.util.Jurisdiction;
 import com.fh.util.excel.LeadingInExcel;
 
@@ -66,6 +68,7 @@ public class StaffDetailController extends BaseController {
 	String DepartCode = "";
 	//默认值
 	Map<String, Object> DefaultValueList = new HashMap<String, Object>();
+	List<TmplConfigDetail> listColumns = new ArrayList<TmplConfigDetail>();
 	
 	/**修改
 	 * @param
@@ -146,7 +149,7 @@ public class StaffDetailController extends BaseController {
 		TmplConfigDetail item = new TmplConfigDetail();
 		item.setDEPT_CODE(DepartCode);
 		item.setTABLE_CODE("TB_STAFF_DETAIL");
-		List<TmplConfigDetail> listColumns = tmplconfigService.listNeed(item);
+		listColumns = tmplconfigService.listNeed(item);
 		//底行显示的求和与平均值字段
 		SqlUserdata = "";
 		//拼接真正设置的jqGrid的ColModel
@@ -239,27 +242,18 @@ public class StaffDetailController extends BaseController {
 			}
 		} else if(strDicType.equals("2")){
 			if(dicName.toUpperCase().equals(("oa_department").toUpperCase())){
-				/*pd.put("ColumnName", " DEPARTMENT_CODE BIANMA, NAME NAME ");
-				pd.put("DicName", dicName);
-				pd.put("order_by", "DEPARTMENT_CODE");
-				List<Dictionaries> listPara = (List<Dictionaries>) staffdetailService.getTableDic(pd);
-				for(Dictionaries dic : listPara){
+				List<Department> listPara = (List<Department>) staffdetailService.getDepartDic(pd);
+				for(Department dic : listPara){
 					if(ret!=null && !ret.toString().trim().equals("")){
 						ret.append("; ");
 					}
-					ret.append(dic.getBIANMA() + ":" + dic.getNAME());
-				}*/
+					ret.append(dic.getDEPARTMENT_CODE() + ":" + dic.getNAME());
+				}
 			}
 		}
 		return ret.toString();
 	}
 	
-	
-	
-	
-	
-	
-
 	/**列表
 	 * @param page
 	 * @throws Exception
@@ -342,13 +336,104 @@ public class StaffDetailController extends BaseController {
 		return commonBase;
 	}
 	
+	/**打开上传EXCEL页面
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/goUploadExcel")
+	public ModelAndView goUploadExcel()throws Exception{
+		ModelAndView mv = this.getModelAndView();
+		mv.setViewName("staffDetail/staffdetail/uploadExcel");
+		return mv;
+	}
+
+	/**从EXCEL导入到数据库
+	 * @param file
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/readExcel")
+	public @ResponseBody CommonBase readExcel(@RequestParam(value="excel",required=false) MultipartFile file) throws Exception{
+		CommonBase commonBase = new CommonBase();
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;}//校验权限
+		
+		// 局部变量
+		LeadingInExcel<StaffDetailModel> testExcel = null;
+		List<StaffDetailModel> uploadAndRead = null;
+		try {
+			// 定义需要读取的数据
+			String formart = "yyyy-MM-dd";
+			String propertiesFileName = "config";
+			String kyeName = "file_path";
+			int sheetIndex = 0;
+			Class<StaffDetailModel> clazz = StaffDetailModel.class;
+			Map<String, String> titleAndAttribute = null;
+			// 定义对应的标题名与对应属性名
+			titleAndAttribute = new HashMap<String, String>();
+			
+			//配置表设置列
+			if(listColumns != null && listColumns.size() > 0){
+				for(int i=0; i < listColumns.size(); i++){
+					titleAndAttribute.put(listColumns.get(i).getCOL_NAME(), listColumns.get(i).getCOL_CODE());
+				}
+			}
+
+			// 调用解析工具包
+			testExcel = new LeadingInExcel<StaffDetailModel>(formart);
+			// 解析excel，获取客户信息集合
+
+			uploadAndRead = testExcel.uploadAndRead(file, propertiesFileName, kyeName, sheetIndex,
+					titleAndAttribute, clazz);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("读取Excel文件错误", e);
+			throw new CustomException("读取Excel文件错误");
+		}
+		boolean judgement = false;
+		if (uploadAndRead != null && !"[]".equals(uploadAndRead.toString()) && uploadAndRead.size() >= 1) {
+			judgement = true;
+		}
+		if (judgement) {
+			int listSize = uploadAndRead.size();
+			//此处执行集合添加 
+			staffdetailService.batchImport(uploadAndRead);
+			
+			
+			/*// 把客户信息分为没100条数据为一组迭代添加客户信息（注：将customerList集合作为参数，在Mybatis的相应映射文件中使用foreach标签进行批量添加。）
+			int listSize = uploadAndRead.size();
+			int toIndex = 100;
+			for (int i = 0; i < listSize; i += 100) {
+				if (i + 100 > listSize) {
+					toIndex = listSize - i;
+				}
+				List<StaffDetailModel> subList = uploadAndRead.subList(i, i + toIndex);
+
+				//此处执行集合添加 
+				staffdetailService.batchImport(subList);
+			}*/
+		} else {
+			commonBase.setCode(-1);
+			commonBase.setMessage("TranslateUtil");
+		}
+		return commonBase;
+	}
+	
+	/**下载模版
+	 * @param response
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/downExcel")
+	public void downExcel(HttpServletResponse response)throws Exception{
+		FileDownload.fileDownload(response, PathUtil.getClasspath() + Const.FILEPATHFILE + "StaffDetail.xls", "StaffDetail.xls");
+	}
+	
 	 /**导出到excel
 	 * @param
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/excel")
 	public ModelAndView exportExcel(JqPage page) throws Exception{
-		logBefore(logger, Jurisdiction.getUsername()+"导出JqGridExtend到excel");
+		logBefore(logger, Jurisdiction.getUsername()+"导出StaffDetail到excel");
 		if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
 		ModelAndView mv = new ModelAndView();
 		PageData pd = new PageData();
@@ -379,92 +464,6 @@ public class StaffDetailController extends BaseController {
 		ObjectExcelView erv = new ObjectExcelView();
 		mv = new ModelAndView(erv,dataMap); 
 		return mv;
-	}
-	
-	/**打开上传EXCEL页面
-	 * @return
-	 * @throws Exception
-	 */
-	@RequestMapping(value="/goUploadExcel")
-	public ModelAndView goUploadExcel()throws Exception{
-		ModelAndView mv = this.getModelAndView();
-		mv.setViewName("staffDetail/staffdetail/uploadExcel");
-		return mv;
-	}
-	
-	/**下载模版
-	 * @param response
-	 * @throws Exception
-	 */
-	@RequestMapping(value="/downExcel")
-	public void downExcel(HttpServletResponse response)throws Exception{
-		//FileDownload.fileDownload(response, PathUtil.getClasspath() + Const.FILEPATHFILE + "JqGrids.xls", "JqGrids.xls");
-	}
-
-	/**从EXCEL导入到数据库
-	 * @param file
-	 * @return
-	 * @throws Exception
-	 */
-	//@ApiOperation(value = "导入Excel", httpMethod = "POST", response = CommonBase.class, notes = "导入Excel")
-	@RequestMapping(value = "/readExcel")
-	public @ResponseBody CommonBase readExcel(@RequestParam(value="excel",required=false) MultipartFile file) throws Exception{
-		CommonBase commonBase = new CommonBase();
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;}//校验权限
-		
-		// 局部变量
-		LeadingInExcel<JqGridModel> testExcel = null;
-		List<JqGridModel> uploadAndRead = null;
-		try {
-			// 定义需要读取的数据
-			String formart = "yyyy-MM-dd";
-			String propertiesFileName = "config";
-			String kyeName = "file_path";
-			int sheetIndex = 0;
-			Class<JqGridModel> clazz = JqGridModel.class;
-			Map<String, String> titleAndAttribute = null;
-			// 定义对应的标题名与对应属性名
-			titleAndAttribute = new HashMap<String, String>();
-			titleAndAttribute.put("ID", "ID");
-			titleAndAttribute.put("CategoryName", "CATEGORYNAME");
-			titleAndAttribute.put("ProductName", "PRODUCTNAME");
-			titleAndAttribute.put("Country", "COUNTRY");
-			titleAndAttribute.put("Price", "PRICE");
-			titleAndAttribute.put("Quantity", "QUANTITY");
-
-			// 调用解析工具包
-			testExcel = new LeadingInExcel<JqGridModel>(formart);
-			// 解析excel，获取客户信息集合
-
-			uploadAndRead = testExcel.uploadAndRead(file, propertiesFileName, kyeName, sheetIndex,
-					titleAndAttribute, clazz);
-		} catch (Exception e) {
-			e.printStackTrace();
-			logger.error("读取Excel文件错误", e);
-			throw new CustomException("读取Excel文件错误");
-		}
-		boolean judgement = false;
-		if (uploadAndRead != null && !"[]".equals(uploadAndRead.toString()) && uploadAndRead.size() >= 1) {
-			judgement = true;
-		}
-		if (judgement) {
-			// 把客户信息分为没100条数据为一组迭代添加客户信息（注：将customerList集合作为参数，在Mybatis的相应映射文件中使用foreach标签进行批量添加。）
-			int listSize = uploadAndRead.size();
-			int toIndex = 100;
-			for (int i = 0; i < listSize; i += 100) {
-				if (i + 100 > listSize) {
-					toIndex = listSize - i;
-				}
-				List<JqGridModel> subList = uploadAndRead.subList(i, i + toIndex);
-
-				/** 此处执行集合添加 */
-				//staffdetailService.batchImport(subList);
-			}
-		} else {
-			commonBase.setCode(-1);
-			commonBase.setMessage("TranslateUtil");
-		}
-		return commonBase;
 	}
 	
 	@InitBinder
