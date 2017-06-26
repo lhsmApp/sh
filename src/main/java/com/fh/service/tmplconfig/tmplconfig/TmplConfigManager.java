@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.fh.entity.JqGridModel;
 import com.fh.entity.Page;
+import com.fh.entity.TableColumns;
 import com.fh.entity.TmplConfigDetail;
 import com.fh.util.PageData;
 
@@ -101,6 +102,12 @@ public interface TmplConfigManager{
 	 * @throws Exception
 	 */
 	public List<PageData> dictList(PageData pd) throws Exception;
+	
+	/**获取某表的所有列
+	 * @param 
+	 * @throws Exception
+	 */
+	public List<TableColumns> getTableColumns(String tableCode)throws Exception;
 	
 	/**批量修改
 	 * @param pd

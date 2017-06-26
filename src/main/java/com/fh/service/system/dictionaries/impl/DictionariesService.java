@@ -108,5 +108,13 @@ public class DictionariesService implements DictionariesManager{
 		return (PageData)dao.findForObject("DictionariesMapper.findFromTbs", pd);
 	}
 	
+	/**获取SysDictionaries字典
+	 * @param 
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Dictionaries> getSysDictionaries(String dicName)throws Exception{
+		return (List<Dictionaries>)dao.findForList("DictionariesMapper.getSysDictionaries", dicName);
+	}
 }
 

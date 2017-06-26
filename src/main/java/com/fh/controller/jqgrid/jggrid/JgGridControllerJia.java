@@ -22,17 +22,13 @@ import com.fh.controller.base.BaseController;
 import com.fh.entity.CommonBase;
 import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
-import com.fh.entity.Page;
 import com.fh.entity.PageResult;
 import com.fh.service.jqgrid.jggrid.JgGridManagerJia;
-import com.fh.util.DateUtil;
+import com.fh.service.sysBillnum.sysbillnum.SysBillnumManager;
 import com.fh.util.Jurisdiction;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
 import com.fh.util.SqlTools;
-import com.fh.util.StringUtil;
-import com.fh.util.base.ConvertUtils;
-import com.fh.util.enums.BillNumType;
 
 import net.sf.json.JSONArray;
 
@@ -52,8 +48,8 @@ public class JgGridControllerJia extends BaseController {
 	@Resource(name="jqgridServiceJia")
 	private JgGridManagerJia jqgridServiceJia;
 	
-	/*@Resource(name="sysbillnumService")
-	private JgGridManagerJia sysbillnumService;*/
+	@Resource(name="sysbillnumService")
+	private SysBillnumManager sysbillnumService;
 	
 	/**列表
 	 * @param page

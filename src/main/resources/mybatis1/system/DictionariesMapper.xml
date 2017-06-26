@@ -135,5 +135,12 @@
 			BIANMA = #{BIANMA}
 	</select>
 	
-	<!-- fh313596790qq(青苔) -->
+	<!-- 获取SysDictionaries字典-->
+	<select id="getSysDictionaries" parameterType="String" resultType="com.fh.entity.system.Dictionaries">
+	    SELECT r.*
+	    FROM sys_dictionaries p, sys_dictionaries r
+	    WHERE p.DICTIONARIES_ID = r.PARENT_ID
+	    and UPPER(p.BIANMA) = UPPER(#{BIANMA})
+	    order by ORDER_BY
+	</select>
 </mapper>
