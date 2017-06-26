@@ -9,6 +9,7 @@ import com.fh.entity.TableColumns;
 import com.fh.entity.TmplConfigDetail;
 import com.fh.entity.system.Dictionaries;
 import com.fh.service.system.dictionaries.DictionariesManager;
+import com.fh.service.tmplConfigDict.tmplconfigdict.TmplConfigDictManager;
 import com.fh.service.tmplconfig.tmplconfig.TmplConfigManager;
 import com.fh.service.tmplconfig.tmplconfig.impl.TmplConfigService;
 import com.fh.util.PageData;
@@ -25,14 +26,18 @@ import com.fh.util.PageData;
 public class TmplUtil {
 
 	private TmplConfigManager tmplconfigService;
+	private TmplConfigDictManager tmplConfigDictService;
+	private DictionariesManager dictionariesService;
 
 	// 查询表的主键字段后缀，区别于主键字段，用于修改或删除
 	String strKeyExtra = "__";
 	// 查询表的主键字段
 	List<String> KeyList = new ArrayList<String>();
 
-	public TmplUtil(TmplConfigManager tmplconfigService) {
+	public TmplUtil(TmplConfigManager tmplconfigService,TmplConfigDictManager tmplConfigDictService,DictionariesManager dictionariesService) {
 		this.tmplconfigService = tmplconfigService;
+		this.tmplConfigDictService=tmplConfigDictService;
+		this.dictionariesService=dictionariesService;
 	}
 
 	/**
@@ -47,7 +52,7 @@ public class TmplUtil {
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 		TmplConfigDetail item = new TmplConfigDetail();
 		item.setDEPT_CODE(departCode);
-		item.setTABLE_CODE("TB_STAFF_DETAIL");
+		item.setTABLE_CODE(tableCode);
 		List<TmplConfigDetail> listColumns = tmplconfigService.listNeed(item);
 		// 底行显示的求和与平均值字段
 		String SqlUserdata = "";
@@ -65,17 +70,16 @@ public class TmplUtil {
 					if (name != null && name.trim() != "") {
 						jqGridColModel.append(name).append(", ");
 					}
-					/*// 配置表中的字典
-					if (listColumns.get(i).getDICT_TRANS() != null
-							&& !listColumns.get(i).getDICT_TRANS().trim().equals("")) {
-						String strDicValue = getDicValue(listColumns.get(i).getDICT_TRANS(), pd);
-						// 翻译
+					//配置表中的字典
+					if(listColumns.get(i).getDICT_TRANS()!=null && !listColumns.get(i).getDICT_TRANS().trim().equals("")){
+						String strDicValue = getDicValue(listColumns.get(i).getDICT_TRANS());
+						//翻译
 						jqGridColModel.append(" formatter: 'select', ");
-						jqGridColModel.append(" formatoptions: {value: '" + strDicValue + "'}, ");
-						// 查询
+					       jqGridColModel.append(" formatoptions: {value: '" + strDicValue + "'}, ");
+						//查询
 						jqGridColModel.append(" stype: 'select', ");
-						jqGridColModel.append(" searchoptions: {value: ':[All];" + strDicValue + "'}, ");
-					}*/
+					       jqGridColModel.append(" searchoptions: {value: ':[All];" + strDicValue + "'}, ");
+					}
 					// 配置表中的隐藏
 					int intHide = Integer.parseInt(listColumns.get(i).getCOL_HIDE());
 					jqGridColModel.append(" hidden: ").append(intHide == 1 ? "false" : "true").append(", ");
@@ -129,21 +133,23 @@ public class TmplUtil {
 
 			StringBuilder model_name = new StringBuilder();
 			StringBuilder model_notedit = new StringBuilder();
-
-			// 主键
-			if (col.getColumn_key() != null && col.getColumn_key().trim().equals("PRI")) {
-				KeyList.add(col.getColumn_name());
-			}
-			// 设置必定不用编辑的列
 			model_notedit.append(" editable: false ");
 
 			int intLength = getColumnLength(col.getColumn_type(), col.getData_type());
 			if (col.getData_type() != null
 					&& (col.getData_type().trim().equals("DECIMAL") || col.getData_type().trim().equals("DOUBLE")
 							|| col.getData_type().trim().equals("INT") || col.getData_type().trim().equals("FLOAT"))) {
-				model_name.append(" width: '150', ");
-				model_name.append(" align: 'right', searchrules: {number: true}, sorttype: 'number', formatter: 'number', ");
-			} 
+				model_name.append(" width: '120', ");
+				//model_name.append(" align: 'right', searchrules: {number: true}, sorttype: 'number', formatter: 'number', ");
+				model_name.append(" align: 'right', search: false, sorttype: 'number', formatter: 'number',");
+			} else{
+				if(intLength > 50){
+					model_name.append(" width: '200', ");
+				} else{
+					model_name.append(" width: '130', ");
+				}
+			}
+			model_name.append(" name: '"+ col.getColumn_name() +"'");
 			MapAdd.put("name", model_name.toString());
 			MapAdd.put("notedit", model_notedit.toString());
 			list.put(col.getColumn_name(), MapAdd);
@@ -158,5 +164,33 @@ public class TmplUtil {
 			ret += Integer.parseInt(length);
 		}
 		return ret;
+	}
+	
+	private String getDicValue(String dicName) throws Exception{
+		StringBuilder ret = new StringBuilder();
+		String strDicType = tmplConfigDictService.getDicType(dicName);
+		if(strDicType.equals("1")){
+			List<Dictionaries> dicList = dictionariesService.getSysDictionaries(dicName);
+			for(Dictionaries dic : dicList){
+				if(ret!=null && !ret.toString().trim().equals("")){
+					ret.append("; ");
+				}
+				ret.append(dic.getBIANMA() + ":" + dic.getNAME());
+			}
+		} else if(strDicType.equals("2")){
+			if(dicName.toUpperCase().equals(("oa_department").toUpperCase())){
+				/*pd.put("ColumnName", " DEPARTMENT_CODE BIANMA, NAME NAME ");
+				pd.put("DicName", dicName);
+				pd.put("order_by", "DEPARTMENT_CODE");
+				List<Dictionaries> listPara = (List<Dictionaries>) staffdetailService.getTableDic(pd);
+				for(Dictionaries dic : listPara){
+					if(ret!=null && !ret.toString().trim().equals("")){
+						ret.append("; ");
+					}
+					ret.append(dic.getBIANMA() + ":" + dic.getNAME());
+				}*/
+			}
+		}
+		return ret.toString();
 	}
 }

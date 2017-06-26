@@ -259,7 +259,7 @@
 	</insert>
 
 	<!-- 获取数据库中表结构-->
-	<select id="getTableColumns" parameterType="String" resultType="com.fh.entity.TableColumns">
+	<select id="getTableColumns" parameterType="string" resultType="com.fh.entity.TableColumns">
 	    SELECT UPPER(column_name) column_name, 
 	           column_comment, 
 	           UPPER(data_type) data_type, 
@@ -269,6 +269,6 @@
 	    FROM information_schema.columns 
 	    WHERE table_schema ='dbgdhs' 
  		AND  
-	    table_name = '#{tableCode}'
+	    table_name = #{value}
 	</select>
 </mapper>

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
+import com.fh.controller.common.TmplUtil;
 import com.fh.entity.CommonBase;
 import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
@@ -33,6 +34,8 @@ import com.fh.util.Tools;
 import net.sf.json.JSONArray;
 
 import com.fh.service.fhoa.department.DepartmentManager;
+import com.fh.service.system.dictionaries.DictionariesManager;
+import com.fh.service.tmplConfigDict.tmplconfigdict.TmplConfigDictManager;
 import com.fh.service.tmplconfig.tmplconfig.impl.TmplConfigService;
 import com.fh.service.voucher.voucher.VoucherManager;
 
@@ -55,6 +58,11 @@ public class VoucherController extends BaseController {
 	@Resource(name="tmplconfigService")
 	private TmplConfigService tmplconfigService;
 	
+	@Resource(name="tmplconfigdictService")
+	private TmplConfigDictManager tmplConfigDictService;
+	
+	@Resource(name="dictionariesService")
+	private DictionariesManager dictionariesService;
 	
 	/**列表
 	 * @param page
@@ -65,7 +73,8 @@ public class VoucherController extends BaseController {
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("voucher/voucher/voucher_list");
-		
+		PageData pd = this.getPageData();
+		//String tableCode=pd.getString("TABLE_CODE");
 		//此处放当前页面初始化时用到的一些数据，例如搜索的下拉列表数据，所需的字典数据、权限数据等等。
 		//mv.addObject("pd", pd);
 		//*********************加载单位树*******************************
@@ -75,30 +84,14 @@ public class VoucherController extends BaseController {
 		//***********************************************************
 		
 		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-		TmplConfigDetail item = new TmplConfigDetail();
-		item.setDEPT_CODE(Jurisdiction.getCurrentDepartmentID());
-		item.setTABLE_CODE("TB_HOUSE_FUND_SUMMY");
-		List<TmplConfigDetail> listColumns = tmplconfigService.listNeed(item);
-		//拼接真正设置的jqGrid的ColModel
-		StringBuilder jqGridColModel = new StringBuilder();
-		jqGridColModel.append("[");	
-		if(listColumns != null && listColumns.size() > 0){
-			for(TmplConfigDetail tmplConfigDetail:listColumns){
-				StringBuilder sbColItem=new StringBuilder();
-				//例子：{label: 'id',name:'ID',index:'',key: true, width:30, sorttype:"int", editable: false},
-				sbColItem.append("{");
-				//lable
-				sbColItem.append("lable:");
-				sbColItem.append(tmplConfigDetail.getCOL_NAME());
-				sbColItem.append(",");
-				//name
-				sbColItem.append("name:");
-				sbColItem.append(tmplConfigDetail.getCOL_CODE());
-				sbColItem.append(",");
-				
-				sbColItem.append("}");
-			}
-		}
+		//生成主表结构
+		TmplUtil tmplUtil=new TmplUtil(tmplconfigService,tmplConfigDictService,dictionariesService);
+		String jqGridColModel=tmplUtil.generateStructureNoEdit("TB_HOUSE_FUND_SUMMY",Jurisdiction.getCurrentDepartmentID());
+		mv.addObject("jqGridColModel", jqGridColModel);
+		
+		//生成子表结构
+		String jqGridColModelSub=tmplUtil.generateStructureNoEdit("TB_HOUSE_FUND_DETAIL",Jurisdiction.getCurrentDepartmentID());
+		mv.addObject("jqGridColModelSub", jqGridColModelSub);
 		return mv;
 	}
 	
@@ -132,6 +125,19 @@ public class VoucherController extends BaseController {
 		userData.put("PRICE", 2622.99);
 		result.setUserdata(userData);
 		
+		return result;
+	}
+	
+	/**列表
+	 * @param page
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/getDetailList")
+	public @ResponseBody PageResult<PageData> getDetailList() throws Exception{
+		PageData pd = this.getPageData();
+		List<PageData> varList = voucherService.listDetail(pd);	//列出Betting列表
+		PageResult<PageData> result = new PageResult<PageData>();
+		result.setRows(varList);
 		return result;
 	}
 	

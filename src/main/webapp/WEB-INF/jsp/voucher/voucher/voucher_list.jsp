@@ -154,14 +154,19 @@
 	<script type="text/javascript" src="static/js/util/toolkit.js"></script>
 	<script src="static/ace/js/ace/ace.widget-box.js"></script>
 	<script type="text/javascript"> 
+	var jqGridColModelSub;
 	$(document).ready(function () {
 		$(top.hangge());//关闭加载状态
 		//dropDownStyle();
 		
+		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
+	    var jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
+	    jqGridColModelSub = eval("(${jqGridColModelSub})");
+	    console.log(jqGridColModelSub);
+		
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
-			//$("#jqGrid").jqGrid( 'setGridWidth', $(".page-content").width());
-			//console.log("ccc"+$("iframe").height());
+			$("#jqGrid").jqGrid( 'setGridWidth', $(".page-content").width());
 			$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - 213);
 	    });
 	    
@@ -175,63 +180,18 @@
 		});
 		
 		$("#jqGrid").jqGrid({
-			url: '<%=basePath%>jqgridJia/getPageList.do',
+			url: '<%=basePath%>voucher/getPageList.do',
 			datatype: "json",
-			 colModel: [
-				{label: ' ',name:'myac',index:'', width:80, fixed:true, sortable:false, resize:false,
-					formatter:'actions', 
-					formatoptions:{ 
-                        onSuccess: function(response) {
-							console.log(response);
-							if(response.responseJSON.code==0){
-								return [true];
-							}else{
-								return [false, response.responseJSON.message];
-							}                
-                        },
-                        onError :function(rowid, res, stat, err) {
-                        	if(err!=null)
-                        		console.log(err);
-                        },
-                        
-                        afterSave:function(rowid, res){
-                        	$("#jqGrid").trigger("reloadGrid");
-                        },
-					
-						keys:true,
-
-						delOptions:{
-							recreateForm: true, 
-							beforeShowForm:beforeDeleteCallback,
-							afterSubmit: function(response, postData) {
-								if(response.responseJSON.code==0){
-									console.log("sss");
-									return [true];
-								}else{
-									console.log("rsdf");
-									return [false, response.responseJSON.message];
-								}
-                            },
-						}
-					}
-				},
-				{label: 'id',name:'ID',index:'',key: true, width:30, sorttype:"int", editable: false},
-				{ label: 'Category Name', name: 'CATEGORYNAME', width: 75,editable: true,editoptions:{size:"20",maxlength:"30"} },
-				{ label: 'Product Name', name: 'PRODUCTNAME', width: 90,editable: true,editoptions:{size:"20",maxlength:"30"} },
-				{ label: 'Country', name: 'COUNTRY', width: 100,editable: true,edittype:"select",editoptions:{value:"FE:FedEx;IN:InTime;TN:TNT;AR:ARAMEX"}},
-				{ label: 'Price', name: 'PRICE', width: 80, formatter: 'number',sorttype: 'number',summaryTpl: "sum: {0}", summaryType: "sum",editable: true,align:'right'},
-				{ label: 'Quantity', name: 'QUANTITY', width: 80, sorttype: 'integer',editable: true,align:'right' ,edittype:'custom', editoptions:{custom_element: myelem, custom_value:myvalue} }                   
-			],
+			colModel: jqGridColModel,
 			reloadAfterSubmit: true, 
-			//caption: "jqGrid with inline editing",
 			//autowidth:true,
-			//shrinkToFit:true,
+			shrinkToFit:false,
 			viewrecords: true, // show the current page, data rang and total records on the toolbar
 			rowNum: 10,
 			rowList:[10,20,30,100000],
 			//height: '100%', 
 			width:'100%',
-			sortname: 'PRODUCTNAME',
+			sortname: 'BILL_CODE',
 			
 			//footerrow: true,
 			//userDataOnFooter: true, // the calculated sums and/or strings from server are put at footer row.
@@ -267,9 +227,9 @@
 			multiselect: true,
 			//multikey: "ctrlKey",
 	        multiboxonly: true,
-	        editurl: "<%=basePath%>jqgridJia/edit.do",//nothing is saved
+	        //editurl: "<%=basePath%>jqgridJia/edit.do",//nothing is saved
 	        
-	      //subgrid options
+	      	//subgrid options
 			subGrid : true,
 			//subGridModel: [{ name : ['No','Item Name','Qty'], width : [55,200,80] }],
 			//datatype: "xml",
@@ -289,41 +249,25 @@
 			{ 	//navbar options
 				edit: false,
 				editicon : 'ace-icon fa fa-pencil blue',
-				add: true,
+				add: false,
 				addicon : 'ace-icon fa fa-plus-circle purple',
-				del: true,
+				del: false,
 				delicon : 'ace-icon fa fa-trash-o red',
 				search: true,
 				searchicon : 'ace-icon fa fa-search orange',
 				refresh: true,
-				refreshicon : 'ace-icon fa fa-refresh green',
+				refreshicon : 'ace-icon fa fa-refresh blue',
 				view: false,
 				viewicon : 'ace-icon fa fa-search-plus grey',
 			},
 			{
 				//edit record form
-				//closeAfterEdit: true,
-				//width: 700,
-				recreateForm: true,
-				beforeShowForm :beforeEditOrAddCallback
 			},
 			{
 				//new record form
-				//width: 700,
-				closeAfterAdd: true,
-				recreateForm: true,
-				viewPagerButtons: false,
-				//reloadAfterSubmit: true,
-				beforeShowForm : beforeEditOrAddCallback,
-			    onclickSubmit: function(params, posdata) {
-					console.log("onclickSubmit");
-                }, 
-                afterSubmit: fn_addSubmit
 			},
 			{
 				//delete record form
-				recreateForm: true,
-				beforeShowForm : beforeDeleteCallback
 			},
 			{
 				//search form
@@ -334,62 +278,23 @@
 				},
 				multipleSearch: true,
 				//multipleGroup:true,
-				showQuery: true
+				showQuery: false
 			}
 		);
-	
-		
-		// 批量编辑
-        $('#jqGrid').navButtonAdd('#jqGridPager',
-        {
-            buttonicon: "ace-icon fa fa-pencil-square-o purple",
-            title: "批量编辑",
-            caption: "",
-            position: "last",
-            onClickButton: batchEdit
-        });
-		
-     	// 批量编辑
-        $('#jqGrid').navButtonAdd('#jqGridPager',
-        {
-            buttonicon: "ace-icon fa fa-undo",
-            title: "取消批量编辑",
-            caption: "",
-            position: "last",
-            onClickButton: batchCancelEdit
-        });
 
-       //批量保存
+       //批量传输
        $('#jqGrid').navButtonAdd('#jqGridPager',
        {
     	   /* bigger-150 */
-           buttonicon: "ace-icon fa fa-save green",
-           title: "批量保存",
+           buttonicon: "ace-icon fa fa-cloud-upload green",
+           title: "批量上传",
            caption: "",
            position: "last",
            onClickButton: batchSave
        });
 	});
 
-	//批量编辑
-	function batchEdit(e) {
-		var grid = $("#jqGrid");
-        var ids = grid.jqGrid('getDataIDs');
-        for (var i = 0; i < ids.length; i++) {
-            grid.jqGrid('editRow',ids[i]);
-        }
-    }
-	
-	//取消批量编辑
-	function batchCancelEdit(e) {
-		var grid = $("#jqGrid");
-        var ids = grid.jqGrid('getDataIDs');
-        for (var i = 0; i < ids.length; i++) {
-            grid.jqGrid('restoreRow',ids[i]);
-        }
-    }
-	
-	//批量保存
+	//批量传输
 	function batchSave(e) {
 		var listData =new Array();
 		var ids = $("#jqGrid").jqGrid('getDataIDs');
@@ -444,7 +349,10 @@
         var childGridID = parentRowID + "_table";
         var childGridPagerID = parentRowID + "_pager";
      // send the parent row primary key to the server so that we know which grid to show
-        var childGridURL = '<%=basePath%>jqGridExtend/getDetailList.do?PARENTID='+parentRowKey+'';
+     	console.log($("#jqGrid").jqGrid('getRowData',parentRowKey));
+     	var parentRowData=$("#jqGrid").jqGrid('getRowData',parentRowKey);
+     	var tableCode="TB_HOUSE_FUND_DETAIL";
+        var childGridURL = '<%=basePath%>voucher/getDetailList.do?BILL_CODE='+parentRowData.BILL_CODE+'&TABLE_CODE='+tableCode+'';
         //childGridURL = childGridURL + "&parentRowID=" + encodeURIComponent(parentRowKey)
 
         // add a table and pager HTML elements to the parent grid row - we will render the child grid here
@@ -454,17 +362,11 @@
             mtype: "GET",
             datatype: "json",
             page: 1,
-            colModel: [
-			           {lable: 'ParentID', name: 'ParentID', width: 80},
-			           {lable: 'ID', name: 'ID', width: 80},
-			           {lable: 'Name', name: 'Name'},
-			           {lable: 'Qty', name: 'Qty', width: 100},
-			           {lable: 'SaleDate', name: 'SaleDate', width: 150,sorttype:'date',formatter: formateDate,unformat:unformateDate
-			           }
-            ],
+            colModel: jqGridColModelSub,
             //width: '100%',
             height: '100%',
-            //autowidth:true,
+            shrinkToFit:true,
+            autowidth:true,
             //pager: "#" + childGridPagerID,
             loadComplete : function() {
 				var table = this;
@@ -476,8 +378,8 @@
 				}, 0);
 			},
 			gridComplete:function(){
-
-			    $("#" + childGridID).parents(".ui-jqgrid-bdiv").css("overflow-x","hidden");}
+			    //$("#" + childGridID).parents(".ui-jqgrid-bdiv").css("overflow-x","hidden");
+		    }
         });
 	}
 
@@ -514,13 +416,14 @@
 		if($(".widget-box").css("display")=="block"){
 			$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass('fa-chevron-down');
 			$("#btnQuery").find("span").text("显示查询");
-			$(window).triggerHandler('resize.jqGrid');
+			
 		}
 		else{
 			$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass('fa-chevron-up');
 			$("#btnQuery").find("span").text("隐藏查询");
 		}
 		$(".widget-box").toggle("fast");
+		//$(window).triggerHandler('resize.jqGrid');
 	}
  	</script>
 </body>

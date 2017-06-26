@@ -72,5 +72,10 @@ public interface DictionariesManager{
 	 */
 	public PageData findFromTbs(PageData pd)throws Exception;
 	
+	/**获取SysDictionaries字典
+	 * @param 
+	 * @throws Exception
+	 */
+	public List<Dictionaries> getSysDictionaries(String dicName)throws Exception;
 }
 

@@ -75,6 +75,15 @@ public class VoucherService implements VoucherManager{
 		return (PageData)dao.findForObject("VoucherMapper.findById", pd);
 	}
 	
+	/**获取明细表信息
+	 * @param page
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PageData> listDetail(PageData pd)throws Exception{
+		return (List<PageData>)dao.findForList("VoucherMapper.listDetail", pd);
+	}
+	
 	/**获取记录数量
 	 * @param pd
 	 * @throws Exception
