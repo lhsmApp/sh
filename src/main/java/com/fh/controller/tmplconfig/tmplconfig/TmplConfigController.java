@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.aspectj.weaver.ast.Var;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
@@ -21,6 +22,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fh.controller.base.BaseController;
+import com.fh.entity.CommonBase;
+import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
 import com.fh.entity.Page;
 import com.fh.entity.PageResult;
@@ -133,9 +136,15 @@ public class TmplConfigController extends BaseController {
 				}
 				mv.addObject("depname", ZDEPARTMENT_ID);
 		
+		List<PageData> dictList = tmplconfigService.dictList(pd);
+		StringBuilder dictString = new StringBuilder();
+		for (PageData pageData : dictList) {
+			dictString.append("").append(pageData.getString("DICT_CODE")).append(":").append(pageData.getString("DICT_NAME")).append(";");
+		}
+		dictString.deleteCharAt(dictString.length()-1);
+		dictString.toString();
 				
-		
-				
+		mv.addObject("dictString", dictString);
 		mv.setViewName("tmplconfig/tmplconfig/tmplconfig_list");
 		mv.addObject("varList", varList);
 		mv.addObject("listBase", listBase);
@@ -237,6 +246,34 @@ public class TmplConfigController extends BaseController {
 		pdList.add(pd);
 		map.put("list", pdList);
 		return AppUtil.returnObject(pd, map);
+	}
+	
+	/**批量修改
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/updateAll")
+	/*@RequestBody RequestBase<JqGridModel> jqGridModel*/
+	public @ResponseBody CommonBase updateAll() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"批量删除JgGrid");
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "del")){return null;} //校验权限	
+		CommonBase commonBase = new CommonBase();
+		commonBase.setCode(-1);
+		PageData pd = this.getPageData();
+		String strDataRows = pd.getString("DATA_ROWS");
+        JSONArray array = JSONArray.fromObject(strDataRows);  
+        List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);// 过时方法
+        
+		if(null != listData && listData.size() > 0){
+			//根据这两个条件删除表
+			pd.put("DEPT_CODE", listData.get(0).get("DEPT_CODE"));
+			pd.put("TABLE_CODE", listData.get(0).get("TABLE_CODE"));
+			tmplconfigService.deleteTable(pd);
+			
+			tmplconfigService.updateAll(listData);
+			commonBase.setCode(0);
+		}
+		return commonBase;
 	}
 	
 	 /**导出到excel

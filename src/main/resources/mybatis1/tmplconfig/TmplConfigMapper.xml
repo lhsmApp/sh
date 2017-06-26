@@ -62,6 +62,16 @@
 		where
 		TABLE_CODE = #{TABLE_CODE}
 	</delete>
+	
+	<!-- 删除 -->
+	<delete id="deleteTable" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where
+		DEPT_CODE = #{DEPT_CODE}
+		and
+		TABLE_CODE = #{TABLE_CODE}
+	</delete>
 
 	<!-- 修改 -->
 	<update id="edit" parameterType="pd">
@@ -203,9 +213,50 @@
 	</select>
 	<!-- 字典翻译集合 -->
 	<select id="dictList" parameterType="pd" resultType="pd">
-		select * 
+		select DICT_CODE, DICT_NAME
 		from tb_tmpl_config_dict
 	</select>
+	
+	<!-- 批量保存 -->
+	<!--  <update id="updateAll" parameterType="pd" >
+		<foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
+		    <if test="item!=null">
+		        update
+		        <include refid="tableName"></include>
+		        set 
+		    	    COL_NAME = #{item.COL_NAME},
+					DISP_ORDER = #{item.DISP_ORDER},
+					DICT_TRANS = #{item.DICT_NAME},
+					COL_HIDE = #{item.COL_HIDE},
+					COL_SUM = #{item.COL_SUM},
+					COL_AVE = #{item.COL_AVE}
+				where
+					DEPT_CODE = #{item.DEPT_CODE}
+				and
+					TABLE_CODE = #{item.TABLE_CODE}
+				and
+					COL_CODE = #{item.COL_CODE}
+		    </if>
+		</foreach>
+	</update>  -->
+	
+	<!-- 新增 -->
+	 <insert id="updateAll" parameterType="pd">
+		<!-- 插入保存 -->
+				insert into
+				<include refid="tableName"></include>
+				(
+				<include refid="Field"></include>
+				) values 
+				<foreach item="item" index="index" collection="list" open=" " separator=", " close=" ">
+		    <if test="item!=null">
+				<trim prefix="(" suffix=")" suffixOverrides=",">
+				#{item.DEPT_CODE},#{item.TABLE_CODE},#{item.COL_CODE},#{item.COL_NAME},#{item.DISP_ORDER},#{item.DICT_NAME},#{item.COL_HIDE},#{item.COL_SUM},#{item.COL_AVE}
+				<!-- <include refid="FieldValue"></include> -->
+				</trim>
+		</if>
+		</foreach>
+	</insert>
 
 	<!-- 获取数据库中表结构-->
 	<select id="getTableColumns" parameterType="String" resultType="com.fh.entity.TableColumns">

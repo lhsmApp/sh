@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.fh.dao.DaoSupport;
 import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
+import com.fh.entity.StaffDetailModel;
 import com.fh.entity.TableColumns;
 import com.fh.entity.system.Dictionaries;
 import com.fh.entity.system.User;
@@ -111,24 +112,24 @@ public class StaffDetailService implements StaffDetailManager{
 	 * @param 
 	 * @throws Exception
 	 */
-	public void deleteAll(PageData pd)throws Exception{
-		dao.delete("StaffDetailMapper.deleteAll", pd);
+	public void deleteAll(List<StaffDetailModel> listData)throws Exception{
+		dao.delete("StaffDetailMapper.deleteAll", listData);
 	}
 	
 	/**批量修改
 	 * @param pd
 	 * @throws Exception
 	 */
-	public void updateAll(List<JqGridModel> pd)throws Exception{
-		dao.update("StaffDetailMapper.updateAll", pd);
+	public void updateAll(List<StaffDetailModel> listData)throws Exception{
+		dao.update("StaffDetailMapper.updateAll", listData);
 	}
 	
 	/**导入
 	 * @param pd
 	 * @throws Exception
 	 */
-	public void batchImport(List<JqGridModel> pd)throws Exception{
-		dao.update("StaffDetailMapper.batchImport", pd);
+	public void batchImport(List<StaffDetailModel> listData)throws Exception{
+		dao.update("StaffDetailMapper.batchImport", listData);
 	}
 	
 	/**获取字典翻译类型
@@ -146,6 +147,14 @@ public class StaffDetailService implements StaffDetailManager{
 	@SuppressWarnings("unchecked")
 	public List<Dictionaries> getSysDictionaries(String dicName)throws Exception{
 		return (List<Dictionaries>)dao.findForList("StaffDetailMapper.getSysDictionaries", dicName);
+	}
+	/**获取表字典
+	 * @param 
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Dictionaries> getTableDic(PageData pd)throws Exception{
+		return (List<Dictionaries>)dao.findForList("StaffDetailMapper.getTableDic", pd);
 	}
 	
 	/**获取单位人员

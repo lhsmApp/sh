@@ -244,8 +244,7 @@
 				{label: 'id',name:'ID',index:'',key: true, width:30, sorttype:"int", editable: false},
 				{ label: 'Category Name', name: 'CATEGORYNAME', width: 75,editable: true,editoptions:{size:"20",maxlength:"30"} },
 				{ label: 'Product Name', name: 'PRODUCTNAME', width: 90,editable: true,editoptions:{size:"20",maxlength:"30"} },
-				{ label: 'Country', name: 'COUNTRY', width: 100,editable: true,edittype:"select",editoptions:{value:"FE:FedEx;IN:InTime;TN:TNT;AR:ARAMEX"},
-				    formatter: 'select', formatoptions: {value: 'FE:FedEx;IN:InTime;TN:TNT;AR:ARAMEX'}},
+				{ label: 'Country', name: 'COUNTRY', width: 100,editable: true,edittype:"select",editoptions:{value:"FE:FedEx;IN:InTime;TN:TNT;AR:ARAMEX"}},
 				{ label: 'Price', name: 'PRICE', width: 80, formatter: 'number',sorttype: 'number',summaryTpl: "sum: {0}", summaryType: "sum",editable: true,align:'right'},
 				// sorttype is used only if the data is loaded locally or loadonce is set to true
 				{ label: 'Quantity', name: 'QUANTITY', width: 80, sorttype: 'integer',editable: true,align:'right' ,edittype:'custom', editoptions:{custom_element: myelem, custom_value:myvalue} }                   
@@ -462,9 +461,9 @@
 		var rowData;
 		$(ids).each(function (index, id){  
             $("#jqGrid").saveRow(id, false, 'clientArray');
-            
              rowData = $("#jqGrid").getRowData(id);
-             console.log(rowData);
+      		console.log("rowData"+rowData);
+
             listData.push(rowData);
 		});
 		top.jzts();
@@ -558,13 +557,6 @@
 	function unformateDate(cellValue, options, rowObject){  
 	    var updateDate = new Date(cellValue);  
 	    return updateDate;  
-	}
-  	
-	function unformateSelect(cellValue, options, rowObject){  
-		/* console.log(cellValue);
-		console.log(rowObject);
-		console.log(options); */
-	    return cellValue; 
 	}
   	
 	//创建一个input输入框

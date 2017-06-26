@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
+import com.fh.entity.StaffDetailModel;
 import com.fh.entity.TableColumns;
 import com.fh.entity.system.Dictionaries;
 import com.fh.entity.system.User;
@@ -78,22 +79,22 @@ public interface StaffDetailManager{
 	public PageData getFooterSummary(JqPage page)throws Exception;
 	
 	/**批量删除
-	 * @param ArrayDATA_IDS
+	 * @param 
 	 * @throws Exception
 	 */
-	public void deleteAll(PageData pd)throws Exception;
+	public void deleteAll(List<StaffDetailModel> listData)throws Exception;
 	
 	/**批量修改
 	 * @param pd
 	 * @throws Exception
 	 */
-	public void updateAll(List<JqGridModel> pd)throws Exception;
+	public void updateAll(List<StaffDetailModel> listData)throws Exception;
 	
 	/**导入
 	 * @param pd
 	 * @throws Exception
 	 */
-	public void batchImport(List<JqGridModel> pd)throws Exception;
+	public void batchImport(List<StaffDetailModel> listData)throws Exception;
 	
 	/**获取字典翻译类型
 	 * @param pd
@@ -106,6 +107,11 @@ public interface StaffDetailManager{
 	 * @throws Exception
 	 */
 	public List<Dictionaries> getSysDictionaries(String dicName)throws Exception;
+	/**获取表字典
+	 * @param 
+	 * @throws Exception
+	 */
+	public List<Dictionaries> getTableDic(PageData pd)throws Exception;
 	
 	/**获取单位人员
 	 * @param 

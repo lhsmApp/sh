@@ -4,6 +4,7 @@ import java.util.List;
 import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import com.fh.dao.DaoSupport;
+import com.fh.entity.JqGridModel;
 import com.fh.entity.Page;
 import com.fh.entity.TableColumns;
 import com.fh.entity.TmplConfigDetail;
@@ -36,6 +37,15 @@ public class TmplConfigService implements TmplConfigManager{
 	 */
 	public void delete(PageData pd)throws Exception{
 		dao.delete("TmplConfigMapper.delete", pd);
+	}
+	
+	/**
+	 * 保存之前删除
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void deleteTable(PageData pd)throws Exception {
+		dao.delete("TmplConfigMapper.deleteTable", pd);
 	}
 	
 	/**修改
@@ -131,6 +141,14 @@ public class TmplConfigService implements TmplConfigManager{
 	@SuppressWarnings("unchecked")
 	public List<TableColumns> getTableColumns(String tableCode)throws Exception{
 		return (List<TableColumns>)dao.findForList("TmplConfigMapper.getTableColumns", tableCode);
+	}
+
+	/**批量修改
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void updateAll(List<PageData> pd)throws Exception{
+		dao.update("TmplConfigMapper.updateAll", pd);
 	}
 }
 
