@@ -41,6 +41,7 @@ public class TmplUtil {
 		this.tmplconfigService = tmplconfigService;
 		this.tmplConfigDictService=tmplConfigDictService;
 		this.dictionariesService=dictionariesService;
+		this.departmentService=departmentService;
 	}
 
 	/**
@@ -76,6 +77,9 @@ public class TmplUtil {
 					//配置表中的字典
 					if(listColumns.get(i).getDICT_TRANS()!=null && !listColumns.get(i).getDICT_TRANS().trim().equals("")){
 						String strDicValue = getDicValue(listColumns.get(i).getDICT_TRANS());
+						//选择
+						jqGridColModel.append(" edittype:'select', ");
+						   jqGridColModel.append(" editoptions:{value:'" + strDicValue + "'}, ");
 						//翻译
 						jqGridColModel.append(" formatter: 'select', ");
 					       jqGridColModel.append(" formatoptions: {value: '" + strDicValue + "'}, ");

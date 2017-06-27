@@ -74,7 +74,25 @@ public class VoucherController extends BaseController {
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("voucher/voucher/voucher_list");
 		PageData pd = this.getPageData();
-		//String tableCode=pd.getString("TABLE_CODE");
+		String which=pd.getString("TABLE_CODE");
+		String tableCode="";
+		String tableCodeSub="";
+		if(which!=null&&which.equals("1")){
+			tableCode="TB_STAFF_SUMMY";
+			tableCodeSub="TB_STAFF_DETAIL";
+		}
+		else if(which!=null&&which.equals("2")){
+			tableCode="TB_SOCIAL_INC_SUMMY";
+			tableCodeSub="TB_SOCIAL_INC_DETAIL";
+		}
+		else if(which!=null&&which.equals("3")){
+			tableCode="TB_HOUSE_FUND_SUMMY";
+			tableCodeSub="TB_HOUSE_FUND_DETAIL";
+		}
+		else{
+			tableCode="TB_HOUSE_FUND_SUMMY";
+			tableCodeSub="TB_HOUSE_FUND_DETAIL";
+		}
 		//此处放当前页面初始化时用到的一些数据，例如搜索的下拉列表数据，所需的字典数据、权限数据等等。
 		//mv.addObject("pd", pd);
 		//*********************加载单位树*******************************
@@ -83,14 +101,17 @@ public class VoucherController extends BaseController {
 		mv.addObject("zTreeNodes", (null == arr ?"":arr.toString()));
 		//***********************************************************
 		
+		pd.put("which", which);
+		mv.addObject("pd", pd);
+		
 		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 		//生成主表结构
 		TmplUtil tmplUtil=new TmplUtil(tmplconfigService,tmplConfigDictService,dictionariesService,departmentService);
-		String jqGridColModel=tmplUtil.generateStructureNoEdit("TB_HOUSE_FUND_SUMMY",Jurisdiction.getCurrentDepartmentID());
+		String jqGridColModel=tmplUtil.generateStructureNoEdit(tableCode,Jurisdiction.getCurrentDepartmentID());
 		mv.addObject("jqGridColModel", jqGridColModel);
 		
 		//生成子表结构
-		String jqGridColModelSub=tmplUtil.generateStructureNoEdit("TB_HOUSE_FUND_DETAIL",Jurisdiction.getCurrentDepartmentID());
+		String jqGridColModelSub=tmplUtil.generateStructureNoEdit(tableCodeSub,Jurisdiction.getCurrentDepartmentID());
 		mv.addObject("jqGridColModelSub", jqGridColModelSub);
 		return mv;
 	}
@@ -104,6 +125,23 @@ public class VoucherController extends BaseController {
 		logBefore(logger, Jurisdiction.getUsername()+"获取待传输列表Voucher");
 		PageData pd = new PageData();
 		pd = this.getPageData();
+		String which=pd.getString("TABLE_CODE");
+		//String voucherType=pd.getString("VOUCHER_TYPE");
+		String tableCode="";
+		if(which!=null&&which.equals("1")){
+			tableCode="TB_STAFF_SUMMY";
+		}
+		else if(which!=null&&which.equals("2")){
+			tableCode="TB_SOCIAL_INC_SUMMY";
+		}
+		else if(which!=null&&which.equals("3")){
+			tableCode="TB_HOUSE_FUND_SUMMY";
+		}
+		else{
+			tableCode="TB_HOUSE_FUND_SUMMY";
+		}
+		pd.put("TABLE_CODE", tableCode);
+		
 		String keywords = pd.getString("keywords");				//关键词检索条件
 		if(null != keywords && !"".equals(keywords)){
 			pd.put("keywords", keywords.trim());
@@ -121,9 +159,9 @@ public class VoucherController extends BaseController {
 		result.setRowNum(page.getRowNum());
 		result.setRecords(records);
 		result.setPage(page.getPage());
-		PageData userData=new PageData();
-		userData.put("PRICE", 2622.99);
-		result.setUserdata(userData);
+		//PageData userData=new PageData();
+		//userData.put("PRICE", 2622.99);
+		//result.setUserdata(userData);
 		
 		return result;
 	}

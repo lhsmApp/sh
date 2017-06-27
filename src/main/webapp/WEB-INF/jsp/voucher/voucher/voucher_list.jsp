@@ -51,11 +51,11 @@
 
 							<div class="btn-toolbar inline middle no-margin">
 								<div data-toggle="buttons" class="btn-group no-margin">
-									<label class="btn btn-sm btn-yellow active"> <span
+									<label class="btn btn-sm btn-primary active"> <span
 										class="bigger-110">工资</span> <input type="radio" value="1" />
-									</label> <label class="btn btn-sm btn-yellow"> <span
+									</label> <label class="btn btn-sm btn-primary"> <span
 										class="bigger-110">社保</span> <input type="radio" value="2" />
-									</label> <label class="btn btn-sm btn-yellow"> <span
+									</label> <label class="btn btn-sm btn-primary"> <span
 										class="bigger-110">公积金</span> <input type="radio" value="3" />
 									</label>
 								</div>
@@ -100,11 +100,11 @@
 						<div class="col-xs-12">
 							<div class="tabbable">
 								<ul class="nav nav-tabs padding-18">
-									<li class="active"><a data-toggle="tab" href="#home">
+									<li class="active"><a data-toggle="tab" href="#voucherTransfer">
 											<i class="green ace-icon fa fa-user bigger-120"></i> 凭证数据传输
 									</a></li>
 
-									<li><a data-toggle="tab" href="#feed"> <i
+									<li><a data-toggle="tab" href="#voucherMgr"> <i
 											class="orange ace-icon fa fa-rss bigger-120"></i> 凭证管理
 									</a></li>
 								</ul>
@@ -162,25 +162,55 @@
 		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 	    var jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
 	    jqGridColModelSub = eval("(${jqGridColModelSub})");
-	    console.log(jqGridColModelSub);
 		
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
 			$("#jqGrid").jqGrid( 'setGridWidth', $(".page-content").width());
 			$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - 213);
 	    });
+		
+		//初始化当前选择凭证类型
+		if('${pd.which}'!=""){
+			$('[data-toggle="buttons"] .btn').each(function(index, data){
+				var target = $(this).find('input[type=radio]');
+				$(this).removeClass('active');
+				var which = parseInt(target.val());
+				if(which=='${pd.which}'){
+					$(this).addClass('active');
+				}
+			});
+		} 
 	    
 		//凭证类型变化
 		$('[data-toggle="buttons"] .btn').on('click', function(e){
 			var target = $(this).find('input[type=radio]');
 			var which = parseInt(target.val());
 			console.log(which);
-			/* $('.user-profile').parent().addClass('hide');
-			$('#user-profile-'+which).parent().removeClass('hide'); */
+			if(which!='${pd.which}'){
+				window.location.href="<%=basePath%>voucher/list.do?TABLE_CODE="+which;
+			}
+		});
+		
+		//tab页切换
+		$('.nav-tabs li').on('click', function(e){
+			if($(this).hasClass('active')) return;
+			var target = $(this).find('a');
+			var voucherType;
+			//data:{VOUCHER_TYPE:voucherType,TABLE_CODE:'${pd.which}'},
+			if(target.attr('href')=='#voucherTransfer'){
+				voucherType=1;
+				$("#jqGrid").jqGrid("setGridParam",{postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}'}});
+				$("#jqGrid").trigger("reloadGrid");  
+			}else{
+				voucherType=2;
+				$("#jqGrid").jqGrid("setGridParam",{postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}'}});
+				$("#jqGrid").trigger("reloadGrid");  
+			}
 		});
 		
 		$("#jqGrid").jqGrid({
 			url: '<%=basePath%>voucher/getPageList.do',
+			postData:{"VOUCHER_TYPE":1,"TABLE_CODE":'${pd.which}'},
 			datatype: "json",
 			colModel: jqGridColModel,
 			reloadAfterSubmit: true, 
@@ -349,7 +379,6 @@
         var childGridID = parentRowID + "_table";
         var childGridPagerID = parentRowID + "_pager";
      // send the parent row primary key to the server so that we know which grid to show
-     	console.log($("#jqGrid").jqGrid('getRowData',parentRowKey));
      	var parentRowData=$("#jqGrid").jqGrid('getRowData',parentRowKey);
      	var tableCode="TB_HOUSE_FUND_DETAIL";
         var childGridURL = '<%=basePath%>voucher/getDetailList.do?BILL_CODE='+parentRowData.BILL_CODE+'&TABLE_CODE='+tableCode+'';
