@@ -181,7 +181,7 @@
 				{ label: '列平均值', name: 'COL_AVE', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch}                   
 			],
 			reloadAfterSubmit: true, 
-			viewrecords: true, // show the current page, data rang and total records on the toolbar
+			//viewrecords: true, // show the current page, data rang and total records on the toolbar
 			rowNum: 1000,
 			sortname: 'DISP_ORDER',
 			pager: "#jqGridPager",
@@ -198,10 +198,6 @@
 			altRows: true,
 			rownumbers: true, // show row numbers
             rownumWidth: 35, // the width of the row numbers columns			
-			/* multiselect: true,
-	        multiboxonly: true, */
-	        //onSelectRow: editRow,
-	       <%--  editurl: "<%=basePath%>tmplconfig/edit.do", --%>
 	        ondblClickRow: dbClickRow,//双击表格编辑
 		});
 		
@@ -388,15 +384,11 @@
 				document.getElementById("DNAME").value="总部"; 
 				
 			}
-			/* var RPT_DEPT = $("#RPT_DEPT").val();
-			var STATUS = $("#STATUS").val();
-			var BILL_TYPE = $("#BILL_TYPE").val(); */
+			
 			var TABLE_NO = $("#TABLE_NO").val(); 
 			var DEPARTMENT_CODE = $("#DEPARTMENT_CODE").val(); 
 			var TABLE_NAME = $("#TABLE_NO").find("option:selected").text();
 			var DNAME = $("#DNAME").val(); 
-			console.log(Text);
-			console.log("哈哈");
 			$("#jqGrid").jqGrid('setGridParam',{  // 重新加载数据
 				url:'<%=basePath%>tmplconfig/getPageList.do?TABLE_NO='+TABLE_NO+'&DEPARTMENT_CODE='+DEPARTMENT_CODE+'&TABLE_NAME='+TABLE_NAME+'&DNAME='+DNAME,  
 				datatype:'json',
@@ -496,7 +488,32 @@
 		
         
         function copyData() {
+        	var listCopyData =new Array();
         	var allRows=$("#jqGrid").jqGrid("getRowData");
+        	listCopyData.push(allRows);
+        	var strdata = '[{"DEPT_CODE":"001","TABLE_CODE":"TB_HOUSE_FUND_AUDIT","COL_CODE":"BUSI_DATE","DNAME":"A公司","TABLE_NAME":"公积金核算表","COL_NAME":"基本日期2","DISP_ORDER":"0","DICT_NAME":"PARTUSERTYPE","COL_HIDE":"0","COL_SUM":"0","COL_AVE":"0"},{"DEPT_CODE":"001","TABLE_CODE":"TB_HOUSE_FUND_AUDIT","COL_CODE":"CUST_COL1","DNAME":"A公司","TABLE_NAME":"公积金核算表","COL_NAME":"自定义列1","DISP_ORDER":"0","DICT_NAME":"EMPLGRP","COL_HIDE":"0","COL_SUM":"0","COL_AVE":"0"}]';
+        	console.log("复制数据"+strdata);
+        	 top.jzts();
+        	 
+        	 
+        	 
+			 var diag = new top.Dialog();
+			 diag.Drag = true;
+			 diag.Title = "复制";
+			 diag.URL = '<%=basePath%>department/listAllDepartmentCopy.do?data1='+strdata+'';
+			 
+			 diag.Width = 320;
+			 diag.Height = 450;
+			 diag.CancelEvent = function(){ //关闭事件
+				diag.close();
+			 };
+			 diag.show();
+			 
+			 
+        	
+        	
+        	
+        	
 			console.log("复制"+allRows);
 		}
 		
