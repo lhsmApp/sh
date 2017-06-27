@@ -71,8 +71,8 @@
 		<include refid="tableName"></include>
 		where BUSI_DATE = ${pd.SystemDateTime}
 		and DEPT_CODE = ${pd.DepartCode}
-		<if test="pd.search!= null and pd.search != ''"><!-- 关键词检索 -->
-			and #{pd.search}
+		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
+			${pd.filterWhereResult}
 		</if>
 		<if test="sidx != null and sidx.trim() != ''" >
 			order by ${sidx} ${sord} 
@@ -85,8 +85,8 @@
 		select count(*) from <include refid="tableName"></include> 
 		where BUSI_DATE = ${pd.SystemDateTime}
 		and DEPT_CODE = ${pd.DepartCode}
-			<if test="pd.search!= null and pd.search != ''"><!-- 关键词检索 -->
-				and #{pd.search}
+			<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
+				${pd.filterWhereResult}
 			</if>
 	</select>
 	<select id="getFooterSummary" parameterType="jqPage" resultType="pd">
@@ -94,8 +94,8 @@
 		from <include refid="tableName"></include> 
 		where BUSI_DATE = ${pd.SystemDateTime}
 		and DEPT_CODE = ${pd.DepartCode}
-			<if test="pd.search!= null and pd.search != ''"><!-- 关键词检索 -->
-				and #{pd.search}
+			<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
+				${pd.filterWhereResult}
 			</if>
 	</select>
 	
@@ -112,10 +112,76 @@
 	
 	<!-- 修改 -->
 	<update id="edit" parameterType="pd">
-		delete from
+		update
 		<include refid="tableName"></include>
-		where BILL_CODE = #{BILL_CODE__} 
-		and BUSI_DATE = #{BUSI_DATE__} 
+		set 
+			BILL_CODE = #{BILL_CODE},
+			BUSI_DATE = #{BUSI_DATE},
+			USER_CODE = #{USER_CODE},
+			USER_NAME = #{USER_NAME},
+			STAFF_IDENT = #{STAFF_IDENT},
+			BANK_CARD = #{BANK_CARD},
+			USER_GROP = #{USER_GROP},
+			USER_CATG = #{USER_CATG},
+			DEPT_CODE = #{DEPT_CODE},
+			ORG_UNIT = #{ORG_UNIT},
+			SAL_RANGE = #{SAL_RANGE},
+			POST_SALY = #{POST_SALY},
+			BONUS = #{BONUS},
+			CASH_BONUS = #{CASH_BONUS},
+			WORK_OT = #{WORK_OT},
+			BACK_SALY = #{BACK_SALY},
+			RET_SALY = #{RET_SALY},
+			CHK_CASH = #{CHK_CASH},
+			INTR_SGL_AWAD = #{INTR_SGL_AWAD},
+			SENY_ALLE = #{SENY_ALLE},
+			POST_ALLE = #{POST_ALLE},
+			NS_ALLE = #{NS_ALLE},
+			AREA_ALLE = #{AREA_ALLE},
+			EXPT_ALLE = #{EXPT_ALLE},
+			TECH_ALLE = #{TECH_ALLE},
+			LIVE_EXPE = #{LIVE_EXPE},
+			LIVE_ALLE = #{LIVE_ALLE},
+			LEAVE_DM = #{LEAVE_DM},
+			HOUSE_ALLE = #{HOUSE_ALLE},
+			ITEM_ALLE = #{ITEM_ALLE},
+			MEAL_EXPE = #{MEAL_EXPE},
+			TRF_ALLE = #{TRF_ALLE},
+			TEL_EXPE = #{TEL_EXPE},
+			HLDY_ALLE = #{HLDY_ALLE},
+			KID_ALLE = #{KID_ALLE},
+			COOL_EXPE = #{COOL_EXPE},
+			EXT_SGL_AWAD = #{EXT_SGL_AWAD},
+			PRE_TAX_PLUS = #{PRE_TAX_PLUS},
+			GROSS_PAY = #{GROSS_PAY},
+			ENDW_INS = #{ENDW_INS},
+			UNEMPL_INS = #{UNEMPL_INS},
+			MED_INS = #{MED_INS},
+			CASD_INS = #{CASD_INS},
+			HOUSE_FUND = #{HOUSE_FUND},
+			SUP_PESN = #{SUP_PESN},
+			TAX_BASE_ADJ = #{TAX_BASE_ADJ},
+			ACCRD_TAX = #{ACCRD_TAX},
+			AFTER_TAX = #{AFTER_TAX},
+			ACT_SALY = #{ACT_SALY},
+			GUESS_DIFF = #{GUESS_DIFF},
+			CUST_COL1 = #{CUST_COL1},
+			CUST_COL2 = #{CUST_COL2},
+			CUST_COL3 = #{CUST_COL3},
+			CUST_COL4 = #{CUST_COL4},
+			CUST_COL5 = #{CUST_COL5},
+			CUST_COL6 = #{CUST_COL6},
+			CUST_COL7 = #{CUST_COL7},
+			CUST_COL8 = #{CUST_COL8},
+			CUST_COL9 = #{CUST_COL9},
+			CUST_COL10 = #{CUST_COL10},
+			ESTB_DEPT = #{ESTB_DEPT}
+		where BUSI_DATE = #{BUSI_DATE__} 
+		and USER_CODE = #{USER_CODE__}
+	
+		<!-- delete from
+		<include refid="tableName"></include>
+		where BUSI_DATE = #{BUSI_DATE__} 
 		and USER_CODE = #{USER_CODE__};
 		
 		insert into 
@@ -124,7 +190,7 @@
 	    <include refid="Field"></include>
 		) values (
 	    <include refid="FieldValueDefine"></include>
-		);
+		); -->
 	</update>
 	
 	<!-- 批量删除 -->
@@ -133,18 +199,84 @@
 		<include refid="tableName"></include>
 		where
 		<foreach item="item" index="index" collection="list" open=" (" separator=" or " close=") ">
-            BILL_CODE = #{item.BILL_CODE__} and BUSI_DATE = #{item.BUSI_DATE__} and USER_CODE = #{item.USER_CODE__} 
+            BUSI_DATE = #{item.BUSI_DATE__} and USER_CODE = #{item.USER_CODE__} 
 		</foreach>
 	</delete>
 	
 	<!-- 批量保存 -->
 	<update id="updateAll" parameterType="com.fh.entity.StaffDetailModel">
-		<foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
+		        update
+		        <include refid="tableName"></include>
+		        set 
+			        BILL_CODE = #{BILL_CODE},
+			        BUSI_DATE = #{BUSI_DATE},
+			        USER_CODE = #{USER_CODE},
+			        USER_NAME = #{USER_NAME},
+			        STAFF_IDENT = #{STAFF_IDENT},
+			        BANK_CARD = #{BANK_CARD},
+			        USER_GROP = #{USER_GROP},
+			        USER_CATG = #{USER_CATG},
+			        DEPT_CODE = #{DEPT_CODE},
+			        ORG_UNIT = #{ORG_UNIT},
+			        SAL_RANGE = #{SAL_RANGE},
+			        POST_SALY = #{POST_SALY},
+			        BONUS = #{BONUS},
+			        CASH_BONUS = #{CASH_BONUS},
+			        WORK_OT = #{WORK_OT},
+			        BACK_SALY = #{BACK_SALY},
+			        RET_SALY = #{RET_SALY},
+			        CHK_CASH = #{CHK_CASH},
+			        INTR_SGL_AWAD = #{INTR_SGL_AWAD},
+			        SENY_ALLE = #{SENY_ALLE},
+			        POST_ALLE = #{POST_ALLE},
+			        NS_ALLE = #{NS_ALLE},
+			        AREA_ALLE = #{AREA_ALLE},
+			        EXPT_ALLE = #{EXPT_ALLE},
+			        TECH_ALLE = #{TECH_ALLE},
+			        LIVE_EXPE = #{LIVE_EXPE},
+			        LIVE_ALLE = #{LIVE_ALLE},
+			        LEAVE_DM = #{LEAVE_DM},
+			        HOUSE_ALLE = #{HOUSE_ALLE},
+			        ITEM_ALLE = #{ITEM_ALLE},
+			        MEAL_EXPE = #{MEAL_EXPE},
+			        TRF_ALLE = #{TRF_ALLE},
+			        TEL_EXPE = #{TEL_EXPE},
+			        HLDY_ALLE = #{HLDY_ALLE},
+			        KID_ALLE = #{KID_ALLE},
+			        COOL_EXPE = #{COOL_EXPE},
+			        EXT_SGL_AWAD = #{EXT_SGL_AWAD},
+			        PRE_TAX_PLUS = #{PRE_TAX_PLUS},
+			        GROSS_PAY = #{GROSS_PAY},
+			        ENDW_INS = #{ENDW_INS},
+			        UNEMPL_INS = #{UNEMPL_INS},
+		        	MED_INS = #{MED_INS},
+		        	CASD_INS = #{CASD_INS},
+			        HOUSE_FUND = #{HOUSE_FUND},
+			        SUP_PESN = #{SUP_PESN},
+		        	TAX_BASE_ADJ = #{TAX_BASE_ADJ},
+			        ACCRD_TAX = #{ACCRD_TAX},
+			        AFTER_TAX = #{AFTER_TAX},
+			        ACT_SALY = #{ACT_SALY},
+			        GUESS_DIFF = #{GUESS_DIFF},
+			        CUST_COL1 = #{CUST_COL1},
+			        CUST_COL2 = #{CUST_COL2},
+			        CUST_COL3 = #{CUST_COL3},
+			        CUST_COL4 = #{CUST_COL4},
+			        CUST_COL5 = #{CUST_COL5},
+		        	CUST_COL6 = #{CUST_COL6},
+		        	CUST_COL7 = #{CUST_COL7},
+			        CUST_COL8 = #{CUST_COL8},
+			        CUST_COL9 = #{CUST_COL9},
+			        CUST_COL10 = #{CUST_COL10},
+			        ESTB_DEPT = #{ESTB_DEPT}
+		        where BUSI_DATE = #{BUSI_DATE__} 
+		        and USER_CODE = #{USER_CODE__}
+	
+		<!-- <foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
 		    <if test="item!=null">
 		        delete from
 	        	<include refid="tableName"></include>
-		        where BILL_CODE = #{item.BILL_CODE__} 
-		        and BUSI_DATE = #{item.BUSI_DATE__} 
+		        where BUSI_DATE = #{item.BUSI_DATE__} 
 		        and USER_CODE = #{item.USER_CODE__};
 		
 		        insert into 
@@ -155,7 +287,7 @@
 	            <include refid="FieldValueItem"></include>
 		        );
 		    </if>
-		</foreach>
+		</foreach> -->
 	</update>
 	
 	<!-- 通过ID获取数据 -->
@@ -166,7 +298,7 @@
 		from 
 		    <include refid="tableName"></include>
 		where BUSI_DATE = ${pd.SystemDateTime}
-		and DEPT_CODE = ${pd.DepartCode}
+		and USER_CODE = ${pd.USER_CODE}
 	</select>
 	
 	<!-- 导出列表 -->
@@ -177,36 +309,29 @@
 		<include refid="tableName"></include>
 		where BUSI_DATE = ${pd.SystemDateTime}
 		and DEPT_CODE = ${pd.DepartCode}
-			<if test="pd.search!= null and pd.search != ''"><!-- 关键词检索 -->
-				and #{pd.search}
-			</if>
+		<!-- <if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''">
+			and ${pd.filterWhereResult}
+		</if> -->
 		<if test="sidx != null" >
 			order by ${sidx} ${sord} 
     	</if>
 	</select>
 	
 	<!-- 导入-->
-	<insert id="batchImport" parameterType="com.fh.entity.StaffDetailModel">
-		<foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
-		    <if test="item!=null">
-		        delete from
-	            <include refid="tableName"></include>
-		        where BILL_CODE = #{item.BILL_CODE} 
-		        and BUSI_DATE = #{item.BUSI_DATE} 
-		        and USER_CODE = #{item.USER_CODE};
-		    </if>
-		</foreach>
-		<foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
-		    <if test="item!=null">
-		        insert into 
-	            <include refid="tableName"></include>
-		        (
-	            <include refid="Field"></include>
-		        ) values (
-	            <include refid="FieldValueItem"></include>
-		        );
-		    </if>
-		</foreach>
+	<delete id="importDelete" parameterType="com.fh.entity.StaffDetailModel">
+		delete from
+		<include refid="tableName"></include>
+		where BUSI_DATE = #{item.BUSI_DATE}
+	    and DEPT_CODE = #{item.DEPT_CODE} 
+	</delete>
+	<insert id="importInsert" parameterType="com.fh.entity.StaffDetailModel">
+		insert into 
+	    <include refid="tableName"></include>
+		(
+	    <include refid="Field"></include>
+		) values (
+	    <include refid="FieldValueDefine"></include>
+		)
 	</insert>
 	
 </mapper>

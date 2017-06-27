@@ -76,6 +76,32 @@ public class DaoSupport implements DAO {
 			sqlSession.close();
 		}
 	}
+
+	/**
+	 * 导入
+	 * @param str
+	 * @param obj
+	 * @return
+	 * @throws Exception
+	 */
+	public void batchImport(String importDelete, String importInsert, List<?> objs )throws Exception{
+		SqlSessionFactory sqlSessionFactory = sqlSessionTemplate.getSqlSessionFactory();
+		//批量执行器
+		SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH,false);
+		try{
+			if(objs!=null&&objs.size()>0){
+				sqlSession.delete(importDelete, objs.get(0));
+				for(int i=0,size=objs.size();i<size;i++){
+					sqlSession.update(importInsert, objs.get(i));
+				}
+				sqlSession.flushStatements();
+				sqlSession.commit();
+				sqlSession.clearCache();
+			}
+		}finally{
+			sqlSession.close();
+		}
+	}
 	
 	/**
 	 * 批量更新

@@ -37,15 +37,20 @@
 				<div class="page-content">
 					<!-- /section:settings.box -->
 					<div class="page-header">
-						<h1>
-							东部管道
-							<small>
-								<i class="ace-icon fa fa-angle-double-right"></i>
-								成本核算
-							</small>
-						</h1>
+						<table>
+							<tr>
+								<td>
+								    <span class="label label-xlg label-success arrowed-right">东部管道</span>
+									<!-- arrowed-in-right --> 
+									<span class="label label-xlg label-yellow arrowed-in arrowed-right"
+									    id="subTitle" style="margin-left: 2px;">工资数据导入</span> 
+									<span style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
+
+								</td>
+							</tr>
+						</table>
 					</div><!-- /.page-header -->
-				
+
 					<div class="row">
 						<div class="col-xs-12">
 						    <table id="jqGridBase"></table>
@@ -104,10 +109,21 @@
 		//当前登录人所在二级单位
 	    var DepartName = '${DepartName}';
 		//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
-	    var State = '${State}';
+	    // 枚举  1封存,0解封
+		var State = '${State}';
 		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 	    var jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
         
+	    function getState(){
+            if(State.trim() == "0"){
+            	alert(true);
+	            return true;
+            }
+        	alert(false);
+            return false;
+	    }
+	    
+	    
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
 			$(gridBase_selector).jqGrid( 'setGridWidth', $(".page-content").width());
@@ -133,6 +149,7 @@
 			pager: pagerBase_selector,
 			footerrow: true,
 			userDataOnFooter: true,
+			ondblClickRow: doubleClickRow,
 			
 			loadComplete : function() {
 				var table = this;
@@ -147,9 +164,9 @@
 		$(gridBase_selector).navGrid(pagerBase_selector, 
 			{
 	            //navbar options
-	            edit: true,
+		        edit: getState,
 	            editicon : 'ace-icon fa fa-pencil blue',
-	            add: true,
+	            add: getState,
 	            addicon : 'ace-icon fa fa-plus-circle purple',
 	            del: false,
 	            delicon : 'ace-icon fa fa-trash-o red',
@@ -162,7 +179,7 @@
         },
         {
 			//edit record form
-			//closeAfterEdit: true,
+			closeAfterEdit: true,
 			recreateForm: true,
 			beforeShowForm :beforeEditOrAddCallback
         },
@@ -185,7 +202,7 @@
 			recreateForm: true,
 			beforeShowForm : beforeDeleteCallback,
 			onClick : function(e) {
-				alert("ss");
+
 			}
         },
         {
@@ -201,46 +218,48 @@
         },
         {},{});
 
-        $(gridBase_selector).navButtonAdd(pagerBase_selector,
-        {
-            buttonicon: "ace-icon fa fa-pencil-square-o purple",
-            title: "批量编辑",
-            caption: "",
-            position: "last",
-            onClickButton: batchEdit
-        });
-        $(gridBase_selector).navButtonAdd(pagerBase_selector,
-        {
-            buttonicon: "ace-icon fa fa-undo",
-            title: "取消批量编辑",
-            caption: "",
-            position: "last",
-            onClickButton: batchCancelEdit
-        });
-		$(gridBase_selector).navButtonAdd(pagerBase_selector, {
-             caption : "",
-             buttonicon : "ace-icon fa fa-save green",
-             onClickButton : batchSave,
-             position : "last",
-             title : "批量保存",
-             cursor : "pointer"
-         });
-		$(gridBase_selector).navButtonAdd(pagerBase_selector, {
-            caption : "",
-            buttonicon : "ace-icon fa fa-trash-o red",
-            onClickButton : batchDelete,
-            position : "last",
-            title : "批量删除",
-            cursor : "pointer"
-        });
-			$(gridBase_selector).navButtonAdd(pagerBase_selector, {
-	             caption : "",
-	             buttonicon : "ace-icon fa fa-cloud-upload",
-	             onClickButton : importItems,
-	             position : "last",
-	             title : "导入",
-	             cursor : "pointer"
-	         });
+		if(getState){
+	        $(gridBase_selector).navButtonAdd(pagerBase_selector,
+	                {
+	                    buttonicon: "ace-icon fa fa-pencil-square-o purple",
+	                    title: "批量编辑",
+	                    caption: "",
+	                    position: "last",
+	                    onClickButton: batchEdit
+	                });
+	                $(gridBase_selector).navButtonAdd(pagerBase_selector,
+	                {
+	                    buttonicon: "ace-icon fa fa-undo",
+	                    title: "取消批量编辑",
+	                    caption: "",
+	                    position: "last",
+	                    onClickButton: batchCancelEdit
+	                });
+	        		$(gridBase_selector).navButtonAdd(pagerBase_selector, {
+	                     caption : "",
+	                     buttonicon : "ace-icon fa fa-save green",
+	                     onClickButton : batchSave,
+	                     position : "last",
+	                     title : "批量保存",
+	                     cursor : "pointer"
+	                 });
+	        		$(gridBase_selector).navButtonAdd(pagerBase_selector, {
+	                    caption : "",
+	                    buttonicon : "ace-icon fa fa-trash-o red",
+	                    onClickButton : batchDelete,
+	                    position : "last",
+	                    title : "批量删除",
+	                    cursor : "pointer"
+	                });
+	        			$(gridBase_selector).navButtonAdd(pagerBase_selector, {
+	        	             caption : "",
+	        	             buttonicon : "ace-icon fa fa-cloud-upload",
+	        	             onClickButton : importItems,
+	        	             position : "last",
+	        	             title : "导入",
+	        	             cursor : "pointer"
+	        	         });
+		}
 			$(gridBase_selector).navButtonAdd(pagerBase_selector, {
 	             caption : "",
 	             buttonicon : "ace-icon fa fa-cloud-download",
@@ -249,6 +268,8 @@
 	             title : "导出",
 	             cursor : "pointer"
 	         });
+
+			if(getState){
 			$(gridBase_selector).navButtonAdd(pagerBase_selector, {
 	             caption : "",
 	             buttonicon : "ace-icon fa fa-check-square green",
@@ -257,6 +278,18 @@
 	             title : "上报",
 	             cursor : "pointer"
 	         });
+			}
+
+			//双击编辑行
+            var lastSelection;
+			function doubleClickRow(rowid,iRow,iCol,e){
+                if (rowid && rowid !== lastSelection) {
+                    var grid = $(gridBase_selector);
+                    grid.restoreRow(lastSelection);
+                    grid.editRow(rowid, {keys:true});//keys:true 这里按[enter]保存  
+                    lastSelection = rowid;
+                }
+			}
 
 			//批量编辑
 			function batchEdit(e) {
@@ -342,7 +375,7 @@
 			 */
 	    function batchSave(){
 	    	//获得选中行ids的方法
-            var ids = $(gridBase_selector).jqGrid("getGridParam", "selarrrow");  
+            var ids = $(gridBase_selector).getDataIDs();  
 	    	
 			if(!(ids!=null&&ids.length>0)){
 				bootbox.dialog({

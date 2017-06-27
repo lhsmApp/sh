@@ -30,6 +30,7 @@ import com.fh.entity.TableColumns;
 import com.fh.entity.TmplConfigDetail;
 import com.fh.entity.system.Department;
 import com.fh.entity.system.Dictionaries;
+import com.fh.entity.system.User;
 import com.fh.exception.CustomException;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
@@ -43,6 +44,7 @@ import com.fh.util.excel.LeadingInExcel;
 import net.sf.json.JSONArray;
 
 import com.fh.service.staffDetail.staffdetail.StaffDetailManager;
+import com.fh.service.sysSealedInfo.syssealedinfo.impl.SysSealedInfoService;
 import com.fh.service.tmplconfig.tmplconfig.impl.TmplConfigService;
 
 /** 
@@ -59,6 +61,8 @@ public class StaffDetailController extends BaseController {
 	private StaffDetailManager staffdetailService;
 	@Resource(name="tmplconfigService")
 	private TmplConfigService tmplconfigService;
+	@Resource(name="syssealedinfoService")
+	private SysSealedInfoService syssealedinfoService;
 
 	//底行显示的求和与平均值字段
 	String SqlUserdata = "";
@@ -68,6 +72,8 @@ public class StaffDetailController extends BaseController {
 	String DepartCode = "";
 	//默认值
 	Map<String, Object> DefaultValueList = new HashMap<String, Object>();
+	//字典
+	Map<String, Object> DicList = new HashMap<String, Object>();
 	List<TmplConfigDetail> listColumns = new ArrayList<TmplConfigDetail>();
 	
 	/**修改
@@ -83,29 +89,28 @@ public class StaffDetailController extends BaseController {
 		pd = this.getPageData();
 		
 		StaffDetailModel.setModelDefault(pd, DefaultValueList);
+		String BILL_CODE = "BILL_CODE";
+		String BUSI_DATE = "BUSI_DATE";
+		String DEPT_CODE = "DEPT_CODE";
+		if(pd.containsKey(BILL_CODE)){
+			pd.remove(BILL_CODE);
+		}
+		pd.put(BILL_CODE, " ");
+		if(pd.containsKey(BUSI_DATE)){
+			pd.remove(BUSI_DATE);
+		}
+		pd.put(BUSI_DATE, SystemDateTime);
+		if(pd.containsKey(DEPT_CODE)){
+			pd.remove(DEPT_CODE);
+		}
+		pd.put(DEPT_CODE, DepartCode);
 
 		if(pd.getString("oper").equals("edit")){
 			staffdetailService.edit(pd);
 			commonBase.setCode(0);
 		}
 		else if(pd.getString("oper").equals("add")){
-			String BILL_CODE = "BILL_CODE";
-			String BUSI_DATE = "BUSI_DATE";
-			String DEPT_CODE = "DEPT_CODE";
-			if(pd.containsKey(BILL_CODE)){
-				pd.remove(BILL_CODE);
-			}
-			pd.put(BILL_CODE, " ");
-			if(pd.containsKey(BUSI_DATE)){
-				pd.remove(BUSI_DATE);
-			}
-			pd.put(BUSI_DATE, SystemDateTime);
-			if(pd.containsKey(DEPT_CODE)){
-				pd.remove(DEPT_CODE);
-			}
-			pd.put(DEPT_CODE, DepartCode);
 			staffdetailService.save(pd);
-			
 			commonBase.setCode(0);
 		}
 		
@@ -133,17 +138,23 @@ public class StaffDetailController extends BaseController {
 		SystemDateTime = staffdetailService.currentSection(pd);
 		mv.addObject("SystemDateTime", SystemDateTime);
 		//当前登录人所在二级单位
-		DepartCode = "001001";//Jurisdiction.getCurrentDepartmentID();
-		String DepartName = "登录人单位";
+		DepartCode = Jurisdiction.getCurrentDepartmentID();//
+		User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
+		String DepartName = user.getDEPARTMENT_NAME();
 		mv.addObject("DepartName", DepartName);
 		//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
-		String State = "0";
+		pd.put("RPT_DEPT", DepartCode);
+		pd.put("RPT_DUR", SystemDateTime);
+		pd.put("BILL_TYPE", 1);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+		String State = syssealedinfoService.getState(pd);
 		mv.addObject("State", State);
 		
 		//用语句查询出数据库表的所有字段及其属性；拼接成jqgrid全部列
 		List<TableColumns> tableColumns = staffdetailService.getTableColumns(pd);
 		//默认值
 		DefaultValueList = new HashMap<String, Object>();
+		//字典
+		DicList = new HashMap<String, Object>();
 		Map<String, Map<String, Object>> listColModelAll = StaffDetailModel.jqGridColModelAll(tableColumns, DepartCode, staffdetailService, DefaultValueList);
 		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 		TmplConfigDetail item = new TmplConfigDetail();
@@ -232,24 +243,30 @@ public class StaffDetailController extends BaseController {
 	public String getDicValue(String dicName, PageData pd) throws Exception{
 		StringBuilder ret = new StringBuilder();
 		String strDicType = staffdetailService.getDicType(dicName);
+		Map<String, String> dicAdd = new HashMap<String, String>();
 		if(strDicType.equals("1")){
 			List<Dictionaries> dicList = staffdetailService.getSysDictionaries(dicName);
 			for(Dictionaries dic : dicList){
 				if(ret!=null && !ret.toString().trim().equals("")){
-					ret.append("; ");
+					ret.append(";");
 				}
 				ret.append(dic.getBIANMA() + ":" + dic.getNAME());
+				dicAdd.put(dic.getBIANMA(), dic.getNAME());
 			}
 		} else if(strDicType.equals("2")){
 			if(dicName.toUpperCase().equals(("oa_department").toUpperCase())){
 				List<Department> listPara = (List<Department>) staffdetailService.getDepartDic(pd);
 				for(Department dic : listPara){
 					if(ret!=null && !ret.toString().trim().equals("")){
-						ret.append("; ");
+						ret.append(";");
 					}
 					ret.append(dic.getDEPARTMENT_CODE() + ":" + dic.getNAME());
+					dicAdd.put(dic.getDEPARTMENT_CODE(), dic.getNAME());
 				}
 			}
+		}
+		if(!DicList.containsKey(dicName)){
+			DicList.put(dicName, dicAdd);
 		}
 		return ret.toString();
 	}
@@ -306,7 +323,11 @@ public class StaffDetailController extends BaseController {
 		String json = DATA_ROWS.toString();  
         JSONArray array = JSONArray.fromObject(json);  
         List<StaffDetailModel> listData = (List<StaffDetailModel>) JSONArray.toCollection(array,StaffDetailModel.class);
-       
+        for(StaffDetailModel item : listData){
+        	item.setBILL_CODE(" ");
+        	item.setBUSI_DATE(SystemDateTime);
+        	item.setDEPT_CODE(DepartCode);
+        }
 		if(null != listData && listData.size() > 0){
 			staffdetailService.updateAll(listData);
 			commonBase.setCode(0);
@@ -424,40 +445,51 @@ public class StaffDetailController extends BaseController {
 	 */
 	@RequestMapping(value="/downExcel")
 	public void downExcel(HttpServletResponse response)throws Exception{
-		FileDownload.fileDownload(response, PathUtil.getClasspath() + Const.FILEPATHFILE + "StaffDetail.xls", "StaffDetail.xls");
+		//FileDownload.fileDownload(response, PathUtil.getClasspath() + Const.FILEPATHFILE + "StaffDetail.xls", "StaffDetail.xls");
 	}
 	
 	 /**导出到excel
 	 * @param
 	 * @throws Exception
 	 */
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/excel")
 	public ModelAndView exportExcel(JqPage page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"导出StaffDetail到excel");
 		if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
 		ModelAndView mv = new ModelAndView();
-		PageData pd = new PageData();
-		pd = this.getPageData();
-		Map<String,Object> dataMap = new HashMap<String,Object>();
-		List<String> titles = new ArrayList<String>();
-		titles.add("ID");	//
-		titles.add("CategoryName");	//1
-		titles.add("ProductName");	//2
-		titles.add("Country");	//3
-		titles.add("Price");	//4
-		titles.add("Quantity");	//5
-		dataMap.put("titles", titles);
+		PageData pd = this.getPageData();
+		//页面显示数据的年月
+		pd.put("SystemDateTime", SystemDateTime);
+		//页面显示数据的二级单位
+		pd.put("DepartCode", DepartCode);
 		page.setPd(pd);
 		List<PageData> varOList = staffdetailService.exportList(page);
+		Map<String,Object> dataMap = new HashMap<String,Object>();
+		List<String> titles = new ArrayList<String>();
+		if(listColumns != null && listColumns.size() > 0){
+			for(int i=0; i < listColumns.size(); i++){
+				titles.add(listColumns.get(i).getCOL_NAME());
+			}
+		}
+		dataMap.put("titles", titles);
 		List<PageData> varList = new ArrayList<PageData>();
 		for(int i=0;i<varOList.size();i++){
 			PageData vpd = new PageData();
-			vpd.put("var1", varOList.get(i).get("ID").toString());	    //1
-			vpd.put("var2", varOList.get(i).getString("CATEGORYNAME"));	    //1
-			vpd.put("var3", varOList.get(i).getString("PRODUCTNAME"));	    //2
-			vpd.put("var4", varOList.get(i).getString("COUNTRY"));	    //3
-			vpd.put("var5", (varOList.get(i).get("PRICE") == null? 0 : varOList.get(i).get("PRICE")).toString());	    //4
-			vpd.put("var6", (varOList.get(i).get("QUANTITY") == null? 0 : varOList.get(i).get("QUANTITY")).toString());	//5
+			if(listColumns != null && listColumns.size() > 0){
+				for(int j=1; j <= listColumns.size(); j++){
+					String trans = listColumns.get(j-1).getDICT_TRANS();
+					Object getCellValue = varOList.get(i).get(listColumns.get(j-1).getCOL_CODE().toUpperCase());
+					if(trans != null && trans.trim()!=""){
+						String value = "";
+						Map<String, String> dicAdd = (Map<String, String>) DicList.get(trans);
+						value = dicAdd.getOrDefault(getCellValue, "");
+						vpd.put("var" + j, value);
+					} else {
+						vpd.put("var" + j, getCellValue.toString());
+					}
+				}
+			}
 			varList.add(vpd);
 		}
 		dataMap.put("varList", varList);

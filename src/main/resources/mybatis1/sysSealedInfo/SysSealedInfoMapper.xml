@@ -147,5 +147,14 @@
 		<include refid="tableName"></include>
 	</select>
 	
+	<!-- 获取状态 -->
+	<select id="getState" parameterType="pd" resultType="String">
+		select STATE
+		from <include refid="tableName"></include>
+		where RPT_DEPT = ${RPT_DEPT}
+		and RPT_DUR = ${RPT_DUR}
+		and BILL_TYPE = ${BILL_TYPE}
+	</select>
+	
 	<!-- fh313596790qq(青苔) -->
 </mapper>

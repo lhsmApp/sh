@@ -51,14 +51,6 @@ public class StaffDetailService implements StaffDetailManager{
 		dao.save("StaffDetailMapper.save", pd);
 	}
 	
-	/**删除
-	 * @param pd
-	 * @throws Exception
-	 */
-	public void delete(PageData pd)throws Exception{
-		dao.delete("StaffDetailMapper.delete", pd);
-	}
-	
 	/**修改
 	 * @param pd
 	 * @throws Exception
@@ -114,7 +106,7 @@ public class StaffDetailService implements StaffDetailManager{
 	 * @throws Exception
 	 */
 	public void deleteAll(List<StaffDetailModel> listData)throws Exception{
-		dao.delete("StaffDetailMapper.deleteAll", listData);
+		dao.batchDelete("StaffDetailMapper.deleteAll", listData);
 	}
 	
 	/**批量修改
@@ -122,7 +114,7 @@ public class StaffDetailService implements StaffDetailManager{
 	 * @throws Exception
 	 */
 	public void updateAll(List<StaffDetailModel> listData)throws Exception{
-		dao.update("StaffDetailMapper.updateAll", listData);
+		dao.batchUpdate("StaffDetailMapper.updateAll", listData);
 	}
 	
 	/**导入
@@ -130,7 +122,7 @@ public class StaffDetailService implements StaffDetailManager{
 	 * @throws Exception
 	 */
 	public void batchImport(List<StaffDetailModel> listData)throws Exception{
-		dao.update("StaffDetailMapper.batchImport", listData);
+		dao.batchImport("StaffDetailMapper.importDelete", "StaffDetailMapper.importInsert", listData);
 	}
 	
 	/**获取字典翻译类型

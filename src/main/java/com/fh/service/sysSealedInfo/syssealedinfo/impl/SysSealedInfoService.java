@@ -104,5 +104,13 @@ public class SysSealedInfoService implements SysSealedInfoManager{
 		return (List<String>)dao.findForList("SysSealedInfoMapper.deptList", null);
 	}
 	
+	/**获取状态 
+	 * @param 
+	 * @throws Exception
+	 */
+	public String getState(PageData pd) throws Exception {
+		return (String)dao.findForObject("SysSealedInfoMapper.getState", pd);
+	}
+	
 }
 

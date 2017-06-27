@@ -69,5 +69,12 @@ public interface SysSealedInfoManager{
 	 */
 	public List<String> deptList() throws Exception;
 	
+	/**
+	 * 获取状态 
+	 * @return
+	 * @throws Exception
+	 */
+	public String getState(PageData pd) throws Exception;
+	
 }
 

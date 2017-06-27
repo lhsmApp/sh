@@ -37,12 +37,6 @@ public interface StaffDetailManager{
 	 */
 	public void save(PageData pd)throws Exception;
 	
-	/**删除
-	 * @param pd
-	 * @throws Exception
-	 */
-	public void delete(PageData pd)throws Exception;
-	
 	/**修改
 	 * @param pd
 	 * @throws Exception
