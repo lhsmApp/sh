@@ -174,17 +174,19 @@
 				{ label: '表名', name: 'TABLE_NAME', width: 90},
 				{ label: '列编码', name: 'COL_CODE', width: 60},
 				{ label: '列名称', name: 'COL_NAME', width: 60,editable: true,},
-				{ label: '显示序号', name: 'DISP_ORDER', width: 80, sorttype: 'number',editable: true,},
+				{ label: '显示序号', name: 'DISP_ORDER', width: 80,formatter: 'int', sorttype: 'number',editable: true,},
 				{ label: '字典翻译', name: 'DICT_NAME', width: 80,align:'center',editable: true,edittype: 'select',editoptions:{value:"${dictString}"},unformat: unformatSelect},                  
 				{ label: '列隐藏', name: 'COL_HIDE', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch},                   
 				{ label: '列汇总', name: 'COL_SUM', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch},                   
 				{ label: '列平均值', name: 'COL_AVE', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch}                   
 			],
 			reloadAfterSubmit: true, 
-			viewrecords: true, // show the current page, data rang and total records on the toolbar
+			//viewrecords: true, // show the current page, data rang and total records on the toolbar
 			rowNum: 1000,
 			sortname: 'DISP_ORDER',
 			pager: "#jqGridPager",
+			pgbuttons: false,//上下按钮 
+			pginput:false,//输入框
 			loadComplete : function() {
 				var table = this;
 				setTimeout(function(){
@@ -198,10 +200,6 @@
 			altRows: true,
 			rownumbers: true, // show row numbers
             rownumWidth: 35, // the width of the row numbers columns			
-			/* multiselect: true,
-	        multiboxonly: true, */
-	        //onSelectRow: editRow,
-	       <%--  editurl: "<%=basePath%>tmplconfig/edit.do", --%>
 	        ondblClickRow: dbClickRow,//双击表格编辑
 		});
 		
@@ -388,15 +386,11 @@
 				document.getElementById("DNAME").value="总部"; 
 				
 			}
-			/* var RPT_DEPT = $("#RPT_DEPT").val();
-			var STATUS = $("#STATUS").val();
-			var BILL_TYPE = $("#BILL_TYPE").val(); */
+			
 			var TABLE_NO = $("#TABLE_NO").val(); 
 			var DEPARTMENT_CODE = $("#DEPARTMENT_CODE").val(); 
 			var TABLE_NAME = $("#TABLE_NO").find("option:selected").text();
 			var DNAME = $("#DNAME").val(); 
-			console.log(Text);
-			console.log("哈哈");
 			$("#jqGrid").jqGrid('setGridParam',{  // 重新加载数据
 				url:'<%=basePath%>tmplconfig/getPageList.do?TABLE_NO='+TABLE_NO+'&DEPARTMENT_CODE='+DEPARTMENT_CODE+'&TABLE_NAME='+TABLE_NAME+'&DNAME='+DNAME,  
 				datatype:'json',
@@ -496,8 +490,19 @@
 		
         
         function copyData() {
-        	var allRows=$("#jqGrid").jqGrid("getRowData");
-			console.log("复制"+allRows);
+        	var TABLE_NO = $("#TABLE_NO").val(); 
+			var DEPARTMENT_CODE = $("#DEPARTMENT_CODE").val(); 
+        	 top.jzts();
+			 var diag = new top.Dialog();
+			 diag.Drag = true;
+			 diag.Title = "复制";
+			 diag.URL = '<%=basePath%>department/listAllDepartmentCopy.do?TABLE_NO='+TABLE_NO+'&DEPARTMENT_CODE='+DEPARTMENT_CODE;
+			 diag.Width = 320;
+			 diag.Height = 450;
+			 diag.CancelEvent = function(){ //关闭事件
+				diag.close();
+			 };
+			 diag.show();
 		}
 		
 		<%-- function getDictList() {

@@ -153,6 +153,30 @@ public class DepartmentController extends BaseController {
 		return mv;
 	}
 	
+	/**
+	 * 显示列表ztree
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value="/listAllDepartmentCopy")
+	public ModelAndView listAllDepartmentCopy(Model model,String DEPARTMENT_CODE)throws Exception{
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		try{
+			JSONArray arr = JSONArray.fromObject(departmentService.listAllDepartment("0"));
+			String json = arr.toString();
+			json = json.replaceAll("DEPARTMENT_CODE", "id").replaceAll("PARENT_CODE", "pId").replaceAll("NAME", "name").replaceAll("subDepartment", "nodes").replaceAll("hasDepartment", "checked").replaceAll("treeurl", "url");
+			model.addAttribute("zTreeNodes", json);
+			mv.addObject("DEPARTMENT_CODE",DEPARTMENT_CODE);
+			mv.addObject("pd", pd);	
+			mv.setViewName("fhoa/department/department_tree_copy");
+		} catch(Exception e){
+			logger.error(e.toString(), e);
+		}
+		return mv;
+	}
+	
 	/**去新增页面
 	 * @param
 	 * @throws Exception

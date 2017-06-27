@@ -160,17 +160,15 @@ public class TmplConfigController extends BaseController {
 	public @ResponseBody PageResult<PageData> getPageList(Page page) throws Exception{
 		PageData pd = new PageData();
 		pd = this.getPageData();
-		//PageData dpd = departmentService.findById(pd);
-		//pd.put("DEPT_BIANMA", dpd.getString("BIANMA"));
 		PageData tpd = tmplconfigService.findTableCodeByTableNo(pd);
 		pd.put("TABLE_CODE", tpd.getString("TABLE_CODE"));
 		page.setPd(pd);
-		List<PageData> varList = tmplconfigService.listAll(page);	//列出Betting列表
+		List<PageData> varList = tmplconfigService.listAll(page);	
 		PageResult<PageData> result = new PageResult<PageData>();
 		if (varList.size()!=0) {
 			result.setRows(varList);
 		} else {
-			List<PageData> temporaryList = tmplconfigService.temporaryList(page);	//列出Betting列表
+			List<PageData> temporaryList = tmplconfigService.temporaryList(page);	
 			result.setRows(temporaryList);
 		}
 		
@@ -271,6 +269,34 @@ public class TmplConfigController extends BaseController {
 			tmplconfigService.deleteTable(pd);
 			
 			tmplconfigService.updateAll(listData);
+			commonBase.setCode(0);
+		}
+		return commonBase;
+	}
+	
+	/**
+	 * 复制
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/copyAll")
+	public @ResponseBody CommonBase copyAll() throws Exception {
+		CommonBase commonBase = new CommonBase();
+		commonBase.setCode(-1);
+		PageData pd = this.getPageData();
+		PageData tpd = tmplconfigService.findTableCodeByTableNo(pd);
+		pd.put("TABLE_CODE", tpd.getString("TABLE_CODE"));
+		
+		String strCode = pd.getString("deptIds");
+		JSONArray array = JSONArray.fromObject(strCode);  
+        List<String> listCode = (List<String>) JSONArray.toCollection(array,String.class);// 过时方法
+        for (String string : listCode) {
+        	pd.put("DEPT_CODE", string);
+        	tmplconfigService.deleteTable(pd);
+		}
+        
+        if(null != listCode && listCode.size() > 0){
+			tmplconfigService.copyAll(listCode);
 			commonBase.setCode(0);
 		}
 		return commonBase;
