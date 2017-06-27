@@ -115,5 +115,13 @@ public interface TmplConfigManager{
 	 */
 	public void updateAll(List<PageData> pd)throws Exception;
 	
+	
+	/**
+	 * 复制
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void copyAll(List<String> st) throws Exception;
+	
 }
 

@@ -203,7 +203,7 @@
 	<select id="temporaryList" parameterType="page" resultType="pd">
 		SELECT column_name AS COL_CODE, column_comment AS COL_NAME,
 		#{pd.DEPARTMENT_CODE} AS DEPT_CODE,#{pd.TABLE_CODE} AS TABLE_CODE,#{pd.DNAME} AS DNAME,#{pd.TABLE_NAME} AS TABLE_NAME,
-		'0' AS DISP_ORDER,'0' AS DICT_TRANS,'0' AS COL_HIDE,'0' AS COL_SUM,'0' AS COL_AVE
+		'0' AS DISP_ORDER,'0' AS DICT_TRANS,'1' AS COL_HIDE,'0' AS COL_SUM,'0' AS COL_AVE
 		FROM 
  		information_schema.columns 
  		WHERE 
@@ -254,6 +254,22 @@
 				#{item.DEPT_CODE},#{item.TABLE_CODE},#{item.COL_CODE},#{item.COL_NAME},#{item.DISP_ORDER},#{item.DICT_NAME},#{item.COL_HIDE},#{item.COL_SUM},#{item.COL_AVE}
 				<!-- <include refid="FieldValue"></include> -->
 				</trim>
+		</if>
+		</foreach>
+	</insert>
+	
+	<!-- 复制 -->
+	 <insert id="copyAll" parameterType="String">
+		<!-- 插入保存 -->
+				insert into
+				<include refid="tableName"></include>
+				(
+				<include refid="Field"></include>
+				)  
+				<foreach item="item" index="index" collection="list" open=" " separator="union all " close=" ">
+		    <if test="item!=null">
+				SELECT #{item} AS 'DEPT_CODE', TABLE_CODE,COL_CODE,COL_NAME,DISP_ORDER,DICT_TRANS,COL_HIDE,COL_SUM,COL_AVE
+ 				FROM tb_tmpl_config_detail WHERE DEPT_CODE='001' AND TABLE_CODE='TB_HOUSE_FUND_AUDIT'
 		</if>
 		</foreach>
 	</insert>

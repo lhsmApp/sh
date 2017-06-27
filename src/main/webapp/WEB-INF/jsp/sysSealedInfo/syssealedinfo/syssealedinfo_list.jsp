@@ -325,6 +325,10 @@
 				.addClass('ace ace-switch ace-switch-5')
 				.after('<span class="lbl"></span>');
 		}, 0);
+		
+		console.log("状态状态"+cellvalue);
+		console.log("状态状态"+cell);
+		
 	}
 	
 	 //批量编辑

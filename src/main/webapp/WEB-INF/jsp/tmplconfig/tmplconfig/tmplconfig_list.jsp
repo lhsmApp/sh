@@ -174,7 +174,7 @@
 				{ label: '表名', name: 'TABLE_NAME', width: 90},
 				{ label: '列编码', name: 'COL_CODE', width: 60},
 				{ label: '列名称', name: 'COL_NAME', width: 60,editable: true,},
-				{ label: '显示序号', name: 'DISP_ORDER', width: 80, sorttype: 'number',editable: true,},
+				{ label: '显示序号', name: 'DISP_ORDER', width: 80,formatter: 'int', sorttype: 'number',editable: true,},
 				{ label: '字典翻译', name: 'DICT_NAME', width: 80,align:'center',editable: true,edittype: 'select',editoptions:{value:"${dictString}"},unformat: unformatSelect},                  
 				{ label: '列隐藏', name: 'COL_HIDE', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch},                   
 				{ label: '列汇总', name: 'COL_SUM', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch},                   
@@ -185,6 +185,8 @@
 			rowNum: 1000,
 			sortname: 'DISP_ORDER',
 			pager: "#jqGridPager",
+			pgbuttons: false,//上下按钮 
+			pginput:false,//输入框
 			loadComplete : function() {
 				var table = this;
 				setTimeout(function(){
@@ -488,33 +490,19 @@
 		
         
         function copyData() {
-        	var listCopyData =new Array();
-        	var allRows=$("#jqGrid").jqGrid("getRowData");
-        	listCopyData.push(allRows);
-        	var strdata = '[{"DEPT_CODE":"001","TABLE_CODE":"TB_HOUSE_FUND_AUDIT","COL_CODE":"BUSI_DATE","DNAME":"A公司","TABLE_NAME":"公积金核算表","COL_NAME":"基本日期2","DISP_ORDER":"0","DICT_NAME":"PARTUSERTYPE","COL_HIDE":"0","COL_SUM":"0","COL_AVE":"0"},{"DEPT_CODE":"001","TABLE_CODE":"TB_HOUSE_FUND_AUDIT","COL_CODE":"CUST_COL1","DNAME":"A公司","TABLE_NAME":"公积金核算表","COL_NAME":"自定义列1","DISP_ORDER":"0","DICT_NAME":"EMPLGRP","COL_HIDE":"0","COL_SUM":"0","COL_AVE":"0"}]';
-        	console.log("复制数据"+strdata);
+        	var TABLE_NO = $("#TABLE_NO").val(); 
+			var DEPARTMENT_CODE = $("#DEPARTMENT_CODE").val(); 
         	 top.jzts();
-        	 
-        	 
-        	 
 			 var diag = new top.Dialog();
 			 diag.Drag = true;
 			 diag.Title = "复制";
-			 diag.URL = '<%=basePath%>department/listAllDepartmentCopy.do?data1='+strdata+'';
-			 
+			 diag.URL = '<%=basePath%>department/listAllDepartmentCopy.do?TABLE_NO='+TABLE_NO+'&DEPARTMENT_CODE='+DEPARTMENT_CODE;
 			 diag.Width = 320;
 			 diag.Height = 450;
 			 diag.CancelEvent = function(){ //关闭事件
 				diag.close();
 			 };
 			 diag.show();
-			 
-			 
-        	
-        	
-        	
-        	
-			console.log("复制"+allRows);
 		}
 		
 		<%-- function getDictList() {

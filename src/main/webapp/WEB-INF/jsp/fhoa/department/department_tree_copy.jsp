@@ -71,8 +71,10 @@
 			var nodes = zTree.getCheckedNodes();
 			var tmpNode;
 			var ids = "";
+			var listIds =new Array();
 			for(var i=0; i<nodes.length; i++){
 				tmpNode = nodes[i];
+				listIds.push(tmpNode.id);
 				if(i!=nodes.length-1){
 					ids += tmpNode.id+",";
 				}else{
@@ -80,15 +82,19 @@
 				}
 			}
 			var DEPARTMENT_CODE = "${DEPARTMENT_CODE}";
-			var url = "<%=basePath%>role/saveMenuqx.do";
+			var DEPARTMENT_CODE_COPY = "${pd.DEPARTMENT_CODE}";
+			var TABLE_NO = "${pd.TABLE_NO}";
+			var url = "<%=basePath%>tmplconfig/copyAll.do?";
 			var postData;
-			postData = {"DEPARTMENT_CODE":DEPARTMENT_CODE,"deptIds":ids};
-			console.log("保存"+DEPARTMENT_CODE+ids);
+			postData = {"DEPARTMENT_CODE":DEPARTMENT_CODE,"TABLE_NO":TABLE_NO,"deptIds":JSON.stringify(listIds)};
+			console.log("listIds保存"+listIds);
+			console.log("ids值："+ids);
+			console.log("保存"+DEPARTMENT_CODE_COPY+TABLE_NO);
 			$("#zhongxin").hide();
 			$("#zhongxin2").show();
-			/* $.post(url,postData,function(data){
+			 $.post(url,postData,function(data){
 				top.Dialog.close();
-			}); */
+			}); 
 		 }
 	
 	</script>

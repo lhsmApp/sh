@@ -150,5 +150,13 @@ public class TmplConfigService implements TmplConfigManager{
 	public void updateAll(List<PageData> pd)throws Exception{
 		dao.update("TmplConfigMapper.updateAll", pd);
 	}
+
+	/**
+	 * 复制
+	 */
+	public void copyAll(List<String> st) throws Exception {
+		dao.update("TmplConfigMapper.copyAll", st);
+		
+	}
 }
 
