@@ -1,6 +1,5 @@
 package com.fh.controller.voucher.voucher;
 
-import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -8,7 +7,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.annotation.Resource;
+
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+
 import com.fh.controller.base.BaseController;
 import com.fh.controller.common.TmplUtil;
 import com.fh.entity.CommonBase;
@@ -23,21 +25,18 @@ import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
 import com.fh.entity.Page;
 import com.fh.entity.PageResult;
-import com.fh.entity.TmplConfigDetail;
-import com.fh.util.AppUtil;
-import com.fh.util.ObjectExcelView;
-import com.fh.util.PageData;
-import com.fh.util.SqlTools;
-import com.fh.util.Jurisdiction;
-import com.fh.util.Tools;
-
-import net.sf.json.JSONArray;
-
 import com.fh.service.fhoa.department.DepartmentManager;
 import com.fh.service.system.dictionaries.DictionariesManager;
 import com.fh.service.tmplConfigDict.tmplconfigdict.TmplConfigDictManager;
 import com.fh.service.tmplconfig.tmplconfig.impl.TmplConfigService;
 import com.fh.service.voucher.voucher.VoucherManager;
+import com.fh.util.AppUtil;
+import com.fh.util.Jurisdiction;
+import com.fh.util.ObjectExcelView;
+import com.fh.util.PageData;
+import com.fh.util.SqlTools;
+
+import net.sf.json.JSONArray;
 
 /** 
  * 说明：凭证数据传输
@@ -64,6 +63,7 @@ public class VoucherController extends BaseController {
 	@Resource(name="dictionariesService")
 	private DictionariesManager dictionariesService;
 	
+	
 	/**列表
 	 * @param page
 	 * @throws Exception
@@ -85,7 +85,7 @@ public class VoucherController extends BaseController {
 		
 		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 		//生成主表结构
-		TmplUtil tmplUtil=new TmplUtil(tmplconfigService,tmplConfigDictService,dictionariesService);
+		TmplUtil tmplUtil=new TmplUtil(tmplconfigService,tmplConfigDictService,dictionariesService,departmentService);
 		String jqGridColModel=tmplUtil.generateStructureNoEdit("TB_HOUSE_FUND_SUMMY",Jurisdiction.getCurrentDepartmentID());
 		mv.addObject("jqGridColModel", jqGridColModel);
 		

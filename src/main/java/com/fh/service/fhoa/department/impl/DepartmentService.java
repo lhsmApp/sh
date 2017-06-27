@@ -171,5 +171,14 @@ public class DepartmentService implements DepartmentManager{
 		return sb.toString();
 	}
 	
+	
+	/**获取表字典
+	 * @param 
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Department> getDepartDic(PageData pd)throws Exception{
+		return (List<Department>)dao.findForList("DepartmentMapper.getDepartDic", pd);
+	}
 }
 

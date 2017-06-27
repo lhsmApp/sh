@@ -87,5 +87,11 @@ public interface DepartmentManager{
 	 */
 	public String getDEPARTMENT_CODES(String DEPARTMENT_ID) throws Exception;
 	
+	/**获取表字典
+	 * @param 
+	 * @throws Exception
+	 */
+	public List<Department> getDepartDic(PageData pd)throws Exception;
+	
 }
 

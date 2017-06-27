@@ -7,7 +7,9 @@ import java.util.Map;
 
 import com.fh.entity.TableColumns;
 import com.fh.entity.TmplConfigDetail;
+import com.fh.entity.system.Department;
 import com.fh.entity.system.Dictionaries;
+import com.fh.service.fhoa.department.DepartmentManager;
 import com.fh.service.system.dictionaries.DictionariesManager;
 import com.fh.service.tmplConfigDict.tmplconfigdict.TmplConfigDictManager;
 import com.fh.service.tmplconfig.tmplconfig.TmplConfigManager;
@@ -28,13 +30,14 @@ public class TmplUtil {
 	private TmplConfigManager tmplconfigService;
 	private TmplConfigDictManager tmplConfigDictService;
 	private DictionariesManager dictionariesService;
+	private DepartmentManager departmentService;
 
 	// 查询表的主键字段后缀，区别于主键字段，用于修改或删除
 	String strKeyExtra = "__";
 	// 查询表的主键字段
 	List<String> KeyList = new ArrayList<String>();
 
-	public TmplUtil(TmplConfigManager tmplconfigService,TmplConfigDictManager tmplConfigDictService,DictionariesManager dictionariesService) {
+	public TmplUtil(TmplConfigManager tmplconfigService,TmplConfigDictManager tmplConfigDictService,DictionariesManager dictionariesService,DepartmentManager departmentService) {
 		this.tmplconfigService = tmplconfigService;
 		this.tmplConfigDictService=tmplConfigDictService;
 		this.dictionariesService=dictionariesService;
@@ -179,16 +182,14 @@ public class TmplUtil {
 			}
 		} else if(strDicType.equals("2")){
 			if(dicName.toUpperCase().equals(("oa_department").toUpperCase())){
-				/*pd.put("ColumnName", " DEPARTMENT_CODE BIANMA, NAME NAME ");
-				pd.put("DicName", dicName);
-				pd.put("order_by", "DEPARTMENT_CODE");
-				List<Dictionaries> listPara = (List<Dictionaries>) staffdetailService.getTableDic(pd);
-				for(Dictionaries dic : listPara){
+				PageData pd=new PageData();
+				List<Department> listPara = (List<Department>) departmentService.getDepartDic(pd);
+				for(Department dic : listPara){
 					if(ret!=null && !ret.toString().trim().equals("")){
 						ret.append("; ");
 					}
-					ret.append(dic.getBIANMA() + ":" + dic.getNAME());
-				}*/
+					ret.append(dic.getDEPARTMENT_CODE() + ":" + dic.getNAME());
+				}
 			}
 		}
 		return ret.toString();
