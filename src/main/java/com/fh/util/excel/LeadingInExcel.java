@@ -31,6 +31,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
+import com.fh.entity.TmplConfigDetail;
 import com.fh.util.base.StochasticUtil;
 
 
@@ -85,7 +86,8 @@ public class LeadingInExcel<T> {
      * @throws Exception
      */
     public List<T> uploadAndRead(MultipartFile multipart,String propertiesFileName, String kyeName,int sheetIndex,
-            Map<String, String> titleAndAttribute,Class<T> clazz) throws Exception{
+            Map<String, String> titleAndAttribute,Class<T> clazz,
+    		List<TmplConfigDetail> listColumns, Map<String, Object> DicList) throws Exception{
         
             String originalFilename=null;
             int i = 0;
@@ -100,7 +102,7 @@ public class LeadingInExcel<T> {
             
             String filePath = readPropertiesFilePathMethod( propertiesFileName, kyeName);
             File filePathname = this.upload(multipart, filePath, isExcel2003);
-            List<T> judgementVersion = judgementVersion(filePathname, sheetIndex, titleAndAttribute, clazz, isExcel2003);
+            List<T> judgementVersion = judgementVersion(filePathname, sheetIndex, titleAndAttribute, clazz, isExcel2003, listColumns, DicList);
         
         return judgementVersion;
     }
@@ -208,7 +210,8 @@ public class LeadingInExcel<T> {
      * @return
      * @throws Exception
      */
-    public List<T> judgementVersion(File filePathname,int sheetIndex,Map<String, String> titleAndAttribute,Class<T> clazz,boolean isExcel2003) throws Exception{
+    public List<T> judgementVersion(File filePathname,int sheetIndex,Map<String, String> titleAndAttribute,Class<T> clazz,boolean isExcel2003,
+    		List<TmplConfigDetail> listColumns, Map<String, Object> DicList) throws Exception{
         
         FileInputStream is=null;
         POIFSFileSystem fs=null;
@@ -238,7 +241,7 @@ public class LeadingInExcel<T> {
                 }
             }
         
-        return readExcelTitle(workbook,sheetIndex,titleAndAttribute,clazz);
+        return readExcelTitle(workbook,sheetIndex,titleAndAttribute,clazz, listColumns, DicList);
     }
 
     /**
@@ -250,7 +253,8 @@ public class LeadingInExcel<T> {
      * @return
      * @throws Exception
      */
-    private List<T> readExcelTitle(Workbook workbook,int sheetIndex,Map<String, String> titleAndAttribute,Class<T> clazz) throws Exception{
+    private List<T> readExcelTitle(Workbook workbook,int sheetIndex,Map<String, String> titleAndAttribute,Class<T> clazz,
+    		List<TmplConfigDetail> listColumns, Map<String, Object> DicList) throws Exception{
 
         //得到第一个shell  
         Sheet sheet = workbook.getSheetAt(sheetIndex);
@@ -280,7 +284,7 @@ public class LeadingInExcel<T> {
             }
         }
 
-        return readExcelValue(workbook,sheet,attribute,clazz);
+        return readExcelValue(workbook,sheet,attribute,clazz, listColumns, DicList);
         
     }
     
@@ -293,7 +297,9 @@ public class LeadingInExcel<T> {
      * @return
      * @throws Exception
      */
-    private List<T> readExcelValue(Workbook workbook,Sheet sheet,Map<Integer, String> attribute,Class<T> clazz) throws Exception{
+    @SuppressWarnings("unchecked")
+	private List<T> readExcelValue(Workbook workbook,Sheet sheet,Map<Integer, String> attribute,Class<T> clazz,
+    		List<TmplConfigDetail> listColumns, Map<String, Object> DicList) throws Exception{
         List<T> info=new ArrayList<T>();
         //获取标题行列数
         int titleCellNum = sheet.getRow(0).getLastCellNum();
@@ -323,6 +329,25 @@ public class LeadingInExcel<T> {
                     //break;
                 	continue;
                 }
+                
+                String ColName = attribute.get(Integer.valueOf(columnIndex));
+    			if(listColumns != null && listColumns.size() > 0){
+    				for(int j=0; j < listColumns.size(); j++){
+    					if(ColName.equals(listColumns.get(j).getCOL_CODE())){
+        					String trans = listColumns.get(j).getDICT_TRANS();
+        					if(trans != null && !trans.trim().equals("")){
+        						Map<String, String> dicAdd = (Map<String, String>) DicList.getOrDefault(trans, new HashMap<String, String>());
+                                String getKey = "";
+        						for (Map.Entry<String, String> dic :dicAdd.entrySet())  {
+        							if(value.equals(dic.getValue().toString())){
+        								getKey = dic.getKey();
+                                    }
+        					    }  
+        						value = getKey;
+        					}
+    					}
+    				}
+    			}
                 
                 /*
                  * 测试：查看自定义的title Map集合中定义的Excle标题和实体类中属性对应情况！

@@ -547,7 +547,6 @@ public class StaffDetailModel {
 			//设置必定不用编辑的列
 			if(col.getColumn_name().equals("BILL_CODE") || 
 					col.getColumn_name().equals("BUSI_DATE") ||
-					//col.getColumn_name().equals("USER_CODE") ||
 					col.getColumn_name().equals("DEPT_CODE")){
 				model_notedit.append(" editable: false ");
 			} else{
@@ -586,6 +585,9 @@ public class StaffDetailModel {
 				//}
 			}
 
+			if(col.getColumn_name().equals("USER_CODE")){
+				model_name.append(" editrules:{required:true}, ");
+			}
 			//if(col.getColumn_name().equals("USER_NAME")){
 			//	model_name.append(" name: 'USER_CODE' ");
 			//} else {
@@ -1061,9 +1063,9 @@ public class StaffDetailModel {
 		for(String field : FieldList){
 			if(!(pd.containsKey(field.toUpperCase()) 
 					&& pd.get(field.toUpperCase()) != null
-					&& pd.getString(field.toUpperCase()) != "")){
+					&& !pd.getString(field.toUpperCase()).trim().equals(""))){
 				Object defaultValue = DefaultValueList.get(field.toUpperCase());
-	            pd.put(field.toUpperCase(), defaultValue);
+		        pd.put(field.toUpperCase(), defaultValue);
 			}
 		}
 	}

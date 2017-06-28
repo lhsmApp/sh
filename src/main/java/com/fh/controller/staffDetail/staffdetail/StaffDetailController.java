@@ -26,6 +26,7 @@ import com.fh.entity.JqPage;
 import com.fh.entity.Page;
 import com.fh.entity.PageResult;
 import com.fh.entity.StaffDetailModel;
+import com.fh.entity.SysSealed;
 import com.fh.entity.TableColumns;
 import com.fh.entity.TmplConfigDetail;
 import com.fh.entity.system.Department;
@@ -34,10 +35,8 @@ import com.fh.entity.system.User;
 import com.fh.exception.CustomException;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
-import com.fh.util.PathUtil;
 import com.fh.util.SqlTools;
 import com.fh.util.Const;
-import com.fh.util.FileDownload;
 import com.fh.util.Jurisdiction;
 import com.fh.util.excel.LeadingInExcel;
 
@@ -83,6 +82,7 @@ public class StaffDetailController extends BaseController {
 	@RequestMapping(value="/edit")
 	public @ResponseBody CommonBase edit() throws Exception{
 		CommonBase commonBase = new CommonBase();
+		commonBase.setCode(-1);
 		logBefore(logger, Jurisdiction.getUsername()+"修改JgGrid");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限
 		PageData pd = new PageData();
@@ -104,21 +104,21 @@ public class StaffDetailController extends BaseController {
 			pd.remove(DEPT_CODE);
 		}
 		pd.put(DEPT_CODE, DepartCode);
-
-		if(pd.getString("oper").equals("edit")){
-			staffdetailService.edit(pd);
-			commonBase.setCode(0);
-		}
-		else if(pd.getString("oper").equals("add")){
-			staffdetailService.save(pd);
-			commonBase.setCode(0);
-		}
 		
-		/**此处为业务错误返回值，例如返回当前删除的信息含有业务关联字段，不能删除，自行设定setCode(返回码，客户端按码抓取并返回提示信息)和setMessage("自定义提示信息，提示给用户的")信息，并由界面进行展示。
-		 * 此处不是异常返回的错误信息，异常返回错误信息统一由框架抓取异常。
-		 */
-		//commonBase.setCode(-1);
-		//commonBase.setMessage("当前删除的信息含有业务关联字段，不能删除");
+		List<StaffDetailModel> repeatList = staffdetailService.findByPd(pd);
+		if(repeatList!=null && repeatList.size()>0){
+			commonBase.setCode(2);
+			commonBase.setMessage("此区间内编码已存在！");
+		} else {
+			if(pd.getString("oper").equals("edit")){
+				staffdetailService.edit(pd);
+				commonBase.setCode(0);
+			}
+			else if(pd.getString("oper").equals("add")){
+				staffdetailService.save(pd);
+				commonBase.setCode(0);
+			}
+		}
 		return commonBase;
 	}
 	
@@ -181,15 +181,19 @@ public class StaffDetailController extends BaseController {
 					String name = (String) itemColModel.get("name");
 					String edittype = (String) itemColModel.get("edittype");
 					String notedit = (String) itemColModel.get("notedit");
-					if(name != null && name.trim() != ""){
+					if(name != null && !name.trim().equals("")){
 						jqGridColModel.append(name).append(", ");
 					}
 					//配置表中的字典
 					if(listColumns.get(i).getDICT_TRANS()!=null && !listColumns.get(i).getDICT_TRANS().trim().equals("")){
 						String strDicValue = getDicValue(listColumns.get(i).getDICT_TRANS(), pd);
+						String strSelectValue = ":";
+						if(strDicValue!=null && !strDicValue.trim().equals("")){
+							strSelectValue += ";" + strDicValue;
+						}
 						//选择
 						jqGridColModel.append(" edittype:'select', ");
-						   jqGridColModel.append(" editoptions:{value:'" + strDicValue + "'}, ");
+						   jqGridColModel.append(" editoptions:{value:'" + strSelectValue + "'}, ");
 						//翻译
 						jqGridColModel.append(" formatter: 'select', ");
 					       jqGridColModel.append(" formatoptions: {value: '" + strDicValue + "'}, ");
@@ -197,7 +201,7 @@ public class StaffDetailController extends BaseController {
 						jqGridColModel.append(" stype: 'select', ");
 					       jqGridColModel.append(" searchoptions: {value: ':[All];" + strDicValue + "'}, ");
 					} else{
-						if(edittype != null && edittype.trim() != ""){
+						if(edittype != null && !edittype.trim().equals("")){
 							jqGridColModel.append(edittype).append(", ");
 						}
 					}
@@ -207,7 +211,7 @@ public class StaffDetailController extends BaseController {
 					if(intHide != 1){
 						jqGridColModel.append(" editable:true, editrules: {edithidden: false}, ");
 					}
-					if(notedit != null && notedit.trim() != ""){
+					if(notedit != null && !notedit.trim().equals("")){
 						jqGridColModel.append(notedit).append(", ");
 					}
 					//配置表中的表头显示
@@ -220,14 +224,14 @@ public class StaffDetailController extends BaseController {
 					//底行显示的求和与平均值字段
 					// 1汇总 0不汇总,默认0
 					if(Integer.parseInt(listColumns.get(i).getCOL_SUM()) == 1){
-						if(SqlUserdata!=null && SqlUserdata.trim()!=""){
+						if(SqlUserdata!=null && !SqlUserdata.trim().equals("")){
 							SqlUserdata += ", ";
 						}
 						SqlUserdata += " sum(" + listColumns.get(i).getCOL_CODE() + ") " + listColumns.get(i).getCOL_CODE();
 					} 
 					// 0不计算 1计算 默认0
 					else if(Integer.parseInt(listColumns.get(i).getCOL_AVE()) == 1){
-						if(SqlUserdata!=null && SqlUserdata.trim()!=""){
+						if(SqlUserdata!=null && !SqlUserdata.trim().equals("")){
 							SqlUserdata += ", ";
 						}
 						SqlUserdata += " round(avg(" + listColumns.get(i).getCOL_CODE() + "), 2) " + listColumns.get(i).getCOL_CODE();
@@ -329,8 +333,14 @@ public class StaffDetailController extends BaseController {
         	item.setDEPT_CODE(DepartCode);
         }
 		if(null != listData && listData.size() > 0){
-			staffdetailService.updateAll(listData);
-			commonBase.setCode(0);
+			List<StaffDetailModel> repeatList = staffdetailService.findByModel(listData);
+			if(repeatList!=null && repeatList.size()>0){
+				commonBase.setCode(2);
+				commonBase.setMessage("此区间内编码已存在！");
+			} else {
+				staffdetailService.updateAll(listData);
+				commonBase.setCode(0);
+			}
 		}
 		return commonBase;
 	}
@@ -376,6 +386,7 @@ public class StaffDetailController extends BaseController {
 	@RequestMapping(value = "/readExcel")
 	public @ResponseBody CommonBase readExcel(@RequestParam(value="excel",required=false) MultipartFile file) throws Exception{
 		CommonBase commonBase = new CommonBase();
+		commonBase.setCode(-1);
 		if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;}//校验权限
 		
 		// 局部变量
@@ -404,7 +415,7 @@ public class StaffDetailController extends BaseController {
 			// 解析excel，获取客户信息集合
 
 			uploadAndRead = testExcel.uploadAndRead(file, propertiesFileName, kyeName, sheetIndex,
-					titleAndAttribute, clazz);
+					titleAndAttribute, clazz, listColumns, DicList);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("读取Excel文件错误", e);
@@ -415,10 +426,60 @@ public class StaffDetailController extends BaseController {
 			judgement = true;
 		}
 		if (judgement) {
+			List<String> sbRet = new ArrayList<String>();
+			String BUSI_DATE = "";
+			String DEPT_CODE = "";
+			List<String> listUserCode = new ArrayList<String>();
 			int listSize = uploadAndRead.size();
-			//此处执行集合添加 
-			staffdetailService.batchImport(uploadAndRead);
-			
+			for(int i=0;i<listSize;i++){
+				if(!(uploadAndRead.get(i).getBUSI_DATE()!=null && !uploadAndRead.get(i).getBUSI_DATE().trim().equals(""))){
+					if(!sbRet.contains("区间不能为空！")){
+						sbRet.add("区间不能为空！");
+					}
+				}
+				if(!(uploadAndRead.get(i).getDEPT_CODE()!=null && !uploadAndRead.get(i).getDEPT_CODE().trim().equals(""))){
+					if(!sbRet.contains("单位不能为空！")){
+						sbRet.add("单位不能为空！");
+					}
+				}
+				if(i == 0){
+					BUSI_DATE = uploadAndRead.get(i).getBUSI_DATE();
+					DEPT_CODE = uploadAndRead.get(i).getDEPT_CODE();
+				} else {
+					if(!BUSI_DATE.equals(uploadAndRead.get(i).getBUSI_DATE()) || !DEPT_CODE.equals(uploadAndRead.get(i).getDEPT_CODE())){
+						if(!sbRet.contains("区间和单位必须一致！")){
+							sbRet.add("区间和单位必须一致！");
+						}
+					}
+				}
+				if(listUserCode.contains(uploadAndRead.get(i).getUSER_CODE())){
+					String strUserAdd = "编码" + uploadAndRead.get(i).getUSER_CODE() + "重复！";
+					if(!sbRet.contains(strUserAdd)){
+						sbRet.add(strUserAdd);
+					}
+				} else {
+					listUserCode.add(uploadAndRead.get(i).getUSER_CODE());
+				}
+			}
+			PageData pd = this.getPageData();
+			pd.put("RPT_DEPT", DEPT_CODE);
+			pd.put("RPT_DUR", BUSI_DATE);
+			pd.put("BILL_TYPE", 1);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+			String State = syssealedinfoService.getState(pd);
+			if(!(State!=null && State.equals("0"))){
+				sbRet.add("导入期间已封存！");
+			}
+			if(sbRet.size()>0){
+				StringBuilder sbTitle = new StringBuilder();
+				for(String str : sbRet){
+					sbTitle.append(str + "\n");
+				}
+				commonBase.setCode(2);
+				commonBase.setMessage(sbTitle.toString());
+			} else {
+				//此处执行集合添加 
+				staffdetailService.batchImport(uploadAndRead);
+			}
 			
 			/*// 把客户信息分为没100条数据为一组迭代添加客户信息（注：将customerList集合作为参数，在Mybatis的相应映射文件中使用foreach标签进行批量添加。）
 			int listSize = uploadAndRead.size();
@@ -444,20 +505,21 @@ public class StaffDetailController extends BaseController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/downExcel")
-	public void downExcel(HttpServletResponse response)throws Exception{
-		//FileDownload.fileDownload(response, PathUtil.getClasspath() + Const.FILEPATHFILE + "StaffDetail.xls", "StaffDetail.xls");
+	//public void downExcel(HttpServletResponse response)throws Exception{
+	public ModelAndView downExcel(JqPage page) throws Exception{
+		//页面显示数据的二级单位
+		List<PageData> varOList = staffdetailService.exportModel(DepartCode);
+		return export(varOList);
 	}
 	
 	 /**导出到excel
 	 * @param
 	 * @throws Exception
 	 */
-	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/excel")
 	public ModelAndView exportExcel(JqPage page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"导出StaffDetail到excel");
 		if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
-		ModelAndView mv = new ModelAndView();
 		PageData pd = this.getPageData();
 		//页面显示数据的年月
 		pd.put("SystemDateTime", SystemDateTime);
@@ -465,6 +527,12 @@ public class StaffDetailController extends BaseController {
 		pd.put("DepartCode", DepartCode);
 		page.setPd(pd);
 		List<PageData> varOList = staffdetailService.exportList(page);
+		return export(varOList);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private ModelAndView export(List<PageData> varOList){
+		ModelAndView mv = new ModelAndView();
 		Map<String,Object> dataMap = new HashMap<String,Object>();
 		List<String> titles = new ArrayList<String>();
 		if(listColumns != null && listColumns.size() > 0){
@@ -480,9 +548,9 @@ public class StaffDetailController extends BaseController {
 				for(int j=1; j <= listColumns.size(); j++){
 					String trans = listColumns.get(j-1).getDICT_TRANS();
 					Object getCellValue = varOList.get(i).get(listColumns.get(j-1).getCOL_CODE().toUpperCase());
-					if(trans != null && trans.trim()!=""){
+					if(trans != null && !trans.trim().equals("")){
 						String value = "";
-						Map<String, String> dicAdd = (Map<String, String>) DicList.get(trans);
+						Map<String, String> dicAdd = (Map<String, String>) DicList.getOrDefault(trans, new HashMap<String, String>());
 						value = dicAdd.getOrDefault(getCellValue, "");
 						vpd.put("var" + j, value);
 					} else {
@@ -496,6 +564,43 @@ public class StaffDetailController extends BaseController {
 		ObjectExcelView erv = new ObjectExcelView();
 		mv = new ModelAndView(erv,dataMap); 
 		return mv;
+	}
+	
+	 /**上报
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/report")
+	public @ResponseBody CommonBase report() throws Exception{
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "report")){return null;} //校验权限	
+		CommonBase commonBase = new CommonBase();
+		commonBase.setCode(-1);
+		PageData pd = this.getPageData();
+		pd.put("RPT_DEPT", DepartCode);
+		pd.put("RPT_DUR", SystemDateTime);
+		pd.put("BILL_TYPE", 1);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+		String State = syssealedinfoService.getState(pd);
+		if(State!=null && State.equals("1")){
+			commonBase.setCode(2);
+			commonBase.setMessage("当前期间已封存！");
+		} else {
+			User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
+			String userId = user.getUSER_ID();
+			SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String time = sdf.format(new Date());
+			
+			SysSealed item = new SysSealed();
+			item.setBILL_CODE(" ");
+			item.setRPT_DEPT(DepartCode);
+			item.setRPT_DUR(SystemDateTime);
+			item.setRPT_USER(userId);
+			item.setRPT_DATE(time);//YYYY-MM-DD HH:MM:SS
+			item.setBILL_TYPE("1");// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+			item.setSTATE("1");// 枚举  1封存,0解封
+			syssealedinfoService.report(item);
+			commonBase.setCode(0);
+		}
+		return commonBase;
 	}
 	
 	@InitBinder

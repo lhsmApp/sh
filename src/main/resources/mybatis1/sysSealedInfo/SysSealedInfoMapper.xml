@@ -156,5 +156,23 @@
 		and BILL_TYPE = ${BILL_TYPE}
 	</select>
 	
+	<!-- 上报-->
+	<delete id="reportDelete" parameterType="com.fh.entity.SysSealed">
+		delete from 
+		<include refid="tableName"></include>
+		where RPT_DUR = #{RPT_DUR}
+	    and RPT_DEPT = #{RPT_DEPT} 
+	    and BILL_TYPE = #{BILL_TYPE} 
+	</delete>
+	<insert id="reportInsert" parameterType="com.fh.entity.SysSealed">
+		insert into 
+	    <include refid="tableName"></include>
+		(
+	    <include refid="Field"></include>
+		) values (
+	    <include refid="FieldValue"></include>
+		)
+	</insert>
+	
 	<!-- fh313596790qq(青苔) -->
 </mapper>

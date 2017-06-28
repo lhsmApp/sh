@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import com.fh.dao.DaoSupport;
 import com.fh.entity.JqPage;
 import com.fh.entity.Page;
+import com.fh.entity.StaffDetailModel;
+import com.fh.entity.SysSealed;
 import com.fh.util.Const;
 import com.fh.util.PageData;
 import com.fh.util.StringUtil;
@@ -110,6 +112,14 @@ public class SysSealedInfoService implements SysSealedInfoManager{
 	 */
 	public String getState(PageData pd) throws Exception {
 		return (String)dao.findForObject("SysSealedInfoMapper.getState", pd);
+	}
+	
+	/**上报
+	 * @param
+	 * @throws Exception
+	 */
+	public void report(SysSealed data)throws Exception{
+		dao.report("SysSealedInfoMapper.reportDelete", "SysSealedInfoMapper.reportInsert", data);
 	}
 	
 }

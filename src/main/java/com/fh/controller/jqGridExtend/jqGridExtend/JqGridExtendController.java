@@ -296,7 +296,7 @@ public class JqGridExtendController extends BaseController {
 			// 解析excel，获取客户信息集合
 
 			uploadAndRead = testExcel.uploadAndRead(file, propertiesFileName, kyeName, sheetIndex,
-					titleAndAttribute, clazz);
+					titleAndAttribute, clazz, null, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("读取Excel文件错误", e);

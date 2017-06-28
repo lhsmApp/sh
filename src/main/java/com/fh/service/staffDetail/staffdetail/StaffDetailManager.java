@@ -30,6 +30,18 @@ public interface StaffDetailManager{
 	 * @throws Exception
 	 */
 	public List<TableColumns> getTableColumns(PageData pd)throws Exception;
+	
+	/**获取数据
+	 * @param pd
+	 * @throws Exception
+	 */
+	public List<StaffDetailModel> findByPd(PageData pd)throws Exception;
+	
+	/**获取数据
+	 * @param pd
+	 * @throws Exception
+	 */
+	public List<StaffDetailModel> findByModel(List<StaffDetailModel> listData)throws Exception;
 
 	/**新增
 	 * @param pd
@@ -43,17 +55,16 @@ public interface StaffDetailManager{
 	 */
 	public void edit(PageData pd)throws Exception;
 	
-	/**通过id获取数据
-	 * @param pd
-	 * @throws Exception
-	 */
-	public PageData findById(PageData pd)throws Exception;
-	
 	/**导出列表
 	 * @param page
 	 * @throws Exception
 	 */
 	public List<PageData> exportList(JqPage page)throws Exception;
+	/**导出模板
+	 * @param page
+	 * @throws Exception
+	 */
+	public List<PageData> exportModel(String DepartCode)throws Exception;
 	
 	/**列表
 	 * @param page

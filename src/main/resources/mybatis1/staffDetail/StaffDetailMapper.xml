@@ -99,6 +99,28 @@
 			</if>
 	</select>
 	
+	<!-- 获取数据 -->
+	<select id="findByPd" parameterType="pd" resultType="com.fh.entity.StaffDetailModel">
+		select 
+		    <include refid="FieldSelectKey"></include>
+		    <include refid="Field"></include>
+		from 
+		    <include refid="tableName"></include>
+		where (BUSI_DATE, USER_CODE) in (#{BUSI_DATE}, #{USER_CODE})
+		and (BUSI_DATE, USER_CODE) not in (#{BUSI_DATE__}, #{USER_CODE__})
+	</select>
+	<select id="findByModel" parameterType="com.fh.entity.StaffDetailModel" resultType="com.fh.entity.StaffDetailModel">
+		select 
+		    <include refid="FieldSelectKey"></include>
+		    <include refid="Field"></include>
+		from 
+		    <include refid="tableName"></include>
+		where
+		<foreach item="item" index="index" collection="list" open=" " separator=" or " close=" ">
+            ((BUSI_DATE, USER_CODE) in (#{BUSI_DATE}, #{USER_CODE}) and (BUSI_DATE, USER_CODE) not in (#{BUSI_DATE__}, #{USER_CODE__}))
+		</foreach>
+	</select>
+	
 	<!-- 新增 -->
 	<insert id="save" parameterType="pd">
 		insert into 
@@ -290,17 +312,6 @@
 		</foreach> -->
 	</update>
 	
-	<!-- 通过ID获取数据 -->
-	<select id="findById" parameterType="pd" resultType="pd">
-		select 
-		    <include refid="FieldSelectKey"></include>
-		    <include refid="Field"></include>
-		from 
-		    <include refid="tableName"></include>
-		where BUSI_DATE = ${pd.SystemDateTime}
-		and USER_CODE = ${pd.USER_CODE}
-	</select>
-	
 	<!-- 导出列表 -->
 	<select id="exportList" parameterType="jqPage" resultType="pd">
 		select
@@ -316,13 +327,23 @@
 			order by ${sidx} ${sord} 
     	</if>
 	</select>
+	<!-- 导出模板 -->
+	<select id="exportModel" parameterType="String" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where DEPT_CODE = #{DepartCode}
+		order by BUSI_DATE desc
+		limit 1
+	</select>
 	
 	<!-- 导入-->
 	<delete id="importDelete" parameterType="com.fh.entity.StaffDetailModel">
 		delete from
 		<include refid="tableName"></include>
-		where BUSI_DATE = #{item.BUSI_DATE}
-	    and DEPT_CODE = #{item.DEPT_CODE} 
+		where BUSI_DATE = #{BUSI_DATE}
+	    and DEPT_CODE = #{DEPT_CODE} 
 	</delete>
 	<insert id="importInsert" parameterType="com.fh.entity.StaffDetailModel">
 		insert into 

@@ -43,6 +43,24 @@ public class StaffDetailService implements StaffDetailManager{
 		return (List<TableColumns>)dao.findForList("StaffDetailMapper.getTableColumns", pd);
 	}
 	
+	/**获取数据
+	 * @param pd
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<StaffDetailModel> findByPd(PageData pd)throws Exception{
+		return (List<StaffDetailModel>)dao.findForList("StaffDetailMapper.findByPd", pd);
+	}
+	
+	/**获取数据
+	 * @param pd
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<StaffDetailModel> findByModel(List<StaffDetailModel> listData)throws Exception{
+		return (List<StaffDetailModel>)dao.findForList("StaffDetailMapper.findByModel", listData);
+	}
+	
 	/**新增
 	 * @param pd
 	 * @throws Exception
@@ -59,14 +77,6 @@ public class StaffDetailService implements StaffDetailManager{
 		dao.update("StaffDetailMapper.edit", pd);
 	}
 	
-	/**通过id获取数据
-	 * @param pd
-	 * @throws Exception
-	 */
-	public PageData findById(PageData pd)throws Exception{
-		return (PageData)dao.findForObject("StaffDetailMapper.findById", pd);
-	}
-	
 	/**导出列表
 	 * @param page
 	 * @throws Exception
@@ -74,6 +84,14 @@ public class StaffDetailService implements StaffDetailManager{
 	@SuppressWarnings("unchecked")
 	public List<PageData> exportList(JqPage page)throws Exception{
 		return (List<PageData>)dao.findForList("StaffDetailMapper.exportList", page);
+	}
+	/**导出模板
+	 * @param page
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PageData> exportModel(String DepartCode)throws Exception{
+		return (List<PageData>)dao.findForList("StaffDetailMapper.exportModel", DepartCode);
 	}
 	
 	/**列表

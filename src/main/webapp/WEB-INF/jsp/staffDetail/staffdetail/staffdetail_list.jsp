@@ -45,7 +45,12 @@
 									<span class="label label-xlg label-yellow arrowed-in arrowed-right"
 									    id="subTitle" style="margin-left: 2px;">工资数据导入</span> 
 									<span style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
-
+								</td>
+								<td style="align: right;">
+									<span class="label label-xlg label-yellow arrowed-left"
+									    id = "showDur" style="margin-right: 2px;"></span> 
+								    <span class="label label-xlg label-success arrowed-left"
+								        id = "showDept" ></span>
 								</td>
 							</tr>
 						</table>
@@ -106,8 +111,10 @@
 	    
 		//当前期间,取自tb_system_config的SystemDateTime字段
 	    var SystemDateTime = '${SystemDateTime}';
+	    $("#showDur").text('当前期间：' + SystemDateTime);
 		//当前登录人所在二级单位
 	    var DepartName = '${DepartName}';
+	    $("#showDept").text('当前单位：' + DepartName);
 		//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
 	    // 枚举  1封存,0解封
 		var State = '${State}';
@@ -115,26 +122,23 @@
 	    var jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
         
 	    function getState(){
-            if(State.trim() == "0"){
-            	alert(true);
+            if(State.trim().equals("0")){
 	            return true;
             }
-        	alert(false);
             return false;
-	    }
-	    
+	    };
 	    
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
 			$(gridBase_selector).jqGrid( 'setGridWidth', $(".page-content").width());
 			$(gridBase_selector).jqGrid( 'setGridHeight', $(window).height() - 240);
-	    })
+	    });
 		
 		$(gridBase_selector).jqGrid({
 			url: '<%=basePath%>staffdetail/getPageList.do',
 			datatype: "json",
 			colModel: jqGridColModel,
-			caption: '当前期间：' + SystemDateTime + '， 当前单位：' + DepartName + '',
+			//caption: '当前期间：' + SystemDateTime + '， 当前单位：' + DepartName + '',
 			reloadAfterSubmit: true, 
 			viewrecords: true, 
 			shrinkToFit: false,
@@ -161,124 +165,121 @@
 				}, 0);
 			},
 		});
-		$(gridBase_selector).navGrid(pagerBase_selector, 
-			{
-	            //navbar options
-		        edit: getState,
-	            editicon : 'ace-icon fa fa-pencil blue',
-	            add: getState,
-	            addicon : 'ace-icon fa fa-plus-circle purple',
-	            del: false,
-	            delicon : 'ace-icon fa fa-trash-o red',
-	            search: true,
-	            searchicon : 'ace-icon fa fa-search orange',
-	            refresh: true,
-	            refreshicon : 'ace-icon fa fa-refresh green',
-	            view: false,
-	            viewicon : 'ace-icon fa fa-search-plus grey',
-        },
-        {
-			//edit record form
-			closeAfterEdit: true,
-			recreateForm: true,
-			beforeShowForm :beforeEditOrAddCallback
-        },
-        {
-			//new record form
-			//width: 700,
-			closeAfterAdd: true,
-			recreateForm: true,
-			viewPagerButtons: false,
-			//reloadAfterSubmit: true,
-			beforeShowForm : beforeEditOrAddCallback,
-		    onclickSubmit: function(params, posdata) {
-				console.log("onclickSubmit");
-                //console.log(posdata	);
-            } , 
-            afterSubmit: fn_addSubmit
-        },
-        {
-			//delete record form
-			recreateForm: true,
-			beforeShowForm : beforeDeleteCallback,
-			onClick : function(e) {
+		
+			$(gridBase_selector).navGrid(pagerBase_selector, 
+					{
+			            //navbar options
+				        edit: true,
+			            editicon : 'ace-icon fa fa-pencil blue',
+			            add: true,
+			            addicon : 'ace-icon fa fa-plus-circle purple',
+			            del: false,
+			            delicon : 'ace-icon fa fa-trash-o red',
+			            search: true,
+			            searchicon : 'ace-icon fa fa-search orange',
+			            refresh: true,
+			            refreshicon : 'ace-icon fa fa-refresh green',
+			            view: false,
+			            viewicon : 'ace-icon fa fa-search-plus grey',
+		        },
+		        {
+					//edit record form
+					closeAfterEdit: true,
+					recreateForm: true,
+					beforeShowForm :beforeEditOrAddCallback
+		        },
+		        {
+					//new record form
+					//width: 700,
+					closeAfterAdd: true,
+					recreateForm: true,
+					viewPagerButtons: false,
+					//reloadAfterSubmit: true,
+					beforeShowForm : beforeEditOrAddCallback,
+				    onclickSubmit: function(params, posdata) {
+						console.log("onclickSubmit");
+		                //console.log(posdata	);
+		            } , 
+		            afterSubmit: fn_addSubmit
+		        },
+		        {
+					//delete record form
+					recreateForm: true,
+					beforeShowForm : beforeDeleteCallback,
+					onClick : function(e) {
 
-			}
-        },
-        {
-			//search form
-			recreateForm: true,
-			afterShowSearch: beforeSearchCallback,
-			afterRedraw: function(){
-				style_search_filters($(this));
-			},
-			multipleSearch: true,
-			//multipleGroup:true,
-			showQuery: true
-        },
-        {},{});
+					}
+		        },
+		        {
+					//search form
+					recreateForm: true,
+					afterShowSearch: beforeSearchCallback,
+					afterRedraw: function(){
+						style_search_filters($(this));
+					},
+					multipleSearch: true,
+					//multipleGroup:true,
+					showQuery: true
+		        },
+		        {},{});
 
-		if(getState){
-	        $(gridBase_selector).navButtonAdd(pagerBase_selector,
-	                {
-	                    buttonicon: "ace-icon fa fa-pencil-square-o purple",
-	                    title: "批量编辑",
-	                    caption: "",
-	                    position: "last",
-	                    onClickButton: batchEdit
-	                });
-	                $(gridBase_selector).navButtonAdd(pagerBase_selector,
-	                {
-	                    buttonicon: "ace-icon fa fa-undo",
-	                    title: "取消批量编辑",
-	                    caption: "",
-	                    position: "last",
-	                    onClickButton: batchCancelEdit
-	                });
-	        		$(gridBase_selector).navButtonAdd(pagerBase_selector, {
-	                     caption : "",
-	                     buttonicon : "ace-icon fa fa-save green",
-	                     onClickButton : batchSave,
-	                     position : "last",
-	                     title : "批量保存",
-	                     cursor : "pointer"
-	                 });
-	        		$(gridBase_selector).navButtonAdd(pagerBase_selector, {
-	                    caption : "",
-	                    buttonicon : "ace-icon fa fa-trash-o red",
-	                    onClickButton : batchDelete,
-	                    position : "last",
-	                    title : "批量删除",
-	                    cursor : "pointer"
-	                });
-	        			$(gridBase_selector).navButtonAdd(pagerBase_selector, {
-	        	             caption : "",
-	        	             buttonicon : "ace-icon fa fa-cloud-upload",
-	        	             onClickButton : importItems,
-	        	             position : "last",
-	        	             title : "导入",
-	        	             cursor : "pointer"
-	        	         });
-		}
-			$(gridBase_selector).navButtonAdd(pagerBase_selector, {
-	             caption : "",
-	             buttonicon : "ace-icon fa fa-cloud-download",
-	             onClickButton : exportItems,
-	             position : "last",
-	             title : "导出",
-	             cursor : "pointer"
-	         });
-
-			if(getState){
-			$(gridBase_selector).navButtonAdd(pagerBase_selector, {
-	             caption : "",
-	             buttonicon : "ace-icon fa fa-check-square green",
-	             onClickButton : report,
-	             position : "last",
-	             title : "上报",
-	             cursor : "pointer"
-	         });
-			}
+			        $(gridBase_selector).navButtonAdd(pagerBase_selector,
+			                {
+			                    buttonicon: "ace-icon fa fa-pencil-square-o purple",
+			                    title: "批量编辑",
+			                    caption: "",
+			                    position: "last",
+			                    onClickButton: batchEdit
+			                });
+			                $(gridBase_selector).navButtonAdd(pagerBase_selector,
+			                {
+			                    buttonicon: "ace-icon fa fa-undo",
+			                    title: "取消批量编辑",
+			                    caption: "",
+			                    position: "last",
+			                    onClickButton: batchCancelEdit
+			                });
+			        		$(gridBase_selector).navButtonAdd(pagerBase_selector, {
+			                     caption : "",
+			                     buttonicon : "ace-icon fa fa-save green",
+			                     onClickButton : batchSave,
+			                     position : "last",
+			                     title : "批量保存",
+			                     cursor : "pointer"
+			                 });
+			        		$(gridBase_selector).navButtonAdd(pagerBase_selector, {
+			                    caption : "",
+			                    buttonicon : "ace-icon fa fa-trash-o red",
+			                    onClickButton : batchDelete,
+			                    position : "last",
+			                    title : "批量删除",
+			                    cursor : "pointer"
+			                });
+			        			$(gridBase_selector).navButtonAdd(pagerBase_selector, {
+			        	             caption : "",
+			        	             buttonicon : "ace-icon fa fa-cloud-upload",
+			        	             onClickButton : importItems,
+			        	             position : "last",
+			        	             title : "导入",
+			        	             cursor : "pointer"
+			        	         });
+					$(gridBase_selector).navButtonAdd(pagerBase_selector, {
+			             caption : "",
+			             buttonicon : "ace-icon fa fa-cloud-download",
+			             onClickButton : exportItems,
+			             position : "last",
+			             title : "导出",
+			             cursor : "pointer"
+			         });
+    					$(gridBase_selector).navButtonAdd(pagerBase_selector, {
+    			             caption : "",
+    			             buttonicon : "ace-icon fa fa-check-square green",
+    			             onClickButton : report,
+    			             position : "last",
+    			             title : "上报",
+    			             cursor : "pointer"
+    			         });
+		
 
 			//双击编辑行
             var lastSelection;
@@ -355,7 +356,7 @@
 	    								$(top.hangge());//关闭加载状态
 	    								$("#subTitle").tips({
 	    									side:3,
-	    						            msg:'删除失败,'+response.responseJSON.message,
+	    						            msg:'删除失败,'+response.message,
 	    						            bg:'#cc0033',
 	    						            time:3
 	    						        });
@@ -417,7 +418,7 @@
     								$(top.hangge());//关闭加载状态
     								$("#subTitle").tips({
     									side:3,
-    						            msg:'保存失败,'+response.responseJSON.message,
+    						            msg:'保存失败,'+response.message,
     						            bg:'#cc0033',
     						            time:3
     						        });
@@ -452,7 +453,7 @@
 					 nextPage(${page.currentPage});
 				 }
 			  }
-			diag.close();
+			  diag.close();
 		   };
 		   diag.show();
 	    }
@@ -468,7 +469,40 @@
 		 * 上报
 		 */
 		function report(){
-			
+            var msg = '确定要上报吗?';
+            bootbox.confirm(msg, function(result) {
+				if(result) {
+					top.jzts();
+					$.ajax({
+						type: "POST",
+						url: '<%=basePath%>staffdetail/report.do?',
+						cache: false,
+						success: function(response){
+							if(response.code==0){
+								$(gridBase_selector).trigger("reloadGrid");  
+								$(top.hangge());//关闭加载状态
+								$("#subTitle").tips({
+									side:3,
+						            msg:'上报成功',
+						            bg:'#009933',
+						            time:3
+						        });
+							}else{
+								$(top.hangge());//关闭加载状态
+								$("#subTitle").tips({
+									side:3,
+						            msg:'上报失败,'+response.message,
+						            bg:'#cc0033',
+						            time:3
+						        });
+							}
+						},
+				    	error: function(e) {
+							$(top.hangge());//关闭加载状态
+				    	}
+					});
+				}
+            });
 		}
 	    
 		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size

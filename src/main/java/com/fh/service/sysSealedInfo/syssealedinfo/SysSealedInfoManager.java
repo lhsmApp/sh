@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.fh.entity.JqPage;
 import com.fh.entity.Page;
+import com.fh.entity.StaffDetailModel;
+import com.fh.entity.SysSealed;
 import com.fh.util.PageData;
 
 /** 
@@ -75,6 +77,12 @@ public interface SysSealedInfoManager{
 	 * @throws Exception
 	 */
 	public String getState(PageData pd) throws Exception;
+
+	/**上报
+	 * @param
+	 * @throws Exception
+	 */
+	public void report(SysSealed data)throws Exception;
 	
 }
 
