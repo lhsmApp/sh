@@ -325,8 +325,15 @@
 				.addClass('ace ace-switch ace-switch-5')
 				.after('<span class="lbl"></span>');
 		}, 0);
-		
 		console.log("状态状态"+cellvalue);
+		if (cellvalue=="封存") {
+				
+			return 1;
+		} else {
+			return 0;
+		}
+		
+		
 		console.log("状态状态"+cell);
 		
 	}

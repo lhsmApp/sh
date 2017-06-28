@@ -175,7 +175,7 @@
 				{ label: '列编码', name: 'COL_CODE', width: 60},
 				{ label: '列名称', name: 'COL_NAME', width: 60,editable: true,},
 				{ label: '显示序号', name: 'DISP_ORDER', width: 80,formatter: 'int', sorttype: 'number',editable: true,},
-				{ label: '字典翻译', name: 'DICT_NAME', width: 80,align:'center',editable: true,edittype: 'select',editoptions:{value:"${dictString}"},unformat: unformatSelect},                  
+				{ label: '字典翻译', name: 'DICT_TRANS', width: 80,align:'center',editable: true,edittype: 'select',formatter:'select',formatteroptions:{value:"${dictString}"},editoptions:{value:"${dictString}"}},                  
 				{ label: '列隐藏', name: 'COL_HIDE', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch},                   
 				{ label: '列汇总', name: 'COL_SUM', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch},                   
 				{ label: '列平均值', name: 'COL_AVE', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch}                   
