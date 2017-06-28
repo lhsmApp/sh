@@ -217,7 +217,7 @@ public class JgGridControllerJia extends BaseController {
 		PageData pd = this.getPageData();
 		String strDataRows = pd.getString("DATA_ROWS");
         JSONArray array = JSONArray.fromObject(strDataRows);  
-        List<JqGridModel> listData = (List<JqGridModel>) JSONArray.toCollection(array,JqGridModel.class);// 过时方法
+        List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);// 过时方法
         /*List<JqGridModel>  dtoList=new ArrayList<JqGridModel>();  
         for (int i = 0; i < array.size(); i++) {  
             JSONObject jsonObject = array.getJSONObject(i);  
@@ -227,7 +227,7 @@ public class JgGridControllerJia extends BaseController {
             }
         }  */
 		if(null != listData && listData.size() > 0){
-			jqgridServiceJia.updateAll(listData);
+			//jqgridServiceJia.updateAll(listData);
 			commonBase.setCode(0);
 		}
 		return commonBase;
