@@ -205,7 +205,7 @@
 				{ label: '上传时间', name: 'RPT_DATE', width: 80, formatter: 'data'},
 				// sorttype is used only if the data is loaded locally or loadonce is set to true
 				{ label: '单据类型', name: 'BILL_TYPE_TR', width: 80,align:'center'},                  
-				{ label: '状态', name: 'STATE', width: 80, editable: true,align:'center',formatter: customFmatterState,edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch}                   
+				{ label: '状态', name: 'STATE', width: 80, editable: true,align:'center',formatter: customFmatterState,edittype:"checkbox",editoptions: {value:"0:1"},unformat: aceSwitch}                   
 			],
 			reloadAfterSubmit: true, 
 			viewrecords: true, // show the current page, data rang and total records on the toolbar
@@ -321,14 +321,21 @@
 	//switch element when editing inline
 	function aceSwitch( cellvalue, options, cell ) {
 		setTimeout(function(){
-			$(cell) .find('input[type=checkbox]')
+			 $(cell).find('input[type=checkbox]')
 				.addClass('ace ace-switch ace-switch-5')
-				.after('<span class="lbl"></span>');
+				.after('<span class="lbl" data-lbl="封存        解封"></span>'); 
+			 if (cellvalue=="解封") {	
+				$(cell).find('input[type=checkbox]').attr('checked','checked');
+			 }else{
+			 	$(cell).find('input[type=checkbox]').removeAttr('checked');
+			 }
 		}, 0);
-		
-		console.log("状态状态"+cellvalue);
-		console.log("状态状态"+cell);
-		
+		/* console.log("状态"+cellvalue);
+		if (cellvalue=="封存") {
+			return 1;
+		} else {
+			return 0;
+		} */
 	}
 	
 	 //批量编辑

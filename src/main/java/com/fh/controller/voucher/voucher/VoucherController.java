@@ -209,25 +209,16 @@ public class VoucherController extends BaseController {
 	 * @param
 	 * @throws Exception
 	 */
-	@RequestMapping(value="/updateAll")
-	/*@RequestBody RequestBase<JqGridModel> jqGridModel*/
-	public @ResponseBody CommonBase updateAll() throws Exception{
-		logBefore(logger, Jurisdiction.getUsername()+"批量删除JgGrid");
+	@RequestMapping(value="/voucherTransfer")
+	public @ResponseBody CommonBase voucherTransfer() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"凭证传输");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "del")){return null;} //校验权限	
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
 		PageData pd = this.getPageData();
 		String strDataRows = pd.getString("DATA_ROWS");
         JSONArray array = JSONArray.fromObject(strDataRows);  
-        List<JqGridModel> listData = (List<JqGridModel>) JSONArray.toCollection(array,JqGridModel.class);// 过时方法
-        /*List<JqGridModel>  dtoList=new ArrayList<JqGridModel>();  
-        for (int i = 0; i < array.size(); i++) {  
-            JSONObject jsonObject = array.getJSONObject(i);  
-            JqGridModel item = (JqGridModel) JSONObject.toBean(jsonObject, JqGridModel.class);
-            if(item != null){
-                dtoList.add(item);  
-            }
-        }  */
+        List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);// 过时方法
 		if(null != listData && listData.size() > 0){
 			//voucherService.updateAll(listData);
 			commonBase.setCode(0);
