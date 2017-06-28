@@ -323,7 +323,7 @@
 		setTimeout(function(){
 			 $(cell).find('input[type=checkbox]')
 				.addClass('ace ace-switch ace-switch-5')
-				.after('<span class="lbl"></span>'); 
+				.after('<span class="lbl" data-lbl="封存        解封"></span>'); 
 			 if (cellvalue=="解封") {	
 				$(cell).find('input[type=checkbox]').attr('checked','checked');
 			 }else{
