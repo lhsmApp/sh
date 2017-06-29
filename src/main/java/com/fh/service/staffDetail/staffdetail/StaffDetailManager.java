@@ -118,7 +118,10 @@ public interface StaffDetailManager{
 	 * @throws Exception
 	 */
 	public List<Department> getDepartDic(PageData pd)throws Exception;
-	
-	
+	/**获取员工编码
+	 * @param 
+	 * @throws Exception
+	 */
+	public List<String> getHaveUserCodeDic(PageData pd)throws Exception;
 }
 

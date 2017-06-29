@@ -84,7 +84,7 @@
 		
 		//保存
 		function save(){
-			if($("#excel").val().equals("") || document.getElementById("excel").files[0].equals('请选择xls格式的文件')){
+			if($("#excel").val() == "" || document.getElementById("excel").files[0] == '请选择xls格式的文件'){
 				
 				$("#excel").tips({
 					side:3,
@@ -100,7 +100,7 @@
 		}
 		function fileType(obj){
 			var fileType=obj.value.substr(obj.value.lastIndexOf(".")).toLowerCase();//获得文件后缀名
-		    if(!fileType.equals('.xls')){
+		    if(fileType != '.xls'){
 		    	$("#excel").tips({
 					side:3,
 		            msg:'请上传xls格式的文件',

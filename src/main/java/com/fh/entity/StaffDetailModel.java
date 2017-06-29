@@ -559,7 +559,7 @@ public class StaffDetailModel {
 						col.getData_type().trim().equals("INT") || 
 					    col.getData_type().trim().equals("FLOAT"))){
 				model_name.append(" width: '150', ");
-				model_name.append(" align: 'right', search: false, sorttype: 'number', ");
+				model_name.append(" align: 'right', search: false, sorttype: 'number', editrules: {number: true}, ");
 				model_edittype.append(" edittype:'text', formatter: 'number', editoptions:{maxlength:'" + intLength + "', number: true} ");
 			} else{
 				//if(col.getColumn_name().equals("USER_NAME")){

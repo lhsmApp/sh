@@ -85,7 +85,7 @@ public class LeadingInExcel<T> {
      * @return                        返回读取出的List集合
      * @throws Exception
      */
-    public List<T> uploadAndRead(MultipartFile multipart,String propertiesFileName, String kyeName,int sheetIndex,
+    public Map<Integer, Object> uploadAndRead(MultipartFile multipart,String propertiesFileName, String kyeName,int sheetIndex,
             Map<String, String> titleAndAttribute,Class<T> clazz,
     		List<TmplConfigDetail> listColumns, Map<String, Object> DicList) throws Exception{
         
@@ -102,7 +102,7 @@ public class LeadingInExcel<T> {
             
             String filePath = readPropertiesFilePathMethod( propertiesFileName, kyeName);
             File filePathname = this.upload(multipart, filePath, isExcel2003);
-            List<T> judgementVersion = judgementVersion(filePathname, sheetIndex, titleAndAttribute, clazz, isExcel2003, listColumns, DicList);
+            Map<Integer, Object> judgementVersion = judgementVersion(filePathname, sheetIndex, titleAndAttribute, clazz, isExcel2003, listColumns, DicList);
         
         return judgementVersion;
     }
@@ -210,7 +210,7 @@ public class LeadingInExcel<T> {
      * @return
      * @throws Exception
      */
-    public List<T> judgementVersion(File filePathname,int sheetIndex,Map<String, String> titleAndAttribute,Class<T> clazz,boolean isExcel2003,
+    public Map<Integer, Object> judgementVersion(File filePathname,int sheetIndex,Map<String, String> titleAndAttribute,Class<T> clazz,boolean isExcel2003,
     		List<TmplConfigDetail> listColumns, Map<String, Object> DicList) throws Exception{
         
         FileInputStream is=null;
@@ -253,7 +253,7 @@ public class LeadingInExcel<T> {
      * @return
      * @throws Exception
      */
-    private List<T> readExcelTitle(Workbook workbook,int sheetIndex,Map<String, String> titleAndAttribute,Class<T> clazz,
+    private Map<Integer, Object> readExcelTitle(Workbook workbook,int sheetIndex,Map<String, String> titleAndAttribute,Class<T> clazz,
     		List<TmplConfigDetail> listColumns, Map<String, Object> DicList) throws Exception{
 
         //得到第一个shell  
@@ -298,8 +298,10 @@ public class LeadingInExcel<T> {
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
-	private List<T> readExcelValue(Workbook workbook,Sheet sheet,Map<Integer, String> attribute,Class<T> clazz,
+	private Map<Integer, Object> readExcelValue(Workbook workbook,Sheet sheet,Map<Integer, String> attribute,Class<T> clazz,
     		List<TmplConfigDetail> listColumns, Map<String, Object> DicList) throws Exception{
+    	Map<Integer, Object> returnMap = new HashMap<Integer, Object>();
+    	Map<String, Object> returnError = new HashMap<String, Object>();
         List<T> info=new ArrayList<T>();
         //获取标题行列数
         int titleCellNum = sheet.getRow(0).getLastCellNum();
@@ -343,6 +345,10 @@ public class LeadingInExcel<T> {
         								getKey = dic.getKey();
                                     }
         					    }  
+        						if(!(getKey != null && getKey.trim() != "")){
+        							returnError.put(listColumns.get(j).getCOL_NAME(), value);
+        							break;
+        						}
         						value = getKey;
         					}
     					}
@@ -382,7 +388,14 @@ public class LeadingInExcel<T> {
             // 4. if
             if(judge)info.add(obj);
         }
-        return info;
+        if(returnError!=null && returnError.size() > 0){
+            returnMap.put(1, false);
+            returnMap.put(2, returnError);
+        } else {
+            returnMap.put(1, true);
+            returnMap.put(2, info);
+        }
+        return returnMap;
     }
     
     /**
