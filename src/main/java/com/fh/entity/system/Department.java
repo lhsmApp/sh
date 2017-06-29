@@ -24,9 +24,9 @@ public class Department {
 	private String BZ;				//备注
 	private	String ADDRESS;			//地址
 	private String DEPARTMENT_ID;	//主键
-	/*private String target;
+	private String target;
 	private Department department;
-	private List<Department> subDepartment;*/
+	private List<Department> subDepartment;
 	private boolean hasDepartment = false;
 	private String treeurl;
 	private String icon;
@@ -100,7 +100,7 @@ public class Department {
 	public void setDEPARTMENT_ID(String dEPARTMENT_ID) {
 		DEPARTMENT_ID = dEPARTMENT_ID;
 	}
-	/*public String getTarget() {
+	public String getTarget() {
 		return target;
 	}
 	public void setTarget(String target) {
@@ -117,7 +117,7 @@ public class Department {
 	}
 	public void setSubDepartment(List<Department> subDepartment) {
 		this.subDepartment = subDepartment;
-	}*/
+	}
 	public boolean isHasDepartment() {
 		return hasDepartment;
 	}

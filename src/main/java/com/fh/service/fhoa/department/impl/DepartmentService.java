@@ -119,14 +119,12 @@ public class DepartmentService implements DepartmentManager{
 		List<Department> departmentList = this.listSubDepartmentByParentId(parentId);
 		if(departmentList!=null&&departmentList.size()>0){
 			curDepartment.setOpen(true);
-			//curDepartment.setIcon("static/images/user.gif");
 			allDepartmentList.add(curDepartment);
 			for(Department depar : departmentList){
 				this.getZTreeNewV(allDepartmentList,depar.getDEPARTMENT_CODE(),depar);
 			}
 		}else{
-			//curDepartment.setOpen(false);
-			//curDepartment.setIcon("static/images/user.gif");
+			curDepartment.setOpen(false);
 			allDepartmentList.add(curDepartment);
 		}
 	}
@@ -141,8 +139,8 @@ public class DepartmentService implements DepartmentManager{
 		List<Department> departmentList = this.listSubDepartmentByParentId(parentId);
 		for(Department depar : departmentList){
 			depar.setTreeurl("department/list.do?DEPARTMENT_CODE="+depar.getDEPARTMENT_CODE());
-			//depar.setSubDepartment(this.listAllDepartment(depar.getDEPARTMENT_CODE()));
-			//depar.setTarget("treeFrame");
+			depar.setSubDepartment(this.listAllDepartment(depar.getDEPARTMENT_CODE()));
+			depar.setTarget("treeFrame");
 			depar.setIcon("static/images/user.gif");
 		}
 		return departmentList;
