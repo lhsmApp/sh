@@ -176,9 +176,9 @@
 				{ label: '列名称', name: 'COL_NAME', width: 60,editable: true,},
 				{ label: '显示序号', name: 'DISP_ORDER', width: 80,formatter: 'int', sorttype: 'number',editable: true,},
 				{ label: '字典翻译', name: 'DICT_TRANS', width: 80,align:'center',editable: true,edittype: 'select',formatter:'select',formatteroptions:{value:"${dictString}"},editoptions:{value:"${dictString}"}},                  
-				{ label: '列隐藏', name: 'COL_HIDE', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch},                   
-				{ label: '列汇总', name: 'COL_SUM', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch},                   
-				{ label: '列平均值', name: 'COL_AVE', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch}                   
+				{ label: '列隐藏', name: 'COL_HIDE', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch,formatter: customFmatterState},                   
+				{ label: '列汇总', name: 'COL_SUM', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch,formatter: customFmatterState},                   
+				{ label: '列平均值', name: 'COL_AVE', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch,formatter: customFmatterState}                   
 			],
 			reloadAfterSubmit: true, 
 			//viewrecords: true, // show the current page, data rang and total records on the toolbar
@@ -414,31 +414,31 @@
 			
 		}
 		
-		//自定义列隐藏样式
-		function customFmatterState(cellvalue, options, rowObject){  
-			if (cellvalue==1) {
-				 return '<span class="label label-important arrowed-in">隐藏</span>';
-			} else if(cellvalue==0){
-				return '<span class="label label-success arrowed">不隐藏</span>';
-			}
-		};
+		
 		
 		//switch element when editing inline
 		function aceSwitch( cellvalue, options, cell ) {
+		
 			setTimeout(function(){
-				$(cell) .find('input[type=checkbox]')
+				 $(cell).find('input[type=checkbox]')
 					.addClass('ace ace-switch ace-switch-5')
-					.after('<span class="lbl"></span>');
+					.after('<span class="lbl" data-lbl="是        否"></span>'); 
+				 if (cellvalue=="是") {	
+					$(cell).find('input[type=checkbox]').attr('checked','checked');
+				 }else{
+				 	$(cell).find('input[type=checkbox]').removeAttr('checked');
+				 }
 			}, 0);
-			console.log(cellvalue);
-			console.log(options);
-			console.log(cell);
-			if (cellvalue=='隐藏') {			
-				return 1;
-			}else if (cellvalue=='不隐藏') {
-				return 0;
-			}
+			
 		}
+		
+		function customFmatterState(cellvalue, options, rowObject){  
+			if (cellvalue==1) {
+				 return '<span class="label label-important arrowed-in">是</span>';
+			} else {
+				return '<span class="label label-success arrowed">否</span>';
+			}
+		};
 		
 		
 		
