@@ -390,7 +390,8 @@ public class StaffDetailController extends BaseController {
 	 */
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/readExcel")
-	public @ResponseBody CommonBase readExcel(@RequestParam(value="excel",required=false) MultipartFile file) throws Exception{
+	//public @ResponseBody CommonBase readExcel(@RequestParam(value="excel",required=false) MultipartFile file) throws Exception{
+	public ModelAndView readExcel(@RequestParam(value="excel",required=false) MultipartFile file) throws Exception{
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
 		if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;}//校验权限
@@ -430,7 +431,7 @@ public class StaffDetailController extends BaseController {
 		boolean judgement = false;
 		if(uploadAndReadMap.get(1).equals(false)){
 			Map<String, Object> returnError =  (Map<String, Object>) uploadAndReadMap.get(2);
-			String message = "字典无此翻译：\n";
+			String message = "字典无此翻译： "; // \n
 			for (String k : returnError.keySet())  
 		    {
 				message += k + " : " + returnError.get(k);
@@ -494,7 +495,7 @@ public class StaffDetailController extends BaseController {
 				if(sbRet.size()>0){
 					StringBuilder sbTitle = new StringBuilder();
 					for(String str : sbRet){
-						sbTitle.append(str + "\n");
+						sbTitle.append(str + "  "); // \n
 					}
 					commonBase.setCode(2);
 					commonBase.setMessage(sbTitle.toString());
@@ -521,7 +522,11 @@ public class StaffDetailController extends BaseController {
 				commonBase.setMessage("TranslateUtil");
 			}
 		}
-		return commonBase;
+		ModelAndView mv = this.getModelAndView();
+		mv.setViewName("staffDetail/staffdetail/uploadExcel");
+		mv.addObject("commonBaseCode", commonBase.getCode());
+		mv.addObject("commonMessage", commonBase.getMessage());
+		return mv;
 	}
 	
 	/**下载模版
