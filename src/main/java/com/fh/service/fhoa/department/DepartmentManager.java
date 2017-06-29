@@ -65,6 +65,14 @@ public interface DepartmentManager{
 	public List<Department> listSubDepartmentByParentId(String parentId) throws Exception;
 	
 	/**
+	 * 获取所有数据并填充每条数据的子级列表(递归处理ZTreeV3.5)
+	 * @param MENU_ID
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Department> listAllDepartmentZTreeNewV(String parentId) throws Exception;
+	
+	/**
 	 * 获取所有数据并填充每条数据的子级列表(递归处理)
 	 * @param MENU_ID
 	 * @return

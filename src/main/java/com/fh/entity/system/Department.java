@@ -30,6 +30,8 @@ public class Department {
 	private boolean hasDepartment = false;
 	private String treeurl;
 	private String icon;
+	private boolean checked;//是否选中
+	private boolean open;//是否含有子节点
 	
 	public String getIcon() {
 		return icon;
@@ -127,6 +129,18 @@ public class Department {
 	}
 	public void setTreeurl(String treeurl) {
 		this.treeurl = treeurl;
+	}
+	public boolean isChecked() {
+		return checked;
+	}
+	public void setChecked(boolean checked) {
+		this.checked = checked;
+	}
+	public boolean isOpen() {
+		return open;
+	}
+	public void setOpen(boolean open) {
+		this.open = open;
 	}
 	
 }
