@@ -95,6 +95,43 @@ public class DepartmentService implements DepartmentManager{
 	}
 	
 	/**
+	 * 获取所有数据并填充每条数据的子级列表(递归处理ZTreeV3.5)
+	 * @param MENU_ID
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Department> listAllDepartmentZTreeNewV(String parentId) throws Exception {
+		List<Department> allDepartmentList=new ArrayList<Department>();
+		List<Department> departmentList = this.listSubDepartmentByParentId(parentId);
+		for(Department depar : departmentList){
+			this.getZTreeNewV(allDepartmentList,depar.getDEPARTMENT_CODE(),depar);
+		}
+		return allDepartmentList;
+	}
+	
+	/**
+	 * 获取所有数据并填充每条数据的子级列表(递归处理ZTreeV3.5)
+	 * @param MENU_ID
+	 * @return
+	 * @throws Exception
+	 */
+	private void getZTreeNewV(List<Department> allDepartmentList,String parentId,Department curDepartment) throws Exception {
+		List<Department> departmentList = this.listSubDepartmentByParentId(parentId);
+		if(departmentList!=null&&departmentList.size()>0){
+			curDepartment.setOpen(true);
+			//curDepartment.setIcon("static/images/user.gif");
+			allDepartmentList.add(curDepartment);
+			for(Department depar : departmentList){
+				this.getZTreeNewV(allDepartmentList,depar.getDEPARTMENT_CODE(),depar);
+			}
+		}else{
+			//curDepartment.setOpen(false);
+			//curDepartment.setIcon("static/images/user.gif");
+			allDepartmentList.add(curDepartment);
+		}
+	}
+	
+	/**
 	 * 获取所有数据并填充每条数据的子级列表(递归处理)
 	 * @param MENU_ID
 	 * @return
@@ -104,8 +141,8 @@ public class DepartmentService implements DepartmentManager{
 		List<Department> departmentList = this.listSubDepartmentByParentId(parentId);
 		for(Department depar : departmentList){
 			depar.setTreeurl("department/list.do?DEPARTMENT_CODE="+depar.getDEPARTMENT_CODE());
-			depar.setSubDepartment(this.listAllDepartment(depar.getDEPARTMENT_CODE()));
-			depar.setTarget("treeFrame");
+			//depar.setSubDepartment(this.listAllDepartment(depar.getDEPARTMENT_CODE()));
+			//depar.setTarget("treeFrame");
 			depar.setIcon("static/images/user.gif");
 		}
 		return departmentList;

@@ -24,12 +24,14 @@ public class Department {
 	private String BZ;				//备注
 	private	String ADDRESS;			//地址
 	private String DEPARTMENT_ID;	//主键
-	private String target;
+	/*private String target;
 	private Department department;
-	private List<Department> subDepartment;
+	private List<Department> subDepartment;*/
 	private boolean hasDepartment = false;
 	private String treeurl;
 	private String icon;
+	private boolean checked;//是否选中
+	private boolean open;//是否含有子节点
 	
 	public String getIcon() {
 		return icon;
@@ -98,7 +100,7 @@ public class Department {
 	public void setDEPARTMENT_ID(String dEPARTMENT_ID) {
 		DEPARTMENT_ID = dEPARTMENT_ID;
 	}
-	public String getTarget() {
+	/*public String getTarget() {
 		return target;
 	}
 	public void setTarget(String target) {
@@ -115,7 +117,7 @@ public class Department {
 	}
 	public void setSubDepartment(List<Department> subDepartment) {
 		this.subDepartment = subDepartment;
-	}
+	}*/
 	public boolean isHasDepartment() {
 		return hasDepartment;
 	}
@@ -127,6 +129,18 @@ public class Department {
 	}
 	public void setTreeurl(String treeurl) {
 		this.treeurl = treeurl;
+	}
+	public boolean isChecked() {
+		return checked;
+	}
+	public void setChecked(boolean checked) {
+		this.checked = checked;
+	}
+	public boolean isOpen() {
+		return open;
+	}
+	public void setOpen(boolean open) {
+		this.open = open;
 	}
 	
 }

@@ -12,8 +12,14 @@
 	<!-- jsp文件头和头部 -->
 	<%@ include file="../../system/index/top.jsp"%>
 	<script type="text/javascript" src="static/js/jquery-1.7.2.js"></script>
-	<link type="text/css" rel="stylesheet" href="plugins/zTree/2.6/zTreeStyle.css"/>
-	<script type="text/javascript" src="plugins/zTree/2.6/jquery.ztree-2.6.min.js"></script>
+	<!-- <link type="text/css" rel="stylesheet" href="plugins/zTree/2.6/zTreeStyle.css"/>
+	<script type="text/javascript" src="plugins/zTree/2.6/jquery.ztree-2.6.min.js"></script> -->
+	
+	<link type="text/css" rel="stylesheet" href="plugins/zTree/3.5/zTreeStyle.css"/>
+	
+	<script type="text/javascript" src="plugins/zTree/3.5/jquery-1.4.4.min.js"></script>
+	<script type="text/javascript" src="plugins/zTree/3.5/jquery.ztree.core.js"></script>
+	<script type="text/javascript" src="plugins/zTree/3.5/jquery.ztree.excheck.js"></script>
 	<style type="text/css">
 	footer{height:50px;position:fixed;bottom:0px;left:0px;width:100%;text-align: center;}
 	</style>
@@ -32,7 +38,7 @@
 						<div class="col-xs-12">
 							<div id="zhongxin">
 								<div style="overflow: scroll; scrolling: yes;height:415px;width: 309px;">
-								<ul id="tree" class="tree" style="overflow:auto;"></ul>
+								<ul id="tree" class="ztree" style="overflow:auto;"></ul>
 								</div>
 							</div>
 							<div id="zhongxin2" class="center" style="display:none"><br/><br/><br/><br/><img src="static/images/jiazai.gif" /><br/><h4 class="lighter block green">正在保存...</h4></div>
@@ -56,19 +62,36 @@
 		$(top.hangge());
 		var zTree;
 		$(document).ready(function(){
+			/* var setting = {
+			    showLine: true,
+			    checkable: true,
+			    check: {
+	                enable: true,
+	                chkboxType: { "Y" : "", "N" : "" }
+	            },
+			}; */
 			
 			var setting = {
-			    showLine: true,
-			    checkable: true
+				check: {
+	                enable: true,
+	                chkboxType: { "Y" : "", "N" : "" }
+	            },
+				data: {
+					simpleData: {
+						enable: true
+					}
+				}
 			};
 			var zn = '${zTreeNodes}';
 			var zTreeNodes = eval(zn);
-			zTree = $("#tree").zTree(setting, zTreeNodes);
+			//zTree = $("#tree").zTree(setting, zTreeNodes);
+			zTree =$.fn.zTree.init($("#tree"), setting, zTreeNodes);
 		});
 	
 		//保存
 		 function save(){
 			var nodes = zTree.getCheckedNodes();
+			console.log(nodes);
 			var tmpNode;
 			var ids = "";
 			var listIds =new Array();
