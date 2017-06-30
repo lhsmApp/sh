@@ -28,7 +28,7 @@ import com.fh.service.${packageName}.${objectNameLower}mx.${objectName}MxManager
 
 /** 
  * 说明：${TITLE}
- * 创建人：FH Q313596790
+ * 创建人：lhsmplus
  * 创建时间：${nowDate?string("yyyy-MM-dd")}
  */
 @Controller

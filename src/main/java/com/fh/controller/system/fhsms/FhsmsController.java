@@ -27,10 +27,13 @@ import com.fh.util.PageData;
 import com.fh.util.Jurisdiction;
 import com.fh.service.system.fhsms.FhsmsManager;
 
-/** 
- * 说明：站内信
- * 创建人：FH Q313596790
- * 创建时间：2016-01-17
+/**
+ * 站内信
+* @ClassName: FhsmsController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping(value="/fhsms")

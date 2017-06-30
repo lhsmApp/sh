@@ -22,11 +22,13 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;   
 import org.dom4j.Element;   
 
-/** 
- * 说明：短信接口类
- * 创建人：FH Q313596790
- * 修改时间：2013年2月22日
- * @version
+/**
+ * 短信接口类
+* @ClassName: SmsUtil
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 public class SmsUtil {
 	

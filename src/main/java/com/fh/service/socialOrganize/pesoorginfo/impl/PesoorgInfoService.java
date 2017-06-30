@@ -10,11 +10,13 @@ import com.fh.util.PageData;
 import com.fh.util.StringUtil;
 import com.fh.service.socialOrganize.pesoorginfo.PesoorgInfoManager;
 
-/** 
- * 说明： 体育社会组织领导机构信息
- * 创建人：FH Q313596790
- * 创建时间：2017-05-09
- * @version
+/**
+ * 体育社会组织领导机构信息
+* @ClassName: PesoorgInfoService
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author zhangxiaoliu
+* @date 2017年6月30日
+*
  */
 @Service("pesoorginfoService")
 public class PesoorgInfoService implements PesoorgInfoManager{

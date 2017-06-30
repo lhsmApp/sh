@@ -8,11 +8,13 @@ import com.fh.entity.Page;
 import com.fh.util.PageData;
 import com.fh.service.tmplConfigDict.tmplconfigdict.TmplConfigDictManager;
 
-/** 
- * 说明： 字典配置
- * 创建人：FH Q313596790
- * 创建时间：2017-06-26
- * @version
+/**
+ * 字典配置
+* @ClassName: TmplConfigDictService
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月30日
+*
  */
 @Service("tmplconfigdictService")
 public class TmplConfigDictService implements TmplConfigDictManager{
@@ -79,6 +81,7 @@ public class TmplConfigDictService implements TmplConfigDictManager{
 	}
 	
 	/**获取字典翻译类型
+	 * 张晓柳
 	 * @param 
 	 * @throws Exception
 	 */

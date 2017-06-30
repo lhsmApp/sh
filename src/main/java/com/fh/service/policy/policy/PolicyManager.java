@@ -4,11 +4,13 @@ import java.util.List;
 import com.fh.entity.Page;
 import com.fh.util.PageData;
 
-/** 
- * 说明： 政策法规接口
- * 创建人：FH Q313596790
- * 创建时间：2017-05-09
- * @version
+/**
+ * 政策法规
+* @ClassName: PolicyManager
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jp
+* @date 2017年6月30日
+*
  */
 public interface PolicyManager{
 

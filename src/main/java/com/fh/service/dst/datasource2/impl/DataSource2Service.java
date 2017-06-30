@@ -8,11 +8,13 @@ import com.fh.entity.Page;
 import com.fh.util.PageData;
 import com.fh.service.dst.datasource2.DataSource2Manager;
 
-/** 
- * 说明： 第2数据源例子
- * 创建人：FH Q313596790
- * 创建时间：2016-04-29
- * @version
+/**
+ * 第2数据源例子
+* @ClassName: DataSource2Service
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Service("datasource2Service")
 public class DataSource2Service implements DataSource2Manager{

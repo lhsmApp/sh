@@ -11,9 +11,13 @@ import com.fh.entity.system.Role;
 import com.fh.service.system.role.RoleManager;
 import com.fh.util.PageData;
 
-/**	角色
- * @author FHadmin QQ313596790
- * 修改日期：2015.11.6
+/**
+ * 角色
+* @ClassName: RoleService
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月30日
+*
  */
 @Service("roleService")
 public class RoleService implements RoleManager{

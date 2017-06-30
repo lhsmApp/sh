@@ -9,11 +9,13 @@ import com.fh.entity.Page;
 import com.fh.util.PageData;
 import com.fh.service.jqgridDetail.jqgriddetail.JqGridDetailManager;
 
-/** 
- * 说明： jqgrid详情
- * 创建人：FH Q313596790
- * 创建时间：2017-06-14
- * @version
+/**
+ * jqgrid详情
+* @ClassName: JqGridDetailService
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author zhangxiaoliu
+* @date 2017年6月30日
+*
  */
 @Service("jqgriddetailService")
 public class JqGridDetailService implements JqGridDetailManager{

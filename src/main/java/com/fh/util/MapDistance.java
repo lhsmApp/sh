@@ -3,11 +3,13 @@ package com.fh.util;
 import java.util.HashMap;
 import java.util.Map;
 
-/** 
- * 说明：经纬度处理
- * 创建人：FH Q313596790
- * 修改时间：2014年9月20日
- * @version
+/**
+ * 经纬度处理
+* @ClassName: MapDistance
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 public class MapDistance {  
 	  

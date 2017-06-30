@@ -60,14 +60,12 @@ import java.security.cert.X509Certificate;
 import javax.net.ssl.X509TrustManager;
 
 /**
- * 
-* 类名称：WeixinController.java
-* 类描述： 微信公共平台开发 
-* @author FH 313596790
-* 作者单位： 
-* 联系方式：
-* 创建时间：2014年7月10日
-* @version 1.0
+ * 微信公共平台开发 
+* @ClassName: WeixinController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping(value="/weixin")

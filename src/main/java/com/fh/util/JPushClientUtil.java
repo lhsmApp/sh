@@ -13,11 +13,13 @@ import cn.jpush.api.MessageResult;
 
 import com.fh.controller.base.BaseController;
 
-/** 
- * 说明：极光推送工具类
- * 创建人：FH Q313596790
- * 修改时间：2015年11月24日
- * @version
+/**
+ * 极光推送工具类
+* @ClassName: JPushClientUtil
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping(value="/jpush")

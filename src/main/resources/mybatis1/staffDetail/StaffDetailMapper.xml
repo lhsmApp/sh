@@ -8,6 +8,7 @@
  * 创建时间：2017-06-19
  * @version
  -->
+	<!-- 张晓柳 -->
  
 	<!--表名 -->
 	<sql id="tableName">
@@ -19,16 +20,9 @@
     <sql id="Field"> BILL_CODE, BUSI_DATE, USER_CODE, USER_NAME, STAFF_IDENT, BANK_CARD, USER_GROP, USER_CATG, DEPT_CODE, ORG_UNIT, SAL_RANGE, POST_SALY, BONUS, CASH_BONUS, WORK_OT, BACK_SALY, RET_SALY, CHK_CASH, INTR_SGL_AWAD, SENY_ALLE, POST_ALLE, NS_ALLE, AREA_ALLE, EXPT_ALLE, TECH_ALLE, LIVE_EXPE, LIVE_ALLE, LEAVE_DM, HOUSE_ALLE, ITEM_ALLE, MEAL_EXPE, TRF_ALLE, TEL_EXPE, HLDY_ALLE, KID_ALLE, COOL_EXPE, EXT_SGL_AWAD, PRE_TAX_PLUS, GROSS_PAY, ENDW_INS, UNEMPL_INS, MED_INS, CASD_INS, HOUSE_FUND, SUP_PESN, TAX_BASE_ADJ, ACCRD_TAX, AFTER_TAX, ACT_SALY, GUESS_DIFF, CUST_COL1, CUST_COL2, CUST_COL3, CUST_COL4, CUST_COL5, CUST_COL6, CUST_COL7, CUST_COL8, CUST_COL9, CUST_COL10, ESTB_DEPT </sql>
     
     <!-- 字段值 -->
-    <sql id="FieldValueDefine"> #{BILL_CODE}, #{BUSI_DATE}, #{USER_CODE}, #{USER_NAME}, #{STAFF_IDENT}, #{BANK_CARD}, #{USER_GROP}, #{USER_CATG}, #{DEPT_CODE}, #{ORG_UNIT}, #{SAL_RANGE}, #{POST_SALY}, #{BONUS}, #{CASH_BONUS}, #{WORK_OT}, #{BACK_SALY}, #{RET_SALY}, #{CHK_CASH}, #{INTR_SGL_AWAD}, #{SENY_ALLE}, #{POST_ALLE}, #{NS_ALLE}, #{AREA_ALLE}, #{EXPT_ALLE}, #{TECH_ALLE}, #{LIVE_EXPE}, #{LIVE_ALLE}, #{LEAVE_DM}, #{HOUSE_ALLE}, #{ITEM_ALLE}, #{MEAL_EXPE}, #{TRF_ALLE}, #{TEL_EXPE}, #{HLDY_ALLE}, #{KID_ALLE}, #{COOL_EXPE}, #{EXT_SGL_AWAD}, #{PRE_TAX_PLUS}, #{GROSS_PAY}, #{ENDW_INS}, #{UNEMPL_INS}, #{MED_INS}, #{CASD_INS}, #{HOUSE_FUND}, #{SUP_PESN}, #{TAX_BASE_ADJ}, #{ACCRD_TAX}, #{AFTER_TAX}, #{ACT_SALY}, #{GUESS_DIFF}, #{CUST_COL1}, #{CUST_COL2}, #{CUST_COL3}, #{CUST_COL4}, #{CUST_COL5}, #{CUST_COL6}, #{CUST_COL7}, #{CUST_COL8}, #{CUST_COL9}, #{CUST_COL10}, #{ESTB_DEPT} </sql>
-	<sql id="FieldValueItem"> #{item.BILL_CODE}, #{item.BUSI_DATE}, #{item.USER_CODE}, #{item.USER_NAME}, #{item.STAFF_IDENT}, #{item.BANK_CARD}, #{item.USER_GROP}, #{item.USER_CATG}, #{item.DEPT_CODE}, #{item.ORG_UNIT}, #{item.SAL_RANGE}, #{item.POST_SALY}, #{item.BONUS}, #{item.CASH_BONUS}, #{item.WORK_OT}, #{item.BACK_SALY}, #{item.RET_SALY}, #{item.CHK_CASH}, #{item.INTR_SGL_AWAD}, #{item.SENY_ALLE}, #{item.POST_ALLE}, #{item.NS_ALLE}, #{item.AREA_ALLE}, #{item.EXPT_ALLE}, #{item.TECH_ALLE}, #{item.LIVE_EXPE}, #{item.LIVE_ALLE}, #{item.LEAVE_DM}, #{item.HOUSE_ALLE}, #{item.ITEM_ALLE}, #{item.MEAL_EXPE}, #{item.TRF_ALLE}, #{item.TEL_EXPE}, #{item.HLDY_ALLE}, #{item.KID_ALLE}, #{item.COOL_EXPE}, #{item.EXT_SGL_AWAD}, #{item.PRE_TAX_PLUS}, #{item.GROSS_PAY}, #{item.ENDW_INS}, #{item.UNEMPL_INS}, #{item.MED_INS}, #{item.CASD_INS}, #{item.HOUSE_FUND}, #{item.SUP_PESN}, #{item.TAX_BASE_ADJ}, #{item.ACCRD_TAX}, #{item.AFTER_TAX}, #{item.ACT_SALY}, #{item.GUESS_DIFF}, #{item.CUST_COL1}, #{item.CUST_COL2}, #{item.CUST_COL3}, #{item.CUST_COL4}, #{item.CUST_COL5}, #{item.CUST_COL6}, #{item.CUST_COL7}, #{item.CUST_COL8}, #{item.CUST_COL9}, #{item.CUST_COL10}, #{item.ESTB_DEPT} </sql>
+    <sql id="FieldValue"> #{BILL_CODE}, #{BUSI_DATE}, #{USER_CODE}, #{USER_NAME}, #{STAFF_IDENT}, #{BANK_CARD}, #{USER_GROP}, #{USER_CATG}, #{DEPT_CODE}, #{ORG_UNIT}, #{SAL_RANGE}, #{POST_SALY}, #{BONUS}, #{CASH_BONUS}, #{WORK_OT}, #{BACK_SALY}, #{RET_SALY}, #{CHK_CASH}, #{INTR_SGL_AWAD}, #{SENY_ALLE}, #{POST_ALLE}, #{NS_ALLE}, #{AREA_ALLE}, #{EXPT_ALLE}, #{TECH_ALLE}, #{LIVE_EXPE}, #{LIVE_ALLE}, #{LEAVE_DM}, #{HOUSE_ALLE}, #{ITEM_ALLE}, #{MEAL_EXPE}, #{TRF_ALLE}, #{TEL_EXPE}, #{HLDY_ALLE}, #{KID_ALLE}, #{COOL_EXPE}, #{EXT_SGL_AWAD}, #{PRE_TAX_PLUS}, #{GROSS_PAY}, #{ENDW_INS}, #{UNEMPL_INS}, #{MED_INS}, #{CASD_INS}, #{HOUSE_FUND}, #{SUP_PESN}, #{TAX_BASE_ADJ}, #{ACCRD_TAX}, #{AFTER_TAX}, #{ACT_SALY}, #{GUESS_DIFF}, #{CUST_COL1}, #{CUST_COL2}, #{CUST_COL3}, #{CUST_COL4}, #{CUST_COL5}, #{CUST_COL6}, #{CUST_COL7}, #{CUST_COL8}, #{CUST_COL9}, #{CUST_COL10}, #{ESTB_DEPT} </sql>
 	
-	<!-- 获取系统期间-->
-	<select id="currentSection" parameterType="pd" resultType="String">
-		select KEY_VALUE
-		from tb_sys_config
-		where KEY_CODE = 'SystemDataTime'
-	</select>
-	
+	<!-- 张晓柳 -->
 	<!-- 获取数据库中表结构-->
 	<select id="getTableColumns" parameterType="pd" resultType="com.fh.entity.TableColumns">
 	    SELECT UPPER(column_name) column_name, 
@@ -40,33 +34,37 @@
 	    FROM information_schema.columns 
 	    WHERE table_name = 'tb_staff_detail'
 	</select>
-	
-	<!-- 获取字典翻译类型-->
-	<select id="getDicType" parameterType="String" resultType="String">
-	    SELECT SRC_TYPE
-	    FROM tb_tmpl_config_dict
-	    WHERE UPPER(DICT_CODE) = UPPER(#{DICT_CODE})
-	</select>
-	
-	<!-- 获取SysDictionaries字典-->
-	<select id="getSysDictionaries" parameterType="String" resultType="com.fh.entity.system.Dictionaries">
-	    SELECT r.*
-	    FROM sys_dictionaries p, sys_dictionaries r
-	    WHERE p.DICTIONARIES_ID = r.PARENT_ID
-	    and UPPER(p.BIANMA) = UPPER(#{BIANMA})
-	    order by ORDER_BY
-	</select>
-	<!-- 获取表字典-->
-	<select id="getDepartDic" parameterType="pd" resultType="com.fh.entity.system.Department">
-	    SELECT * 
-	    FROM oa_department
-	</select>
-	<!-- 获取员工编码-->
+
+	<!-- 张晓柳 -->
+	<!-- 获取员工编码 相当于字典-->
 	<select id="getHaveUserCodeDic" parameterType="pd" resultType="String">
 		select USER_CODE
 		from <include refid="tableName"></include>
 		where BUSI_DATE = ${RPT_DUR}
 		and DEPT_CODE = ${RPT_DEPT}
+	</select>
+	
+	<!-- 获取数据 验证数据重复 -->
+	<select id="findByPd" parameterType="pd" resultType="com.fh.entity.StaffDetailModel">
+		select 
+		    <include refid="FieldSelectKey"></include>
+		    <include refid="Field"></include>
+		from 
+		    <include refid="tableName"></include>
+		where BUSI_DATE = #{BUSI_DATE}
+		and (USER_CODE = #{USER_CODE} and USER_CODE != #{USER_CODE__})
+	</select>
+	<select id="findByModel" parameterType="com.fh.entity.StaffDetailModel" resultType="com.fh.entity.StaffDetailModel">
+		select 
+		    <include refid="FieldSelectKey"></include>
+		    <include refid="Field"></include>
+		from 
+		    <include refid="tableName"></include>
+        <where>
+		<foreach item="item" index="index" collection="list" open=" " separator=" or " close=" ">
+            (BUSI_DATE = #{item.BUSI_DATE} and USER_CODE = #{item.USER_CODE} and USER_CODE != #{item.USER_CODE__})
+		</foreach>
+		</where>
 	</select>
 	
 	<!-- 列表 -->
@@ -115,29 +113,6 @@
 		</if>
 	</select>
 	
-	<!-- 获取数据 -->
-	<select id="findByPd" parameterType="pd" resultType="com.fh.entity.StaffDetailModel">
-		select 
-		    <include refid="FieldSelectKey"></include>
-		    <include refid="Field"></include>
-		from 
-		    <include refid="tableName"></include>
-		where BUSI_DATE = #{BUSI_DATE}
-		and (USER_CODE = #{USER_CODE} and USER_CODE != #{USER_CODE__})
-	</select>
-	<select id="findByModel" parameterType="com.fh.entity.StaffDetailModel" resultType="com.fh.entity.StaffDetailModel">
-		select 
-		    <include refid="FieldSelectKey"></include>
-		    <include refid="Field"></include>
-		from 
-		    <include refid="tableName"></include>
-        <where>
-		<foreach item="item" index="index" collection="list" open=" " separator=" or " close=" ">
-            (BUSI_DATE = #{item.BUSI_DATE} and USER_CODE = #{item.USER_CODE} and USER_CODE != #{item.USER_CODE__})
-		</foreach>
-		</where>
-	</select>
-	
 	<!-- 新增 -->
 	<insert id="save" parameterType="pd">
 		insert into 
@@ -145,7 +120,7 @@
 		(
 	    <include refid="Field"></include>
 		) values (
-	    <include refid="FieldValueDefine"></include>
+	    <include refid="FieldValue"></include>
 		)
 	</insert>
 	
@@ -217,19 +192,6 @@
 			ESTB_DEPT = #{ESTB_DEPT}
 		where BUSI_DATE = #{BUSI_DATE__} 
 		and USER_CODE = #{USER_CODE__}
-	
-		<!-- delete from
-		<include refid="tableName"></include>
-		where BUSI_DATE = #{BUSI_DATE__} 
-		and USER_CODE = #{USER_CODE__};
-		
-		insert into 
-	    <include refid="tableName"></include>
-		(
-	    <include refid="Field"></include>
-		) values (
-	    <include refid="FieldValueDefine"></include>
-		); -->
 	</update>
 	
 	<!-- 批量删除 -->
@@ -311,22 +273,6 @@
 		        where BUSI_DATE = #{BUSI_DATE__} 
 		        and USER_CODE = #{USER_CODE__}
 	
-		<!-- <foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
-		    <if test="item!=null">
-		        delete from
-	        	<include refid="tableName"></include>
-		        where BUSI_DATE = #{item.BUSI_DATE__} 
-		        and USER_CODE = #{item.USER_CODE__};
-		
-		        insert into 
-	            <include refid="tableName"></include>
-		        (
-	            <include refid="Field"></include>
-		        ) values (
-	            <include refid="FieldValueItem"></include>
-		        );
-		    </if>
-		</foreach> -->
 	</update>
 	
 	<!-- 导出列表 -->
@@ -368,7 +314,7 @@
 		(
 	    <include refid="Field"></include>
 		) values (
-	    <include refid="FieldValueDefine"></include>
+	    <include refid="FieldValue"></include>
 		)
 	</insert>
 	

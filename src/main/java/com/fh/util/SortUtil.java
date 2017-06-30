@@ -11,11 +11,14 @@ import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.collections.ComparatorUtils;
 import org.apache.commons.collections.comparators.ComparableComparator;
 import org.apache.commons.collections.comparators.ComparatorChain;
-/** 
- * 说明：list排序
- * 创建人：FH Q313596790
- * 修改时间：2015年11月24日
- * @version
+
+/**
+ * list排序
+* @ClassName: SortUtil
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 public class SortUtil {
 	public static void main(String[] args) {

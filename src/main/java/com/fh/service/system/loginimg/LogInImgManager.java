@@ -4,11 +4,13 @@ import java.util.List;
 import com.fh.entity.Page;
 import com.fh.util.PageData;
 
-/** 
- * 说明： 登录页面背景图片接口
- * 创建人：FH Q313596790
- * 创建时间：2016-06-03
- * @version
+/**
+ * 登录页面背景图片接口
+* @ClassName: LogInImgManager
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 public interface LogInImgManager{
 

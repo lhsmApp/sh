@@ -8,11 +8,13 @@ import com.fh.entity.Page;
 import com.fh.util.PageData;
 import com.fh.service.system.loginimg.LogInImgManager;
 
-/** 
- * 说明： 登录页面背景图片
- * 创建人：FH Q313596790
- * 创建时间：2016-06-03
- * @version
+/**
+ * 登录页面背景图片
+* @ClassName: LogInImgService
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Service("loginimgService")
 public class LogInImgService implements LogInImgManager{

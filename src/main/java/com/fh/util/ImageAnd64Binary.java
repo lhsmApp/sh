@@ -9,11 +9,13 @@ import java.io.OutputStream;
 import Decoder.BASE64Decoder;
 import Decoder.BASE64Encoder;
 
-/** 
- * 说明：BASE64处理
- * 创建人：FH Q313596790
- * 修改时间：2015年11月24日
- * @version
+/**
+ * BASE64处理
+* @ClassName: ImageAnd64Binary
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 public class ImageAnd64Binary {
     public static void main(String[] args){

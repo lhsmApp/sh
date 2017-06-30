@@ -1,11 +1,16 @@
 package com.fh.util.mail;   
+
+
+import java.util.Properties; 
+
 /**
  * 发送邮件需要使用的基本信息 
-* @author FH QQ 313596790[青苔]
-* 修改时间：2015年7月27日
-* @version 2.0
+* @ClassName: MailSenderInfo
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
-import java.util.Properties;    
 public class MailSenderInfo {    
     // 发送邮件的服务器的IP和端口    
     private String mailServerHost;    

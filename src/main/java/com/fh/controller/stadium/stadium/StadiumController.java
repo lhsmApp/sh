@@ -37,10 +37,13 @@ import com.fh.util.PageData;
 
 import net.sf.json.JSONArray;
 
-/** 
- * 说明：体育场馆管理
- * 创建人：FH Q313596790
- * 创建时间：2017-05-08
+/**
+ * 体育场馆管理
+* @ClassName: StadiumController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping(value="/stadium")

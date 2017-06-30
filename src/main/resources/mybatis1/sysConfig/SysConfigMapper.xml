@@ -4,7 +4,7 @@
 	
 	<!--表名 -->
 	<sql id="tableName">
-		TB_SYSCONFIG
+		tb_sys_config
 	</sql>
 	
 	<!-- 字段 -->
@@ -103,5 +103,14 @@
 		</foreach>
 	</delete>
 	
-	<!-- fh313596790qq(青苔) -->
+	
+	<!-- 获取系统期间-->
+	<!-- 张晓柳 -->
+	<select id="currentSection" parameterType="pd" resultType="String">
+		select KEY_VALUE
+		from
+        <include refid="tableName"></include>
+		where KEY_CODE = 'SystemDataTime'
+	</select>
+	
 </mapper>

@@ -8,11 +8,13 @@ import com.fh.entity.Page;
 import com.fh.util.PageData;
 import com.fh.service.sysConfig.sysconfig.SysConfigManager;
 
-/** 
- * 说明： 系统配置
- * 创建人：FH Q313596790
- * 创建时间：2017-06-26
- * @version
+/**
+ * 系统配置
+* @ClassName: SysConfigService
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Service("sysconfigService")
 public class SysConfigService implements SysConfigManager{
@@ -77,6 +79,15 @@ public class SysConfigService implements SysConfigManager{
 	public void deleteAll(String[] ArrayDATA_IDS)throws Exception{
 		dao.delete("SysConfigMapper.deleteAll", ArrayDATA_IDS);
 	}
-	
+
+
+	/**获取系统期间
+	 * 张晓柳
+	 * @param pd
+	 * @throws Exception
+	 */
+	public String currentSection(PageData pd)throws Exception{
+		return (String) dao.findForObject("SysConfigMapper.currentSection", pd);
+	}
 }
 

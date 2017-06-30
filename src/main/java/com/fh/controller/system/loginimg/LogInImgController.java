@@ -24,10 +24,13 @@ import com.fh.util.Jurisdiction;
 import com.fh.util.PathUtil;
 import com.fh.service.system.loginimg.LogInImgManager;
 
-/** 
- * 说明：登录页面背景图片
- * 创建人：FH Q313596790
- * 创建时间：2016-06-03
+/**
+ * 登录页面背景图片
+* @ClassName: LogInImgController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping(value="/loginimg")

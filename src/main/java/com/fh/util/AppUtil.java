@@ -6,9 +6,13 @@ import java.util.Map;
 
 import org.codehaus.jackson.map.util.JSONPObject;
 
-/** 接口参数校验
- * @author:	fh qq313596790[青苔]
- * 修改日期：2015/11/2
+/**
+ * 接口参数校验
+* @ClassName: AppUtil
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 public class AppUtil  {
 	

@@ -28,10 +28,13 @@ import com.fh.util.Tools;
 import com.fh.service.jqgridDetail.jqgriddetail.JqGridDetailManager;
 import com.fh.service.jqgridDetail.jqgriddetail.impl.JqGridDetailService;
 
-/** 
- * 说明：jqgrid详情
- * 创建人：FH Q313596790
- * 创建时间：2017-06-14
+/**
+ * jqgrid详情
+* @ClassName: JqGridDetailController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping(value="/jqgriddetail")

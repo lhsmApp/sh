@@ -30,10 +30,13 @@ import com.fh.util.PageData;
 import com.fh.util.Jurisdiction;
 import com.fh.service.fhoa.department.DepartmentManager;
 
-/** 
- * 说明：组织机构
- * 创建人：FH Q313596790
- * 创建时间：2015-12-16
+/**
+ * 组织机构
+* @ClassName: DepartmentController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping(value="/department")

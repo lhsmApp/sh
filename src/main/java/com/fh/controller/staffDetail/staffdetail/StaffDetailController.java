@@ -42,13 +42,17 @@ import com.fh.util.excel.LeadingInExcel;
 
 import net.sf.json.JSONArray;
 
+import com.fh.service.fhoa.department.impl.DepartmentService;
 import com.fh.service.staffDetail.staffdetail.StaffDetailManager;
+import com.fh.service.sysConfig.sysconfig.SysConfigManager;
 import com.fh.service.sysSealedInfo.syssealedinfo.impl.SysSealedInfoService;
+import com.fh.service.system.dictionaries.impl.DictionariesService;
+import com.fh.service.tmplConfigDict.tmplconfigdict.impl.TmplConfigDictService;
 import com.fh.service.tmplconfig.tmplconfig.impl.TmplConfigService;
 
 /** 
  * 说明：业务封存信息
- * 创建人：FH Q313596790
+ * 创建人：zhangxiaoliu
  * 创建时间：2017-06-16
  */
 @Controller
@@ -62,6 +66,15 @@ public class StaffDetailController extends BaseController {
 	private TmplConfigService tmplconfigService;
 	@Resource(name="syssealedinfoService")
 	private SysSealedInfoService syssealedinfoService;
+	@Resource(name="sysconfigService")
+	private SysConfigManager sysConfigManager;
+	@Resource(name="tmplconfigdictService")
+	private TmplConfigDictService tmplconfigdictService;
+	@Resource(name="dictionariesService")
+	private DictionariesService dictionariesService;
+	@Resource(name="departmentService")
+	private DepartmentService departmentService;
+	
 
 	//底行显示的求和与平均值字段
 	String SqlUserdata = "";
@@ -135,7 +148,7 @@ public class StaffDetailController extends BaseController {
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("staffDetail/staffdetail/staffdetail_list");
 		//当前期间,取自tb_system_config的SystemDateTime字段
-		SystemDateTime = staffdetailService.currentSection(pd);
+		SystemDateTime = sysConfigManager.currentSection(pd);
 		mv.addObject("SystemDateTime", SystemDateTime);
 		//当前登录人所在二级单位
 		DepartCode = Jurisdiction.getCurrentDepartmentID();//
@@ -248,10 +261,10 @@ public class StaffDetailController extends BaseController {
 	
 	public String getDicValue(String dicName, PageData pd) throws Exception{
 		StringBuilder ret = new StringBuilder();
-		String strDicType = staffdetailService.getDicType(dicName);
+		String strDicType = tmplconfigdictService.getDicType(dicName);
 		Map<String, String> dicAdd = new HashMap<String, String>();
 		if(strDicType.equals("1")){
-			List<Dictionaries> dicList = staffdetailService.getSysDictionaries(dicName);
+			List<Dictionaries> dicList = dictionariesService.getSysDictionaries(dicName);
 			for(Dictionaries dic : dicList){
 				if(ret!=null && !ret.toString().trim().equals("")){
 					ret.append(";");
@@ -261,7 +274,7 @@ public class StaffDetailController extends BaseController {
 			}
 		} else if(strDicType.equals("2")){
 			if(dicName.toUpperCase().equals(("oa_department").toUpperCase())){
-				List<Department> listPara = (List<Department>) staffdetailService.getDepartDic(pd);
+				List<Department> listPara = (List<Department>) departmentService.getDepartDic(pd);
 				for(Department dic : listPara){
 					if(ret!=null && !ret.toString().trim().equals("")){
 						ret.append(";");

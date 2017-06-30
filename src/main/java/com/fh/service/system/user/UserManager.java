@@ -7,9 +7,13 @@ import com.fh.entity.system.User;
 import com.fh.util.PageData;
 
 
-/** 用户接口类
- * @author fh313596790qq(青苔)
- * 修改时间：2015.11.2
+/**
+ * 用户接口类
+* @ClassName: UserManager
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月30日
+*
  */
 public interface UserManager {
 	

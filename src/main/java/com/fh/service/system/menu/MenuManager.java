@@ -6,8 +6,13 @@ import com.fh.entity.system.Menu;
 import com.fh.util.PageData;
 
 
-/**说明：MenuService 菜单处理接口
- * @author fh 313596790
+/**
+ * 菜单处理接口
+* @ClassName: MenuManager
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月30日
+*
  */
 public interface MenuManager {
 

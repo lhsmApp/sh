@@ -18,9 +18,13 @@ import com.fh.dao.redis.RedisDao;
 import com.fh.util.AppUtil;
 import com.fh.util.PageData;
 
-/** RedisDemo
- * @author FH Q313596790
- * 2016.5.8
+/**
+ * RedisDemo
+* @ClassName: RedisDemoController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping(value="/appRedisDemo")
@@ -54,7 +58,7 @@ public class RedisDemoController extends BaseController{
 		Map<String, String> jmap = new HashMap<String, String>();
     	jmap.put("name", "fhadmin");
     	jmap.put("age", "22");
-    	jmap.put("qq", "313596790");
+    	jmap.put("qq", "609877918");
 		System.out.println(redisDaoImpl.addMap("fh", jmap));				//存储Map
 		System.out.println("获取Map:"+redisDaoImpl.getMap("fh"));			//获取Map
 		

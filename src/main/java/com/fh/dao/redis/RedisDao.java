@@ -5,11 +5,13 @@ import java.util.Map;
 import java.util.Set;
 
 
-/** 
- * 说明： 第2数据源例子接口
- * 创建人：FH Q313596790
- * 创建时间：2016-05-2
- * @version
+/**
+ * 第2数据源例子接口
+* @ClassName: RedisDao
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 public interface RedisDao {
 	

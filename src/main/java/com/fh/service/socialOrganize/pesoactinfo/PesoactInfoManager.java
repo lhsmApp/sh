@@ -4,11 +4,13 @@ import java.util.List;
 import com.fh.entity.Page;
 import com.fh.util.PageData;
 
-/** 
- * 说明： 体育社会组织活动、资金、评价情况接口
- * 创建人：FH Q313596790
- * 创建时间：2017-05-09
- * @version
+/**
+ * 体育社会组织活动、资金、评价情况接口
+* @ClassName: PesoactInfoManager
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author zxl
+* @date 2017年6月30日
+*
  */
 public interface PesoactInfoManager{
 

@@ -6,11 +6,13 @@ import com.fh.entity.Page;
 import com.fh.entity.system.Department;
 import com.fh.util.PageData;
 
-/** 
- * 说明： 组织机构接口类
- * 创建人：FH Q313596790
- * 创建时间：2015-12-16
- * @version
+/**
+ *  组织机构接口类
+* @ClassName: DepartmentManager
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月30日
+*
  */
 public interface DepartmentManager{
 
@@ -96,6 +98,7 @@ public interface DepartmentManager{
 	public String getDEPARTMENT_CODES(String DEPARTMENT_ID) throws Exception;
 	
 	/**获取表字典
+	 * 张晓柳
 	 * @param 
 	 * @throws Exception
 	 */

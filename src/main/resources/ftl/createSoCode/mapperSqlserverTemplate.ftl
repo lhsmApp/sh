@@ -117,5 +117,5 @@
 		where
 			${faobject}_ID = ${r"#{"}${faobject}_ID${r"}"}
 	</select>
-	!-- fh313596790qq(青苔) -->
+	
 </mapper>

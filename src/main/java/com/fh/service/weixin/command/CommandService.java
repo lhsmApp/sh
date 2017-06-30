@@ -10,10 +10,13 @@ import com.fh.dao.DaoSupport;
 import com.fh.entity.Page;
 import com.fh.util.PageData;
 
-/** 
- * 类名称：CommandService
- * 创建人：FH QQ 313596790
- * 创建时间：2015-05-09
+/**
+ * 
+* @ClassName: CommandService
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Service("commandService")
 public class CommandService {

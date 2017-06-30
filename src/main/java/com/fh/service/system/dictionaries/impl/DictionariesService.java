@@ -12,11 +12,13 @@ import com.fh.entity.system.Dictionaries;
 import com.fh.util.PageData;
 import com.fh.service.system.dictionaries.DictionariesManager;
 
-/** 
- * 说明： 数据字典
- * 创建人：FH Q313596790
- * 创建时间：2015-12-16
- * @version
+/**
+ * 数据字典
+* @ClassName: DictionariesService
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月30日
+*
  */
 @Service("dictionariesService")
 public class DictionariesService implements DictionariesManager{
@@ -109,6 +111,7 @@ public class DictionariesService implements DictionariesManager{
 	}
 	
 	/**获取SysDictionaries字典
+	 * 张晓柳
 	 * @param 
 	 * @throws Exception
 	 */
