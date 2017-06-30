@@ -201,7 +201,7 @@
 			rownumbers: true, // show row numbers
             rownumWidth: 35, // the width of the row numbers columns			
 	        ondblClickRow: dbClickRow,//双击表格编辑
-	        editurl: '<%=basePath%>tmplconfig/edit.do?',
+	        //editurl: '<%=basePath%>tmplconfig/edit.do?',
 		});
 		
 		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
@@ -243,7 +243,7 @@
                 } , 
                 afterSubmit: fn_addSubmit
 			},
-			
+			{},
 			{
 				//search form
 				recreateForm: true,
@@ -254,7 +254,7 @@
 				multipleSearch: true,
 				
 				//multipleGroup:true,
-				showQuery: true
+				showQuery: false
 				
 			}
 		);
@@ -423,7 +423,7 @@
 			setTimeout(function(){
 				 $(cell).find('input[type=checkbox]')
 					.addClass('ace ace-switch ace-switch-5')
-					.after('<span class="lbl" data-lbl="是        否"></span>'); 
+					.after('<span class="lbl" data-lbl="是             否"></span>'); 
 				 if (cellvalue=="是") {	
 					$(cell).find('input[type=checkbox]').attr('checked','checked');
 				 }else{
@@ -534,7 +534,8 @@
 		function dbClickRow(rowId, rowIndex, colnumIndex, event){ 
 			if (rowId && rowId !== lastSelection) {
                 var grid = $("#jqGrid");
-                grid.jqGrid('saveRow',lastSelection);
+                //grid.jqGrid('saveRow',lastSelection);
+                grid.jqGrid('saveRow',lastSelection,false, 'clientArray');
                 grid.jqGrid('restoreRow',lastSelection);
                 grid.jqGrid('editRow',rowId, {keys: true} );
                 lastSelection = rowId;
