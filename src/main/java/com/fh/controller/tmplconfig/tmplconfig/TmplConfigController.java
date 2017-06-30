@@ -138,6 +138,7 @@ public class TmplConfigController extends BaseController {
 		
 		List<PageData> dictList = tmplconfigService.dictList(pd);
 		StringBuilder dictString = new StringBuilder();
+		dictString.append(" : ;");
 		for (PageData pageData : dictList) {
 			dictString.append("").append(pageData.getString("DICT_CODE")).append(":").append(pageData.getString("DICT_NAME")).append(";");
 		}

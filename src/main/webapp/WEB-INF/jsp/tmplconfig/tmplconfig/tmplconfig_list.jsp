@@ -201,6 +201,7 @@
 			rownumbers: true, // show row numbers
             rownumWidth: 35, // the width of the row numbers columns			
 	        ondblClickRow: dbClickRow,//双击表格编辑
+	        editurl: '<%=basePath%>tmplconfig/edit.do?',
 		});
 		
 		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
@@ -429,6 +430,11 @@
 				 	$(cell).find('input[type=checkbox]').removeAttr('checked');
 				 }
 			}, 0);
+			if (cellvalue=="是") {
+				return 1;
+			} else {
+				return 0;
+			} 
 			
 		}
 		
@@ -442,7 +448,7 @@
 		
 		
 		
-		 function unformatSelect(cellvalue, options, cellobject ) {
+		 /* function unformatSelect(cellvalue, options, cellobject ) {
 			 var unformatValue = '';
 			 
 			 var strs= new Array(); 
@@ -463,7 +469,7 @@
 			  });
 			  return unformatValue;
 		}
-		 
+		  */
 		
     
 		function initComplete(){
@@ -528,6 +534,7 @@
 		function dbClickRow(rowId, rowIndex, colnumIndex, event){ 
 			if (rowId && rowId !== lastSelection) {
                 var grid = $("#jqGrid");
+                grid.jqGrid('saveRow',lastSelection);
                 grid.jqGrid('restoreRow',lastSelection);
                 grid.jqGrid('editRow',rowId, {keys: true} );
                 lastSelection = rowId;
