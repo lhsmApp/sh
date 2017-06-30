@@ -251,7 +251,7 @@
 				<foreach item="item" index="index" collection="list" open=" " separator=", " close=" ">
 		    <if test="item!=null">
 				<trim prefix="(" suffix=")" suffixOverrides=",">
-				#{item.DEPT_CODE},#{item.TABLE_CODE},#{item.COL_CODE},#{item.COL_NAME},#{item.DISP_ORDER},#{item.DICT_NAME},#{item.COL_HIDE},#{item.COL_SUM},#{item.COL_AVE}
+				#{item.DEPT_CODE},#{item.TABLE_CODE},#{item.COL_CODE},#{item.COL_NAME},#{item.DISP_ORDER},#{item.DICT_TRANS},#{item.COL_HIDE},#{item.COL_SUM},#{item.COL_AVE}
 				<!-- <include refid="FieldValue"></include> -->
 				</trim>
 		</if>

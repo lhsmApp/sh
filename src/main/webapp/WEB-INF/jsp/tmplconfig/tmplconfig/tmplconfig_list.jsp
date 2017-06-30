@@ -176,7 +176,7 @@
 				{ label: '列名称', name: 'COL_NAME', width: 60,editable: true,},
 				{ label: '显示序号', name: 'DISP_ORDER', width: 80,formatter: 'int', sorttype: 'number',editable: true,},
 				{ label: '字典翻译', name: 'DICT_TRANS', width: 80,align:'center',editable: true,edittype: 'select',formatter:'select',formatteroptions:{value:"${dictString}"},editoptions:{value:"${dictString}"}},                  
-				{ label: '列隐藏', name: 'COL_HIDE', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch,formatter: customFmatterState},                   
+				{ label: '列显示', name: 'COL_HIDE', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch,formatter: customFmatterState},                   
 				{ label: '列汇总', name: 'COL_SUM', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch,formatter: customFmatterState},                   
 				{ label: '列平均值', name: 'COL_AVE', width: 80, editable: true,align:'center',edittype:"checkbox",editoptions: {value:"1:0"},unformat: aceSwitch,formatter: customFmatterState}                   
 			],
@@ -201,6 +201,7 @@
 			rownumbers: true, // show row numbers
             rownumWidth: 35, // the width of the row numbers columns			
 	        ondblClickRow: dbClickRow,//双击表格编辑
+	        editurl: '<%=basePath%>tmplconfig/edit.do?',
 		});
 		
 		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
@@ -429,6 +430,11 @@
 				 	$(cell).find('input[type=checkbox]').removeAttr('checked');
 				 }
 			}, 0);
+			if (cellvalue=="是") {
+				return 1;
+			} else {
+				return 0;
+			} 
 			
 		}
 		
@@ -442,7 +448,7 @@
 		
 		
 		
-		 function unformatSelect(cellvalue, options, cellobject ) {
+		 /* function unformatSelect(cellvalue, options, cellobject ) {
 			 var unformatValue = '';
 			 
 			 var strs= new Array(); 
@@ -463,7 +469,7 @@
 			  });
 			  return unformatValue;
 		}
-		 
+		  */
 		
     
 		function initComplete(){
@@ -490,6 +496,18 @@
 		
         
         function copyData() {
+        	
+        	if('${temporary}'== true){
+				$("#btnCopy").tips({
+					side:3,
+		            msg:'不能复制',
+		            bg:'#AE81FF',
+		            time:2
+		        });
+				$("#btnCopy").focus();
+			return false;
+			}
+        	
         	var TABLE_NO = $("#TABLE_NO").val(); 
 			var DEPARTMENT_CODE = $("#DEPARTMENT_CODE").val(); 
         	 top.jzts();
@@ -528,6 +546,7 @@
 		function dbClickRow(rowId, rowIndex, colnumIndex, event){ 
 			if (rowId && rowId !== lastSelection) {
                 var grid = $("#jqGrid");
+                grid.jqGrid('saveRow',lastSelection);
                 grid.jqGrid('restoreRow',lastSelection);
                 grid.jqGrid('editRow',rowId, {keys: true} );
                 lastSelection = rowId;

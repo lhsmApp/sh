@@ -117,6 +117,13 @@ public class TmplConfigController extends BaseController {
 		PageData pd = new PageData();
 		pd = this.getPageData();
 		page.setPd(pd);
+		
+		List<PageData> temporaryList = tmplconfigService.listAll(page);	
+		if (temporaryList.size()!=0) {
+			mv.addObject("temporary", false);
+		} else {
+			mv.addObject("temporary", true);
+		}
 		List<PageData>	varList = tmplconfigService.list(page);	//列出TmplConfigBase列表
 		List<PageData>	listBase = tmplconfigService.listBase(page);	//列出TmplConfigBase列表
 		String TABLE_CODE = pd.getString("TABLE_CODE");				//关键词检索条件
@@ -138,6 +145,7 @@ public class TmplConfigController extends BaseController {
 		
 		List<PageData> dictList = tmplconfigService.dictList(pd);
 		StringBuilder dictString = new StringBuilder();
+		dictString.append(" : ;");
 		for (PageData pageData : dictList) {
 			dictString.append("").append(pageData.getString("DICT_CODE")).append(":").append(pageData.getString("DICT_NAME")).append(";");
 		}
