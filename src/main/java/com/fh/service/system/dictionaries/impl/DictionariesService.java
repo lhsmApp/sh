@@ -109,6 +109,7 @@ public class DictionariesService implements DictionariesManager{
 	}
 	
 	/**获取SysDictionaries字典
+	 * 张晓柳
 	 * @param 
 	 * @throws Exception
 	 */

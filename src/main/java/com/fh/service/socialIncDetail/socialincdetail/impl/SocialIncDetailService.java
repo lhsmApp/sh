@@ -1,4 +1,4 @@
-package com.fh.service.tmplConfigDict.tmplconfigdict.impl;
+package com.fh.service.socialIncDetail.socialincdetail.impl;
 
 import java.util.List;
 import javax.annotation.Resource;
@@ -6,16 +6,16 @@ import org.springframework.stereotype.Service;
 import com.fh.dao.DaoSupport;
 import com.fh.entity.Page;
 import com.fh.util.PageData;
-import com.fh.service.tmplConfigDict.tmplconfigdict.TmplConfigDictManager;
+import com.fh.service.socialIncDetail.socialincdetail.SocialIncDetailManager;
 
 /** 
- * 说明： 字典配置
- * 创建人：FH Q313596790
- * 创建时间：2017-06-26
+ * 说明： socialIncDetail
+ * 创建人：zhangxiaoliu
+ * 创建时间：2017-06-30
  * @version
  */
-@Service("tmplconfigdictService")
-public class TmplConfigDictService implements TmplConfigDictManager{
+@Service("socialincdetailService")
+public class SocialIncDetailService implements SocialIncDetailManager{
 
 	@Resource(name = "daoSupport")
 	private DaoSupport dao;
@@ -25,7 +25,7 @@ public class TmplConfigDictService implements TmplConfigDictManager{
 	 * @throws Exception
 	 */
 	public void save(PageData pd)throws Exception{
-		dao.save("TmplConfigDictMapper.save", pd);
+		dao.save("SocialIncDetailMapper.save", pd);
 	}
 	
 	/**删除
@@ -33,7 +33,7 @@ public class TmplConfigDictService implements TmplConfigDictManager{
 	 * @throws Exception
 	 */
 	public void delete(PageData pd)throws Exception{
-		dao.delete("TmplConfigDictMapper.delete", pd);
+		dao.delete("SocialIncDetailMapper.delete", pd);
 	}
 	
 	/**修改
@@ -41,7 +41,7 @@ public class TmplConfigDictService implements TmplConfigDictManager{
 	 * @throws Exception
 	 */
 	public void edit(PageData pd)throws Exception{
-		dao.update("TmplConfigDictMapper.edit", pd);
+		dao.update("SocialIncDetailMapper.edit", pd);
 	}
 	
 	/**列表
@@ -50,7 +50,7 @@ public class TmplConfigDictService implements TmplConfigDictManager{
 	 */
 	@SuppressWarnings("unchecked")
 	public List<PageData> list(Page page)throws Exception{
-		return (List<PageData>)dao.findForList("TmplConfigDictMapper.datalistPage", page);
+		return (List<PageData>)dao.findForList("SocialIncDetailMapper.datalistPage", page);
 	}
 	
 	/**列表(全部)
@@ -59,7 +59,7 @@ public class TmplConfigDictService implements TmplConfigDictManager{
 	 */
 	@SuppressWarnings("unchecked")
 	public List<PageData> listAll(PageData pd)throws Exception{
-		return (List<PageData>)dao.findForList("TmplConfigDictMapper.listAll", pd);
+		return (List<PageData>)dao.findForList("SocialIncDetailMapper.listAll", pd);
 	}
 	
 	/**通过id获取数据
@@ -67,7 +67,7 @@ public class TmplConfigDictService implements TmplConfigDictManager{
 	 * @throws Exception
 	 */
 	public PageData findById(PageData pd)throws Exception{
-		return (PageData)dao.findForObject("TmplConfigDictMapper.findById", pd);
+		return (PageData)dao.findForObject("SocialIncDetailMapper.findById", pd);
 	}
 	
 	/**批量删除
@@ -75,16 +75,8 @@ public class TmplConfigDictService implements TmplConfigDictManager{
 	 * @throws Exception
 	 */
 	public void deleteAll(String[] ArrayDATA_IDS)throws Exception{
-		dao.delete("TmplConfigDictMapper.deleteAll", ArrayDATA_IDS);
+		dao.delete("SocialIncDetailMapper.deleteAll", ArrayDATA_IDS);
 	}
 	
-	/**获取字典翻译类型
-	 * 张晓柳
-	 * @param 
-	 * @throws Exception
-	 */
-	public String getDicType(String dicName)throws Exception{
-		return (String)dao.findForObject("TmplConfigDictMapper.getDicType", dicName);
-	}
 }
 

@@ -55,6 +55,7 @@ public interface TmplConfigDictManager{
 	public void deleteAll(String[] ArrayDATA_IDS)throws Exception;
 	
 	/**获取字典翻译类型
+	 * 张晓柳
 	 * @param pd
 	 * @throws Exception
 	 */

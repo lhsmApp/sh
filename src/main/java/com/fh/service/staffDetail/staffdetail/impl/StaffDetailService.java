@@ -26,15 +26,8 @@ public class StaffDetailService implements StaffDetailManager{
 	@Resource(name = "daoSupport")
 	private DaoSupport dao;
 	
-	/**获取系统期间
-	 * @param pd
-	 * @throws Exception
-	 */
-	public String currentSection(PageData pd)throws Exception{
-		return (String) dao.findForObject("StaffDetailMapper.currentSection", pd);
-	}
-	
 	/**获取某表的所有列
+	 * 张晓柳
 	 * @param 
 	 * @throws Exception
 	 */
@@ -44,6 +37,7 @@ public class StaffDetailService implements StaffDetailManager{
 	}
 	
 	/**获取数据
+	 * 张晓柳
 	 * @param pd
 	 * @throws Exception
 	 */
@@ -53,6 +47,7 @@ public class StaffDetailService implements StaffDetailManager{
 	}
 	
 	/**获取数据
+	 * 张晓柳
 	 * @param pd
 	 * @throws Exception
 	 */
@@ -142,31 +137,7 @@ public class StaffDetailService implements StaffDetailManager{
 	public void batchImport(List<StaffDetailModel> listData)throws Exception{
 		dao.batchImport("StaffDetailMapper.importDelete", "StaffDetailMapper.importInsert", listData);
 	}
-	
-	/**获取字典翻译类型
-	 * @param 
-	 * @throws Exception
-	 */
-	public String getDicType(String dicName)throws Exception{
-		return (String)dao.findForObject("StaffDetailMapper.getDicType", dicName);
-	}
-	
-	/**获取SysDictionaries字典
-	 * @param 
-	 * @throws Exception
-	 */
-	@SuppressWarnings("unchecked")
-	public List<Dictionaries> getSysDictionaries(String dicName)throws Exception{
-		return (List<Dictionaries>)dao.findForList("StaffDetailMapper.getSysDictionaries", dicName);
-	}
-	/**获取表字典
-	 * @param 
-	 * @throws Exception
-	 */
-	@SuppressWarnings("unchecked")
-	public List<Department> getDepartDic(PageData pd)throws Exception{
-		return (List<Department>)dao.findForList("StaffDetailMapper.getDepartDic", pd);
-	}
+
 	/**获取员工编码
 	 * @param 
 	 * @throws Exception

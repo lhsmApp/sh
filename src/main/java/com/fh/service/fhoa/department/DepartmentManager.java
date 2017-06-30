@@ -96,6 +96,7 @@ public interface DepartmentManager{
 	public String getDEPARTMENT_CODES(String DEPARTMENT_ID) throws Exception;
 	
 	/**获取表字典
+	 * 张晓柳
 	 * @param 
 	 * @throws Exception
 	 */

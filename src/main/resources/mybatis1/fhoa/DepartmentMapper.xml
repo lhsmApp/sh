@@ -146,8 +146,10 @@
 	</select>
 	
 	<!-- 获取表字典-->
+	<!-- 张晓柳 -->
 	<select id="getDepartDic" parameterType="pd" resultType="com.fh.entity.system.Department">
 	    SELECT * 
-	    FROM oa_department
+	    FROM 
+        <include refid="tableName"></include>
 	</select>
 </mapper>

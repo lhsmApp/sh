@@ -1,16 +1,16 @@
-package com.fh.service.sysConfig.sysconfig;
+package com.fh.service.socialIncDetail.socialincdetail;
 
 import java.util.List;
 import com.fh.entity.Page;
 import com.fh.util.PageData;
 
 /** 
- * 说明： 系统配置接口
- * 创建人：FH Q313596790
- * 创建时间：2017-06-26
+ * 说明： socialIncDetail接口
+ * 创建人：zhangxiaoliu
+ * 创建时间：2017-06-30
  * @version
  */
-public interface SysConfigManager{
+public interface SocialIncDetailManager{
 
 	/**新增
 	 * @param pd
@@ -53,13 +53,6 @@ public interface SysConfigManager{
 	 * @throws Exception
 	 */
 	public void deleteAll(String[] ArrayDATA_IDS)throws Exception;
-
-
-	/**获取系统期间
-	 * 张晓柳
-	 * @param pd
-	 * @throws Exception
-	 */
-	public String currentSection(PageData pd)throws Exception;
+	
 }
 

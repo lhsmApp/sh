@@ -77,6 +77,15 @@ public class SysConfigService implements SysConfigManager{
 	public void deleteAll(String[] ArrayDATA_IDS)throws Exception{
 		dao.delete("SysConfigMapper.deleteAll", ArrayDATA_IDS);
 	}
-	
+
+
+	/**获取系统期间
+	 * 张晓柳
+	 * @param pd
+	 * @throws Exception
+	 */
+	public String currentSection(PageData pd)throws Exception{
+		return (String) dao.findForObject("SysConfigMapper.currentSection", pd);
+	}
 }
 

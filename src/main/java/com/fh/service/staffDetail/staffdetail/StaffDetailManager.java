@@ -18,26 +18,23 @@ import com.fh.util.PageData;
  * @version
  */
 public interface StaffDetailManager{
-
-	/**获取系统期间
-	 * @param pd
-	 * @throws Exception
-	 */
-	public String currentSection(PageData pd)throws Exception;
 	
 	/**获取某表的所有列
+	 * 张晓柳
 	 * @param 
 	 * @throws Exception
 	 */
 	public List<TableColumns> getTableColumns(PageData pd)throws Exception;
 	
 	/**获取数据
+	 * 张晓柳
 	 * @param pd
 	 * @throws Exception
 	 */
 	public List<StaffDetailModel> findByPd(PageData pd)throws Exception;
 	
 	/**获取数据
+	 * 张晓柳
 	 * @param pd
 	 * @throws Exception
 	 */
@@ -101,24 +98,9 @@ public interface StaffDetailManager{
 	 * @throws Exception
 	 */
 	public void batchImport(List<StaffDetailModel> listData)throws Exception;
-	
-	/**获取字典翻译类型
-	 * @param pd
-	 * @throws Exception
-	 */
-	public String getDicType(String dicName)throws Exception;
-	
-	/**获取SysDictionaries字典
-	 * @param 
-	 * @throws Exception
-	 */
-	public List<Dictionaries> getSysDictionaries(String dicName)throws Exception;
-	/**获取表字典
-	 * @param 
-	 * @throws Exception
-	 */
-	public List<Department> getDepartDic(PageData pd)throws Exception;
+
 	/**获取员工编码
+	 * 张晓柳
 	 * @param 
 	 * @throws Exception
 	 */

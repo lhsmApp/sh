@@ -73,6 +73,7 @@ public interface DictionariesManager{
 	public PageData findFromTbs(PageData pd)throws Exception;
 	
 	/**获取SysDictionaries字典
+	 * 张晓柳
 	 * @param 
 	 * @throws Exception
 	 */
