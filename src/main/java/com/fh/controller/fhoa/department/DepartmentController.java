@@ -2,6 +2,7 @@ package com.fh.controller.fhoa.department;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.fh.controller.base.BaseController;
 import com.fh.entity.Page;
+import com.fh.entity.system.Department;
 import com.fh.util.AppUtil;
 import com.fh.util.PageData;
 import com.fh.util.Jurisdiction;
@@ -164,9 +166,10 @@ public class DepartmentController extends BaseController {
 		PageData pd = new PageData();
 		pd = this.getPageData();
 		try{
-			JSONArray arr = JSONArray.fromObject(departmentService.listAllDepartment("0"));
+			List<Department> allDepartmentList=departmentService.listAllDepartmentZTreeNewV("0");
+			JSONArray arr = JSONArray.fromObject(allDepartmentList);
 			String json = arr.toString();
-			json = json.replaceAll("DEPARTMENT_CODE", "id").replaceAll("PARENT_CODE", "pId").replaceAll("NAME", "name").replaceAll("subDepartment", "nodes").replaceAll("hasDepartment", "checked").replaceAll("treeurl", "url");
+			json = json.replaceAll("DEPARTMENT_CODE", "id").replaceAll("PARENT_CODE", "pId").replaceAll("NAME", "name");
 			model.addAttribute("zTreeNodes", json);
 			mv.addObject("DEPARTMENT_CODE",DEPARTMENT_CODE);
 			mv.addObject("pd", pd);	

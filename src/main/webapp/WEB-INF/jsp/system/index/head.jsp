@@ -35,10 +35,11 @@
 		<!-- #section:basics/navbar.dropdown -->
 		<div class="navbar-buttons navbar-header pull-right" role="navigation">
 			<ul class="nav ace-nav">
-				<li title="信息模块" class="grey"><a data-toggle="dropdown"
+			<!-- <span class="badge badge-grey">2</span> -->
+				<!--<li title="信息模块" class="grey"><a data-toggle="dropdown"
 					class="dropdown-toggle" href="#"> <i
-						class="ace-icon fa fa-tasks"></i> <!-- <span class="badge badge-grey">2</span> --></a>
-					<ul
+						class="ace-icon fa fa-tasks"></i> </a>
+					 <ul
 						class="dropdown-menu-right dropdown-navbar dropdown-menu dropdown-caret dropdown-close">
 						<li class="dropdown-header"><i class="ace-icon fa fa-check"></i>
 							信息板块</li>
@@ -63,9 +64,8 @@
 								<img style="height:30px;width:150px;" src="static/images/caipiao.png" />
 							</a>
 						</li>
-					</ul>
-				</li>
-
+					</ul> 
+				</li>-->
 				<!-- <li title="即时聊天" class="purple"  onclick="creatw();">creatw()在 WebRoot\plugins\websocketInstantMsg\websocket.js中
 							<a data-toggle="dropdown" class="dropdown-toggle" href="#">
 								<i class="ace-icon fa fa-bell icon-animated-bell"></i>
@@ -80,14 +80,14 @@
 							</ul>
 						</li> -->
 
-				<li title="组织机构" class="purple" onclick="instframe();"
+				<li title="标准页面" class="purple" onclick="instframe();"
 					id="instframe"><a data-toggle="dropdown"
 					class="dropdown-toggle" href="#"> <i
 						class="ace-icon fa fa-users icon-animated-vertical"></i>
 
 				</a></li>
 
-				<li title="法律法规" class="green" onclick="fhsms();" id="fhsmstss">
+				<li title="练习" class="green" onclick="fhsms();" id="fhsmstss">
 					<!-- fhsms()在 WebRoot\static\js\myjs\head.js中 --> <a
 					data-toggle="dropdown" class="dropdown-toggle" href="#"> <i
 						class="ace-icon fa fa-briefcase icon-animated-vertical"></i> <!-- <span class="badge badge-success" id="fhsmsCount"></span> -->

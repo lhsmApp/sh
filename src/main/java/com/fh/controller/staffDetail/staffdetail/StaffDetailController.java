@@ -148,6 +148,8 @@ public class StaffDetailController extends BaseController {
 		pd.put("BILL_TYPE", 1);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 		String State = syssealedinfoService.getState(pd);
 		mv.addObject("State", State);
+		List<String> userCodeList = staffdetailService.getHaveUserCodeDic(pd);
+		mv.addObject("userCodeList", userCodeList);
 		
 		//用语句查询出数据库表的所有字段及其属性；拼接成jqgrid全部列
 		List<TableColumns> tableColumns = staffdetailService.getTableColumns(pd);
@@ -284,14 +286,17 @@ public class StaffDetailController extends BaseController {
 		logBefore(logger, Jurisdiction.getUsername()+"列表Betting");
 		PageData pd = new PageData();
 		pd = this.getPageData();
-		String keywords = pd.getString("keywords");				//关键词检索条件
-		if(null != keywords && !"".equals(keywords)){
-			pd.put("keywords", keywords.trim());
+		//
+		String UserCode = pd.getString("UserCode");	
+		if(null != UserCode && !"".equals(UserCode)){
+			pd.put("UserCode", UserCode.trim());
 		}
-		String filters = pd.getString("filters");				//多条件过滤条件
+		//多条件过滤条件
+		String filters = pd.getString("filters");
 		if(null != filters && !"".equals(filters)){
 			pd.put("filterWhereResult", SqlTools.constructWhere(filters,null));
 		}
+		//底行显示的求和与平均值字段
 		pd.put("Userdata", SqlUserdata);
 		//页面显示数据的年月
 		pd.put("SystemDateTime", SystemDateTime);
@@ -383,15 +388,17 @@ public class StaffDetailController extends BaseController {
 	 * @return
 	 * @throws Exception
 	 */
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/readExcel")
-	public @ResponseBody CommonBase readExcel(@RequestParam(value="excel",required=false) MultipartFile file) throws Exception{
+	//public @ResponseBody CommonBase readExcel(@RequestParam(value="excel",required=false) MultipartFile file) throws Exception{
+	public ModelAndView readExcel(@RequestParam(value="excel",required=false) MultipartFile file) throws Exception{
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
 		if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;}//校验权限
 		
 		// 局部变量
 		LeadingInExcel<StaffDetailModel> testExcel = null;
-		List<StaffDetailModel> uploadAndRead = null;
+		Map<Integer, Object> uploadAndReadMap = null;
 		try {
 			// 定义需要读取的数据
 			String formart = "yyyy-MM-dd";
@@ -414,7 +421,7 @@ public class StaffDetailController extends BaseController {
 			testExcel = new LeadingInExcel<StaffDetailModel>(formart);
 			// 解析excel，获取客户信息集合
 
-			uploadAndRead = testExcel.uploadAndRead(file, propertiesFileName, kyeName, sheetIndex,
+			uploadAndReadMap = testExcel.uploadAndRead(file, propertiesFileName, kyeName, sheetIndex,
 					titleAndAttribute, clazz, listColumns, DicList);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -422,82 +429,104 @@ public class StaffDetailController extends BaseController {
 			throw new CustomException("读取Excel文件错误");
 		}
 		boolean judgement = false;
-		if (uploadAndRead != null && !"[]".equals(uploadAndRead.toString()) && uploadAndRead.size() >= 1) {
-			judgement = true;
-		}
-		if (judgement) {
-			List<String> sbRet = new ArrayList<String>();
-			String BUSI_DATE = "";
-			String DEPT_CODE = "";
-			List<String> listUserCode = new ArrayList<String>();
-			int listSize = uploadAndRead.size();
-			for(int i=0;i<listSize;i++){
-				if(!(uploadAndRead.get(i).getBUSI_DATE()!=null && !uploadAndRead.get(i).getBUSI_DATE().trim().equals(""))){
-					if(!sbRet.contains("区间不能为空！")){
-						sbRet.add("区间不能为空！");
-					}
-				}
-				if(!(uploadAndRead.get(i).getDEPT_CODE()!=null && !uploadAndRead.get(i).getDEPT_CODE().trim().equals(""))){
-					if(!sbRet.contains("单位不能为空！")){
-						sbRet.add("单位不能为空！");
-					}
-				}
-				if(i == 0){
-					BUSI_DATE = uploadAndRead.get(i).getBUSI_DATE();
-					DEPT_CODE = uploadAndRead.get(i).getDEPT_CODE();
-				} else {
-					if(!BUSI_DATE.equals(uploadAndRead.get(i).getBUSI_DATE()) || !DEPT_CODE.equals(uploadAndRead.get(i).getDEPT_CODE())){
-						if(!sbRet.contains("区间和单位必须一致！")){
-							sbRet.add("区间和单位必须一致！");
+		if(uploadAndReadMap.get(1).equals(false)){
+			Map<String, Object> returnError =  (Map<String, Object>) uploadAndReadMap.get(2);
+			String message = "字典无此翻译： "; // \n
+			for (String k : returnError.keySet())  
+		    {
+				message += k + " : " + returnError.get(k);
+		    }
+			commonBase.setCode(2);
+			commonBase.setMessage(message);
+		} else {
+			List<StaffDetailModel> uploadAndRead = (List<StaffDetailModel>) uploadAndReadMap.get(2);
+			if (uploadAndRead != null && !"[]".equals(uploadAndRead.toString()) && uploadAndRead.size() >= 1) {
+				judgement = true;
+			}
+			if (judgement) {
+				List<String> sbRet = new ArrayList<String>();
+				String BUSI_DATE = "";
+				String DEPT_CODE = "";
+				List<String> listUserCode = new ArrayList<String>();
+				int listSize = uploadAndRead.size();
+				for(int i=0;i<listSize;i++){
+					if(!(uploadAndRead.get(i).getBUSI_DATE()!=null && !uploadAndRead.get(i).getBUSI_DATE().trim().equals(""))){
+						if(!sbRet.contains("区间不能为空！")){
+							sbRet.add("区间不能为空！");
 						}
 					}
-				}
-				if(listUserCode.contains(uploadAndRead.get(i).getUSER_CODE())){
-					String strUserAdd = "编码" + uploadAndRead.get(i).getUSER_CODE() + "重复！";
-					if(!sbRet.contains(strUserAdd)){
-						sbRet.add(strUserAdd);
+					if(!(uploadAndRead.get(i).getDEPT_CODE()!=null && !uploadAndRead.get(i).getDEPT_CODE().trim().equals(""))){
+						if(!sbRet.contains("单位不能为空！")){
+							sbRet.add("单位不能为空！");
+						}
 					}
+					if(!(uploadAndRead.get(i).getUSER_CODE()!=null && !uploadAndRead.get(i).getUSER_CODE().trim().equals(""))){
+						if(!sbRet.contains("人员编码不能为空！")){
+							sbRet.add("人员编码不能为空！");
+						}
+					}
+					if(i == 0){
+						BUSI_DATE = uploadAndRead.get(i).getBUSI_DATE();
+						DEPT_CODE = uploadAndRead.get(i).getDEPT_CODE();
+					} else {
+						if(!BUSI_DATE.equals(uploadAndRead.get(i).getBUSI_DATE()) || !DEPT_CODE.equals(uploadAndRead.get(i).getDEPT_CODE())){
+							if(!sbRet.contains("区间和单位必须一致！")){
+								sbRet.add("区间和单位必须一致！");
+							}
+						}
+					}
+					if(listUserCode.contains(uploadAndRead.get(i).getUSER_CODE())){
+						String strUserAdd = "编码" + uploadAndRead.get(i).getUSER_CODE() + "重复！";
+						if(!sbRet.contains(strUserAdd)){
+							sbRet.add(strUserAdd);
+						}
+					} else {
+						listUserCode.add(uploadAndRead.get(i).getUSER_CODE());
+					}
+				}
+				PageData pd = this.getPageData();
+				pd.put("RPT_DEPT", DEPT_CODE);
+				pd.put("RPT_DUR", BUSI_DATE);
+				pd.put("BILL_TYPE", 1);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+				String State = syssealedinfoService.getState(pd);
+				if(!(State!=null && State.equals("0"))){
+					sbRet.add("导入期间已封存！");
+				}
+				if(sbRet.size()>0){
+					StringBuilder sbTitle = new StringBuilder();
+					for(String str : sbRet){
+						sbTitle.append(str + "  "); // \n
+					}
+					commonBase.setCode(2);
+					commonBase.setMessage(sbTitle.toString());
 				} else {
-					listUserCode.add(uploadAndRead.get(i).getUSER_CODE());
+					//此处执行集合添加 
+					staffdetailService.batchImport(uploadAndRead);
+					commonBase.setCode(0);
 				}
-			}
-			PageData pd = this.getPageData();
-			pd.put("RPT_DEPT", DEPT_CODE);
-			pd.put("RPT_DUR", BUSI_DATE);
-			pd.put("BILL_TYPE", 1);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
-			String State = syssealedinfoService.getState(pd);
-			if(!(State!=null && State.equals("0"))){
-				sbRet.add("导入期间已封存！");
-			}
-			if(sbRet.size()>0){
-				StringBuilder sbTitle = new StringBuilder();
-				for(String str : sbRet){
-					sbTitle.append(str + "\n");
-				}
-				commonBase.setCode(2);
-				commonBase.setMessage(sbTitle.toString());
-			} else {
-				//此处执行集合添加 
-				staffdetailService.batchImport(uploadAndRead);
-			}
-			
-			/*// 把客户信息分为没100条数据为一组迭代添加客户信息（注：将customerList集合作为参数，在Mybatis的相应映射文件中使用foreach标签进行批量添加。）
-			int listSize = uploadAndRead.size();
-			int toIndex = 100;
-			for (int i = 0; i < listSize; i += 100) {
-				if (i + 100 > listSize) {
-					toIndex = listSize - i;
-				}
-				List<StaffDetailModel> subList = uploadAndRead.subList(i, i + toIndex);
+				
+				/*// 把客户信息分为没100条数据为一组迭代添加客户信息（注：将customerList集合作为参数，在Mybatis的相应映射文件中使用foreach标签进行批量添加。）
+				int listSize = uploadAndRead.size();
+				int toIndex = 100;
+				for (int i = 0; i < listSize; i += 100) {
+					if (i + 100 > listSize) {
+						toIndex = listSize - i;
+					}
+					List<StaffDetailModel> subList = uploadAndRead.subList(i, i + toIndex);
 
-				//此处执行集合添加 
-				staffdetailService.batchImport(subList);
-			}*/
-		} else {
-			commonBase.setCode(-1);
-			commonBase.setMessage("TranslateUtil");
+					//此处执行集合添加 
+					staffdetailService.batchImport(subList);
+				}*/
+			} else {
+				commonBase.setCode(-1);
+				commonBase.setMessage("TranslateUtil");
+			}
 		}
-		return commonBase;
+		ModelAndView mv = this.getModelAndView();
+		mv.setViewName("staffDetail/staffdetail/uploadExcel");
+		mv.addObject("commonBaseCode", commonBase.getCode());
+		mv.addObject("commonMessage", commonBase.getMessage());
+		return mv;
 	}
 	
 	/**下载模版

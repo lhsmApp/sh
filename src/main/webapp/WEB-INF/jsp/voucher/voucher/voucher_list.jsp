@@ -20,6 +20,15 @@
 
 <!-- 最新版的Jqgrid Css，如果旧版本（Ace）某些方法不好用，尝试用此版本Css，替换旧版本Css -->
 <!-- <link rel="stylesheet" type="text/css" media="screen" href="static/ace/css/ui.jqgrid-bootstrap.css" /> -->
+
+<script type="text/javascript" src="static/js/jquery-1.7.2.js"></script>
+<!-- 树形下拉框start -->
+<script type="text/javascript" src="plugins/selectZtree/selectTree.js"></script>
+<script type="text/javascript" src="plugins/selectZtree/framework.js"></script>
+<link rel="stylesheet" type="text/css" href="plugins/selectZtree/import_fh.css"/>
+<script type="text/javascript" src="plugins/selectZtree/ztree/ztree.js"></script>
+<link type="text/css" rel="stylesheet" href="plugins/selectZtree/ztree/ztree.css"></link>
+<!-- 树形下拉框end -->
 <style>
 .page-header {
 	padding-top: 9px;
@@ -74,18 +83,21 @@
 												id="form-field-icon-1" type="text" placeholder="这里输入关键词">
 												<i class="ace-icon fa fa-leaf blue"></i>
 											</span>
-											<!-- class="input-small" -->
-											<input type="text" placeholder="Username" /> <span> <select
-												class="chosen-select form-control" name="BELONG_AREA"
-												id="belong_area" data-placeholder="请选择所属区域"
-												style="vertical-align: top; height: 32px; width: 150px;">
-													<option value="" selected>请选择国家</option>
-													<option value="">USA</option>
-													<c:forEach items="${areaList}" var="area">
-														<option value="${area.BIANMA }"
-															<c:if test="${pd.BELONG_AREA==area.BIANMA}">selected</c:if>>${area.NAME }</option>
-													</c:forEach>
-											</select>
+											<span> 
+												<select
+													class="chosen-select form-control" name="BELONG_AREA"
+													id="belong_area" data-placeholder="请选择所属区域"
+													style="vertical-align: top; height: 32px; width: 150px;">
+														<option value="" selected>请选择国家</option>
+														<option value="">USA</option>
+														<c:forEach items="${areaList}" var="area">
+															<option value="${area.BIANMA }"
+																<c:if test="${pd.BELONG_AREA==area.BIANMA}">selected</c:if>>${area.NAME }</option>
+														</c:forEach>
+												</select>
+											</span>
+											<span>
+												<div class="selectTree" id="selectTree"></div>
 											</span>
 											<button type="button" class="btn btn-info btn-sm">
 												<i class="ace-icon fa fa-search bigger-110"></i>
@@ -453,6 +465,27 @@
 		}
 		$(".widget-box").toggle("fast");
 		//$(window).triggerHandler('resize.jqGrid');
+	}
+	
+	//加载单位树
+	function initComplete(){
+		//下拉树
+		var defaultNodes = {"treeNodes":${zTreeNodes}};
+		//绑定change事件
+		$("#selectTree").bind("change",function(){
+			console.log($(this));
+			if(!$(this).attr("relValue")){
+		      //  top.Dialog.alert("没有选择节点");
+		    }else{
+				//alert("选中节点文本："+$(this).attr("relText")+"<br/>选中节点值："+$(this).attr("relValue"));
+				$("#DEPARTMENT_CODE").val($(this).attr("relValue"));
+				$("#DNAME").val($(this).attr("relText"));
+		    }
+		});
+		//赋给data属性
+		$("#selectTree").data("data",defaultNodes);  
+		$("#selectTree").render();
+		$("#selectTree2_input").val("${'0'==depname?'请选择':depname}");
 	}
  	</script>
 </body>

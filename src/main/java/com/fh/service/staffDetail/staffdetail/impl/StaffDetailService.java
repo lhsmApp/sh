@@ -167,6 +167,14 @@ public class StaffDetailService implements StaffDetailManager{
 	public List<Department> getDepartDic(PageData pd)throws Exception{
 		return (List<Department>)dao.findForList("StaffDetailMapper.getDepartDic", pd);
 	}
+	/**获取员工编码
+	 * @param 
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<String> getHaveUserCodeDic(PageData pd)throws Exception{
+		return (List<String>)dao.findForList("StaffDetailMapper.getHaveUserCodeDic", pd);
+	}
 	
 }
 

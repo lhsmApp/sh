@@ -37,24 +37,52 @@
 				<div class="page-content">
 					<!-- /section:settings.box -->
 					<div class="page-header">
-						<table>
-							<tr>
-								<td>
 								    <span class="label label-xlg label-success arrowed-right">东部管道</span>
 									<!-- arrowed-in-right --> 
 									<span class="label label-xlg label-yellow arrowed-in arrowed-right"
 									    id="subTitle" style="margin-left: 2px;">工资数据导入</span> 
-									<span style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
-								</td>
-								<td style="align: right;">
-									<span class="label label-xlg label-yellow arrowed-left"
-									    id = "showDur" style="margin-right: 2px;"></span> 
-								    <span class="label label-xlg label-success arrowed-left"
-								        id = "showDept" ></span>
-								</td>
-							</tr>
-						</table>
+                                    <span style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
+								
+									<button id="btnQuery" class="btn btn-white btn-info btn-sm"
+										onclick="showQueryCondi()">
+										<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
+									</button>
+								
+						            <div class="pull-right">
+									    <span class="label label-xlg label-blue arrowed-left"
+									        id = "showDur" style="background:#428bca; margin-right: 2px;"></span> 
+								        <span class="label label-xlg label-blue arrowed-left"
+								            id = "showDept" style="background:#428bca"></span>
+								    </div>
 					</div><!-- /.page-header -->
+			
+						<div class="row">
+						<div class="col-xs-12">
+							<div class="widget-box" style="display: none;">
+								<div class="widget-body">
+									<div class="widget-main">
+										<form class="form-inline">
+											<span>
+												<select class="chosen-select form-control" 
+													name="UserCode" id="UserCode"
+													data-placeholder="请选择员工编号"
+													style="vertical-align: top; height:32px;width: 150px;">
+													<option value="">全部</option>
+													<c:forEach items="${userCodeList}" var="usercode">
+														<option value="${usercode}"
+															<c:if test="${pd.UserCode==usercode}">selected</c:if>>${usercode}</option>
+													</c:forEach>
+												</select>
+											</span>
+											<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
+												<i class="ace-icon fa fa-search bigger-110"></i>
+											</button>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 
 					<div class="row">
 						<div class="col-xs-12">
@@ -101,13 +129,14 @@
 	<script src="static/ace/js/ace/elements.fileinput.js"></script>
 	
 	<script type="text/javascript"> 
+    var gridBase_selector = "#jqGridBase";  
+    var pagerBase_selector = "#jqGridBasePager";  
+    
 	$(document).ready(function () {
 		/* $.jgrid.defaults.width = 780;*/
 		//$.jgrid.defaults.styleUI = 'Bootstrap'; 
 		
 		$(top.hangge());//关闭加载状态
-        var gridBase_selector = "#jqGridBase";  
-        var pagerBase_selector = "#jqGridBasePager";  
 	    
 		//当前期间,取自tb_system_config的SystemDateTime字段
 	    var SystemDateTime = '${SystemDateTime}';
@@ -120,12 +149,12 @@
 		var State = '${State}';
 		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 	    var jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
-        
+	    
 	    function getState(){
-            if(State.trim().equals("0")){
+	        if($.trim(State) == "0"){
 	            return true;
-            }
-            return false;
+	        }
+	        return false;
 	    };
 	    
 		//resize to fit page size
@@ -165,13 +194,15 @@
 				}, 0);
 			},
 		});
+	    
+		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
 		
 			$(gridBase_selector).navGrid(pagerBase_selector, 
 					{
 			            //navbar options
-				        edit: true,
+				        edit: getState(),
 			            editicon : 'ace-icon fa fa-pencil blue',
-			            add: true,
+			            add: getState(),
 			            addicon : 'ace-icon fa fa-plus-circle purple',
 			            del: false,
 			            delicon : 'ace-icon fa fa-trash-o red',
@@ -186,19 +217,19 @@
 					//edit record form
 					closeAfterEdit: true,
 					recreateForm: true,
-					beforeShowForm :beforeEditOrAddCallback
+					beforeShowForm :beforeEditOrAddCallback,
+		            afterSubmit: fn_addSubmit
 		        },
 		        {
 					//new record form
-					//width: 700,
 					closeAfterAdd: true,
 					recreateForm: true,
 					viewPagerButtons: false,
+					//width: 700,
 					//reloadAfterSubmit: true,
 					beforeShowForm : beforeEditOrAddCallback,
 				    onclickSubmit: function(params, posdata) {
 						console.log("onclickSubmit");
-		                //console.log(posdata	);
 		            } , 
 		            afterSubmit: fn_addSubmit
 		        },
@@ -223,46 +254,48 @@
 		        },
 		        {},{});
 
-			        $(gridBase_selector).navButtonAdd(pagerBase_selector,
-			                {
-			                    buttonicon: "ace-icon fa fa-pencil-square-o purple",
-			                    title: "批量编辑",
-			                    caption: "",
-			                    position: "last",
-			                    onClickButton: batchEdit
-			                });
-			                $(gridBase_selector).navButtonAdd(pagerBase_selector,
-			                {
-			                    buttonicon: "ace-icon fa fa-undo",
-			                    title: "取消批量编辑",
-			                    caption: "",
-			                    position: "last",
-			                    onClickButton: batchCancelEdit
-			                });
-			        		$(gridBase_selector).navButtonAdd(pagerBase_selector, {
-			                     caption : "",
-			                     buttonicon : "ace-icon fa fa-save green",
-			                     onClickButton : batchSave,
-			                     position : "last",
-			                     title : "批量保存",
-			                     cursor : "pointer"
-			                 });
-			        		$(gridBase_selector).navButtonAdd(pagerBase_selector, {
-			                    caption : "",
-			                    buttonicon : "ace-icon fa fa-trash-o red",
-			                    onClickButton : batchDelete,
-			                    position : "last",
-			                    title : "批量删除",
-			                    cursor : "pointer"
-			                });
-			        			$(gridBase_selector).navButtonAdd(pagerBase_selector, {
-			        	             caption : "",
-			        	             buttonicon : "ace-icon fa fa-cloud-upload",
-			        	             onClickButton : importItems,
-			        	             position : "last",
-			        	             title : "导入",
-			        	             cursor : "pointer"
-			        	         });
+		if(getState()){
+	        $(gridBase_selector).navButtonAdd(pagerBase_selector,
+	                {
+	                    buttonicon: "ace-icon fa fa-pencil-square-o purple",
+	                    title: "批量编辑",
+	                    caption: "",
+	                    position: "last",
+	                    onClickButton: batchEdit
+	                });
+            $(gridBase_selector).navButtonAdd(pagerBase_selector,
+	                {
+	                    buttonicon: "ace-icon fa fa-undo",
+	                    title: "取消批量编辑",
+	                    caption: "",
+	                    position: "last",
+	                    onClickButton: batchCancelEdit
+	                });
+	        		$(gridBase_selector).navButtonAdd(pagerBase_selector, {
+	                     caption : "",
+	                     buttonicon : "ace-icon fa fa-save green",
+	                     onClickButton : batchSave,
+	                     position : "last",
+	                     title : "批量保存",
+	                     cursor : "pointer"
+	                 });
+	        		$(gridBase_selector).navButtonAdd(pagerBase_selector, {
+	                    caption : "",
+	                    buttonicon : "ace-icon fa fa-trash-o red",
+	                    onClickButton : batchDelete,
+	                    position : "last",
+	                    title : "批量删除",
+	                    cursor : "pointer"
+	                });
+	        			$(gridBase_selector).navButtonAdd(pagerBase_selector, {
+	        	             caption : "",
+	        	             buttonicon : "ace-icon fa fa-cloud-upload",
+	        	             onClickButton : importItems,
+	        	             position : "last",
+	        	             title : "导入",
+	        	             cursor : "pointer"
+	        	         });
+		};
 					$(gridBase_selector).navButtonAdd(pagerBase_selector, {
 			             caption : "",
 			             buttonicon : "ace-icon fa fa-cloud-download",
@@ -271,6 +304,7 @@
 			             title : "导出",
 			             cursor : "pointer"
 			         });
+					if(getState()){
     					$(gridBase_selector).navButtonAdd(pagerBase_selector, {
     			             caption : "",
     			             buttonicon : "ace-icon fa fa-check-square green",
@@ -279,18 +313,72 @@
     			             title : "上报",
     			             cursor : "pointer"
     			         });
+					};
 		
-
 			//双击编辑行
             var lastSelection;
 			function doubleClickRow(rowid,iRow,iCol,e){
+				if(getState()){
                 if (rowid && rowid !== lastSelection) {
                     var grid = $(gridBase_selector);
                     grid.restoreRow(lastSelection);
-                    grid.editRow(rowid, {keys:true});//keys:true 这里按[enter]保存  
+                    grid.editRow(rowid, {
+                    	keys:true, //keys:true 这里按[enter]保存  
+                        restoreAfterError: false,  
+                    	oneditfunc: function(rowid){  
+                            console.log(rowid);  
+                        },  
+                        successfunc: function(response){
+							if(response.responseJSON.code==0){
+								grid.trigger("reloadGrid");  
+								$(top.hangge());//关闭加载状态
+								$("#subTitle").tips({
+									side:3,
+						            msg:'保存成功',
+						            bg:'#009933',
+						            time:3
+						        });
+								lastSelection = rowid;
+								return [true,"",""];
+							}//else{
+					        //   grid.jqGrid('editRow',lastSelection);
+							//	$(top.hangge());//关闭加载状态
+							//	$("#subTitle").tips({
+							//		side:3,
+						    //        msg:'保存失败,'+response.responseJSON.message,
+						    //        bg:'#cc0033',
+						    //        time:3
+						    //    });
+							//}
+                        },  
+                        errorfunc: function(rowid, response){
+				            grid.jqGrid('editRow',lastSelection);
+							$(top.hangge());//关闭加载状态
+							if(response.statusText == "success"){
+								if(response.responseJSON.code != 0){
+							        grid.jqGrid('editRow',lastSelection);
+									$(top.hangge());//关闭加载状态
+									$("#subTitle").tips({
+										side:3,
+								        msg:'保存失败,'+response.responseJSON.message,
+								        bg:'#cc0033',
+								        time:3
+								    });
+								}
+							} else {
+								$("#subTitle").tips({
+									side:3,
+						            msg:'保存出错:' + res.toString(),
+						            bg:'#cc0033',
+						            time:3
+						        });
+							}
+                        }  
+                    });
                     lastSelection = rowid;
                 }
-			}
+				}
+			} 
 
 			//批量编辑
 			function batchEdit(e) {
@@ -364,6 +452,12 @@
 	    						},
 	    				    	error: function(e) {
 	    							$(top.hangge());//关闭加载状态
+    								$("#subTitle").tips({
+    									side:3,
+    						            msg:'删除出错',
+    						            bg:'#cc0033',
+    						            time:3
+    						        });
 	    				    	}
 	    					});
 	    				}
@@ -415,6 +509,7 @@
     						            time:3
     						        });
     							}else{
+        							batchEdit(null);
     								$(top.hangge());//关闭加载状态
     								$("#subTitle").tips({
     									side:3,
@@ -425,7 +520,14 @@
     							}
     						},
     				    	error: function(e) {
+    							batchEdit(e);
     							$(top.hangge());//关闭加载状态
+								$("#subTitle").tips({
+									side:3,
+						            msg:'保存出错',
+						            bg:'#cc0033',
+						            time:3
+						        });
     				    	}
     					});
     				}
@@ -499,15 +601,42 @@
 						},
 				    	error: function(e) {
 							$(top.hangge());//关闭加载状态
+							$("#subTitle").tips({
+								side:3,
+					            msg:'上报出错',
+					            bg:'#cc0033',
+					            time:3
+					        });
 				    	}
 					});
 				}
             });
 		}
-	    
-		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
-		
 	});
+	
+	//显示隐藏查询
+	function showQueryCondi(){
+		if($(".widget-box").css("display") == "block"){
+			$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass('fa-chevron-down');
+			$("#btnQuery").find("span").text("显示查询");
+			$(window).triggerHandler('resize.jqGrid');
+		}
+		else{
+			$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass('fa-chevron-up');
+			$("#btnQuery").find("span").text("隐藏查询");
+		}
+		$(".widget-box").toggle("fast");
+	}
+	
+	//检索
+	function tosearch() {
+		var UserCode = $("#UserCode").val();
+		$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据
+			url:'<%=basePath%>staffdetail/getPageList.do?UserCode='+UserCode,  
+			datatype:'json',
+		      page:1
+		}).trigger("reloadGrid");
+	}  
 
  	</script>
 </html>

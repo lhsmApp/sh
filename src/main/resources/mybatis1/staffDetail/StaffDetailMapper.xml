@@ -61,6 +61,13 @@
 	    SELECT * 
 	    FROM oa_department
 	</select>
+	<!-- 获取员工编码-->
+	<select id="getHaveUserCodeDic" parameterType="pd" resultType="String">
+		select USER_CODE
+		from <include refid="tableName"></include>
+		where BUSI_DATE = ${RPT_DUR}
+		and DEPT_CODE = ${RPT_DEPT}
+	</select>
 	
 	<!-- 列表 -->
 	<select id="datalistJqPage" parameterType="jqPage" resultType="pd">
@@ -74,6 +81,9 @@
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
+		<if test="pd.UserCode!= null and pd.UserCode != ''"><!-- 关键词检索 -->
+		    and USER_CODE = ${pd.UserCode}
+		</if>
 		<if test="sidx != null and sidx.trim() != ''" >
 			order by ${sidx} ${sord} 
     	</if>
@@ -85,18 +95,24 @@
 		select count(*) from <include refid="tableName"></include> 
 		where BUSI_DATE = ${pd.SystemDateTime}
 		and DEPT_CODE = ${pd.DepartCode}
-			<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
-				${pd.filterWhereResult}
-			</if>
+		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
+			${pd.filterWhereResult}
+		</if>
+		<if test="pd.UserCode!= null and pd.UserCode != ''"><!-- 关键词检索 -->
+		    and USER_CODE = ${pd.UserCode}
+		</if>
 	</select>
 	<select id="getFooterSummary" parameterType="jqPage" resultType="pd">
 		select ${pd.Userdata} 
 		from <include refid="tableName"></include> 
 		where BUSI_DATE = ${pd.SystemDateTime}
 		and DEPT_CODE = ${pd.DepartCode}
-			<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
-				${pd.filterWhereResult}
-			</if>
+		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
+			${pd.filterWhereResult}
+		</if>
+		<if test="pd.UserCode!= null and pd.UserCode != ''"><!-- 关键词检索 -->
+		    and USER_CODE = ${pd.UserCode}
+		</if>
 	</select>
 	
 	<!-- 获取数据 -->
@@ -106,8 +122,8 @@
 		    <include refid="Field"></include>
 		from 
 		    <include refid="tableName"></include>
-		where (BUSI_DATE, USER_CODE) in (#{BUSI_DATE}, #{USER_CODE})
-		and (BUSI_DATE, USER_CODE) not in (#{BUSI_DATE__}, #{USER_CODE__})
+		where BUSI_DATE = #{BUSI_DATE}
+		and (USER_CODE = #{USER_CODE} and USER_CODE != #{USER_CODE__})
 	</select>
 	<select id="findByModel" parameterType="com.fh.entity.StaffDetailModel" resultType="com.fh.entity.StaffDetailModel">
 		select 
@@ -115,10 +131,11 @@
 		    <include refid="Field"></include>
 		from 
 		    <include refid="tableName"></include>
-		where
+        <where>
 		<foreach item="item" index="index" collection="list" open=" " separator=" or " close=" ">
-            ((BUSI_DATE, USER_CODE) in (#{BUSI_DATE}, #{USER_CODE}) and (BUSI_DATE, USER_CODE) not in (#{BUSI_DATE__}, #{USER_CODE__}))
+            (BUSI_DATE = #{item.BUSI_DATE} and USER_CODE = #{item.USER_CODE} and USER_CODE != #{item.USER_CODE__})
 		</foreach>
+		</where>
 	</select>
 	
 	<!-- 新增 -->

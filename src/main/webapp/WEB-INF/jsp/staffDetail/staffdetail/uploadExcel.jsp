@@ -66,7 +66,29 @@
 	<!--提示框-->
 	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
 	<script type="text/javascript">
-		$(top.hangge());
+		$(document).ready(function () {
+			$(top.hangge());
+		    var commonBaseCode = '${commonBaseCode}';
+		    var commonMessage = '${commonMessage}';
+		    if(commonBaseCode != null && $.trim(commonBaseCode) != ""){
+		        if($.trim(commonBaseCode) == 0){
+		            $("#excel").tips({
+		                side:3,
+		                msg:'导入成功',
+		                bg:'#AE81FF',
+		                time:3
+		            });
+		        } else {
+				    $("#excel").tips({
+				    	side:3,
+		                msg:commonMessage,
+		                bg:'#AE81FF',
+		                time:3
+		            });
+			    }
+		    };
+		})
+		
 		$(function() {
 			//上传
 			$('#excel').ace_file_input({
@@ -84,8 +106,7 @@
 		
 		//保存
 		function save(){
-			if($("#excel").val().equals("") || document.getElementById("excel").files[0].equals('请选择xls格式的文件')){
-				
+			if($("#excel").val() == "" || document.getElementById("excel").files[0] == '请选择xls格式的文件'){
 				$("#excel").tips({
 					side:3,
 		            msg:'请选择文件',
@@ -100,7 +121,7 @@
 		}
 		function fileType(obj){
 			var fileType=obj.value.substr(obj.value.lastIndexOf(".")).toLowerCase();//获得文件后缀名
-		    if(!fileType.equals('.xls')){
+		    if(fileType != '.xls'){
 		    	$("#excel").tips({
 					side:3,
 		            msg:'请上传xls格式的文件',
