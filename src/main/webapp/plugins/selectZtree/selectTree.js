@@ -322,7 +322,7 @@ jQuery.SelectTreeBox = function (F, H) {
             } else {
                 if (I.attr("openDirection") == "bottom") {
                     f.css({
-                        top: 24
+                        top: 33
                     })
                 } else {
                     if (e < O) {
@@ -337,13 +337,13 @@ jQuery.SelectTreeBox = function (F, H) {
                                 })
                             } else {
                                 f.css({
-                                    top: 24
+                                    top: 33
                                 })
                             }
                         }
                     } else {
                         f.css({
-                            top: 24
+                            top: 33
                         })
                     }
                 }
@@ -364,12 +364,12 @@ jQuery.SelectTreeBox = function (F, H) {
                 if (I.attr("openDirection") == "bottom") {
                     if (e < f.height()) {
                         f.css({
-                            top: 24
+                            top: 33
                         });
                         f.height(e)
                     } else {
                         f.css({
-                            top: 24
+                            top: 33
                         })
                     }
                 } else {
@@ -386,22 +386,22 @@ jQuery.SelectTreeBox = function (F, H) {
                                 })
                             } else {
                                 f.css({
-                                    top: 24
+                                    top: 33
                                 });
                                 f.height(e)
                             }
                         }
                     } else {
                         f.css({
-                            top: 24
+                            top: 33
                         })
                     }
                 }
             }
         }
         if (!I.attr("boxWidth")) {
-            if (f.width() < m + 24) {
-                f.width(m + 24)
+            if (f.width() < m + 33) {
+                f.width(m + 33)
             }
         }
     }
