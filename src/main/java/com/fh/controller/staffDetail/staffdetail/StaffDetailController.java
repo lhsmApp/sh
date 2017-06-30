@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
+import com.fh.controller.common.TmplUtil;
 import com.fh.entity.CommonBase;
 import com.fh.entity.JqPage;
 import com.fh.entity.Page;
@@ -42,12 +43,16 @@ import com.fh.util.excel.LeadingInExcel;
 
 import net.sf.json.JSONArray;
 
+import com.fh.service.fhoa.department.DepartmentManager;
 import com.fh.service.fhoa.department.impl.DepartmentService;
 import com.fh.service.staffDetail.staffdetail.StaffDetailManager;
 import com.fh.service.sysConfig.sysconfig.SysConfigManager;
 import com.fh.service.sysSealedInfo.syssealedinfo.impl.SysSealedInfoService;
+import com.fh.service.system.dictionaries.DictionariesManager;
 import com.fh.service.system.dictionaries.impl.DictionariesService;
+import com.fh.service.tmplConfigDict.tmplconfigdict.TmplConfigDictManager;
 import com.fh.service.tmplConfigDict.tmplconfigdict.impl.TmplConfigDictService;
+import com.fh.service.tmplconfig.tmplconfig.TmplConfigManager;
 import com.fh.service.tmplconfig.tmplconfig.impl.TmplConfigService;
 
 /** 
@@ -76,17 +81,18 @@ public class StaffDetailController extends BaseController {
 	private DepartmentService departmentService;
 	
 
-	//底行显示的求和与平均值字段
-	String SqlUserdata = "";
 	//页面显示数据的年月
 	String SystemDateTime = "";
 	//页面显示数据的二级单位
 	String DepartCode = "";
+	//底行显示的求和与平均值字段
+	StringBuilder SqlUserdata = new StringBuilder();
 	//默认值
 	Map<String, Object> DefaultValueList = new HashMap<String, Object>();
 	//字典
 	Map<String, Object> DicList = new HashMap<String, Object>();
-	List<TmplConfigDetail> listColumns = new ArrayList<TmplConfigDetail>();
+	//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
+	List<TmplConfigDetail> ColumnsList = new ArrayList<TmplConfigDetail>();
 	
 	/**修改
 	 * @param
@@ -96,12 +102,12 @@ public class StaffDetailController extends BaseController {
 	public @ResponseBody CommonBase edit() throws Exception{
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
-		logBefore(logger, Jurisdiction.getUsername()+"修改JgGrid");
+		logBefore(logger, Jurisdiction.getUsername()+"修改StaffDetail");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限
 		PageData pd = new PageData();
 		pd = this.getPageData();
 		
-		StaffDetailModel.setModelDefault(pd, DefaultValueList);
+		TmplUtil.setModelDefault(pd, StaffDetailModel.class, DefaultValueList);
 		String BILL_CODE = "BILL_CODE";
 		String BUSI_DATE = "BUSI_DATE";
 		String DEPT_CODE = "DEPT_CODE";
@@ -164,98 +170,18 @@ public class StaffDetailController extends BaseController {
 		List<String> userCodeList = staffdetailService.getHaveUserCodeDic(pd);
 		mv.addObject("userCodeList", userCodeList);
 		
-		//用语句查询出数据库表的所有字段及其属性；拼接成jqgrid全部列
-		List<TableColumns> tableColumns = staffdetailService.getTableColumns(pd);
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService);
+		String jqGridColModel = tmpl.generateStructure("TB_STAFF_DETAIL", DepartCode);
+		
+		SqlUserdata = tmpl.getSqlUserdata();
 		//默认值
-		DefaultValueList = new HashMap<String, Object>();
+		DefaultValueList = tmpl.getDefaultValueList();
 		//字典
-		DicList = new HashMap<String, Object>();
-		Map<String, Map<String, Object>> listColModelAll = StaffDetailModel.jqGridColModelAll(tableColumns, DepartCode, staffdetailService, DefaultValueList);
+		DicList = tmpl.getDicList();
 		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-		TmplConfigDetail item = new TmplConfigDetail();
-		item.setDEPT_CODE(DepartCode);
-		item.setTABLE_CODE("TB_STAFF_DETAIL");
-		listColumns = tmplconfigService.listNeed(item);
-		//底行显示的求和与平均值字段
-		SqlUserdata = "";
-		//拼接真正设置的jqGrid的ColModel
-		StringBuilder jqGridColModel = new StringBuilder();
-		jqGridColModel.append("[");
-		//添加关键字的保存列
-		if(StaffDetailModel.KeyList!=null && StaffDetailModel.KeyList.size()>0){
-			for(String key : StaffDetailModel.KeyList){
-				jqGridColModel.append(" {name: '").append(key.toUpperCase()).append(StaffDetailModel.KeyExtra).append("', hidden: true, editable: true, editrules: {edithidden: false}}, ");
-			}
-		}
-		//添加配置表设置列，字典（未设置就使用表默认，text或number）、隐藏、表头显示
-		if(listColumns != null && listColumns.size() > 0){
-			for(int i=0; i < listColumns.size(); i++){
-				if(listColModelAll.containsKey(listColumns.get(i).getCOL_CODE().toUpperCase())){
-					Map<String, Object> itemColModel = listColModelAll.get(listColumns.get(i).getCOL_CODE());
-					jqGridColModel.append("{");
-					String name = (String) itemColModel.get("name");
-					String edittype = (String) itemColModel.get("edittype");
-					String notedit = (String) itemColModel.get("notedit");
-					if(name != null && !name.trim().equals("")){
-						jqGridColModel.append(name).append(", ");
-					}
-					//配置表中的字典
-					if(listColumns.get(i).getDICT_TRANS()!=null && !listColumns.get(i).getDICT_TRANS().trim().equals("")){
-						String strDicValue = getDicValue(listColumns.get(i).getDICT_TRANS(), pd);
-						String strSelectValue = ":";
-						if(strDicValue!=null && !strDicValue.trim().equals("")){
-							strSelectValue += ";" + strDicValue;
-						}
-						//选择
-						jqGridColModel.append(" edittype:'select', ");
-						   jqGridColModel.append(" editoptions:{value:'" + strSelectValue + "'}, ");
-						//翻译
-						jqGridColModel.append(" formatter: 'select', ");
-					       jqGridColModel.append(" formatoptions: {value: '" + strDicValue + "'}, ");
-						//查询
-						jqGridColModel.append(" stype: 'select', ");
-					       jqGridColModel.append(" searchoptions: {value: ':[All];" + strDicValue + "'}, ");
-					} else{
-						if(edittype != null && !edittype.trim().equals("")){
-							jqGridColModel.append(edittype).append(", ");
-						}
-					}
-					//配置表中的隐藏
-					int intHide = Integer.parseInt(listColumns.get(i).getCOL_HIDE());
-					jqGridColModel.append(" hidden: ").append(intHide == 1 ? "false" : "true").append(", ");
-					if(intHide != 1){
-						jqGridColModel.append(" editable:true, editrules: {edithidden: false}, ");
-					}
-					if(notedit != null && !notedit.trim().equals("")){
-						jqGridColModel.append(notedit).append(", ");
-					}
-					//配置表中的表头显示
-					jqGridColModel.append(" label: '").append(listColumns.get(i).getCOL_NAME()).append("' ");
-					
-					jqGridColModel.append("}");
-					if(i < listColumns.size() -1){
-						jqGridColModel.append(",");
-					}
-					//底行显示的求和与平均值字段
-					// 1汇总 0不汇总,默认0
-					if(Integer.parseInt(listColumns.get(i).getCOL_SUM()) == 1){
-						if(SqlUserdata!=null && !SqlUserdata.trim().equals("")){
-							SqlUserdata += ", ";
-						}
-						SqlUserdata += " sum(" + listColumns.get(i).getCOL_CODE() + ") " + listColumns.get(i).getCOL_CODE();
-					} 
-					// 0不计算 1计算 默认0
-					else if(Integer.parseInt(listColumns.get(i).getCOL_AVE()) == 1){
-						if(SqlUserdata!=null && !SqlUserdata.trim().equals("")){
-							SqlUserdata += ", ";
-						}
-						SqlUserdata += " round(avg(" + listColumns.get(i).getCOL_CODE() + "), 2) " + listColumns.get(i).getCOL_CODE();
-					}
-				}
-			}
-		}
-		jqGridColModel.append("]");
-		mv.addObject("jqGridColModel", jqGridColModel.toString());
+		ColumnsList = tmpl.getColumnsList();
+		
+		mv.addObject("jqGridColModel", jqGridColModel);
 		return mv;
 	}
 	
@@ -296,7 +222,7 @@ public class StaffDetailController extends BaseController {
 	 */
 	@RequestMapping(value="/getPageList")
 	public @ResponseBody PageResult<PageData> getPageList(JqPage page) throws Exception{
-		logBefore(logger, Jurisdiction.getUsername()+"列表Betting");
+		logBefore(logger, Jurisdiction.getUsername()+"列表StaffDetail");
 		PageData pd = new PageData();
 		pd = this.getPageData();
 		//
@@ -310,7 +236,7 @@ public class StaffDetailController extends BaseController {
 			pd.put("filterWhereResult", SqlTools.constructWhere(filters,null));
 		}
 		//底行显示的求和与平均值字段
-		pd.put("Userdata", SqlUserdata);
+		pd.put("Userdata", SqlUserdata.toString());
 		//页面显示数据的年月
 		pd.put("SystemDateTime", SystemDateTime);
 		//页面显示数据的二级单位
@@ -424,9 +350,9 @@ public class StaffDetailController extends BaseController {
 			titleAndAttribute = new HashMap<String, String>();
 			
 			//配置表设置列
-			if(listColumns != null && listColumns.size() > 0){
-				for(int i=0; i < listColumns.size(); i++){
-					titleAndAttribute.put(listColumns.get(i).getCOL_NAME(), listColumns.get(i).getCOL_CODE());
+			if(ColumnsList != null && ColumnsList.size() > 0){
+				for(int i=0; i < ColumnsList.size(); i++){
+					titleAndAttribute.put(ColumnsList.get(i).getCOL_NAME(), ColumnsList.get(i).getCOL_CODE());
 				}
 			}
 
@@ -435,7 +361,7 @@ public class StaffDetailController extends BaseController {
 			// 解析excel，获取客户信息集合
 
 			uploadAndReadMap = testExcel.uploadAndRead(file, propertiesFileName, kyeName, sheetIndex,
-					titleAndAttribute, clazz, listColumns, DicList);
+					titleAndAttribute, clazz, ColumnsList, DicList);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("读取Excel文件错误", e);
@@ -577,19 +503,19 @@ public class StaffDetailController extends BaseController {
 		ModelAndView mv = new ModelAndView();
 		Map<String,Object> dataMap = new HashMap<String,Object>();
 		List<String> titles = new ArrayList<String>();
-		if(listColumns != null && listColumns.size() > 0){
-			for(int i=0; i < listColumns.size(); i++){
-				titles.add(listColumns.get(i).getCOL_NAME());
+		if(ColumnsList != null && ColumnsList.size() > 0){
+			for(int i=0; i < ColumnsList.size(); i++){
+				titles.add(ColumnsList.get(i).getCOL_NAME());
 			}
 		}
 		dataMap.put("titles", titles);
 		List<PageData> varList = new ArrayList<PageData>();
 		for(int i=0;i<varOList.size();i++){
 			PageData vpd = new PageData();
-			if(listColumns != null && listColumns.size() > 0){
-				for(int j=1; j <= listColumns.size(); j++){
-					String trans = listColumns.get(j-1).getDICT_TRANS();
-					Object getCellValue = varOList.get(i).get(listColumns.get(j-1).getCOL_CODE().toUpperCase());
+			if(ColumnsList != null && ColumnsList.size() > 0){
+				for(int j=1; j <= ColumnsList.size(); j++){
+					String trans = ColumnsList.get(j-1).getDICT_TRANS();
+					Object getCellValue = varOList.get(i).get(ColumnsList.get(j-1).getCOL_CODE().toUpperCase());
 					if(trans != null && !trans.trim().equals("")){
 						String value = "";
 						Map<String, String> dicAdd = (Map<String, String>) DicList.getOrDefault(trans, new HashMap<String, String>());
