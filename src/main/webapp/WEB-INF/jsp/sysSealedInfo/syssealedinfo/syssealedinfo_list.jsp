@@ -71,7 +71,6 @@
 													data-placeholder="请选单位"
 													style="vertical-align: top; height:32px;width: 150px;">
 													<option value="">请选择单位</option>
-													<option value="">全部</option>
 													<c:forEach items="${deptList}" var="dept">
 														<option value="${dept}"
 															<c:if test="${pd.RPT_DEPT==dept}">selected</c:if>>${dept }</option>
@@ -84,7 +83,6 @@
 													data-placeholder="请选类型"
 													style="vertical-align: top; height:32px;width: 150px;">
 													<option value="">请选择类型</option>
-													<option value="">全部</option>
 													<c:forEach items="${billTypeList}" var="billType">
 														<option value="${billType.nameValue}"
 															<c:if test="${pd.BILL_TYPE==billType.nameValue}">selected</c:if>>${billType.nameValue}</option>

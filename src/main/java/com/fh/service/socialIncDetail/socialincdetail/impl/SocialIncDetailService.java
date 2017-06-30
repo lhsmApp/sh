@@ -4,7 +4,9 @@ import java.util.List;
 import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import com.fh.dao.DaoSupport;
-import com.fh.entity.Page;
+import com.fh.entity.JqPage;
+import com.fh.entity.SocialIncDetailModel;
+import com.fh.entity.TableColumns;
 import com.fh.util.PageData;
 import com.fh.service.socialIncDetail.socialincdetail.SocialIncDetailManager;
 
@@ -20,20 +22,42 @@ public class SocialIncDetailService implements SocialIncDetailManager{
 	@Resource(name = "daoSupport")
 	private DaoSupport dao;
 	
+	/**获取某表的所有列
+	 * 张晓柳
+	 * @param 
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<TableColumns> getTableColumns(PageData pd)throws Exception{
+		return (List<TableColumns>)dao.findForList("SocialIncDetailMapper.getTableColumns", pd);
+	}
+	
+	/**获取数据
+	 * 张晓柳
+	 * @param pd
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<SocialIncDetailModel> findByPd(PageData pd)throws Exception{
+		return (List<SocialIncDetailModel>)dao.findForList("SocialIncDetailMapper.findByPd", pd);
+	}
+	
+	/**获取数据
+	 * 张晓柳
+	 * @param pd
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<SocialIncDetailModel> findByModel(List<SocialIncDetailModel> listData)throws Exception{
+		return (List<SocialIncDetailModel>)dao.findForList("SocialIncDetailMapper.findByModel", listData);
+	}
+	
 	/**新增
 	 * @param pd
 	 * @throws Exception
 	 */
 	public void save(PageData pd)throws Exception{
 		dao.save("SocialIncDetailMapper.save", pd);
-	}
-	
-	/**删除
-	 * @param pd
-	 * @throws Exception
-	 */
-	public void delete(PageData pd)throws Exception{
-		dao.delete("SocialIncDetailMapper.delete", pd);
 	}
 	
 	/**修改
@@ -44,38 +68,79 @@ public class SocialIncDetailService implements SocialIncDetailManager{
 		dao.update("SocialIncDetailMapper.edit", pd);
 	}
 	
+	/**导出列表
+	 * @param page
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PageData> exportList(JqPage page)throws Exception{
+		return (List<PageData>)dao.findForList("SocialIncDetailMapper.exportList", page);
+	}
+	/**导出模板
+	 * @param page
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PageData> exportModel(String DepartCode)throws Exception{
+		return (List<PageData>)dao.findForList("SocialIncDetailMapper.exportModel", DepartCode);
+	}
+	
 	/**列表
 	 * @param page
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	public List<PageData> list(Page page)throws Exception{
-		return (List<PageData>)dao.findForList("SocialIncDetailMapper.datalistPage", page);
+	public List<PageData> JqPage(JqPage page)throws Exception{
+		return (List<PageData>)dao.findForList("SocialIncDetailMapper.datalistJqPage", page);
 	}
 	
-	/**列表(全部)
+	/**获取记录数量
 	 * @param pd
 	 * @throws Exception
 	 */
-	@SuppressWarnings("unchecked")
-	public List<PageData> listAll(PageData pd)throws Exception{
-		return (List<PageData>)dao.findForList("SocialIncDetailMapper.listAll", pd);
+	public int countJqGridExtend(JqPage page)throws Exception{
+		return (int)dao.findForObject("SocialIncDetailMapper.countJqGridExtend", page);
 	}
 	
-	/**通过id获取数据
+	/**获取记录总合计
 	 * @param pd
 	 * @throws Exception
 	 */
-	public PageData findById(PageData pd)throws Exception{
-		return (PageData)dao.findForObject("SocialIncDetailMapper.findById", pd);
+	public PageData getFooterSummary(JqPage page)throws Exception{
+		return (PageData)dao.findForObject("SocialIncDetailMapper.getFooterSummary", page);
 	}
 	
 	/**批量删除
-	 * @param ArrayDATA_IDS
+	 * @param 
 	 * @throws Exception
 	 */
-	public void deleteAll(String[] ArrayDATA_IDS)throws Exception{
-		dao.delete("SocialIncDetailMapper.deleteAll", ArrayDATA_IDS);
+	public void deleteAll(List<SocialIncDetailModel> listData)throws Exception{
+		dao.batchDelete("SocialIncDetailMapper.deleteAll", listData);
+	}
+	
+	/**批量修改
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void updateAll(List<SocialIncDetailModel> listData)throws Exception{
+		dao.batchUpdate("SocialIncDetailMapper.updateAll", listData);
+	}
+	
+	/**导入
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void batchImport(List<SocialIncDetailModel> listData)throws Exception{
+		dao.batchImport("SocialIncDetailMapper.importDelete", "SocialIncDetailMapper.importInsert", listData);
+	}
+
+	/**获取员工编码
+	 * @param 
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<String> getHaveUserCodeDic(PageData pd)throws Exception{
+		return (List<String>)dao.findForList("SocialIncDetailMapper.getHaveUserCodeDic", pd);
 	}
 	
 }

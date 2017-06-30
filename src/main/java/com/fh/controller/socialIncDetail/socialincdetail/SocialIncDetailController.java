@@ -14,16 +14,41 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
+import com.fh.entity.CommonBase;
+import com.fh.entity.JqPage;
 import com.fh.entity.Page;
+import com.fh.entity.PageResult;
+import com.fh.entity.SocialIncDetailModel;
+import com.fh.entity.SysSealed;
+import com.fh.entity.TableColumns;
+import com.fh.entity.TmplConfigDetail;
+import com.fh.entity.system.Department;
+import com.fh.entity.system.Dictionaries;
+import com.fh.entity.system.User;
+import com.fh.exception.CustomException;
 import com.fh.util.AppUtil;
+import com.fh.util.Const;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
+import com.fh.util.SqlTools;
 import com.fh.util.Jurisdiction;
 import com.fh.util.Tools;
+import com.fh.util.excel.LeadingInExcel;
+
+import net.sf.json.JSONArray;
+
+import com.fh.service.fhoa.department.impl.DepartmentService;
 import com.fh.service.socialIncDetail.socialincdetail.SocialIncDetailManager;
+import com.fh.service.sysConfig.sysconfig.SysConfigManager;
+import com.fh.service.sysSealedInfo.syssealedinfo.impl.SysSealedInfoService;
+import com.fh.service.system.dictionaries.impl.DictionariesService;
+import com.fh.service.tmplConfigDict.tmplconfigdict.impl.TmplConfigDictService;
+import com.fh.service.tmplconfig.tmplconfig.impl.TmplConfigService;
 
 /** 
  * 说明：socialIncDetail
@@ -37,55 +62,77 @@ public class SocialIncDetailController extends BaseController {
 	String menuUrl = "socialincdetail/list.do"; //菜单地址(权限用)
 	@Resource(name="socialincdetailService")
 	private SocialIncDetailManager socialincdetailService;
-	
-	/**保存
-	 * @param
-	 * @throws Exception
-	 */
-	@RequestMapping(value="/save")
-	public ModelAndView save() throws Exception{
-		logBefore(logger, Jurisdiction.getUsername()+"新增SocialIncDetail");
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;} //校验权限
-		ModelAndView mv = this.getModelAndView();
-		PageData pd = new PageData();
-		pd = this.getPageData();
-		pd.put("SOCIALINCDETAIL_ID", this.get32UUID());	//主键
-		socialincdetailService.save(pd);
-		mv.addObject("msg","success");
-		mv.setViewName("save_result");
-		return mv;
-	}
-	
-	/**删除
-	 * @param out
-	 * @throws Exception
-	 */
-	@RequestMapping(value="/delete")
-	public void delete(PrintWriter out) throws Exception{
-		logBefore(logger, Jurisdiction.getUsername()+"删除SocialIncDetail");
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "del")){return;} //校验权限
-		PageData pd = new PageData();
-		pd = this.getPageData();
-		socialincdetailService.delete(pd);
-		out.write("success");
-		out.close();
-	}
-	
+	@Resource(name="tmplconfigService")
+	private TmplConfigService tmplconfigService;
+	@Resource(name="syssealedinfoService")
+	private SysSealedInfoService syssealedinfoService;
+	@Resource(name="sysconfigService")
+	private SysConfigManager sysConfigManager;
+	@Resource(name="tmplconfigdictService")
+	private TmplConfigDictService tmplconfigdictService;
+	@Resource(name="dictionariesService")
+	private DictionariesService dictionariesService;
+	@Resource(name="departmentService")
+	private DepartmentService departmentService;
+
+
+	//底行显示的求和与平均值字段
+	String SqlUserdata = "";
+	//页面显示数据的年月
+	String SystemDateTime = "";
+	//页面显示数据的二级单位
+	String DepartCode = "";
+	//默认值
+	Map<String, Object> DefaultValueList = new HashMap<String, Object>();
+	//字典
+	Map<String, Object> DicList = new HashMap<String, Object>();
+	List<TmplConfigDetail> listColumns = new ArrayList<TmplConfigDetail>();
+
 	/**修改
 	 * @param
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/edit")
-	public ModelAndView edit() throws Exception{
+	public @ResponseBody CommonBase edit() throws Exception{
+		CommonBase commonBase = new CommonBase();
+		commonBase.setCode(-1);
 		logBefore(logger, Jurisdiction.getUsername()+"修改SocialIncDetail");
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限
-		ModelAndView mv = this.getModelAndView();
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限
 		PageData pd = new PageData();
 		pd = this.getPageData();
-		socialincdetailService.edit(pd);
-		mv.addObject("msg","success");
-		mv.setViewName("save_result");
-		return mv;
+		
+		//SocialIncDetailModel.setModelDefault(pd, DefaultValueList);
+		String BILL_CODE = "BILL_CODE";
+		String BUSI_DATE = "BUSI_DATE";
+		String DEPT_CODE = "DEPT_CODE";
+		if(pd.containsKey(BILL_CODE)){
+			pd.remove(BILL_CODE);
+		}
+		pd.put(BILL_CODE, " ");
+		if(pd.containsKey(BUSI_DATE)){
+			pd.remove(BUSI_DATE);
+		}
+		pd.put(BUSI_DATE, SystemDateTime);
+		if(pd.containsKey(DEPT_CODE)){
+			pd.remove(DEPT_CODE);
+		}
+		pd.put(DEPT_CODE, DepartCode);
+		
+		List<SocialIncDetailModel> repeatList = socialincdetailService.findByPd(pd);
+		if(repeatList!=null && repeatList.size()>0){
+			commonBase.setCode(2);
+			commonBase.setMessage("此区间内编码已存在！");
+		} else {
+			if(pd.getString("oper").equals("edit")){
+				socialincdetailService.edit(pd);
+				commonBase.setCode(0);
+			}
+			else if(pd.getString("oper").equals("add")){
+				socialincdetailService.save(pd);
+				commonBase.setCode(0);
+			}
+		}
+		return commonBase;
 	}
 	
 	/**列表
@@ -96,77 +143,415 @@ public class SocialIncDetailController extends BaseController {
 	public ModelAndView list(Page page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"列表SocialIncDetail");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
+		PageData pd = this.getPageData();
+		
 		ModelAndView mv = this.getModelAndView();
-		PageData pd = new PageData();
-		pd = this.getPageData();
-		String keywords = pd.getString("keywords");				//关键词检索条件
-		if(null != keywords && !"".equals(keywords)){
-			pd.put("keywords", keywords.trim());
+		mv.setViewName("staffDetail/staffdetail/staffdetail_list");
+		//当前期间,取自tb_system_config的SystemDateTime字段
+		SystemDateTime = sysConfigManager.currentSection(pd);
+		mv.addObject("SystemDateTime", SystemDateTime);
+		//当前登录人所在二级单位
+		DepartCode = Jurisdiction.getCurrentDepartmentID();//
+		User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
+		String DepartName = user.getDEPARTMENT_NAME();
+		mv.addObject("DepartName", DepartName);
+		//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
+		pd.put("RPT_DEPT", DepartCode);
+		pd.put("RPT_DUR", SystemDateTime);
+		pd.put("BILL_TYPE", 1);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+		String State = syssealedinfoService.getState(pd);
+		mv.addObject("State", State);
+		List<String> userCodeList = socialincdetailService.getHaveUserCodeDic(pd);
+		mv.addObject("userCodeList", userCodeList);
+		
+		//用语句查询出数据库表的所有字段及其属性；拼接成jqgrid全部列
+		List<TableColumns> tableColumns = socialincdetailService.getTableColumns(pd);
+		//默认值
+		DefaultValueList = new HashMap<String, Object>();
+		//字典
+		DicList = new HashMap<String, Object>();
+		//Map<String, Map<String, Object>> listColModelAll = SocialIncDetailModel.jqGridColModelAll(tableColumns, DepartCode, socialincdetailService, DefaultValueList);
+		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
+		TmplConfigDetail item = new TmplConfigDetail();
+		item.setDEPT_CODE(DepartCode);
+		item.setTABLE_CODE("TB_STAFF_DETAIL");
+		listColumns = tmplconfigService.listNeed(item);
+		//底行显示的求和与平均值字段
+		SqlUserdata = "";
+		//拼接真正设置的jqGrid的ColModel
+		StringBuilder jqGridColModel = new StringBuilder();
+		jqGridColModel.append("[");
+		//添加关键字的保存列
+		/*if(SocialIncDetailModel.KeyList!=null && SocialIncDetailModel.KeyList.size()>0){
+			for(String key : SocialIncDetailModel.KeyList){
+				jqGridColModel.append(" {name: '").append(key.toUpperCase()).append(SocialIncDetailModel.KeyExtra).append("', hidden: true, editable: true, editrules: {edithidden: false}}, ");
+			}
 		}
-		page.setPd(pd);
-		List<PageData>	varList = socialincdetailService.list(page);	//列出SocialIncDetail列表
-		mv.setViewName("socialIncDetail/socialincdetail/socialincdetail_list");
-		mv.addObject("varList", varList);
-		mv.addObject("pd", pd);
-		mv.addObject("QX",Jurisdiction.getHC());	//按钮权限
+		//添加配置表设置列，字典（未设置就使用表默认，text或number）、隐藏、表头显示
+		if(listColumns != null && listColumns.size() > 0){
+			for(int i=0; i < listColumns.size(); i++){
+				if(listColModelAll.containsKey(listColumns.get(i).getCOL_CODE().toUpperCase())){
+					Map<String, Object> itemColModel = listColModelAll.get(listColumns.get(i).getCOL_CODE());
+					jqGridColModel.append("{");
+					String name = (String) itemColModel.get("name");
+					String edittype = (String) itemColModel.get("edittype");
+					String notedit = (String) itemColModel.get("notedit");
+					if(name != null && !name.trim().equals("")){
+						jqGridColModel.append(name).append(", ");
+					}
+					//配置表中的字典
+					if(listColumns.get(i).getDICT_TRANS()!=null && !listColumns.get(i).getDICT_TRANS().trim().equals("")){
+						String strDicValue = getDicValue(listColumns.get(i).getDICT_TRANS(), pd);
+						String strSelectValue = ":";
+						if(strDicValue!=null && !strDicValue.trim().equals("")){
+							strSelectValue += ";" + strDicValue;
+						}
+						//选择
+						jqGridColModel.append(" edittype:'select', ");
+						   jqGridColModel.append(" editoptions:{value:'" + strSelectValue + "'}, ");
+						//翻译
+						jqGridColModel.append(" formatter: 'select', ");
+					       jqGridColModel.append(" formatoptions: {value: '" + strDicValue + "'}, ");
+						//查询
+						jqGridColModel.append(" stype: 'select', ");
+					       jqGridColModel.append(" searchoptions: {value: ':[All];" + strDicValue + "'}, ");
+					} else{
+						if(edittype != null && !edittype.trim().equals("")){
+							jqGridColModel.append(edittype).append(", ");
+						}
+					}
+					//配置表中的隐藏
+					int intHide = Integer.parseInt(listColumns.get(i).getCOL_HIDE());
+					jqGridColModel.append(" hidden: ").append(intHide == 1 ? "false" : "true").append(", ");
+					if(intHide != 1){
+						jqGridColModel.append(" editable:true, editrules: {edithidden: false}, ");
+					}
+					if(notedit != null && !notedit.trim().equals("")){
+						jqGridColModel.append(notedit).append(", ");
+					}
+					//配置表中的表头显示
+					jqGridColModel.append(" label: '").append(listColumns.get(i).getCOL_NAME()).append("' ");
+					
+					jqGridColModel.append("}");
+					if(i < listColumns.size() -1){
+						jqGridColModel.append(",");
+					}
+					//底行显示的求和与平均值字段
+					// 1汇总 0不汇总,默认0
+					if(Integer.parseInt(listColumns.get(i).getCOL_SUM()) == 1){
+						if(SqlUserdata!=null && !SqlUserdata.trim().equals("")){
+							SqlUserdata += ", ";
+						}
+						SqlUserdata += " sum(" + listColumns.get(i).getCOL_CODE() + ") " + listColumns.get(i).getCOL_CODE();
+					} 
+					// 0不计算 1计算 默认0
+					else if(Integer.parseInt(listColumns.get(i).getCOL_AVE()) == 1){
+						if(SqlUserdata!=null && !SqlUserdata.trim().equals("")){
+							SqlUserdata += ", ";
+						}
+						SqlUserdata += " round(avg(" + listColumns.get(i).getCOL_CODE() + "), 2) " + listColumns.get(i).getCOL_CODE();
+					}
+				}
+			}
+		}*/
+		jqGridColModel.append("]");
+		mv.addObject("jqGridColModel", jqGridColModel.toString());
 		return mv;
 	}
 	
-	/**去新增页面
-	 * @param
-	 * @throws Exception
-	 */
-	@RequestMapping(value="/goAdd")
-	public ModelAndView goAdd()throws Exception{
-		ModelAndView mv = this.getModelAndView();
-		PageData pd = new PageData();
-		pd = this.getPageData();
-		mv.setViewName("socialIncDetail/socialincdetail/socialincdetail_edit");
-		mv.addObject("msg", "save");
-		mv.addObject("pd", pd);
-		return mv;
-	}	
+	public String getDicValue(String dicName, PageData pd) throws Exception{
+		StringBuilder ret = new StringBuilder();
+		String strDicType = tmplconfigdictService.getDicType(dicName);
+		Map<String, String> dicAdd = new HashMap<String, String>();
+		if(strDicType.equals("1")){
+			List<Dictionaries> dicList = dictionariesService.getSysDictionaries(dicName);
+			for(Dictionaries dic : dicList){
+				if(ret!=null && !ret.toString().trim().equals("")){
+					ret.append(";");
+				}
+				ret.append(dic.getBIANMA() + ":" + dic.getNAME());
+				dicAdd.put(dic.getBIANMA(), dic.getNAME());
+			}
+		} else if(strDicType.equals("2")){
+			if(dicName.toUpperCase().equals(("oa_department").toUpperCase())){
+				List<Department> listPara = (List<Department>) departmentService.getDepartDic(pd);
+				for(Department dic : listPara){
+					if(ret!=null && !ret.toString().trim().equals("")){
+						ret.append(";");
+					}
+					ret.append(dic.getDEPARTMENT_CODE() + ":" + dic.getNAME());
+					dicAdd.put(dic.getDEPARTMENT_CODE(), dic.getNAME());
+				}
+			}
+		}
+		if(!DicList.containsKey(dicName)){
+			DicList.put(dicName, dicAdd);
+		}
+		return ret.toString();
+	}
 	
-	 /**去修改页面
+	/**列表
+	 * @param page
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/getPageList")
+	public @ResponseBody PageResult<PageData> getPageList(JqPage page) throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"列表SocialIncDetail");
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		//
+		String UserCode = pd.getString("UserCode");	
+		if(null != UserCode && !"".equals(UserCode)){
+			pd.put("UserCode", UserCode.trim());
+		}
+		//多条件过滤条件
+		String filters = pd.getString("filters");
+		if(null != filters && !"".equals(filters)){
+			pd.put("filterWhereResult", SqlTools.constructWhere(filters,null));
+		}
+		//底行显示的求和与平均值字段
+		pd.put("Userdata", SqlUserdata);
+		//页面显示数据的年月
+		pd.put("SystemDateTime", SystemDateTime);
+		//页面显示数据的二级单位
+		pd.put("DepartCode", DepartCode);
+		page.setPd(pd);
+		List<PageData> varList = socialincdetailService.JqPage(page);	//列出Betting列表
+		int records = socialincdetailService.countJqGridExtend(page);
+		PageData userdata=socialincdetailService.getFooterSummary(page);
+		
+		PageResult<PageData> result = new PageResult<PageData>();
+		result.setRows(varList);
+		result.setRowNum(page.getRowNum());
+		result.setRecords(records);
+		result.setPage(page.getPage());
+		result.setUserdata(userdata);
+		
+		return result;
+	}
+	
+	 /**批量修改
 	 * @param
 	 * @throws Exception
 	 */
-	@RequestMapping(value="/goEdit")
-	public ModelAndView goEdit()throws Exception{
-		ModelAndView mv = this.getModelAndView();
-		PageData pd = new PageData();
-		pd = this.getPageData();
-		pd = socialincdetailService.findById(pd);	//根据ID读取
-		mv.setViewName("socialIncDetail/socialincdetail/socialincdetail_edit");
-		mv.addObject("msg", "edit");
-		mv.addObject("pd", pd);
-		return mv;
-	}	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value="/updateAll")
+	public @ResponseBody CommonBase updateAll() throws Exception{
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限	
+		CommonBase commonBase = new CommonBase();
+		commonBase.setCode(-1);
+		PageData pd = this.getPageData();
+		Object DATA_ROWS = pd.get("DATA_ROWS");
+		String json = DATA_ROWS.toString();  
+        JSONArray array = JSONArray.fromObject(json);  
+        List<SocialIncDetailModel> listData = (List<SocialIncDetailModel>) JSONArray.toCollection(array,SocialIncDetailModel.class);
+        for(SocialIncDetailModel item : listData){
+        	item.setBILL_CODE(" ");
+        	item.setBUSI_DATE(SystemDateTime);
+        	item.setDEPT_CODE(DepartCode);
+        }
+		if(null != listData && listData.size() > 0){
+			List<SocialIncDetailModel> repeatList = socialincdetailService.findByModel(listData);
+			if(repeatList!=null && repeatList.size()>0){
+				commonBase.setCode(2);
+				commonBase.setMessage("此区间内编码已存在！");
+			} else {
+				socialincdetailService.updateAll(listData);
+				commonBase.setCode(0);
+			}
+		}
+		return commonBase;
+	}
 	
 	 /**批量删除
 	 * @param
 	 * @throws Exception
 	 */
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/deleteAll")
-	@ResponseBody
-	public Object deleteAll() throws Exception{
-		logBefore(logger, Jurisdiction.getUsername()+"批量删除SocialIncDetail");
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "del")){return null;} //校验权限
-		PageData pd = new PageData();		
-		Map<String,Object> map = new HashMap<String,Object>();
-		pd = this.getPageData();
-		List<PageData> pdList = new ArrayList<PageData>();
-		String DATA_IDS = pd.getString("DATA_IDS");
-		if(null != DATA_IDS && !"".equals(DATA_IDS)){
-			String ArrayDATA_IDS[] = DATA_IDS.split(",");
-			socialincdetailService.deleteAll(ArrayDATA_IDS);
-			pd.put("msg", "ok");
-		}else{
-			pd.put("msg", "no");
+	public @ResponseBody CommonBase deleteAll() throws Exception{
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "delete")){return null;} //校验权限	
+		CommonBase commonBase = new CommonBase();
+		commonBase.setCode(-1);
+		PageData pd = this.getPageData();
+		Object DATA_ROWS = pd.get("DATA_ROWS");
+		String json = DATA_ROWS.toString();  
+        JSONArray array = JSONArray.fromObject(json);  
+        List<SocialIncDetailModel> listData = (List<SocialIncDetailModel>) JSONArray.toCollection(array,SocialIncDetailModel.class);
+        if(null != listData && listData.size() > 0){
+			socialincdetailService.deleteAll(listData);
+			commonBase.setCode(0);
 		}
-		pdList.add(pd);
-		map.put("list", pdList);
-		return AppUtil.returnObject(pd, map);
+		return commonBase;
+	}
+	
+	/**打开上传EXCEL页面
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/goUploadExcel")
+	public ModelAndView goUploadExcel()throws Exception{
+		ModelAndView mv = this.getModelAndView();
+		mv.setViewName("staffDetail/staffdetail/uploadExcel");
+		return mv;
+	}
+
+	/**从EXCEL导入到数据库
+	 * @param file
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/readExcel")
+	//public @ResponseBody CommonBase readExcel(@RequestParam(value="excel",required=false) MultipartFile file) throws Exception{
+	public ModelAndView readExcel(@RequestParam(value="excel",required=false) MultipartFile file) throws Exception{
+		CommonBase commonBase = new CommonBase();
+		commonBase.setCode(-1);
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;}//校验权限
+		
+		// 局部变量
+		LeadingInExcel<SocialIncDetailModel> testExcel = null;
+		Map<Integer, Object> uploadAndReadMap = null;
+		try {
+			// 定义需要读取的数据
+			String formart = "yyyy-MM-dd";
+			String propertiesFileName = "config";
+			String kyeName = "file_path";
+			int sheetIndex = 0;
+			Class<SocialIncDetailModel> clazz = SocialIncDetailModel.class;
+			Map<String, String> titleAndAttribute = null;
+			// 定义对应的标题名与对应属性名
+			titleAndAttribute = new HashMap<String, String>();
+			
+			//配置表设置列
+			if(listColumns != null && listColumns.size() > 0){
+				for(int i=0; i < listColumns.size(); i++){
+					titleAndAttribute.put(listColumns.get(i).getCOL_NAME(), listColumns.get(i).getCOL_CODE());
+				}
+			}
+
+			// 调用解析工具包
+			testExcel = new LeadingInExcel<SocialIncDetailModel>(formart);
+			// 解析excel，获取客户信息集合
+
+			uploadAndReadMap = testExcel.uploadAndRead(file, propertiesFileName, kyeName, sheetIndex,
+					titleAndAttribute, clazz, listColumns, DicList);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("读取Excel文件错误", e);
+			throw new CustomException("读取Excel文件错误");
+		}
+		boolean judgement = false;
+		if(uploadAndReadMap.get(1).equals(false)){
+			Map<String, Object> returnError =  (Map<String, Object>) uploadAndReadMap.get(2);
+			String message = "字典无此翻译： "; // \n
+			for (String k : returnError.keySet())  
+		    {
+				message += k + " : " + returnError.get(k);
+		    }
+			commonBase.setCode(2);
+			commonBase.setMessage(message);
+		} else {
+			List<SocialIncDetailModel> uploadAndRead = (List<SocialIncDetailModel>) uploadAndReadMap.get(2);
+			if (uploadAndRead != null && !"[]".equals(uploadAndRead.toString()) && uploadAndRead.size() >= 1) {
+				judgement = true;
+			}
+			if (judgement) {
+				List<String> sbRet = new ArrayList<String>();
+				String BUSI_DATE = "";
+				String DEPT_CODE = "";
+				List<String> listUserCode = new ArrayList<String>();
+				int listSize = uploadAndRead.size();
+				for(int i=0;i<listSize;i++){
+					if(!(uploadAndRead.get(i).getBUSI_DATE()!=null && !uploadAndRead.get(i).getBUSI_DATE().trim().equals(""))){
+						if(!sbRet.contains("区间不能为空！")){
+							sbRet.add("区间不能为空！");
+						}
+					}
+					if(!(uploadAndRead.get(i).getDEPT_CODE()!=null && !uploadAndRead.get(i).getDEPT_CODE().trim().equals(""))){
+						if(!sbRet.contains("单位不能为空！")){
+							sbRet.add("单位不能为空！");
+						}
+					}
+					if(!(uploadAndRead.get(i).getUSER_CODE()!=null && !uploadAndRead.get(i).getUSER_CODE().trim().equals(""))){
+						if(!sbRet.contains("人员编码不能为空！")){
+							sbRet.add("人员编码不能为空！");
+						}
+					}
+					if(i == 0){
+						BUSI_DATE = uploadAndRead.get(i).getBUSI_DATE();
+						DEPT_CODE = uploadAndRead.get(i).getDEPT_CODE();
+					} else {
+						if(!BUSI_DATE.equals(uploadAndRead.get(i).getBUSI_DATE()) || !DEPT_CODE.equals(uploadAndRead.get(i).getDEPT_CODE())){
+							if(!sbRet.contains("区间和单位必须一致！")){
+								sbRet.add("区间和单位必须一致！");
+							}
+						}
+					}
+					if(listUserCode.contains(uploadAndRead.get(i).getUSER_CODE())){
+						String strUserAdd = "编码" + uploadAndRead.get(i).getUSER_CODE() + "重复！";
+						if(!sbRet.contains(strUserAdd)){
+							sbRet.add(strUserAdd);
+						}
+					} else {
+						listUserCode.add(uploadAndRead.get(i).getUSER_CODE());
+					}
+				}
+				PageData pd = this.getPageData();
+				pd.put("RPT_DEPT", DEPT_CODE);
+				pd.put("RPT_DUR", BUSI_DATE);
+				pd.put("BILL_TYPE", 1);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+				String State = syssealedinfoService.getState(pd);
+				if(!(State!=null && State.equals("0"))){
+					sbRet.add("导入期间已封存！");
+				}
+				if(sbRet.size()>0){
+					StringBuilder sbTitle = new StringBuilder();
+					for(String str : sbRet){
+						sbTitle.append(str + "  "); // \n
+					}
+					commonBase.setCode(2);
+					commonBase.setMessage(sbTitle.toString());
+				} else {
+					//此处执行集合添加 
+					socialincdetailService.batchImport(uploadAndRead);
+					commonBase.setCode(0);
+				}
+				
+				/*// 把客户信息分为没100条数据为一组迭代添加客户信息（注：将customerList集合作为参数，在Mybatis的相应映射文件中使用foreach标签进行批量添加。）
+				int listSize = uploadAndRead.size();
+				int toIndex = 100;
+				for (int i = 0; i < listSize; i += 100) {
+					if (i + 100 > listSize) {
+						toIndex = listSize - i;
+					}
+					List<SocialIncDetailModel> subList = uploadAndRead.subList(i, i + toIndex);
+
+					//此处执行集合添加 
+					socialincdetailService.batchImport(subList);
+				}*/
+			} else {
+				commonBase.setCode(-1);
+				commonBase.setMessage("TranslateUtil");
+			}
+		}
+		ModelAndView mv = this.getModelAndView();
+		mv.setViewName("staffDetail/staffdetail/uploadExcel");
+		mv.addObject("commonBaseCode", commonBase.getCode());
+		mv.addObject("commonMessage", commonBase.getMessage());
+		return mv;
+	}
+	
+	/**下载模版
+	 * @param response
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/downExcel")
+	//public void downExcel(HttpServletResponse response)throws Exception{
+	public ModelAndView downExcel(JqPage page) throws Exception{
+		//页面显示数据的二级单位
+		List<PageData> varOList = socialincdetailService.exportModel(DepartCode);
+		return export(varOList);
 	}
 	
 	 /**导出到excel
@@ -174,85 +559,90 @@ public class SocialIncDetailController extends BaseController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/excel")
-	public ModelAndView exportExcel() throws Exception{
+	public ModelAndView exportExcel(JqPage page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"导出SocialIncDetail到excel");
 		if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
+		PageData pd = this.getPageData();
+		//页面显示数据的年月
+		pd.put("SystemDateTime", SystemDateTime);
+		//页面显示数据的二级单位
+		pd.put("DepartCode", DepartCode);
+		page.setPd(pd);
+		List<PageData> varOList = socialincdetailService.exportList(page);
+		return export(varOList);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private ModelAndView export(List<PageData> varOList){
 		ModelAndView mv = new ModelAndView();
-		PageData pd = new PageData();
-		pd = this.getPageData();
 		Map<String,Object> dataMap = new HashMap<String,Object>();
 		List<String> titles = new ArrayList<String>();
-		titles.add("备注1");	//1
-		titles.add("备注2");	//2
-		titles.add("备注3");	//3
-		titles.add("备注4");	//4
-		titles.add("备注5");	//5
-		titles.add("备注6");	//6
-		titles.add("备注7");	//7
-		titles.add("备注8");	//8
-		titles.add("备注9");	//9
-		titles.add("备注10");	//10
-		titles.add("备注11");	//11
-		titles.add("备注12");	//12
-		titles.add("备注13");	//13
-		titles.add("备注14");	//14
-		titles.add("备注15");	//15
-		titles.add("备注16");	//16
-		titles.add("备注17");	//17
-		titles.add("备注18");	//18
-		titles.add("备注19");	//19
-		titles.add("备注20");	//20
-		titles.add("备注21");	//21
-		titles.add("备注22");	//22
-		titles.add("备注23");	//23
-		titles.add("备注24");	//24
-		titles.add("备注25");	//25
-		titles.add("备注26");	//26
-		titles.add("备注27");	//27
-		titles.add("备注28");	//28
-		titles.add("备注29");	//29
-		titles.add("备注30");	//30
+		if(listColumns != null && listColumns.size() > 0){
+			for(int i=0; i < listColumns.size(); i++){
+				titles.add(listColumns.get(i).getCOL_NAME());
+			}
+		}
 		dataMap.put("titles", titles);
-		List<PageData> varOList = socialincdetailService.listAll(pd);
 		List<PageData> varList = new ArrayList<PageData>();
 		for(int i=0;i<varOList.size();i++){
 			PageData vpd = new PageData();
-			vpd.put("var1", varOList.get(i).getString("BILL_CODE"));	    //1
-			vpd.put("var2", varOList.get(i).getString("BUSI_DATE"));	    //2
-			vpd.put("var3", varOList.get(i).getString("USER_CODE"));	    //3
-			vpd.put("var4", varOList.get(i).getString("USER_NAME"));	    //4
-			vpd.put("var5", varOList.get(i).getString("USER_GROP"));	    //5
-			vpd.put("var6", varOList.get(i).getString("SOC_INC_BASE"));	    //6
-			vpd.put("var7", varOList.get(i).getString("PER_ENDW_INS"));	    //7
-			vpd.put("var8", varOList.get(i).getString("PER_MED_INS"));	    //8
-			vpd.put("var9", varOList.get(i).getString("PER_UNEMPL_INS"));	    //9
-			vpd.put("var10", varOList.get(i).getString("PER_TOTAL"));	    //10
-			vpd.put("var11", varOList.get(i).getString("DEPT_ENDW_INS"));	    //11
-			vpd.put("var12", varOList.get(i).getString("DEPT_MED_INS"));	    //12
-			vpd.put("var13", varOList.get(i).getString("DEPT_UNEMPL_INS"));	    //13
-			vpd.put("var14", varOList.get(i).getString("EMPT_INJ_INS"));	    //14
-			vpd.put("var15", varOList.get(i).getString("MATY_INS"));	    //15
-			vpd.put("var16", varOList.get(i).getString("DEPT_TOTAL"));	    //16
-			vpd.put("var17", varOList.get(i).getString("DEPT_CODE"));	    //17
-			vpd.put("var18", varOList.get(i).getString("USER_CATG"));	    //18
-			vpd.put("var19", varOList.get(i).getString("PMT_PLACE"));	    //19
-			vpd.put("var20", varOList.get(i).getString("CUST_COL1"));	    //20
-			vpd.put("var21", varOList.get(i).getString("CUST_COL2"));	    //21
-			vpd.put("var22", varOList.get(i).getString("CUST_COL3"));	    //22
-			vpd.put("var23", varOList.get(i).getString("CUST_COL4"));	    //23
-			vpd.put("var24", varOList.get(i).getString("CUST_COL5"));	    //24
-			vpd.put("var25", varOList.get(i).getString("CUST_COL6"));	    //25
-			vpd.put("var26", varOList.get(i).getString("CUST_COL7"));	    //26
-			vpd.put("var27", varOList.get(i).getString("CUST_COL8"));	    //27
-			vpd.put("var28", varOList.get(i).getString("CUST_COL9"));	    //28
-			vpd.put("var29", varOList.get(i).getString("CUST_COL10"));	    //29
-			vpd.put("var30", varOList.get(i).getString("ESTB_DEPT"));	    //30
+			if(listColumns != null && listColumns.size() > 0){
+				for(int j=1; j <= listColumns.size(); j++){
+					String trans = listColumns.get(j-1).getDICT_TRANS();
+					Object getCellValue = varOList.get(i).get(listColumns.get(j-1).getCOL_CODE().toUpperCase());
+					if(trans != null && !trans.trim().equals("")){
+						String value = "";
+						Map<String, String> dicAdd = (Map<String, String>) DicList.getOrDefault(trans, new HashMap<String, String>());
+						value = dicAdd.getOrDefault(getCellValue, "");
+						vpd.put("var" + j, value);
+					} else {
+						vpd.put("var" + j, getCellValue.toString());
+					}
+				}
+			}
 			varList.add(vpd);
 		}
 		dataMap.put("varList", varList);
 		ObjectExcelView erv = new ObjectExcelView();
-		mv = new ModelAndView(erv,dataMap);
+		mv = new ModelAndView(erv,dataMap); 
 		return mv;
+	}
+	
+	 /**上报
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/report")
+	public @ResponseBody CommonBase report() throws Exception{
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "report")){return null;} //校验权限	
+		CommonBase commonBase = new CommonBase();
+		commonBase.setCode(-1);
+		PageData pd = this.getPageData();
+		pd.put("RPT_DEPT", DepartCode);
+		pd.put("RPT_DUR", SystemDateTime);
+		pd.put("BILL_TYPE", 1);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+		String State = syssealedinfoService.getState(pd);
+		if(State!=null && State.equals("1")){
+			commonBase.setCode(2);
+			commonBase.setMessage("当前期间已封存！");
+		} else {
+			User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
+			String userId = user.getUSER_ID();
+			SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String time = sdf.format(new Date());
+			
+			SysSealed item = new SysSealed();
+			item.setBILL_CODE(" ");
+			item.setRPT_DEPT(DepartCode);
+			item.setRPT_DUR(SystemDateTime);
+			item.setRPT_USER(userId);
+			item.setRPT_DATE(time);//YYYY-MM-DD HH:MM:SS
+			item.setBILL_TYPE("1");// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+			item.setSTATE("1");// 枚举  1封存,0解封
+			syssealedinfoService.report(item);
+			commonBase.setCode(0);
+		}
+		return commonBase;
 	}
 	
 	@InitBinder
