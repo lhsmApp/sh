@@ -54,14 +54,18 @@
 		<include refid="tableName"></include>
 		set 
 			BILL_CODE = #{BILL_CODE},
-			<!-- RPT_DEPT = #{RPT_DEPT},
+			 RPT_DEPT = #{RPT_DEPT},
 			RPT_DUR = #{RPT_DUR},
-			RPT_USER = #{RPT_USER},
+			<!-- RPT_USER = #{RPT_USER},
 			RPT_DATE = #{RPT_DATE},
 			BILL_TYPE = #{BILL_TYPE}, -->
 			STATE = #{STATE}
 		where 
 		BILL_CODE = #{BILL_CODE}
+		and
+		RPT_DEPT = #{RPT_DEPT}
+		and
+		RPT_DUR = #{RPT_DUR}
 	</update>
 	
 	<!-- 通过ID获取数据 -->
@@ -173,6 +177,27 @@
 	    <include refid="FieldValue"></include>
 		)
 	</insert>
+	
+	<!-- 批量保存 -->
+	<update id="updateAll" parameterType="pd">
+		<foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
+		    <if test="item!=null">
+		        update
+		        <include refid="tableName"></include>
+		        set 
+			BILL_CODE = #{item.BILL_CODE},
+			 RPT_DEPT = #{item.RPT_DEPT},
+			RPT_DUR = #{item.RPT_DUR},
+			STATE = #{item.STATE}
+		where 
+		BILL_CODE = #{item.BILL_CODE}
+		and
+		RPT_DEPT = #{item.RPT_DEPT}
+		and
+		RPT_DUR = #{item.RPT_DUR}
+		    </if>
+		</foreach>
+	</update>
 	
 	<!-- fh313596790qq(青苔) -->
 </mapper>

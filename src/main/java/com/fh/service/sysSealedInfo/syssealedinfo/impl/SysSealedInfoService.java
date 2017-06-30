@@ -4,6 +4,7 @@ import java.util.List;
 import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import com.fh.dao.DaoSupport;
+import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
 import com.fh.entity.Page;
 import com.fh.entity.StaffDetailModel;
@@ -120,6 +121,14 @@ public class SysSealedInfoService implements SysSealedInfoManager{
 	 */
 	public void report(SysSealed data)throws Exception{
 		dao.report("SysSealedInfoMapper.reportDelete", "SysSealedInfoMapper.reportInsert", data);
+	}
+	
+	/**批量修改
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void updateAll(List<PageData> pd)throws Exception{
+		dao.update("SysSealedInfoMapper.updateAll", pd);
 	}
 	
 }

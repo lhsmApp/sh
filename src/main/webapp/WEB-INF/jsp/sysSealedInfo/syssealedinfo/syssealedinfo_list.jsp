@@ -70,7 +70,7 @@
 													name="RPT_DEPT" id="RPT_DEPT"
 													data-placeholder="请选单位"
 													style="vertical-align: top; height:32px;width: 150px;">
-													<option value=""></option>
+													<option value="">请选择单位</option>
 													<option value="">全部</option>
 													<c:forEach items="${deptList}" var="dept">
 														<option value="${dept}"
@@ -83,7 +83,7 @@
 													name="BILL_TYPE" id="BILL_TYPE"
 													data-placeholder="请选类型"
 													style="vertical-align: top; height:32px;width: 150px;">
-													<option value=""></option>
+													<option value="">请选择类型</option>
 													<option value="">全部</option>
 													<c:forEach items="${billTypeList}" var="billType">
 														<option value="${billType.nameValue}"
@@ -97,7 +97,7 @@
 													name="STATUS" id="STATUS"
 													data-placeholder="请选状态"
 													style="vertical-align: top; height:32px;width: 150px;">
-													<option value=""></option>
+													<option value="">请选择状态</option>
 													<option value="0">解封</option>
 													<option value="1">封存</option>
 													
@@ -160,7 +160,7 @@
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
 			$("#jqGrid").jqGrid( 'setGridWidth', $(".page-content").width());
-			$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - 200);
+			$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - 160);
 	    })
 		
 		$("#jqGrid").jqGrid({
@@ -191,14 +191,21 @@
                         
                         afterSave:function(rowid, res){
                         	console.log("afterSave");
-                        	$("#jqGrid").trigger("reloadGrid");
+                        	$(".tooltip").remove();
+                        	/* $("#jqGrid").trigger("reloadGrid"); */
                         },
 					
 						keys:true,
 					    delbutton: false,//disable delete button
 					}
 				},
-				{label: '单据编码',name:'BILL_CODE',index:'',key: true, width:100},
+				
+				{label: '单据编码',name:'BILL_CODE', width:100,hidden : true,editable: true},
+				{ label: '单据单位', name: 'RPT_DEPT', width: 90,hidden : true,editable: true,},
+				{ label: '单据期间', name: 'RPT_DUR', width: 60,hidden : true,editable: true,},
+				
+				
+				{label: '单据编码',name:'BILL_CODE', width:100},
 				{ label: '单据单位', name: 'NAME', width: 90},
 				{ label: '单据期间', name: 'RPT_DUR', width: 60},
 				{ label: '上传人', name: 'RPT_USER', width: 60},
@@ -330,12 +337,11 @@
 			 	$(cell).find('input[type=checkbox]').removeAttr('checked');
 			 }
 		}, 0);
-		/* console.log("状态"+cellvalue);
 		if (cellvalue=="封存") {
 			return 1;
 		} else {
 			return 0;
-		} */
+		} 
 	}
 	
 	 //批量编辑

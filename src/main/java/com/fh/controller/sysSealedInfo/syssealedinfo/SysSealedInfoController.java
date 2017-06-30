@@ -28,6 +28,9 @@ import com.fh.util.SqlTools;
 import com.fh.util.Jurisdiction;
 import com.fh.util.Tools;
 import com.fh.util.enums.BillType;
+
+import net.sf.json.JSONArray;
+
 import com.fh.service.sysSealedInfo.syssealedinfo.SysSealedInfoManager;
 
 /** 
@@ -159,6 +162,29 @@ public class SysSealedInfoController extends BaseController {
 		List<String>	deptList = syssealedinfoService.deptList();
 		
 		return deptList;
+	}
+	
+	/**批量修改
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/updateAll")
+	/*@RequestBody RequestBase<JqGridModel> jqGridModel*/
+	public @ResponseBody CommonBase updateAll() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"批量删除JgGrid");
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "del")){return null;} //校验权限	
+		CommonBase commonBase = new CommonBase();
+		commonBase.setCode(-1);
+		PageData pd = this.getPageData();
+		String strDataRows = pd.getString("DATA_ROWS");
+        JSONArray array = JSONArray.fromObject(strDataRows);  
+        List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);// 过时方法
+       
+		if(null != listData && listData.size() > 0){
+			syssealedinfoService.updateAll(listData);
+			commonBase.setCode(0);
+		}
+		return commonBase;
 	}
 	
 	@InitBinder
