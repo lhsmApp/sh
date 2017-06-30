@@ -24,10 +24,13 @@ import com.fh.util.Jurisdiction;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
 
-/** 
- * 说明：SQL编辑器
- * 创建人：FH Q313596790
- * 创建时间：2016-03-30
+/**
+ * SQL编辑器
+* @ClassName: SQLeditController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping(value="/sqledit")

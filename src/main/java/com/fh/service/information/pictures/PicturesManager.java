@@ -4,10 +4,13 @@ import java.util.List;
 import com.fh.entity.Page;
 import com.fh.util.PageData;
 
-
-/** 图片管理接口
- * @author fh313596790qq(青苔)
- * 修改时间：2015.11.2
+/**
+ * 图片管理接口
+* @ClassName: PicturesManager
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 public interface PicturesManager {
 	

@@ -32,10 +32,13 @@ import net.sf.json.processors.JsonValueProcessor;
 import com.fh.service.socialOrganize.pesoinfo.PesoInfoManager;
 import com.fh.service.system.dictionaries.DictionariesManager;
 
-/** 
- * 说明：社会组织
- * 创建人：FH Q313596790
- * 创建时间：2017-05-08
+/**
+ * 社会组织
+* @ClassName: PesoInfoController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping(value="/pesoinfo")

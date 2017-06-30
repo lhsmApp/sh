@@ -32,7 +32,7 @@ public class GenerateTransferData {
 	 * @param transferOperType
 	 */
 	public String generateVoucherData(List<TableColumns> tableColumns, List<PageData> listTransferData, String deptCode,
-			TransferOperType transferOperType, String tableCode) {
+			String transferOperType, String tableCode) {
 		// 建立document对象
 		Document doc = DocumentHelper.createDocument();
 		// 建立XML文档的根data

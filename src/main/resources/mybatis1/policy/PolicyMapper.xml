@@ -143,5 +143,4 @@
 			POLI_TYPE = #{pd.POLI_TYPE}
 	</select>
 	
-	<!-- fh313596790qq(青苔) -->
 </mapper>

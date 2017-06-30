@@ -16,10 +16,14 @@ import javax.mail.internet.MimeMultipart;
 
 import com.fh.controller.base.BaseController;
 
-/**   
- * 邮件发送器   
- * @author FH QQ 313596790[青苔]
- */    
+/**
+ * 邮件发送器     
+* @ClassName: SimpleMailSender
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
+ */
 public class SimpleMailSender extends BaseController {    
 /**   
   * 以文本格式发送邮件   
@@ -169,7 +173,7 @@ public class SimpleMailSender extends BaseController {
 	     mailInfo.setUserName("itfather@1b23.com");    
 	     mailInfo.setPassword("tttt");//您的邮箱密码    
 	     mailInfo.setFromAddress("itfather@1b23.com");    
-	     mailInfo.setToAddress("313596790@qq.com");    
+	     mailInfo.setToAddress("609877918@qq.com");    
 	     mailInfo.setSubject("设置邮箱标题");    
 	     mailInfo.setContent("设置邮箱内容");    
 	     //这个类主要来发送邮件   

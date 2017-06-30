@@ -17,11 +17,13 @@ import com.fh.util.DbFH;
 import com.fh.util.Jurisdiction;
 import com.fh.util.PageData;
 
-/** 
- * 类名称： 反向生成
- * 创建人：FH Q313596790
- * 修改时间：2016年4月15日
- * @version
+/**
+ * 反向生成
+* @ClassName: ReverseCreateCodeController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping(value="/recreateCode")

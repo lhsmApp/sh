@@ -9,11 +9,13 @@ import com.fh.entity.instframe.Instframe;
 import com.fh.util.PageData;
 import com.fh.service.instframe.instframe.InstframeManager;
 
-/** 
- * 说明： 组织机构
- * 创建人：FH Q313596790
- * 创建时间：2017-05-12
- * @version
+/**
+ * 组织机构
+* @ClassName: InstframeService
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Service("instframeService")
 public class InstframeService implements InstframeManager{

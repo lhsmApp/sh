@@ -2,14 +2,12 @@ package com.fh.entity.system;
 
 import java.util.List;
 /**
- * 
-* 类名称：菜单
-* 类描述： 
-* @author FH QQ 313596790[青苔]
-* 作者单位： 
-* 联系方式：
-* 创建时间：2015年7月27日
-* @version 2.0
+ * 菜单
+* @ClassName: Menu
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月30日
+*
  */
 public class Menu {
 	

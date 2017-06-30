@@ -30,10 +30,13 @@ import com.fh.util.Jurisdiction;
 import com.fh.util.Tools;
 import com.fh.service.fhdb.brdb.BRdbManager;
 
-/** 
- * 说明：数据库管理(备份和还原)
- * 创建人：FH Q313596790
- * 创建时间：2016-03-30
+/**
+ * 数据库管理(备份和还原)
+* @ClassName: BRdbController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping(value="/brdb")

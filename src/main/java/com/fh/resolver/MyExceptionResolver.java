@@ -5,14 +5,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
+
 /**
- * 
-* 类名称：MyExceptionResolver.java
-* 类描述： 
-* @author FH
-* 作者单位： 
-* 联系方式：QQ313596790
-* @version 1.0
+ * MyExceptionResolver.java
+* @ClassName: MyExceptionResolver
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月30日
+*
  */
 public class MyExceptionResolver implements HandlerExceptionResolver{
 

@@ -13,11 +13,13 @@ import javax.imageio.ImageIO;
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
 
-/** 
- * 说明：图片水印处理类 （报错注意：用安装版的jdk，不要用开发工具自带的jdk）
- * 创建人：FH Q313596790
- * 修改时间：2013年12月1日
- * @version
+/**
+ * 图片水印处理类 （报错注意：用安装版的jdk，不要用开发工具自带的jdk）
+* @ClassName: Watermark
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 public class Watermark {
 	

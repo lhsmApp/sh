@@ -28,10 +28,13 @@ import com.fh.util.Tools;
 import com.fh.service.information.attached.AttachedManager;
 import com.fh.service.information.attachedmx.AttachedMxManager;
 
-/** 
- * 说明：主附结构
- * 创建人：FH Q313596790
- * 创建时间：2016-04-17
+/**
+ * 主附结构
+* @ClassName: AttachedController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping(value="/attached")

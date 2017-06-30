@@ -27,11 +27,13 @@ import com.fh.util.Tools;
 import com.fh.util.Watermark;
 import com.fh.util.mail.SimpleMailSender;
 
-/** 
- * 类名称：HeadController
- * 创建人：FH 313596790Q
- * 修改时间：2015年11月23日
- * @version
+/**
+ * HeadController
+* @ClassName: HeadController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping(value="/head")

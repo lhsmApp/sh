@@ -8,9 +8,11 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * 下载文件
- * 创建人：FH Q313596790
- * 创建时间：2014年12月23日
- * @version
+* @ClassName: FileDownload
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 public class FileDownload {
 

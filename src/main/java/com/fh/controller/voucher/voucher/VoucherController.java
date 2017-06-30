@@ -19,12 +19,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fh.controller.base.BaseController;
+import com.fh.controller.common.GenerateTransferData;
 import com.fh.controller.common.TmplUtil;
 import com.fh.entity.CommonBase;
 import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
 import com.fh.entity.Page;
 import com.fh.entity.PageResult;
+import com.fh.entity.TableColumns;
 import com.fh.service.fhoa.department.DepartmentManager;
 import com.fh.service.system.dictionaries.DictionariesManager;
 import com.fh.service.tmplConfigDict.tmplconfigdict.TmplConfigDictManager;
@@ -35,13 +37,17 @@ import com.fh.util.Jurisdiction;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
 import com.fh.util.SqlTools;
+import com.fh.util.enums.TransferOperType;
 
 import net.sf.json.JSONArray;
 
-/** 
- * 说明：凭证数据传输
- * 创建人：FH Q313596790
- * 创建时间：2017-06-23
+/**
+ * 凭证数据传输
+* @ClassName: VoucherController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月29日
+*
  */
 @Controller
 @RequestMapping(value="/voucher")
@@ -127,19 +133,7 @@ public class VoucherController extends BaseController {
 		pd = this.getPageData();
 		String which=pd.getString("TABLE_CODE");
 		//String voucherType=pd.getString("VOUCHER_TYPE");
-		String tableCode="";
-		if(which!=null&&which.equals("1")){
-			tableCode="TB_STAFF_SUMMY";
-		}
-		else if(which!=null&&which.equals("2")){
-			tableCode="TB_SOCIAL_INC_SUMMY";
-		}
-		else if(which!=null&&which.equals("3")){
-			tableCode="TB_HOUSE_FUND_SUMMY";
-		}
-		else{
-			tableCode="TB_HOUSE_FUND_SUMMY";
-		}
+		String tableCode=getTableCode(which);
 		pd.put("TABLE_CODE", tableCode);
 		
 		String keywords = pd.getString("keywords");				//关键词检索条件
@@ -218,12 +212,49 @@ public class VoucherController extends BaseController {
 		PageData pd = this.getPageData();
 		String strDataRows = pd.getString("DATA_ROWS");
         JSONArray array = JSONArray.fromObject(strDataRows);  
-        List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);// 过时方法
-		if(null != listData && listData.size() > 0){
+        List<PageData> listTransferData = (List<PageData>) JSONArray.toCollection(array,PageData.class);// 过时方法
+		
+        /**********************生成传输数据************************/
+        String which=pd.getString("TABLE_CODE");
+        String tableCode=getTableCode(which);
+		//String voucherType=pd.getString("VOUCHER_TYPE");
+		
+        // 用语句查询出数据库表的所有字段及其属性；拼接成jqgrid全部列
+     	List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCode);
+        GenerateTransferData generateTransferData=new GenerateTransferData();
+        String transferData=generateTransferData.generateVoucherData(tableColumns, listTransferData, "001001", TransferOperType.INSERT, tableCode);
+        //执行上传FIMS
+        
+        //执行上传成功后对数据进行封存
+        /******************************************************/
+        		
+        if(null != listTransferData && listTransferData.size() > 0){
 			//voucherService.updateAll(listData);
 			commonBase.setCode(0);
 		}
 		return commonBase;
+	}
+	
+	/**
+	 * 根据前端业务表索引获取表名称
+	 * @param which
+	 * @return
+	 */
+	private String getTableCode(String which){
+		String tableCode="";
+		if(which!=null&&which.equals("1")){
+			tableCode="TB_STAFF_SUMMY";
+		}
+		else if(which!=null&&which.equals("2")){
+			tableCode="TB_SOCIAL_INC_SUMMY";
+		}
+		else if(which!=null&&which.equals("3")){
+			tableCode="TB_HOUSE_FUND_SUMMY";
+		}
+		else{
+			tableCode="TB_HOUSE_FUND_SUMMY";
+		}
+		return tableCode;
 	}
 	
 	 /**导出到excel

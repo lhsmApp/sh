@@ -10,11 +10,13 @@ import com.fh.util.PageData;
 import com.fh.util.StringUtil;
 import com.fh.service.stadium.stadium.StadiumManager;
 
-/** 
- * 说明： 体育场馆管理
- * 创建人：FH Q313596790
- * 创建时间：2017-05-08
- * @version
+/**
+ * 体育场馆管理
+* @ClassName: StadiumService
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author zhangxiaoliu
+* @date 2017年6月30日
+*
  */
 @Service("stadiumService")
 public class StadiumService implements StadiumManager{

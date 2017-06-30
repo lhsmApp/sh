@@ -16,11 +16,14 @@ import org.springframework.web.servlet.view.document.AbstractExcelView;
 
 import com.fh.util.PageData;
 import com.fh.util.Tools;
+
 /**
-* 导入到EXCEL
-* 类名称：ObjectExcelView.java
-* @author FH Q313596790
-* @version 1.0
+ * 导入到EXCEL
+* @ClassName: ObjectExcelView
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 public class ObjectExcelView extends AbstractExcelView{
 

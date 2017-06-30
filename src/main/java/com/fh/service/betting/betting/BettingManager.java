@@ -4,11 +4,13 @@ import java.util.List;
 import com.fh.entity.Page;
 import com.fh.util.PageData;
 
-/** 
- * 说明： 投注站管理接口
- * 创建人：FH Q313596790
- * 创建时间：2017-05-05
- * @version
+/**
+ * 投注站管理接口
+* @ClassName: BettingManager
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月30日
+*
  */
 public interface BettingManager{
 

@@ -2,10 +2,13 @@ package com.fh.entity.instframe;
 
 import java.util.List;
 
-/** 
- * 说明：组织机构 实体类
- * 创建人：FH Q313596790
- * 创建时间：2017-05-12
+/**
+ * 组织机构 实体类
+* @ClassName: Instframe
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 public class Instframe{ 
 	

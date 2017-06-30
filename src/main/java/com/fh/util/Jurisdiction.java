@@ -11,8 +11,11 @@ import com.fh.entity.system.User;
 
 /**
  * 权限处理
- * 
- * @author:fh qq 313596790[青苔] 修改日期：2015/11/19
+* @ClassName: Jurisdiction
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月30日
+*
  */
 public class Jurisdiction {
 

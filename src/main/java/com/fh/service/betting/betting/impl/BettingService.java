@@ -10,11 +10,13 @@ import com.fh.util.PageData;
 import com.fh.util.StringUtil;
 import com.fh.service.betting.betting.BettingManager;
 
-/** 
- * 说明： 投注站管理
- * 创建人：FH Q313596790
- * 创建时间：2017-05-05
- * @version
+/**
+ * 投注站管理
+* @ClassName: BettingService
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月30日
+*
  */
 @Service("bettingService")
 public class BettingService implements BettingManager{

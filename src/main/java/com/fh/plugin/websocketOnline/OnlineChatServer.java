@@ -14,9 +14,11 @@ import org.java_websocket.server.WebSocketServer;
 
 /**
  * 在线管理
- * @author FH
- * QQ 313596790
- * 2015-5-25
+* @ClassName: OnlineChatServer
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 public class OnlineChatServer extends WebSocketServer{
 

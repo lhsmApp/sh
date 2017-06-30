@@ -45,11 +45,13 @@ import com.fh.util.Tools;
 
 import net.sf.json.JSONArray;
 
-/** 
- * 类名称：UserController
- * 创建人：FH fh313596790qq(青苔)
- * 更新时间：2015年11月3日
- * @version
+/**
+ * 用户管理
+* @ClassName: UserController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping(value="/user")

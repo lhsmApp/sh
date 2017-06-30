@@ -16,9 +16,11 @@ import freemarker.template.TemplateException;
 
 /**
  * Freemarker 模版引擎类
- * 创建人：FH Q313596790
- * 创建时间：2015年2月8日
- * @version
+* @ClassName: Freemarker
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 public class Freemarker {
 

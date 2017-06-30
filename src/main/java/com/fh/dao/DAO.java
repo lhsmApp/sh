@@ -1,7 +1,12 @@
 package com.fh.dao;
+
 /**
- * @author FH Q313596790
- * 修改时间：2015、12、11
+ * redis Dao 
+* @ClassName: DAO
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 public interface DAO {
 	

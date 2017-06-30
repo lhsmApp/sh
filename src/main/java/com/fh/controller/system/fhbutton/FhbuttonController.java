@@ -27,10 +27,13 @@ import com.fh.util.PageData;
 import com.fh.util.Jurisdiction;
 import com.fh.service.system.fhbutton.FhbuttonManager;
 
-/** 
- * 说明：按钮管理
- * 创建人：FH Q313596790
- * 创建时间：2016-01-15
+/**
+ * 按钮管理
+* @ClassName: FhbuttonController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping(value="/fhbutton")

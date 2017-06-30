@@ -5,11 +5,16 @@ import javax.annotation.Resource;
 import org.springframework.data.redis.core.RedisTemplate;  
 import org.springframework.data.redis.serializer.RedisSerializer;  
 
-/**  
- * redis Dao 
- * @author FH Q313596790 
- * 修改时间：2016、5、2
- */   
+/**
+ * redis Dao    
+* @ClassName: AbstractBaseRedisDao
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
+* @param <K>
+* @param <V>
+ */
 public abstract class AbstractBaseRedisDao<K, V> {  
       
     @Resource(name="redisTemplate")

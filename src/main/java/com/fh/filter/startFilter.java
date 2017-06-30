@@ -26,9 +26,11 @@ import com.fh.controller.base.BaseController;
 
 /**
  * 启动tomcat时运行此类
- * 创建人：FH FH QQ 313596790[青苔]
- * 创建时间：2014年2月17日
- * @version
+* @ClassName: startFilter
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 public class startFilter extends BaseController implements Filter{
 	

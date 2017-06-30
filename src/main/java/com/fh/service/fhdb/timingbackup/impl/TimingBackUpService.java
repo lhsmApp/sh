@@ -11,11 +11,13 @@ import com.fh.entity.Page;
 import com.fh.util.PageData;
 import com.fh.service.fhdb.timingbackup.TimingBackUpManager;
 
-/** 
- * 说明： 定时备份
- * 创建人：FH Q313596790
- * 创建时间：2016-04-09
- * @version
+/**
+ *  定时备份
+* @ClassName: TimingBackUpService
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Service("timingbackupService")
 public class TimingBackUpService implements TimingBackUpManager{

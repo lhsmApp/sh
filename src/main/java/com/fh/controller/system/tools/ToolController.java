@@ -28,11 +28,13 @@ import com.fh.util.PageData;
 import com.fh.util.PathUtil;
 import com.fh.util.TwoDimensionCode;
 
-/** 
- * 类名称：ToolController 系统工具
- * 创建人：FH Q313596790
- * 修改时间：2015年11月23日
- * @version
+/**
+ * 系统工具
+* @ClassName: ToolController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping(value="/tool")
@@ -322,4 +324,3 @@ public class ToolController extends BaseController {
 		return mv;
 	}
 }
-// 创建人：FH Q313596790

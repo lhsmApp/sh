@@ -21,7 +21,7 @@ import com.fh.util.PageData;
 import com.fh.util.Tools;
 
 
-/**@author FH Q313596790
+/**@author lhsmplus
   * 系统用户-接口类 
   * 相关参数协议：
   * 00	请求失败

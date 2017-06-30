@@ -25,10 +25,13 @@ import com.fh.util.Jurisdiction;
 import com.fh.util.Tools;
 import com.fh.service.policy.policy.PolicyManager;
 
-/** 
- * 说明：政策法规
- * 创建人：FH Q313596790
- * 创建时间：2017-05-09
+/**
+ * 政策法规
+* @ClassName: PolicyController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping(value="/policy")

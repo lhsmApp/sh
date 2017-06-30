@@ -37,10 +37,13 @@ import com.fh.util.Tools;
 import com.fh.util.Watermark;
 import com.fh.service.information.pictures.PicturesManager;
 
-/** 
- * 类名称：图片管理
- * 创建人：FH Q313596790
- * 创建时间：2015-03-21
+/**
+ * 图片管理
+* @ClassName: PicturesController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping(value="/pictures")
