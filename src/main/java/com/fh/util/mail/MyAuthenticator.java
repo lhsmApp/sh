@@ -1,12 +1,16 @@
 package com.fh.util.mail;
-/**
- * 发送邮件需要使用的基本信息 
-* @author FH QQ 313596790[青苔]
-* 创建时间：2014年6月20日
-* @version 2.0
- */
+
+
 import javax.mail.*;   
 
+/**
+ * 发送邮件需要使用的基本信息 
+* @ClassName: MyAuthenticator
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
+ */
 public class MyAuthenticator extends Authenticator{   
     String userName=null;   
     String password=null;   

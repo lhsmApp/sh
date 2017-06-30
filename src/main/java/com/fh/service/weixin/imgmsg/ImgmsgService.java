@@ -11,10 +11,13 @@ import com.fh.entity.Page;
 import com.fh.util.PageData;
 
 
-/** 
- * 类名称：ImgmsgService
- * 创建人：FH QQ 313596790
- * 创建时间：2015-05-09
+/**
+ * 
+* @ClassName: ImgmsgService
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Service("imgmsgService")
 public class ImgmsgService {

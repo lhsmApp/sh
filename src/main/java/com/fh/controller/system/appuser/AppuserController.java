@@ -30,11 +30,13 @@ import com.fh.util.MD5;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
 
-/** 
- * 类名称：会员管理
- * 创建人：FH Q313596790
- * 修改时间：2014年11月17日
- * @version
+/**
+ * 会员管理
+* @ClassName: AppuserController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping(value="/happuser")

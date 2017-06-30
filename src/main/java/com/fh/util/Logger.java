@@ -1,10 +1,12 @@
 package com.fh.util;
 
-/** 
- * 说明：日志处理
- * 创建人：FH Q313596790
- * 修改时间：2014年9月20日
- * @version
+/**
+ * 日志处理
+* @ClassName: Logger
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 public class Logger {
 

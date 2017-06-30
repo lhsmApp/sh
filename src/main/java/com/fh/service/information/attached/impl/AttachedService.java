@@ -8,11 +8,13 @@ import com.fh.entity.Page;
 import com.fh.util.PageData;
 import com.fh.service.information.attached.AttachedManager;
 
-/** 
- * 说明： 主附结构
- * 创建人：FH Q313596790
- * 创建时间：2016-04-17
- * @version
+/**
+ *  主附结构
+* @ClassName: AttachedService
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Service("attachedService")
 public class AttachedService implements AttachedManager{

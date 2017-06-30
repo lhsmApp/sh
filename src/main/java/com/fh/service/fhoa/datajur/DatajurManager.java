@@ -2,11 +2,13 @@ package com.fh.service.fhoa.datajur;
 
 import com.fh.util.PageData;
 
-/** 
- * 说明： 组织数据权限接口
- * 创建人：FH Q313596790
- * 创建时间：2016-04-26
- * @version
+/**
+ * 组织数据权限表
+* @ClassName: DatajurManager
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 public interface DatajurManager{
 

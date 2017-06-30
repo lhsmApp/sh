@@ -3,14 +3,12 @@ package com.fh.entity.system;
 import java.util.List;
 
 /**
- * 
-* 类名称：组织机构
-* 类描述： 
-* @author FH QQ 313596790[青苔]
-* 作者单位： 
-* 联系方式：
-* 修改时间：2015年12月16日
-* @version 2.0
+ * 组织机构
+* @ClassName: Department
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月30日
+*
  */
 public class Department {
 

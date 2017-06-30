@@ -12,9 +12,13 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 
-/**	文件处理
-*  创建人：FH Q313596790
- * 创建时间：2014年12月23日
+/**
+ * 文件处理
+* @ClassName: FileUtil
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 public class FileUtil {
 

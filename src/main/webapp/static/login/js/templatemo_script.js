@@ -1,4 +1,4 @@
-//创建人：FH fh313596790qq(青苔)
+//创建人：lhsmplus
 jQuery(function()
 {
     $ = jQuery ;

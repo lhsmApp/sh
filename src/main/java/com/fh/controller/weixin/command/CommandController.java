@@ -28,10 +28,13 @@ import com.fh.util.Tools;
 import com.fh.util.Jurisdiction;
 import com.fh.service.weixin.command.CommandService;
 
-/** 
- * 类名称：CommandController
- * 创建人：FH  313596790
- * 创建时间：2015-05-09
+/**
+ * CommandController
+* @ClassName: CommandController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping(value="/command")

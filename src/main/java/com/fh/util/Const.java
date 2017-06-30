@@ -1,10 +1,11 @@
 package com.fh.util;
 
 import org.springframework.context.ApplicationContext;
+
 /**
- * 项目名称：
- * @author:fh qq313596790[青苔]
- * 修改日期：2015/11/2
+ * 项目系统常量统一维护类
+ * @author:lhsmplus
+ * 修改日期：2016/11/2
 */
 public class Const {
 	public static final String SESSION_SECURITY_CODE = "sessionSecCode";	//验证码

@@ -5,11 +5,13 @@ import java.util.List;
 import com.fh.entity.Page;
 import com.fh.util.PageData;
 
-/** 
- * 说明： 明细表接口
- * 创建人：FH Q313596790
- * 创建时间：2016-04-17
- * @version
+/**
+ * 明细表接口
+* @ClassName: AttachedMxManager
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 public interface AttachedMxManager{
 

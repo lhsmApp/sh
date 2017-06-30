@@ -33,11 +33,13 @@ import java.util.concurrent.Future;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/** 
- * 说明：用于备份、还原数据库、在线编辑SQL
- * 创建人：FH Q313596790
- * 修改时间：2016年3月29日
- * @version
+/**
+ * 用于备份、还原数据库、在线编辑SQL
+* @ClassName: DbFH
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 public class DbFH{
 	private static Log logger = LogFactory.getLog(DbFH.class);
@@ -214,7 +216,7 @@ public class DbFH{
 	}
 
 	/**用于执行某表的备份(内部类)线程
-	 * @author FHQ 3 135 9 67 90
+	 * @author lhsmplus
 	 * Callable 有返回值的线程接口
 	 */
 	class DbBackUpCallable implements Callable<Object>{
@@ -343,7 +345,7 @@ public class DbFH{
 	}
 	
 	/**用于执行某表或整库的还原(内部类)线程
-	 * @author FHQ 3 1 35 967 90
+	 * @author lhsmplus
 	 * Callable 有返回值的线程接口
 	 */
 	class DbRecoverCallable implements Callable<Object>{
@@ -568,8 +570,3 @@ public class DbFH{
 	}
 
 }
-
-
-
-
-//创建人：FH Q 3 135 9 67 90

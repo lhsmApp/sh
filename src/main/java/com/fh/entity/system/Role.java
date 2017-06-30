@@ -1,13 +1,12 @@
 package com.fh.entity.system;
+
 /**
- * 
-* 类名称：角色
-* 类描述： 
-* @author FH QQ 313596790[青苔]
-* 作者单位： 
-* 联系方式：
-* 创建时间：2014年3月10日
-* @version 1.0
+ * 角色
+* @ClassName: Role
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月30日
+*
  */
 public class Role {
 	private String ROLE_ID;

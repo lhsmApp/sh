@@ -6,11 +6,13 @@ import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
 import com.fh.util.PageData;
 
-/** 
- * 说明： jqtest接口
- * 创建人：FH Q313596790
- * 创建时间：2017-06-08
- * @version
+/**
+ * jqtest接口
+* @ClassName: JgGridManagerJia
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author zhaojianping
+* @date 2017年6月30日
+*
  */
 public interface JgGridManagerJia{
 

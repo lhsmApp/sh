@@ -30,10 +30,13 @@ import com.fh.util.QuartzManager;
 import com.fh.util.Tools;
 import com.fh.service.fhdb.timingbackup.TimingBackUpManager;
 
-/** 
- * 说明：定时备份
- * 创建人：FH Q313596790
- * 创建时间：2016-04-09
+/**
+ * 定时备份
+* @ClassName: TimingBackUpController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping(value="/timingbackup")

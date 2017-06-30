@@ -12,11 +12,13 @@ import com.fh.entity.JqPage;
 import com.fh.service.jqgrid.jggrid.JgGridManagerJia;
 import com.fh.util.PageData;
 
-/** 
- * 说明： jqtest
- * 创建人：FH Q313596790
- * 创建时间：2017-06-08
- * @version
+/**
+ * jqtest
+* @ClassName: JgGridServiceJia
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author zhaojianping
+* @date 2017年6月30日
+*
  */
 @Service("jqgridServiceJia")
 public class JgGridServiceJia implements JgGridManagerJia{

@@ -11,9 +11,11 @@ import org.java_websocket.WebSocket;
 
 /**
  * 即时通讯
- * @author FH
- * QQ 313596790
- * 2015-5-16
+* @ClassName: ChatServerPool
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 public class ChatServerPool {
 

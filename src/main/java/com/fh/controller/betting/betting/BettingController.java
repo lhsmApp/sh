@@ -33,10 +33,13 @@ import com.fh.util.StringUtil;
 
 import net.sf.json.JSONArray;
 
-/** 
- * 说明：投注站管理
- * 创建人：FH Q313596790
- * 创建时间：2017-05-05
+/**
+ * 投注站管理
+* @ClassName: BettingController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping(value="/betting")

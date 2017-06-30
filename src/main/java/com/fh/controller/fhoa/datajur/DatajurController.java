@@ -23,10 +23,13 @@ import com.fh.util.Jurisdiction;
 import com.fh.service.fhoa.datajur.DatajurManager;
 import com.fh.service.fhoa.department.DepartmentManager;
 
-/** 
- * 说明：组织数据权限表
- * 创建人：FH Q313596790
- * 创建时间：2016-04-26
+/**
+ * 组织数据权限表
+* @ClassName: DatajurController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping(value="/datajur")

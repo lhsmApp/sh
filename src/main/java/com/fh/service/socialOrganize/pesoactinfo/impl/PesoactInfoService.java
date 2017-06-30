@@ -10,11 +10,13 @@ import com.fh.util.PageData;
 import com.fh.util.StringUtil;
 import com.fh.service.socialOrganize.pesoactinfo.PesoactInfoManager;
 
-/** 
- * 说明： 体育社会组织活动、资金、评价情况
- * 创建人：FH Q313596790
- * 创建时间：2017-05-09
- * @version
+/**
+ * 体育社会组织活动、资金、评价情况
+* @ClassName: PesoactInfoService
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author zxl
+* @date 2017年6月30日
+*
  */
 @Service("pesoactinfoService")
 public class PesoactInfoService implements PesoactInfoManager{

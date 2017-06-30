@@ -6,15 +6,14 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import com.fh.entity.system.User;
 import com.fh.util.Const;
 import com.fh.util.Jurisdiction;
+
 /**
- * 
-* 类名称：登录过滤，权限验证
-* 类描述： 
-* @author FH qq313596790[青苔]
-* 作者单位： 
-* 联系方式：
-* 创建时间：2015年11月2日
-* @version 1.6
+ * 登录过滤，权限验证
+* @ClassName: LoginHandlerInterceptor
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月30日
+*
  */
 public class LoginHandlerInterceptor extends HandlerInterceptorAdapter{
 

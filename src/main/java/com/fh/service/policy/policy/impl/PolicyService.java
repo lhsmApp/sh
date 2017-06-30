@@ -10,11 +10,13 @@ import com.fh.entity.Page;
 import com.fh.util.PageData;
 import com.fh.service.policy.policy.PolicyManager;
 
-/** 
- * 说明： 政策法规
- * 创建人：FH Q313596790
- * 创建时间：2017-05-09
- * @version
+/**
+ * 政策法规
+* @ClassName: PolicyService
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author zhaojianping
+* @date 2017年6月30日
+*
  */
 @Service("policyService")
 public class PolicyService implements PolicyManager{

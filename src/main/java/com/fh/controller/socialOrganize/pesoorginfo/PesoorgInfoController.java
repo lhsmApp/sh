@@ -27,10 +27,13 @@ import com.fh.util.Tools;
 import com.fh.service.socialOrganize.pesoorginfo.PesoorgInfoManager;
 import com.fh.service.system.dictionaries.DictionariesManager;
 
-/** 
- * 说明：体育社会组织领导机构信息
- * 创建人：FH Q313596790
- * 创建时间：2017-05-09
+/**
+ * 体育社会组织领导机构信息
+* @ClassName: PesoorgInfoController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping(value="/pesoorginfo")

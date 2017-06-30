@@ -5,9 +5,13 @@ import java.util.List;
 import com.fh.entity.system.Role;
 import com.fh.util.PageData;
 
-/**	角色接口类
- * @author FHadmin QQ313596790
- * 修改日期：2015.11.6
+/**
+ * 角色接口类
+* @ClassName: RoleManager
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月30日
+*
  */
 public interface RoleManager {
 	

@@ -8,11 +8,13 @@ import com.fh.entity.Page;
 import com.fh.util.PageData;
 import com.fh.service.system.userphoto.UserPhotoManager;
 
-/** 
- * 说明： 用户头像
- * 创建人：FH Q313596790
- * 创建时间：2016-06-05
- * @version
+/**
+ * 用户头像
+* @ClassName: UserPhotoService
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Service("userphotoService")
 public class UserPhotoService implements UserPhotoManager{

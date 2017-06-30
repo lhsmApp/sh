@@ -14,11 +14,13 @@ import com.fh.util.Tools;
 import com.fh.util.UuidUtil;
 import com.fh.service.system.fhlog.FHlogManager;
 
-/** 
- * 说明： 操作日志记录
- * 创建人：FH Q313596790
- * 创建时间：2016-05-10
- * @version
+/**
+ *  操作日志记录
+* @ClassName: FHlogService
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Service("fhlogService")
 public class FHlogService implements FHlogManager{

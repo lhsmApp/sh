@@ -22,12 +22,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.fh.util.Const;
 
-/** 
- * 类名称：登录验证码
- * 类描述： 
- * 作者单位： FHqq313596790
- * 联系方式：
- * @version
+/**
+ * 登录验证码
+* @ClassName: SecCodeController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Controller
 @RequestMapping("/code")

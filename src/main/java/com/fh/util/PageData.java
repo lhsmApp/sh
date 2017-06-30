@@ -7,11 +7,14 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-/** 
- * 说明：参数封装Map
- * 创建人：FH Q313596790
- * 修改时间：2014年9月20日
- * @version
+
+/**
+ * 参数封装Map
+* @ClassName: PageData
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月30日
+*
  */
 public class PageData extends HashMap implements Map{
 	

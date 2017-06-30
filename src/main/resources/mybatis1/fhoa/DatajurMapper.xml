@@ -74,5 +74,4 @@
 			a.USER_ID = #{USERNAME}
 	</select>
 	
-	<!-- fh313596790qq(青苔) -->
 </mapper>

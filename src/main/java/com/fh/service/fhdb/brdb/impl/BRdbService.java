@@ -11,11 +11,13 @@ import com.fh.entity.Page;
 import com.fh.util.PageData;
 import com.fh.service.fhdb.brdb.BRdbManager;
 
-/** 
- * 说明： 数据库管理
- * 创建人：FH Q313596790
- * 创建时间：2016-03-30
- * @version
+/**
+ * 数据库管理
+* @ClassName: BRdbService
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 @Service("brdbService")
 public class BRdbService implements BRdbManager{

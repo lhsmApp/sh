@@ -4,11 +4,13 @@ import java.util.List;
 import com.fh.entity.Page;
 import com.fh.util.PageData;
 
-/** 
- * 说明： 社会组织接口
- * 创建人：FH Q313596790
- * 创建时间：2017-05-08
- * @version
+/**
+ * 社会组织接口
+* @ClassName: PesoInfoManager
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author zhangxiaoliu
+* @date 2017年6月30日
+*
  */
 public interface PesoInfoManager{
 

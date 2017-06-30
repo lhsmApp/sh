@@ -6,11 +6,13 @@ import com.fh.entity.JqPage;
 import com.fh.entity.Page;
 import com.fh.util.PageData;
 
-/** 
- * 说明： jqgrid详情接口
- * 创建人：FH Q313596790
- * 创建时间：2017-06-14
- * @version
+/**
+ * jqgrid详情接口
+* @ClassName: JqGridDetailManager
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author zhangxiaoliu
+* @date 2017年6月30日
+*
  */
 public interface JqGridDetailManager{
 

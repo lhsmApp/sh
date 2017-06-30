@@ -4,11 +4,13 @@ import java.util.List;
 import com.fh.entity.Page;
 import com.fh.util.PageData;
 
-/** 
- * 说明： 文件管理接口
- * 创建人：FH Q313596790
- * 创建时间：2016-05-27
- * @version
+/**
+ * 文件管理接口
+* @ClassName: FhfileManager
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 public interface FhfileManager{
 

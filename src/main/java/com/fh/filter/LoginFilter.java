@@ -13,9 +13,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.fh.controller.base.BaseController;
 
-/**登录验证过滤器(废弃  com.fh.interceptor替代)
- * @author FH QQ 313596790[青苔]
- *
+/**
+ * 登录验证过滤器(废弃  com.fh.interceptor替代)
+* @ClassName: LoginFilter
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author lhsmplus
+* @date 2017年6月30日
+*
  */
 public class LoginFilter extends BaseController implements Filter {
 
