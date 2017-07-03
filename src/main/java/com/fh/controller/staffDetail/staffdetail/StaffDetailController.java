@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -28,7 +27,6 @@ import com.fh.entity.Page;
 import com.fh.entity.PageResult;
 import com.fh.entity.StaffDetailModel;
 import com.fh.entity.SysSealed;
-import com.fh.entity.TableColumns;
 import com.fh.entity.TmplConfigDetail;
 import com.fh.entity.system.Department;
 import com.fh.entity.system.Dictionaries;
@@ -43,20 +41,16 @@ import com.fh.util.excel.LeadingInExcel;
 
 import net.sf.json.JSONArray;
 
-import com.fh.service.fhoa.department.DepartmentManager;
 import com.fh.service.fhoa.department.impl.DepartmentService;
 import com.fh.service.staffDetail.staffdetail.StaffDetailManager;
 import com.fh.service.sysConfig.sysconfig.SysConfigManager;
 import com.fh.service.sysSealedInfo.syssealedinfo.impl.SysSealedInfoService;
-import com.fh.service.system.dictionaries.DictionariesManager;
 import com.fh.service.system.dictionaries.impl.DictionariesService;
-import com.fh.service.tmplConfigDict.tmplconfigdict.TmplConfigDictManager;
 import com.fh.service.tmplConfigDict.tmplconfigdict.impl.TmplConfigDictService;
-import com.fh.service.tmplconfig.tmplconfig.TmplConfigManager;
 import com.fh.service.tmplconfig.tmplconfig.impl.TmplConfigService;
 
 /** 
- * 说明：业务封存信息
+ * 说明：工资明细
  * 创建人：zhangxiaoliu
  * 创建时间：2017-06-16
  */
@@ -79,7 +73,11 @@ public class StaffDetailController extends BaseController {
 	private DictionariesService dictionariesService;
 	@Resource(name="departmentService")
 	private DepartmentService departmentService;
-	
+
+	//表名
+	String TableName = "TB_STAFF_DETAIL";
+	//枚举类型  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+	Integer TypeCode = 1;
 
 	//页面显示数据的年月
 	String SystemDateTime = "";
@@ -164,14 +162,14 @@ public class StaffDetailController extends BaseController {
 		//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
 		pd.put("RPT_DEPT", DepartCode);
 		pd.put("RPT_DUR", SystemDateTime);
-		pd.put("BILL_TYPE", 1);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+		pd.put("BILL_TYPE", TypeCode);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 		String State = syssealedinfoService.getState(pd);
 		mv.addObject("State", State);
 		List<String> userCodeList = staffdetailService.getHaveUserCodeDic(pd);
 		mv.addObject("userCodeList", userCodeList);
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService);
-		String jqGridColModel = tmpl.generateStructure("TB_STAFF_DETAIL", DepartCode);
+		String jqGridColModel = tmpl.generateStructure(TableName, DepartCode);
 		
 		SqlUserdata = tmpl.getSqlUserdata();
 		//默认值
@@ -183,37 +181,6 @@ public class StaffDetailController extends BaseController {
 		
 		mv.addObject("jqGridColModel", jqGridColModel);
 		return mv;
-	}
-	
-	public String getDicValue(String dicName, PageData pd) throws Exception{
-		StringBuilder ret = new StringBuilder();
-		String strDicType = tmplconfigdictService.getDicType(dicName);
-		Map<String, String> dicAdd = new HashMap<String, String>();
-		if(strDicType.equals("1")){
-			List<Dictionaries> dicList = dictionariesService.getSysDictionaries(dicName);
-			for(Dictionaries dic : dicList){
-				if(ret!=null && !ret.toString().trim().equals("")){
-					ret.append(";");
-				}
-				ret.append(dic.getBIANMA() + ":" + dic.getNAME());
-				dicAdd.put(dic.getBIANMA(), dic.getNAME());
-			}
-		} else if(strDicType.equals("2")){
-			if(dicName.toUpperCase().equals(("oa_department").toUpperCase())){
-				List<Department> listPara = (List<Department>) departmentService.getDepartDic(pd);
-				for(Department dic : listPara){
-					if(ret!=null && !ret.toString().trim().equals("")){
-						ret.append(";");
-					}
-					ret.append(dic.getDEPARTMENT_CODE() + ":" + dic.getNAME());
-					dicAdd.put(dic.getDEPARTMENT_CODE(), dic.getNAME());
-				}
-			}
-		}
-		if(!DicList.containsKey(dicName)){
-			DicList.put(dicName, dicAdd);
-		}
-		return ret.toString();
 	}
 	
 	/**列表
@@ -235,8 +202,6 @@ public class StaffDetailController extends BaseController {
 		if(null != filters && !"".equals(filters)){
 			pd.put("filterWhereResult", SqlTools.constructWhere(filters,null));
 		}
-		//底行显示的求和与平均值字段
-		pd.put("Userdata", SqlUserdata.toString());
 		//页面显示数据的年月
 		pd.put("SystemDateTime", SystemDateTime);
 		//页面显示数据的二级单位
@@ -244,7 +209,12 @@ public class StaffDetailController extends BaseController {
 		page.setPd(pd);
 		List<PageData> varList = staffdetailService.JqPage(page);	//列出Betting列表
 		int records = staffdetailService.countJqGridExtend(page);
-		PageData userdata=staffdetailService.getFooterSummary(page);
+		PageData userdata = null;
+		if(SqlUserdata!=null && !SqlUserdata.toString().trim().equals("")){
+			//底行显示的求和与平均值字段
+			pd.put("Userdata", SqlUserdata.toString());
+			userdata = staffdetailService.getFooterSummary(page);
+		}
 		
 		PageResult<PageData> result = new PageResult<PageData>();
 		result.setRows(varList);
@@ -426,7 +396,7 @@ public class StaffDetailController extends BaseController {
 				PageData pd = this.getPageData();
 				pd.put("RPT_DEPT", DEPT_CODE);
 				pd.put("RPT_DUR", BUSI_DATE);
-				pd.put("BILL_TYPE", 1);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+				pd.put("BILL_TYPE", TypeCode);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 				String State = syssealedinfoService.getState(pd);
 				if(!(State!=null && State.equals("0"))){
 					sbRet.add("导入期间已封存！");
@@ -546,7 +516,7 @@ public class StaffDetailController extends BaseController {
 		PageData pd = this.getPageData();
 		pd.put("RPT_DEPT", DepartCode);
 		pd.put("RPT_DUR", SystemDateTime);
-		pd.put("BILL_TYPE", 1);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+		pd.put("BILL_TYPE", TypeCode);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 		String State = syssealedinfoService.getState(pd);
 		if(State!=null && State.equals("1")){
 			commonBase.setCode(2);
@@ -563,7 +533,7 @@ public class StaffDetailController extends BaseController {
 			item.setRPT_DUR(SystemDateTime);
 			item.setRPT_USER(userId);
 			item.setRPT_DATE(time);//YYYY-MM-DD HH:MM:SS
-			item.setBILL_TYPE("1");// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+			item.setBILL_TYPE(TypeCode.toString());// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 			item.setSTATE("1");// 枚举  1封存,0解封
 			syssealedinfoService.report(item);
 			commonBase.setCode(0);

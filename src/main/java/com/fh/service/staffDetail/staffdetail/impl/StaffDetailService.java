@@ -15,9 +15,9 @@ import com.fh.util.PageData;
 import com.fh.service.staffDetail.staffdetail.StaffDetailManager;
 
 /** 
- * 说明： 工资明细
+ * 说明：  工资明细
  * 创建人：zhangxiaoliu
- * 创建时间：2017-06-19
+ * 创建时间：2017-06-30
  * @version
  */
 @Service("staffdetailService")

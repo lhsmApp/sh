@@ -187,7 +187,7 @@
 		from 
 		    <include refid="tableName"></include>
 		where DEPT_CODE = #{DEPT_CODE}
-	    and TABLE_CODE = #{TABLE_CODE}
+	    and UPPER(TABLE_CODE) = UPPER(#{TABLE_CODE})
 	    order by DISP_ORDER
 	</select>
 	

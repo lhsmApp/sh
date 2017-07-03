@@ -164,7 +164,7 @@
 	    });
 		
 		$(gridBase_selector).jqGrid({
-			url: '<%=basePath%>socialincdetail/getPageList.do',
+			url: '<%=basePath%>housefunddetail/getPageList.do',
 			datatype: "json",
 			colModel: jqGridColModel,
 			//caption: '当前期间：' + SystemDateTime + '， 当前单位：' + DepartName + '',
@@ -177,7 +177,7 @@
             multiboxonly: true,
             sortable: true,
 			altRows: true, //斑马条纹
-			editurl: '<%=basePath%>socialincdetail/edit.do?',
+			editurl: '<%=basePath%>housefunddetail/edit.do?',
 			
 			pager: pagerBase_selector,
 			footerrow: true,
@@ -426,7 +426,7 @@
 	    					top.jzts();
 	    					$.ajax({
 	    						type: "POST",
-	    						url: '<%=basePath%>socialincdetail/deleteAll.do?',
+	    						url: '<%=basePath%>housefunddetail/deleteAll.do?',
 	    				    	data: {DATA_ROWS:JSON.stringify(listData)},
 	    						dataType:'json',
 	    						cache: false,
@@ -494,7 +494,7 @@
     					top.jzts();
     					$.ajax({
     						type: "POST",
-    						url: '<%=basePath%>socialincdetail/updateAll.do?',
+    						url: '<%=basePath%>housefunddetail/updateAll.do?',
     				    	data: {DATA_ROWS:JSON.stringify(listData)},
     						dataType:'json',
     						cache: false,
@@ -543,7 +543,7 @@
 	   	   var diag = new top.Dialog();
 	   	   diag.Drag=true;
 	   	   diag.Title ="EXCEL 导入到数据库";
-	   	   diag.URL = '<%=basePath%>socialincdetail/goUploadExcel.do';
+	   	   diag.URL = '<%=basePath%>housefunddetail/goUploadExcel.do';
 	   	   diag.Width = 300;
 	   	   diag.Height = 150;
 	   	   diag.CancelEvent = function(){ //关闭事件
@@ -564,7 +564,7 @@
 		 * 导出
 		 */
 	    function exportItems(){
-	    	window.location.href='<%=basePath%>socialincdetail/excel.do?';
+	    	window.location.href='<%=basePath%>housefunddetail/excel.do?';
 	    }
 
 		/**
@@ -577,7 +577,7 @@
 					top.jzts();
 					$.ajax({
 						type: "POST",
-						url: '<%=basePath%>socialincdetail/report.do?',
+						url: '<%=basePath%>housefunddetail/report.do?',
 						cache: false,
 						success: function(response){
 							if(response.code==0){
@@ -632,7 +632,7 @@
 	function tosearch() {
 		var UserCode = $("#UserCode").val();
 		$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据
-			url:'<%=basePath%>socialincdetail/getPageList.do?UserCode='+UserCode,  
+			url:'<%=basePath%>housefunddetail/getPageList.do?UserCode='+UserCode,  
 			datatype:'json',
 		      page:1
 		}).trigger("reloadGrid");

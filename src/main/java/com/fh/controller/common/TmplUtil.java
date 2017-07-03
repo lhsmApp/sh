@@ -291,8 +291,12 @@ public class TmplUtil {
 		jqGridColModel.append("[");
 		//添加关键字的保存列
 		if(keyList!=null && keyList.size()>0){
-			for(String key : keyList){
-				jqGridColModel.append(" {name: '").append(key.toUpperCase()).append(keyExtra).append("', hidden: true, editable: true, editrules: {edithidden: false}}, ");
+			for(int i=0; i<keyList.size(); i++){
+				String key = keyList.get(i);
+				if(i != 0){
+					jqGridColModel.append(", ");
+				}
+				jqGridColModel.append(" {name: '").append(key.toUpperCase()).append(keyExtra).append("', hidden: true, editable: true, editrules: {edithidden: false}} ");
 			}
 		}
 		//添加配置表设置列，字典（未设置就使用表默认，text或number）、隐藏、表头显示
@@ -300,12 +304,14 @@ public class TmplUtil {
 			for(int i=0; i < m_columnsList.size(); i++){
 				if(listColModelAll.containsKey(m_columnsList.get(i).getCOL_CODE().toUpperCase())){
 					Map<String, Object> itemColModel = listColModelAll.get(m_columnsList.get(i).getCOL_CODE());
-					jqGridColModel.append("{");
+					jqGridColModel.append(", {");
 					String name = (String) itemColModel.get("name");
 					String edittype = (String) itemColModel.get("edittype");
 					String notedit = (String) itemColModel.get("notedit");
 					if(name != null && !name.trim().equals("")){
 						jqGridColModel.append(name).append(", ");
+					} else {
+						continue;
 					}
 					//配置表中的字典
 					if(m_columnsList.get(i).getDICT_TRANS()!=null && !m_columnsList.get(i).getDICT_TRANS().trim().equals("")){
@@ -341,9 +347,9 @@ public class TmplUtil {
 					jqGridColModel.append(" label: '").append(m_columnsList.get(i).getCOL_NAME()).append("' ");
 					
 					jqGridColModel.append("}");
-					if(i < m_columnsList.size() -1){
+					/* if(i < m_columnsList.size() -1){
 						jqGridColModel.append(",");
-					}
+					} */
 					//底行显示的求和与平均值字段
 					// 1汇总 0不汇总,默认0
 					if(Integer.parseInt(m_columnsList.get(i).getCOL_SUM()) == 1){

@@ -1,19 +1,19 @@
-package com.fh.service.socialIncDetail.socialincdetail;
+package com.fh.service.houseFundDetail.housefunddetail;
 
 import java.util.List;
 
 import com.fh.entity.JqPage;
-import com.fh.entity.SocialIncDetailModel;
+import com.fh.entity.HouseFundDetailModel;
 import com.fh.entity.TableColumns;
 import com.fh.util.PageData;
 
 /** 
- * 说明： 社保明细
+ * 说明： 公积金明细
  * 创建人：zhangxiaoliu
  * 创建时间：2017-06-30
  * @version
  */
-public interface SocialIncDetailManager{
+public interface HouseFundDetailManager{
 
 	
 	/**获取某表的所有列
@@ -28,14 +28,14 @@ public interface SocialIncDetailManager{
 	 * @param pd
 	 * @throws Exception
 	 */
-	public List<SocialIncDetailModel> findByPd(PageData pd)throws Exception;
+	public List<HouseFundDetailModel> findByPd(PageData pd)throws Exception;
 	
 	/**获取数据
 	 * 张晓柳
 	 * @param pd
 	 * @throws Exception
 	 */
-	public List<SocialIncDetailModel> findByModel(List<SocialIncDetailModel> listData)throws Exception;
+	public List<HouseFundDetailModel> findByModel(List<HouseFundDetailModel> listData)throws Exception;
 
 	/**新增
 	 * @param pd
@@ -82,19 +82,19 @@ public interface SocialIncDetailManager{
 	 * @param 
 	 * @throws Exception
 	 */
-	public void deleteAll(List<SocialIncDetailModel> listData)throws Exception;
+	public void deleteAll(List<HouseFundDetailModel> listData)throws Exception;
 	
 	/**批量修改
 	 * @param pd
 	 * @throws Exception
 	 */
-	public void updateAll(List<SocialIncDetailModel> listData)throws Exception;
+	public void updateAll(List<HouseFundDetailModel> listData)throws Exception;
 	
 	/**导入
 	 * @param pd
 	 * @throws Exception
 	 */
-	public void batchImport(List<SocialIncDetailModel> listData)throws Exception;
+	public void batchImport(List<HouseFundDetailModel> listData)throws Exception;
 
 	/**获取员工编码
 	 * 张晓柳

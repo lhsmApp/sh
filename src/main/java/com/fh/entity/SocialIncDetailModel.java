@@ -1,6 +1,7 @@
 package com.fh.entity;
 
 public class SocialIncDetailModel{
+	
 	private String BILL_CODE__ = " "; 
 	private String BUSI_DATE__ = " "; 
 	private String USER_CODE__ = " "; 

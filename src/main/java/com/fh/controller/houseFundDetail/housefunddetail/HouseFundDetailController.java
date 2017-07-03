@@ -1,4 +1,4 @@
-package com.fh.controller.socialIncDetail.socialincdetail;
+package com.fh.controller.houseFundDetail.housefunddetail;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -23,11 +23,9 @@ import com.fh.entity.CommonBase;
 import com.fh.entity.JqPage;
 import com.fh.entity.Page;
 import com.fh.entity.PageResult;
-import com.fh.entity.SocialIncDetailModel;
+import com.fh.entity.HouseFundDetailModel;
 import com.fh.entity.SysSealed;
 import com.fh.entity.TmplConfigDetail;
-import com.fh.entity.system.Department;
-import com.fh.entity.system.Dictionaries;
 import com.fh.entity.system.User;
 import com.fh.exception.CustomException;
 import com.fh.util.Const;
@@ -40,7 +38,7 @@ import com.fh.util.excel.LeadingInExcel;
 import net.sf.json.JSONArray;
 
 import com.fh.service.fhoa.department.impl.DepartmentService;
-import com.fh.service.socialIncDetail.socialincdetail.SocialIncDetailManager;
+import com.fh.service.houseFundDetail.housefunddetail.HouseFundDetailManager;
 import com.fh.service.sysConfig.sysconfig.SysConfigManager;
 import com.fh.service.sysSealedInfo.syssealedinfo.impl.SysSealedInfoService;
 import com.fh.service.system.dictionaries.impl.DictionariesService;
@@ -48,17 +46,17 @@ import com.fh.service.tmplConfigDict.tmplconfigdict.impl.TmplConfigDictService;
 import com.fh.service.tmplconfig.tmplconfig.impl.TmplConfigService;
 
 /** 
- * 说明：社保明细
+ * 说明： 公积金明细
  * 创建人：zhangxiaoliu
  * 创建时间：2017-06-30
  */
 @Controller
-@RequestMapping(value="/socialincdetail")
-public class SocialIncDetailController extends BaseController {
+@RequestMapping(value="/housefunddetail")
+public class HouseFundDetailController extends BaseController {
 	
-	String menuUrl = "socialincdetail/list.do"; //菜单地址(权限用)
-	@Resource(name="socialincdetailService")
-	private SocialIncDetailManager socialincdetailService;
+	String menuUrl = "housefunddetail/list.do"; //菜单地址(权限用)
+	@Resource(name="housefunddetailService")
+	private HouseFundDetailManager housefunddetailService;
 	@Resource(name="tmplconfigService")
 	private TmplConfigService tmplconfigService;
 	@Resource(name="syssealedinfoService")
@@ -74,9 +72,9 @@ public class SocialIncDetailController extends BaseController {
 	
 
 	//表名
-	String TableName = "tb_social_inc_detail";
+	String TableName = "tb_house_fund_detail";
 	//枚举类型  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
-	Integer TypeCode = 5;
+	Integer TypeCode = 3;
 	
 	//页面显示数据的年月
 	String SystemDateTime = "";
@@ -99,12 +97,12 @@ public class SocialIncDetailController extends BaseController {
 	public @ResponseBody CommonBase edit() throws Exception{
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
-		logBefore(logger, Jurisdiction.getUsername()+"修改SocialIncDetail");
+		logBefore(logger, Jurisdiction.getUsername()+"修改HouseFundDetail");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限
 		PageData pd = new PageData();
 		pd = this.getPageData();
 		
-		TmplUtil.setModelDefault(pd, SocialIncDetailModel.class, DefaultValueList);
+		TmplUtil.setModelDefault(pd, HouseFundDetailModel.class, DefaultValueList);
 		String BILL_CODE = "BILL_CODE";
 		String BUSI_DATE = "BUSI_DATE";
 		String DEPT_CODE = "DEPT_CODE";
@@ -121,17 +119,17 @@ public class SocialIncDetailController extends BaseController {
 		}
 		pd.put(DEPT_CODE, DepartCode);
 		
-		List<SocialIncDetailModel> repeatList = socialincdetailService.findByPd(pd);
+		List<HouseFundDetailModel> repeatList = housefunddetailService.findByPd(pd);
 		if(repeatList!=null && repeatList.size()>0){
 			commonBase.setCode(2);
 			commonBase.setMessage("此区间内编码已存在！");
 		} else {
 			if(pd.getString("oper").equals("edit")){
-				socialincdetailService.edit(pd);
+				housefunddetailService.edit(pd);
 				commonBase.setCode(0);
 			}
 			else if(pd.getString("oper").equals("add")){
-				socialincdetailService.save(pd);
+				housefunddetailService.save(pd);
 				commonBase.setCode(0);
 			}
 		}
@@ -144,12 +142,12 @@ public class SocialIncDetailController extends BaseController {
 	 */
 	@RequestMapping(value="/list")
 	public ModelAndView list(Page page) throws Exception{
-		logBefore(logger, Jurisdiction.getUsername()+"列表SocialIncDetail");
+		logBefore(logger, Jurisdiction.getUsername()+"列表HouseFundDetail");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
 		PageData pd = this.getPageData();
 		
 		ModelAndView mv = this.getModelAndView();
-		mv.setViewName("socialIncDetail/socialincdetail/socialincdetail_list");
+		mv.setViewName("houseFundDetail/housefunddetail/housefunddetail_list");
 		//当前期间,取自tb_system_config的SystemDateTime字段
 		SystemDateTime = sysConfigManager.currentSection(pd);
 		mv.addObject("SystemDateTime", SystemDateTime);
@@ -164,7 +162,7 @@ public class SocialIncDetailController extends BaseController {
 		pd.put("BILL_TYPE", TypeCode);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 		String State = syssealedinfoService.getState(pd);
 		mv.addObject("State", State);
-		List<String> userCodeList = socialincdetailService.getHaveUserCodeDic(pd);
+		List<String> userCodeList = housefunddetailService.getHaveUserCodeDic(pd);
 		mv.addObject("userCodeList", userCodeList);
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService);
@@ -188,7 +186,7 @@ public class SocialIncDetailController extends BaseController {
 	 */
 	@RequestMapping(value="/getPageList")
 	public @ResponseBody PageResult<PageData> getPageList(JqPage page) throws Exception{
-		logBefore(logger, Jurisdiction.getUsername()+"列表SocialIncDetail");
+		logBefore(logger, Jurisdiction.getUsername()+"列表HouseFundDetail");
 		PageData pd = new PageData();
 		pd = this.getPageData();
 		//
@@ -206,13 +204,13 @@ public class SocialIncDetailController extends BaseController {
 		//页面显示数据的二级单位
 		pd.put("DepartCode", DepartCode);
 		page.setPd(pd);
-		List<PageData> varList = socialincdetailService.JqPage(page);	//列出Betting列表
-		int records = socialincdetailService.countJqGridExtend(page);
+		List<PageData> varList = housefunddetailService.JqPage(page);	//列出Betting列表
+		int records = housefunddetailService.countJqGridExtend(page);
 		PageData userdata = null;
 		if(SqlUserdata!=null && !SqlUserdata.toString().trim().equals("")){
 			//底行显示的求和与平均值字段
 			pd.put("Userdata", SqlUserdata.toString());
-		    userdata=socialincdetailService.getFooterSummary(page);
+		    userdata=housefunddetailService.getFooterSummary(page);
 		}
 		
 		PageResult<PageData> result = new PageResult<PageData>();
@@ -239,19 +237,19 @@ public class SocialIncDetailController extends BaseController {
 		Object DATA_ROWS = pd.get("DATA_ROWS");
 		String json = DATA_ROWS.toString();  
         JSONArray array = JSONArray.fromObject(json);  
-        List<SocialIncDetailModel> listData = (List<SocialIncDetailModel>) JSONArray.toCollection(array,SocialIncDetailModel.class);
-        for(SocialIncDetailModel item : listData){
+        List<HouseFundDetailModel> listData = (List<HouseFundDetailModel>) JSONArray.toCollection(array,HouseFundDetailModel.class);
+        for(HouseFundDetailModel item : listData){
         	item.setBILL_CODE(" ");
         	item.setBUSI_DATE(SystemDateTime);
         	item.setDEPT_CODE(DepartCode);
         }
 		if(null != listData && listData.size() > 0){
-			List<SocialIncDetailModel> repeatList = socialincdetailService.findByModel(listData);
+			List<HouseFundDetailModel> repeatList = housefunddetailService.findByModel(listData);
 			if(repeatList!=null && repeatList.size()>0){
 				commonBase.setCode(2);
 				commonBase.setMessage("此区间内编码已存在！");
 			} else {
-				socialincdetailService.updateAll(listData);
+				housefunddetailService.updateAll(listData);
 				commonBase.setCode(0);
 			}
 		}
@@ -272,9 +270,9 @@ public class SocialIncDetailController extends BaseController {
 		Object DATA_ROWS = pd.get("DATA_ROWS");
 		String json = DATA_ROWS.toString();  
         JSONArray array = JSONArray.fromObject(json);  
-        List<SocialIncDetailModel> listData = (List<SocialIncDetailModel>) JSONArray.toCollection(array,SocialIncDetailModel.class);
+        List<HouseFundDetailModel> listData = (List<HouseFundDetailModel>) JSONArray.toCollection(array,HouseFundDetailModel.class);
         if(null != listData && listData.size() > 0){
-			socialincdetailService.deleteAll(listData);
+			housefunddetailService.deleteAll(listData);
 			commonBase.setCode(0);
 		}
 		return commonBase;
@@ -287,7 +285,7 @@ public class SocialIncDetailController extends BaseController {
 	@RequestMapping(value="/goUploadExcel")
 	public ModelAndView goUploadExcel()throws Exception{
 		ModelAndView mv = this.getModelAndView();
-		mv.setViewName("socialIncDetail/socialincdetail/uploadExcel");
+		mv.setViewName("houseFundDetail/housefunddetail/uploadExcel");
 		return mv;
 	}
 
@@ -305,7 +303,7 @@ public class SocialIncDetailController extends BaseController {
 		if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;}//校验权限
 		
 		// 局部变量
-		LeadingInExcel<SocialIncDetailModel> testExcel = null;
+		LeadingInExcel<HouseFundDetailModel> testExcel = null;
 		Map<Integer, Object> uploadAndReadMap = null;
 		try {
 			// 定义需要读取的数据
@@ -313,7 +311,7 @@ public class SocialIncDetailController extends BaseController {
 			String propertiesFileName = "config";
 			String kyeName = "file_path";
 			int sheetIndex = 0;
-			Class<SocialIncDetailModel> clazz = SocialIncDetailModel.class;
+			Class<HouseFundDetailModel> clazz = HouseFundDetailModel.class;
 			Map<String, String> titleAndAttribute = null;
 			// 定义对应的标题名与对应属性名
 			titleAndAttribute = new HashMap<String, String>();
@@ -326,7 +324,7 @@ public class SocialIncDetailController extends BaseController {
 			}
 
 			// 调用解析工具包
-			testExcel = new LeadingInExcel<SocialIncDetailModel>(formart);
+			testExcel = new LeadingInExcel<HouseFundDetailModel>(formart);
 			// 解析excel，获取客户信息集合
 
 			uploadAndReadMap = testExcel.uploadAndRead(file, propertiesFileName, kyeName, sheetIndex,
@@ -347,7 +345,7 @@ public class SocialIncDetailController extends BaseController {
 			commonBase.setCode(2);
 			commonBase.setMessage(message);
 		} else {
-			List<SocialIncDetailModel> uploadAndRead = (List<SocialIncDetailModel>) uploadAndReadMap.get(2);
+			List<HouseFundDetailModel> uploadAndRead = (List<HouseFundDetailModel>) uploadAndReadMap.get(2);
 			if (uploadAndRead != null && !"[]".equals(uploadAndRead.toString()) && uploadAndRead.size() >= 1) {
 				judgement = true;
 			}
@@ -409,7 +407,7 @@ public class SocialIncDetailController extends BaseController {
 					commonBase.setMessage(sbTitle.toString());
 				} else {
 					//此处执行集合添加 
-					socialincdetailService.batchImport(uploadAndRead);
+					housefunddetailService.batchImport(uploadAndRead);
 					commonBase.setCode(0);
 				}
 				
@@ -420,10 +418,10 @@ public class SocialIncDetailController extends BaseController {
 					if (i + 100 > listSize) {
 						toIndex = listSize - i;
 					}
-					List<SocialIncDetailModel> subList = uploadAndRead.subList(i, i + toIndex);
+					List<HouseFundDetailModel> subList = uploadAndRead.subList(i, i + toIndex);
 
 					//此处执行集合添加 
-					socialincdetailService.batchImport(subList);
+					housefunddetailService.batchImport(subList);
 				}*/
 			} else {
 				commonBase.setCode(-1);
@@ -431,7 +429,7 @@ public class SocialIncDetailController extends BaseController {
 			}
 		}
 		ModelAndView mv = this.getModelAndView();
-		mv.setViewName("socialIncDetail/socialincdetail/uploadExcel");
+		mv.setViewName("houseFundDetail/housefunddetail/uploadExcel");
 		mv.addObject("commonBaseCode", commonBase.getCode());
 		mv.addObject("commonMessage", commonBase.getMessage());
 		return mv;
@@ -445,7 +443,7 @@ public class SocialIncDetailController extends BaseController {
 	//public void downExcel(HttpServletResponse response)throws Exception{
 	public ModelAndView downExcel(JqPage page) throws Exception{
 		//页面显示数据的二级单位
-		List<PageData> varOList = socialincdetailService.exportModel(DepartCode);
+		List<PageData> varOList = housefunddetailService.exportModel(DepartCode);
 		return export(varOList);
 	}
 	
@@ -455,7 +453,7 @@ public class SocialIncDetailController extends BaseController {
 	 */
 	@RequestMapping(value="/excel")
 	public ModelAndView exportExcel(JqPage page) throws Exception{
-		logBefore(logger, Jurisdiction.getUsername()+"导出SocialIncDetail到excel");
+		logBefore(logger, Jurisdiction.getUsername()+"导出HouseFundDetail到excel");
 		if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
 		PageData pd = this.getPageData();
 		//页面显示数据的年月
@@ -463,7 +461,7 @@ public class SocialIncDetailController extends BaseController {
 		//页面显示数据的二级单位
 		pd.put("DepartCode", DepartCode);
 		page.setPd(pd);
-		List<PageData> varOList = socialincdetailService.exportList(page);
+		List<PageData> varOList = housefunddetailService.exportList(page);
 		return export(varOList);
 	}
 	
