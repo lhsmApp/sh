@@ -3,6 +3,7 @@ package com.fh.entity;
 public class HouseFundDetailModel{
 	
 	private String BILL_CODE__ = " "; 
+	
 	private String BUSI_DATE__ = " "; 
 	private String USER_CODE__ = " "; 
 	private String BILL_CODE = " "; 

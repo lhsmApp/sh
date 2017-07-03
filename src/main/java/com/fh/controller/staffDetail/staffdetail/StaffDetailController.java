@@ -102,38 +102,43 @@ public class StaffDetailController extends BaseController {
 		commonBase.setCode(-1);
 		logBefore(logger, Jurisdiction.getUsername()+"修改StaffDetail");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限
-		PageData pd = new PageData();
-		pd = this.getPageData();
 		
-		TmplUtil.setModelDefault(pd, StaffDetailModel.class, DefaultValueList);
-		String BILL_CODE = "BILL_CODE";
-		String BUSI_DATE = "BUSI_DATE";
-		String DEPT_CODE = "DEPT_CODE";
-		if(pd.containsKey(BILL_CODE)){
-			pd.remove(BILL_CODE);
-		}
-		pd.put(BILL_CODE, " ");
-		if(pd.containsKey(BUSI_DATE)){
-			pd.remove(BUSI_DATE);
-		}
-		pd.put(BUSI_DATE, SystemDateTime);
-		if(pd.containsKey(DEPT_CODE)){
-			pd.remove(DEPT_CODE);
-		}
-		pd.put(DEPT_CODE, DepartCode);
-		
-		List<StaffDetailModel> repeatList = staffdetailService.findByPd(pd);
-		if(repeatList!=null && repeatList.size()>0){
+		PageData pd = this.getPageData();
+		String checkState = CheckState(pd);
+		if(checkState!=null && checkState.trim() != ""){
 			commonBase.setCode(2);
-			commonBase.setMessage("此区间内编码已存在！");
+			commonBase.setMessage(checkState);
 		} else {
-			if(pd.getString("oper").equals("edit")){
-				staffdetailService.edit(pd);
-				commonBase.setCode(0);
+			TmplUtil.setModelDefault(pd, StaffDetailModel.class, DefaultValueList);
+			String BILL_CODE = "BILL_CODE";
+			String BUSI_DATE = "BUSI_DATE";
+			String DEPT_CODE = "DEPT_CODE";
+			if(pd.containsKey(BILL_CODE)){
+				pd.remove(BILL_CODE);
 			}
-			else if(pd.getString("oper").equals("add")){
-				staffdetailService.save(pd);
-				commonBase.setCode(0);
+			pd.put(BILL_CODE, " ");
+			if(pd.containsKey(BUSI_DATE)){
+				pd.remove(BUSI_DATE);
+			}
+			pd.put(BUSI_DATE, SystemDateTime);
+			if(pd.containsKey(DEPT_CODE)){
+				pd.remove(DEPT_CODE);
+			}
+			pd.put(DEPT_CODE, DepartCode);
+			
+			List<StaffDetailModel> repeatList = staffdetailService.findByPd(pd);
+			if(repeatList!=null && repeatList.size()>0){
+				commonBase.setCode(2);
+				commonBase.setMessage("此区间内编码已存在！");
+			} else {
+				if(pd.getString("oper").equals("edit")){
+					staffdetailService.edit(pd);
+					commonBase.setCode(0);
+				}
+				else if(pd.getString("oper").equals("add")){
+					staffdetailService.save(pd);
+					commonBase.setCode(0);
+				}
 			}
 		}
 		return commonBase;
@@ -236,24 +241,31 @@ public class StaffDetailController extends BaseController {
 		if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限	
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
+
 		PageData pd = this.getPageData();
-		Object DATA_ROWS = pd.get("DATA_ROWS");
-		String json = DATA_ROWS.toString();  
-        JSONArray array = JSONArray.fromObject(json);  
-        List<StaffDetailModel> listData = (List<StaffDetailModel>) JSONArray.toCollection(array,StaffDetailModel.class);
-        for(StaffDetailModel item : listData){
-        	item.setBILL_CODE(" ");
-        	item.setBUSI_DATE(SystemDateTime);
-        	item.setDEPT_CODE(DepartCode);
-        }
-		if(null != listData && listData.size() > 0){
-			List<StaffDetailModel> repeatList = staffdetailService.findByModel(listData);
-			if(repeatList!=null && repeatList.size()>0){
-				commonBase.setCode(2);
-				commonBase.setMessage("此区间内编码已存在！");
-			} else {
-				staffdetailService.updateAll(listData);
-				commonBase.setCode(0);
+		String checkState = CheckState(pd);
+		if(checkState!=null && checkState.trim() != ""){
+			commonBase.setCode(2);
+			commonBase.setMessage(checkState);
+		} else {
+			Object DATA_ROWS = pd.get("DATA_ROWS");
+			String json = DATA_ROWS.toString();  
+	        JSONArray array = JSONArray.fromObject(json);  
+	        List<StaffDetailModel> listData = (List<StaffDetailModel>) JSONArray.toCollection(array,StaffDetailModel.class);
+	        for(StaffDetailModel item : listData){
+	        	item.setBILL_CODE(" ");
+	        	item.setBUSI_DATE(SystemDateTime);
+	        	item.setDEPT_CODE(DepartCode);
+	        }
+			if(null != listData && listData.size() > 0){
+				List<StaffDetailModel> repeatList = staffdetailService.findByModel(listData);
+				if(repeatList!=null && repeatList.size()>0){
+					commonBase.setCode(2);
+					commonBase.setMessage("此区间内编码已存在！");
+				} else {
+					staffdetailService.updateAll(listData);
+					commonBase.setCode(0);
+				}
 			}
 		}
 		return commonBase;
@@ -269,14 +281,21 @@ public class StaffDetailController extends BaseController {
 		if(!Jurisdiction.buttonJurisdiction(menuUrl, "delete")){return null;} //校验权限	
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
+		
 		PageData pd = this.getPageData();
-		Object DATA_ROWS = pd.get("DATA_ROWS");
-		String json = DATA_ROWS.toString();  
-        JSONArray array = JSONArray.fromObject(json);  
-        List<StaffDetailModel> listData = (List<StaffDetailModel>) JSONArray.toCollection(array,StaffDetailModel.class);
-        if(null != listData && listData.size() > 0){
-			staffdetailService.deleteAll(listData);
-			commonBase.setCode(0);
+		String checkState = CheckState(pd);
+		if(checkState!=null && checkState.trim() != ""){
+			commonBase.setCode(2);
+			commonBase.setMessage(checkState);
+		} else {
+			Object DATA_ROWS = pd.get("DATA_ROWS");
+			String json = DATA_ROWS.toString();  
+	        JSONArray array = JSONArray.fromObject(json);  
+	        List<StaffDetailModel> listData = (List<StaffDetailModel>) JSONArray.toCollection(array,StaffDetailModel.class);
+	        if(null != listData && listData.size() > 0){
+				staffdetailService.deleteAll(listData);
+				commonBase.setCode(0);
+			}
 		}
 		return commonBase;
 	}
@@ -304,131 +323,130 @@ public class StaffDetailController extends BaseController {
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
 		if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;}//校验权限
-		
-		// 局部变量
-		LeadingInExcel<StaffDetailModel> testExcel = null;
-		Map<Integer, Object> uploadAndReadMap = null;
-		try {
-			// 定义需要读取的数据
-			String formart = "yyyy-MM-dd";
-			String propertiesFileName = "config";
-			String kyeName = "file_path";
-			int sheetIndex = 0;
-			Class<StaffDetailModel> clazz = StaffDetailModel.class;
-			Map<String, String> titleAndAttribute = null;
-			// 定义对应的标题名与对应属性名
-			titleAndAttribute = new HashMap<String, String>();
-			
-			//配置表设置列
-			if(ColumnsList != null && ColumnsList.size() > 0){
-				for(int i=0; i < ColumnsList.size(); i++){
-					titleAndAttribute.put(ColumnsList.get(i).getCOL_NAME(), ColumnsList.get(i).getCOL_CODE());
-				}
-			}
 
-			// 调用解析工具包
-			testExcel = new LeadingInExcel<StaffDetailModel>(formart);
-			// 解析excel，获取客户信息集合
-
-			uploadAndReadMap = testExcel.uploadAndRead(file, propertiesFileName, kyeName, sheetIndex,
-					titleAndAttribute, clazz, ColumnsList, DicList);
-		} catch (Exception e) {
-			e.printStackTrace();
-			logger.error("读取Excel文件错误", e);
-			throw new CustomException("读取Excel文件错误");
-		}
-		boolean judgement = false;
-		if(uploadAndReadMap.get(1).equals(false)){
-			Map<String, Object> returnError =  (Map<String, Object>) uploadAndReadMap.get(2);
-			String message = "字典无此翻译： "; // \n
-			for (String k : returnError.keySet())  
-		    {
-				message += k + " : " + returnError.get(k);
-		    }
+		PageData pd = this.getPageData();
+		String checkState = CheckState(pd);
+		if(checkState!=null && checkState.trim() != ""){
 			commonBase.setCode(2);
-			commonBase.setMessage(message);
+			commonBase.setMessage(checkState);
 		} else {
-			List<StaffDetailModel> uploadAndRead = (List<StaffDetailModel>) uploadAndReadMap.get(2);
-			if (uploadAndRead != null && !"[]".equals(uploadAndRead.toString()) && uploadAndRead.size() >= 1) {
-				judgement = true;
+			// 局部变量
+			LeadingInExcel<StaffDetailModel> testExcel = null;
+			Map<Integer, Object> uploadAndReadMap = null;
+			try {
+				// 定义需要读取的数据
+				String formart = "yyyy-MM-dd";
+				String propertiesFileName = "config";
+				String kyeName = "file_path";
+				int sheetIndex = 0;
+				Class<StaffDetailModel> clazz = StaffDetailModel.class;
+				Map<String, String> titleAndAttribute = null;
+				// 定义对应的标题名与对应属性名
+				titleAndAttribute = new HashMap<String, String>();
+				
+				//配置表设置列
+				if(ColumnsList != null && ColumnsList.size() > 0){
+					for(int i=0; i < ColumnsList.size(); i++){
+						titleAndAttribute.put(ColumnsList.get(i).getCOL_NAME(), ColumnsList.get(i).getCOL_CODE());
+					}
+				}
+
+				// 调用解析工具包
+				testExcel = new LeadingInExcel<StaffDetailModel>(formart);
+				// 解析excel，获取客户信息集合
+
+				uploadAndReadMap = testExcel.uploadAndRead(file, propertiesFileName, kyeName, sheetIndex,
+						titleAndAttribute, clazz, ColumnsList, DicList);
+			} catch (Exception e) {
+				e.printStackTrace();
+				logger.error("读取Excel文件错误", e);
+				throw new CustomException("读取Excel文件错误");
 			}
-			if (judgement) {
-				List<String> sbRet = new ArrayList<String>();
-				String BUSI_DATE = "";
-				String DEPT_CODE = "";
-				List<String> listUserCode = new ArrayList<String>();
-				int listSize = uploadAndRead.size();
-				for(int i=0;i<listSize;i++){
-					if(!(uploadAndRead.get(i).getBUSI_DATE()!=null && !uploadAndRead.get(i).getBUSI_DATE().trim().equals(""))){
-						if(!sbRet.contains("区间不能为空！")){
-							sbRet.add("区间不能为空！");
-						}
-					}
-					if(!(uploadAndRead.get(i).getDEPT_CODE()!=null && !uploadAndRead.get(i).getDEPT_CODE().trim().equals(""))){
-						if(!sbRet.contains("单位不能为空！")){
-							sbRet.add("单位不能为空！");
-						}
-					}
-					if(!(uploadAndRead.get(i).getUSER_CODE()!=null && !uploadAndRead.get(i).getUSER_CODE().trim().equals(""))){
-						if(!sbRet.contains("人员编码不能为空！")){
-							sbRet.add("人员编码不能为空！");
-						}
-					}
-					if(i == 0){
-						BUSI_DATE = uploadAndRead.get(i).getBUSI_DATE();
-						DEPT_CODE = uploadAndRead.get(i).getDEPT_CODE();
-					} else {
-						if(!BUSI_DATE.equals(uploadAndRead.get(i).getBUSI_DATE()) || !DEPT_CODE.equals(uploadAndRead.get(i).getDEPT_CODE())){
-							if(!sbRet.contains("区间和单位必须一致！")){
-								sbRet.add("区间和单位必须一致！");
+			boolean judgement = false;
+			if(uploadAndReadMap.get(1).equals(false)){
+				Map<String, Object> returnError =  (Map<String, Object>) uploadAndReadMap.get(2);
+				String message = "字典无此翻译： "; // \n
+				for (String k : returnError.keySet())  
+			    {
+					message += k + " : " + returnError.get(k);
+			    }
+				commonBase.setCode(2);
+				commonBase.setMessage(message);
+			} else {
+				List<StaffDetailModel> uploadAndRead = (List<StaffDetailModel>) uploadAndReadMap.get(2);
+				if (uploadAndRead != null && !"[]".equals(uploadAndRead.toString()) && uploadAndRead.size() >= 1) {
+					judgement = true;
+				}
+				if (judgement) {
+					List<String> sbRet = new ArrayList<String>();
+					String BUSI_DATE = "";
+					String DEPT_CODE = "";
+					List<String> listUserCode = new ArrayList<String>();
+					int listSize = uploadAndRead.size();
+					for(int i=0;i<listSize;i++){
+						if(!(uploadAndRead.get(i).getBUSI_DATE()!=null && !uploadAndRead.get(i).getBUSI_DATE().trim().equals(""))){
+							if(!sbRet.contains("区间不能为空！")){
+								sbRet.add("区间不能为空！");
 							}
 						}
-					}
-					if(listUserCode.contains(uploadAndRead.get(i).getUSER_CODE())){
-						String strUserAdd = "编码" + uploadAndRead.get(i).getUSER_CODE() + "重复！";
-						if(!sbRet.contains(strUserAdd)){
-							sbRet.add(strUserAdd);
+						if(!(uploadAndRead.get(i).getDEPT_CODE()!=null && !uploadAndRead.get(i).getDEPT_CODE().trim().equals(""))){
+							if(!sbRet.contains("单位不能为空！")){
+								sbRet.add("单位不能为空！");
+							}
 						}
+						if(!(uploadAndRead.get(i).getUSER_CODE()!=null && !uploadAndRead.get(i).getUSER_CODE().trim().equals(""))){
+							if(!sbRet.contains("人员编码不能为空！")){
+								sbRet.add("人员编码不能为空！");
+							}
+						}
+						if(i == 0){
+							BUSI_DATE = uploadAndRead.get(i).getBUSI_DATE();
+							DEPT_CODE = uploadAndRead.get(i).getDEPT_CODE();
+						} else {
+							if(!BUSI_DATE.equals(uploadAndRead.get(i).getBUSI_DATE()) || !DEPT_CODE.equals(uploadAndRead.get(i).getDEPT_CODE())){
+								if(!sbRet.contains("区间和单位必须一致！")){
+									sbRet.add("区间和单位必须一致！");
+								}
+							}
+						}
+						if(listUserCode.contains(uploadAndRead.get(i).getUSER_CODE())){
+							String strUserAdd = "编码" + uploadAndRead.get(i).getUSER_CODE() + "重复！";
+							if(!sbRet.contains(strUserAdd)){
+								sbRet.add(strUserAdd);
+							}
+						} else {
+							listUserCode.add(uploadAndRead.get(i).getUSER_CODE());
+						}
+					}
+					if(sbRet.size()>0){
+						StringBuilder sbTitle = new StringBuilder();
+						for(String str : sbRet){
+							sbTitle.append(str + "  "); // \n
+						}
+						commonBase.setCode(2);
+						commonBase.setMessage(sbTitle.toString());
 					} else {
-						listUserCode.add(uploadAndRead.get(i).getUSER_CODE());
+						//此处执行集合添加 
+						staffdetailService.batchImport(uploadAndRead);
+						commonBase.setCode(0);
 					}
-				}
-				PageData pd = this.getPageData();
-				pd.put("RPT_DEPT", DEPT_CODE);
-				pd.put("RPT_DUR", BUSI_DATE);
-				pd.put("BILL_TYPE", TypeCode);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
-				String State = syssealedinfoService.getState(pd);
-				if(!(State!=null && State.equals("0"))){
-					sbRet.add("导入期间已封存！");
-				}
-				if(sbRet.size()>0){
-					StringBuilder sbTitle = new StringBuilder();
-					for(String str : sbRet){
-						sbTitle.append(str + "  "); // \n
-					}
-					commonBase.setCode(2);
-					commonBase.setMessage(sbTitle.toString());
-				} else {
-					//此处执行集合添加 
-					staffdetailService.batchImport(uploadAndRead);
-					commonBase.setCode(0);
-				}
-				
-				/*// 把客户信息分为没100条数据为一组迭代添加客户信息（注：将customerList集合作为参数，在Mybatis的相应映射文件中使用foreach标签进行批量添加。）
-				int listSize = uploadAndRead.size();
-				int toIndex = 100;
-				for (int i = 0; i < listSize; i += 100) {
-					if (i + 100 > listSize) {
-						toIndex = listSize - i;
-					}
-					List<StaffDetailModel> subList = uploadAndRead.subList(i, i + toIndex);
+					
+					/*// 把客户信息分为没100条数据为一组迭代添加客户信息（注：将customerList集合作为参数，在Mybatis的相应映射文件中使用foreach标签进行批量添加。）
+					int listSize = uploadAndRead.size();
+					int toIndex = 100;
+					for (int i = 0; i < listSize; i += 100) {
+						if (i + 100 > listSize) {
+							toIndex = listSize - i;
+						}
+						List<StaffDetailModel> subList = uploadAndRead.subList(i, i + toIndex);
 
-					//此处执行集合添加 
-					staffdetailService.batchImport(subList);
-				}*/
-			} else {
-				commonBase.setCode(-1);
-				commonBase.setMessage("TranslateUtil");
+						//此处执行集合添加 
+						staffdetailService.batchImport(subList);
+					}*/
+				} else {
+					commonBase.setCode(-1);
+					commonBase.setMessage("TranslateUtil");
+				}
 			}
 		}
 		ModelAndView mv = this.getModelAndView();
@@ -514,14 +532,10 @@ public class StaffDetailController extends BaseController {
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "report")){return null;} //校验权限	
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
-		PageData pd = this.getPageData();
-		pd.put("RPT_DEPT", DepartCode);
-		pd.put("RPT_DUR", SystemDateTime);
-		pd.put("BILL_TYPE", TypeCode);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
-		String State = syssealedinfoService.getState(pd);
-		if(State!=null && State.equals("1")){
+		String checkState = CheckState(this.getPageData());
+		if(checkState!=null && checkState.trim() != ""){
 			commonBase.setCode(2);
-			commonBase.setMessage("当前期间已封存！");
+			commonBase.setMessage(checkState);
 		} else {
 			User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
 			String userId = user.getUSER_ID();
@@ -540,6 +554,21 @@ public class StaffDetailController extends BaseController {
 			commonBase.setCode(0);
 		}
 		return commonBase;
+	}
+	
+	private String CheckState(PageData pd) throws Exception{
+		String strRut = "当前期间已封存！";pd.put("RPT_DEPT", DepartCode);
+		pd.put("RPT_DUR", SystemDateTime);
+		pd.put("BILL_TYPE", TypeCode);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+		String State = syssealedinfoService.getState(pd);
+		if(State!=null && State.equals("1")){
+			//commonBase.setCode(2);
+			//commonBase.setMessage("当前期间已封存！");
+		} else {
+			
+		}
+		
+		return strRut;
 	}
 	
 	@InitBinder
