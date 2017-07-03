@@ -34,6 +34,12 @@ public class ObjectExcelView extends AbstractExcelView{
 		// TODO Auto-generated method stub
 		Date date = new Date();
 		String filename = Tools.date2Str(date, "yyyyMMddHHmmss");
+		if(model.containsKey("filename")){
+			String strName = (String) model.get("filename");
+			if(strName != null && !strName.trim().equalsIgnoreCase("")){
+				filename = strName;
+			}
+		}
 		HSSFSheet sheet;
 		HSSFCell cell;
 		response.setContentType("application/octet-stream");

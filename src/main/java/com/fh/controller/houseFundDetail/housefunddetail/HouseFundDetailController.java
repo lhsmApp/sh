@@ -444,7 +444,7 @@ public class HouseFundDetailController extends BaseController {
 	public ModelAndView downExcel(JqPage page) throws Exception{
 		//页面显示数据的二级单位
 		List<PageData> varOList = housefunddetailService.exportModel(DepartCode);
-		return export(varOList);
+		return export(varOList, "HouseFundDetail"); //公积金明细
 	}
 	
 	 /**导出到excel
@@ -462,13 +462,14 @@ public class HouseFundDetailController extends BaseController {
 		pd.put("DepartCode", DepartCode);
 		page.setPd(pd);
 		List<PageData> varOList = housefunddetailService.exportList(page);
-		return export(varOList);
+		return export(varOList, "");
 	}
 	
 	@SuppressWarnings("unchecked")
-	private ModelAndView export(List<PageData> varOList){
+	private ModelAndView export(List<PageData> varOList, String ExcelName){
 		ModelAndView mv = new ModelAndView();
 		Map<String,Object> dataMap = new HashMap<String,Object>();
+		dataMap.put("filename", ExcelName);
 		List<String> titles = new ArrayList<String>();
 		if(ColumnsList != null && ColumnsList.size() > 0){
 			for(int i=0; i < ColumnsList.size(); i++){
