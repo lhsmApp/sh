@@ -274,7 +274,9 @@
                 } , 
                 afterSubmit: fn_addSubmit
 			},
-			
+			{
+				//删除
+			},
 			{
 				//search form
 				recreateForm: true,
@@ -285,7 +287,7 @@
 				multipleSearch: true,
 				
 				//multipleGroup:true,
-				showQuery: true
+				showQuery: false
 				
 			}
 		);

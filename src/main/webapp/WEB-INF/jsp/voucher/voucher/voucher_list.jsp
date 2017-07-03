@@ -29,13 +29,8 @@
 <script type="text/javascript" src="plugins/selectZtree/ztree/ztree.js"></script>
 <link type="text/css" rel="stylesheet" href="plugins/selectZtree/ztree/ztree.css"></link>
 <!-- 树形下拉框end -->
-<style>
-.page-header {
-	padding-top: 9px;
-	padding-bottom: 9px;
-	margin: 0 0 8px;
-}
-</style>
+<!-- 标准页面统一样式 -->
+<link rel="stylesheet" href="static/css/normal.css" />
 </head>
 <body class="no-skin">
 	<div class="main-container" id="main-container">
@@ -79,11 +74,12 @@
 								<div class="widget-body">
 									<div class="widget-main">
 										<form class="form-inline">
-											<span class="input-icon"> <input
+											<span class="input-icon pull-left" style="margin-right:5px;"> <input
 												id="form-field-icon-1" type="text" placeholder="这里输入关键词">
 												<i class="ace-icon fa fa-leaf blue"></i>
 											</span>
-											<span> 
+						
+											<%-- <span class="pull-left" style="margin-right:5px;"> 
 												<select
 													class="chosen-select form-control" name="BELONG_AREA"
 													id="belong_area" data-placeholder="请选择所属区域"
@@ -95,9 +91,9 @@
 																<c:if test="${pd.BELONG_AREA==area.BIANMA}">selected</c:if>>${area.NAME }</option>
 														</c:forEach>
 												</select>
-											</span>
-											<span>
-												<div class="selectTree" id="selectTree"></div>
+											</span> --%>
+											<span class="pull-left" style="margin-right:5px;">
+												<div class="selectTree" id="selectTree" multiMode="true" allSelectable="false" noGroup="false"></div>
 											</span>
 											<button type="button" class="btn btn-info btn-sm">
 												<i class="ace-icon fa fa-search bigger-110"></i>

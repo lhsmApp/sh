@@ -4,8 +4,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%
 	String path = request.getContextPath();
-	String basePath = request.getScheme() + "://"
-			+ request.getServerName() + ":" + request.getServerPort()
+	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
 			+ path + "/";
 %>
 <!DOCTYPE html>
@@ -18,9 +17,11 @@
 <!-- 树形下拉框start -->
 <script type="text/javascript" src="plugins/selectZtree/selectTree.js"></script>
 <script type="text/javascript" src="plugins/selectZtree/framework.js"></script>
-<link rel="stylesheet" type="text/css" href="plugins/selectZtree/import_fh.css"/>
+<link rel="stylesheet" type="text/css"
+	href="plugins/selectZtree/import_fh.css" />
 <script type="text/javascript" src="plugins/selectZtree/ztree/ztree.js"></script>
-<link type="text/css" rel="stylesheet" href="plugins/selectZtree/ztree/ztree.css"></link>
+<link type="text/css" rel="stylesheet"
+	href="plugins/selectZtree/ztree/ztree.css"></link>
 <!-- 树形下拉框end -->
 <!-- 下拉框 -->
 <link rel="stylesheet" href="static/ace/css/chosen.css" />
@@ -31,13 +32,10 @@
 
 <!-- 最新版的Jqgrid Css，如果旧版本（Ace）某些方法不好用，尝试用此版本Css，替换旧版本Css -->
 <!-- <link rel="stylesheet" type="text/css" media="screen" href="static/ace/css/ui.jqgrid-bootstrap.css" /> -->
-<style>
-.page-header {
-	padding-top: 9px;
-	padding-bottom: 9px;
-	margin: 0 0 8px;
-}
-</style>
+
+<!-- 标准页面统一样式 -->
+<link rel="stylesheet" href="static/css/normal.css" />
+
 </head>
 <body class="no-skin">
 	<div class="main-container" id="main-container">
@@ -59,10 +57,10 @@
 										onclick="showQueryCondi()">
 										<i class="ace-icon fa fa-chevron-up bigger-120 blue"></i> <span>隐藏查询</span>
 									</button>
-									
-									<button id="btnCopy" class="btn btn-white btn-info btn-sm" style="margin-left: 10px;"
-										onclick="copyData()">
-										 <span>复制</span>
+
+									<button id="btnCopy" class="btn btn-white btn-info btn-sm"
+										style="margin-left: 10px;" onclick="copyData()">
+										<span>复制</span>
 									</button></td>
 							</tr>
 						</table>
@@ -71,38 +69,39 @@
 
 					<div class="row">
 						<div class="col-xs-12">
-							<div class="widget-box" >
+							<div class="widget-box">
 								<div class="widget-body">
 									<div class="widget-main">
-										<form class="form-inline">		
-										<table style="margin-top:5px;">
-							<tr>
-							<td><input name="DEPARTMENT_CODE" id="DEPARTMENT_CODE" type="hidden" value="${pd.DEPARTMENT_CODE }" /></td>
-							<td><input name="DNAME" id="DNAME" type="hidden" value="${pd.DNAME }" /></td>
-								<td>
-											<span>
-												<select class="chosen-select form-control" 
-													name="TABLE_NO" id=TABLE_NO
-													data-placeholder="请选择表明称"
-													style="vertical-align: top; height:32px;width: 150px;">
-													<option value="">请选择表名称</option>
-													<c:forEach items="${listBase}" var="tableName">
-														<option value="${tableName.TABLE_NO}"
-															<c:if test="${pd.TABLE_NO==tableName.TABLE_NO}">selected</c:if>>${tableName.TABLE_NAME  }</option>
-													</c:forEach>
-												</select>
-											</span>
-											</td>			
-											<td style="padding-left:5px">
-											<div class="selectTree" id="selectTree"></div>
-											</td>
-											<td style="padding-left:5px">
-											<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
-												<i class="ace-icon fa fa-search bigger-110"></i>
-											</button>
-											</td>
+										<form class="form-inline">
+											<table>
+												<tr>
+													<td><input name="DEPARTMENT_CODE" id="DEPARTMENT_CODE"
+														type="hidden" value="${pd.DEPARTMENT_CODE }" /></td>
+													<td><input name="DNAME" id="DNAME" type="hidden"
+														value="${pd.DNAME }" /></td>
+													<td><span> <select
+															class="chosen-select form-control" name="TABLE_NO"
+															id=TABLE_NO data-placeholder="请选择表明称"
+															style="vertical-align: top; height: 32px; width: 150px;">
+																<option value="">请选择表名称</option>
+																<c:forEach items="${listBase}" var="tableName">
+																	<option value="${tableName.TABLE_NO}"
+																		<c:if test="${pd.TABLE_NO==tableName.TABLE_NO}">selected</c:if>>${tableName.TABLE_NAME  }</option>
+																</c:forEach>
+														</select>
+													</span></td>
+													<td style="padding-left: 5px">
+														<div class="selectTree" id="selectTree" multiMode="false"
+															allSelectable="false" noGroup="false"></div>
+													</td>
+													<td style="padding-left: 5px">
+														<button type="button" class="btn btn-info btn-sm"
+															onclick="tosearch();">
+															<i class="ace-icon fa fa-search bigger-110"></i>
+														</button>
+													</td>
 												</tr>
-						</table>
+											</table>
 										</form>
 									</div>
 								</div>
@@ -148,7 +147,7 @@
 	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
 	<!-- JqGrid统一样式统一操作 -->
 	<script type="text/javascript" src="static/js/common/jqgrid_style.js"></script>
-		
+
 	<script type="text/javascript"> 
 	
 	$(document).ready(function () {
@@ -201,7 +200,7 @@
 			rownumbers: true, // show row numbers
             rownumWidth: 35, // the width of the row numbers columns			
 	        ondblClickRow: dbClickRow,//双击表格编辑
-	        editurl: '<%=basePath%>tmplconfig/edit.do?',
+	        //editurl: '<%=basePath%>tmplconfig/edit.do?',
 		});
 		
 		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
@@ -243,7 +242,7 @@
                 } , 
                 afterSubmit: fn_addSubmit
 			},
-			
+			{},
 			{
 				//search form
 				recreateForm: true,
@@ -254,7 +253,7 @@
 				multipleSearch: true,
 				
 				//multipleGroup:true,
-				showQuery: true
+				showQuery: false
 				
 			}
 		);
@@ -423,7 +422,7 @@
 			setTimeout(function(){
 				 $(cell).find('input[type=checkbox]')
 					.addClass('ace ace-switch ace-switch-5')
-					.after('<span class="lbl" data-lbl="是        否"></span>'); 
+					.after('<span class="lbl" data-lbl="是             否"></span>'); 
 				 if (cellvalue=="是") {	
 					$(cell).find('input[type=checkbox]').attr('checked','checked');
 				 }else{
@@ -546,7 +545,8 @@
 		function dbClickRow(rowId, rowIndex, colnumIndex, event){ 
 			if (rowId && rowId !== lastSelection) {
                 var grid = $("#jqGrid");
-                grid.jqGrid('saveRow',lastSelection);
+                //grid.jqGrid('saveRow',lastSelection);
+                grid.jqGrid('saveRow',lastSelection,false, 'clientArray');
                 grid.jqGrid('restoreRow',lastSelection);
                 grid.jqGrid('editRow',rowId, {keys: true} );
                 lastSelection = rowId;
