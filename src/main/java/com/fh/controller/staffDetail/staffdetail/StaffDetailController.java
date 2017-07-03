@@ -92,58 +92,6 @@ public class StaffDetailController extends BaseController {
 	//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 	List<TmplConfigDetail> ColumnsList = new ArrayList<TmplConfigDetail>();
 	
-	/**修改
-	 * @param
-	 * @throws Exception
-	 */
-	@RequestMapping(value="/edit")
-	public @ResponseBody CommonBase edit() throws Exception{
-		CommonBase commonBase = new CommonBase();
-		commonBase.setCode(-1);
-		logBefore(logger, Jurisdiction.getUsername()+"修改StaffDetail");
-		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限
-		
-		PageData pd = this.getPageData();
-		String checkState = CheckState(pd);
-		if(checkState!=null && checkState.trim() != ""){
-			commonBase.setCode(2);
-			commonBase.setMessage(checkState);
-		} else {
-			TmplUtil.setModelDefault(pd, StaffDetailModel.class, DefaultValueList);
-			String BILL_CODE = "BILL_CODE";
-			String BUSI_DATE = "BUSI_DATE";
-			String DEPT_CODE = "DEPT_CODE";
-			if(pd.containsKey(BILL_CODE)){
-				pd.remove(BILL_CODE);
-			}
-			pd.put(BILL_CODE, " ");
-			if(pd.containsKey(BUSI_DATE)){
-				pd.remove(BUSI_DATE);
-			}
-			pd.put(BUSI_DATE, SystemDateTime);
-			if(pd.containsKey(DEPT_CODE)){
-				pd.remove(DEPT_CODE);
-			}
-			pd.put(DEPT_CODE, DepartCode);
-			
-			List<StaffDetailModel> repeatList = staffdetailService.findByPd(pd);
-			if(repeatList!=null && repeatList.size()>0){
-				commonBase.setCode(2);
-				commonBase.setMessage("此区间内编码已存在！");
-			} else {
-				if(pd.getString("oper").equals("edit")){
-					staffdetailService.edit(pd);
-					commonBase.setCode(0);
-				}
-				else if(pd.getString("oper").equals("add")){
-					staffdetailService.save(pd);
-					commonBase.setCode(0);
-				}
-			}
-		}
-		return commonBase;
-	}
-	
 	/**列表
 	 * @param page
 	 * @throws Exception
@@ -229,6 +177,58 @@ public class StaffDetailController extends BaseController {
 		result.setUserdata(userdata);
 		
 		return result;
+	}
+	
+	/**修改
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/edit")
+	public @ResponseBody CommonBase edit() throws Exception{
+		CommonBase commonBase = new CommonBase();
+		commonBase.setCode(-1);
+		logBefore(logger, Jurisdiction.getUsername()+"修改StaffDetail");
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限
+		
+		PageData pd = this.getPageData();
+		String checkState = CheckState(pd);
+		if(checkState!=null && checkState.trim() != ""){
+			commonBase.setCode(2);
+			commonBase.setMessage(checkState);
+		} else {
+			TmplUtil.setModelDefault(pd, StaffDetailModel.class, DefaultValueList);
+			String BILL_CODE = "BILL_CODE";
+			String BUSI_DATE = "BUSI_DATE";
+			String DEPT_CODE = "DEPT_CODE";
+			if(pd.containsKey(BILL_CODE)){
+				pd.remove(BILL_CODE);
+			}
+			pd.put(BILL_CODE, " ");
+			if(pd.containsKey(BUSI_DATE)){
+				pd.remove(BUSI_DATE);
+			}
+			pd.put(BUSI_DATE, SystemDateTime);
+			if(pd.containsKey(DEPT_CODE)){
+				pd.remove(DEPT_CODE);
+			}
+			pd.put(DEPT_CODE, DepartCode);
+			
+			List<StaffDetailModel> repeatList = staffdetailService.findByPd(pd);
+			if(repeatList!=null && repeatList.size()>0){
+				commonBase.setCode(2);
+				commonBase.setMessage("此区间内编码已存在！");
+			} else {
+				if(pd.getString("oper").equals("edit")){
+					staffdetailService.edit(pd);
+					commonBase.setCode(0);
+				}
+				else if(pd.getString("oper").equals("add")){
+					staffdetailService.save(pd);
+					commonBase.setCode(0);
+				}
+			}
+		}
+		return commonBase;
 	}
 	
 	 /**批量修改
@@ -532,6 +532,7 @@ public class StaffDetailController extends BaseController {
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "report")){return null;} //校验权限	
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
+		
 		String checkState = CheckState(this.getPageData());
 		if(checkState!=null && checkState.trim() != ""){
 			commonBase.setCode(2);
@@ -557,17 +558,14 @@ public class StaffDetailController extends BaseController {
 	}
 	
 	private String CheckState(PageData pd) throws Exception{
-		String strRut = "当前期间已封存！";pd.put("RPT_DEPT", DepartCode);
+		String strRut = "当前期间已封存！";
+		pd.put("RPT_DEPT", DepartCode);
 		pd.put("RPT_DUR", SystemDateTime);
 		pd.put("BILL_TYPE", TypeCode);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 		String State = syssealedinfoService.getState(pd);
-		if(State!=null && State.equals("1")){
-			//commonBase.setCode(2);
-			//commonBase.setMessage("当前期间已封存！");
-		} else {
-			
+		if(State!=null && State.equals("0")){
+			strRut = "";
 		}
-		
 		return strRut;
 	}
 	
