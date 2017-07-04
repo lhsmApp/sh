@@ -26,16 +26,6 @@ public class StaffDetailService implements StaffDetailManager{
 	@Resource(name = "daoSupport")
 	private DaoSupport dao;
 	
-	/**获取某表的所有列
-	 * 张晓柳
-	 * @param 
-	 * @throws Exception
-	 */
-	@SuppressWarnings("unchecked")
-	public List<TableColumns> getTableColumns(PageData pd)throws Exception{
-		return (List<TableColumns>)dao.findForList("StaffDetailMapper.getTableColumns", pd);
-	}
-	
 	/**获取数据
 	 * 张晓柳
 	 * @param pd

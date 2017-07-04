@@ -15,14 +15,6 @@ import com.fh.util.PageData;
  */
 public interface HouseFundDetailManager{
 
-	
-	/**获取某表的所有列
-	 * 张晓柳
-	 * @param 
-	 * @throws Exception
-	 */
-	public List<TableColumns> getTableColumns(PageData pd)throws Exception;
-	
 	/**获取数据
 	 * 张晓柳
 	 * @param pd

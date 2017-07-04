@@ -22,19 +22,6 @@
     <!-- 字段值 -->
     <sql id="FieldValue"> #{BILL_CODE}, #{BUSI_DATE}, #{USER_CODE}, #{USER_NAME}, #{STAFF_IDENT}, #{BANK_CARD}, #{USER_GROP}, #{USER_CATG}, #{DEPT_CODE}, #{ORG_UNIT}, #{SAL_RANGE}, #{POST_SALY}, #{BONUS}, #{CASH_BONUS}, #{WORK_OT}, #{BACK_SALY}, #{RET_SALY}, #{CHK_CASH}, #{INTR_SGL_AWAD}, #{SENY_ALLE}, #{POST_ALLE}, #{NS_ALLE}, #{AREA_ALLE}, #{EXPT_ALLE}, #{TECH_ALLE}, #{LIVE_EXPE}, #{LIVE_ALLE}, #{LEAVE_DM}, #{HOUSE_ALLE}, #{ITEM_ALLE}, #{MEAL_EXPE}, #{TRF_ALLE}, #{TEL_EXPE}, #{HLDY_ALLE}, #{KID_ALLE}, #{COOL_EXPE}, #{EXT_SGL_AWAD}, #{PRE_TAX_PLUS}, #{GROSS_PAY}, #{ENDW_INS}, #{UNEMPL_INS}, #{MED_INS}, #{CASD_INS}, #{HOUSE_FUND}, #{SUP_PESN}, #{TAX_BASE_ADJ}, #{ACCRD_TAX}, #{AFTER_TAX}, #{ACT_SALY}, #{GUESS_DIFF}, #{CUST_COL1}, #{CUST_COL2}, #{CUST_COL3}, #{CUST_COL4}, #{CUST_COL5}, #{CUST_COL6}, #{CUST_COL7}, #{CUST_COL8}, #{CUST_COL9}, #{CUST_COL10}, #{ESTB_DEPT} </sql>
 	
-	<!-- 获取数据库中表结构-->
-	<!-- 张晓柳 -->
-	<select id="getTableColumns" parameterType="pd" resultType="com.fh.entity.TableColumns">
-	    SELECT UPPER(column_name) column_name, 
-	           column_comment, 
-	           UPPER(data_type) data_type, 
-	           UPPER(column_type) column_type,
-	           UPPER(column_key) column_key, 
-	           column_default 
-	    FROM information_schema.columns 
-	    WHERE table_name = 'tb_staff_detail'
-	</select>
-
 	<!-- 获取员工编码 相当于字典-->
 	<!-- 张晓柳 -->
 	<select id="getHaveUserCodeDic" parameterType="pd" resultType="String">

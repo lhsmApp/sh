@@ -101,6 +101,7 @@ public class TmplConfigService implements TmplConfigManager{
 	
 	
 	/**根据当前单位编码及表名获取字段配置信息 
+	 * 张晓柳
 	 * @param pd
 	 * @throws Exception
 	 */

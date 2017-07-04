@@ -180,6 +180,7 @@
 	</select>
 
 	<!-- 根据当前单位编码及表名获取字段配置信息 -->
+	<!-- 张晓柳 -->
 	<select id="listNeed" parameterType="com.fh.entity.TmplConfigDetail" 
 	        resultType="com.fh.entity.TmplConfigDetail">
 		select
@@ -188,6 +189,7 @@
 		    <include refid="tableName"></include>
 		where DEPT_CODE = #{DEPT_CODE}
 	    and UPPER(TABLE_CODE) = UPPER(#{TABLE_CODE})
+	    and UPPER(TABLE_CODE) in (select UPPER(TABLE_CODE) from tb_tmpl_config_base where STATE = '1')
 	    order by DISP_ORDER
 	</select>
 	
