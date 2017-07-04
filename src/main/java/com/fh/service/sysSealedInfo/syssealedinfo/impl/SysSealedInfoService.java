@@ -131,5 +131,13 @@ public class SysSealedInfoService implements SysSealedInfoManager{
 		dao.update("SysSealedInfoMapper.updateAll", pd);
 	}
 	
+	
+	/**批量生成
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void insertBatch(List<SysSealed> list)throws Exception{
+		dao.update("SysSealedInfoMapper.insertBatch", list);
+	}
 }
 
