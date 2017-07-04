@@ -21,19 +21,6 @@
 	<!-- 字段值 -->
 	<sql id="FieldValue"> #{BILL_CODE}, #{BUSI_DATE}, #{USER_CODE}, #{USER_NAME}, #{USER_GROP}, #{SOC_INC_BASE}, #{PER_BASIC_FUND}, #{PER_SUPP_FUND}, #{PER_TOTAL}, #{DEPT_BASIC_FUND}, #{DEPT_SUPP_FUND}, #{DEPT_TOTAL}, #{DEPT_CODE}, #{USER_CATG}, #{PMT_PLACE}, #{CUST_COL1}, #{CUST_COL2}, #{CUST_COL3}, #{CUST_COL4}, #{CUST_COL5}, #{CUST_COL6}, #{CUST_COL7}, #{CUST_COL8}, #{CUST_COL9}, #{CUST_COL10}, #{ESTB_DEPT} </sql>
 	
-	<!-- 获取数据库中表结构-->
-	<!-- 张晓柳 -->
-	<select id="getTableColumns" parameterType="pd" resultType="com.fh.entity.TableColumns">
-	    SELECT UPPER(column_name) column_name, 
-	           column_comment, 
-	           UPPER(data_type) data_type, 
-	           UPPER(column_type) column_type,
-	           UPPER(column_key) column_key, 
-	           column_default 
-	    FROM information_schema.columns 
-	    WHERE table_name = 'tb_staff_detail'
-	</select>
-
 	<!-- 获取员工编码 相当于字典-->
 	<!-- 张晓柳 -->
 	<select id="getHaveUserCodeDic" parameterType="pd" resultType="String">

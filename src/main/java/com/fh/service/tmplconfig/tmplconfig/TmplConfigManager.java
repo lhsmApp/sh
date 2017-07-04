@@ -74,6 +74,7 @@ public interface TmplConfigManager{
 	public List<PageData> listBase(Page pd) throws Exception;
 
     /**根据当前单位编码及表名获取字段配置信息
+	 * 张晓柳
 	 * @param pd
 	 * @throws Exception
 	 */
