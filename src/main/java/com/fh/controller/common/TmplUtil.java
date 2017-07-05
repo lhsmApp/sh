@@ -121,22 +121,21 @@ public class TmplUtil {
 					if (i < listColumns.size() - 1) {
 						jqGridColModel.append(",");
 					}
-					// 底行显示的求和与平均值字段
+					
+					//底行显示的求和与平均值字段
 					// 1汇总 0不汇总,默认0
-					if (Integer.parseInt(listColumns.get(i).getCOL_SUM()) == 1) {
-						if (SqlUserdata != null && SqlUserdata.trim() != "") {
-							SqlUserdata += ", ";
+					if(Integer.parseInt(listColumns.get(i).getCOL_SUM()) == 1){
+						if(m_sqlUserdata!=null && !m_sqlUserdata.toString().trim().equals("")){
+							m_sqlUserdata.append(", ");
 						}
-						SqlUserdata += " sum(" + listColumns.get(i).getCOL_CODE() + ") "
-								+ listColumns.get(i).getCOL_CODE();
-					}
+						m_sqlUserdata.append(" sum(" + listColumns.get(i).getCOL_CODE() + ") " + listColumns.get(i).getCOL_CODE());
+					} 
 					// 0不计算 1计算 默认0
-					else if (Integer.parseInt(listColumns.get(i).getCOL_AVE()) == 1) {
-						if (SqlUserdata != null && SqlUserdata.trim() != "") {
-							SqlUserdata += ", ";
+					else if(Integer.parseInt(listColumns.get(i).getCOL_AVE()) == 1){
+						if(m_sqlUserdata!=null && !m_sqlUserdata.toString().trim().equals("")){
+							m_sqlUserdata.append(", ");
 						}
-						SqlUserdata += " round(avg(" + listColumns.get(i).getCOL_CODE() + "), 2) "
-								+ listColumns.get(i).getCOL_CODE();
+						m_sqlUserdata.append(" round(avg(" + listColumns.get(i).getCOL_CODE() + "), 2) " + listColumns.get(i).getCOL_CODE());
 					}
 				}
 			}

@@ -1,203 +1,221 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="SysSealedInfoMapper">
-	
+
 	<!--表名 -->
 	<sql id="tableName">
 		TB_SYS_SEALED_INFO
 	</sql>
-	
+
 	<!-- 字段 -->
 	<sql id="Field">
-		BILL_CODE,	
-		RPT_DEPT,	
-		RPT_DUR,	
-		RPT_USER,	
-		RPT_DATE,	
-		BILL_TYPE,	
+		BILL_CODE,
+		RPT_DEPT,
+		RPT_DUR,
+		RPT_USER,
+		RPT_DATE,
+		BILL_TYPE,
 		STATE
 	</sql>
-	
+
 	<!-- 字段值 -->
 	<sql id="FieldValue">
-		#{BILL_CODE},	
-		#{RPT_DEPT},	
-		#{RPT_DUR},	
-		#{RPT_USER},	
-		#{RPT_DATE},	
-		#{BILL_TYPE},	
+		#{BILL_CODE},
+		#{RPT_DEPT},
+		#{RPT_DUR},
+		#{RPT_USER},
+		#{RPT_DATE},
+		#{BILL_TYPE},
 		#{STATE}
 	</sql>
-	
-	<!-- 新增-->
+
+	<!-- 新增 -->
 	<insert id="save" parameterType="pd">
-		insert into 
-	<include refid="tableName"></include>
+		insert into
+		<include refid="tableName"></include>
 		(
-	<include refid="Field"></include>
+		<include refid="Field"></include>
 		) values (
-	<include refid="FieldValue"></include>
+		<include refid="FieldValue"></include>
 		)
 	</insert>
-	
-	<!-- 删除-->
+
+	<!-- 删除 -->
 	<delete id="delete" parameterType="pd">
 		delete from
 		<include refid="tableName"></include>
-		where 
-			SYSSEALEDINFO_ID = #{SYSSEALEDINFO_ID}
+		where
+		SYSSEALEDINFO_ID = #{SYSSEALEDINFO_ID}
 	</delete>
-	
+
 	<!-- 修改 -->
 	<update id="edit" parameterType="pd">
 		update
 		<include refid="tableName"></include>
-		set 
-			BILL_CODE = #{BILL_CODE},
-			 RPT_DEPT = #{RPT_DEPT},
-			RPT_DUR = #{RPT_DUR},
-			<!-- RPT_USER = #{RPT_USER},
-			RPT_DATE = #{RPT_DATE},
-			BILL_TYPE = #{BILL_TYPE}, -->
-			STATE = #{STATE}
-		where 
+		set
+		BILL_CODE = #{BILL_CODE},
+		RPT_DEPT = #{RPT_DEPT},
+		RPT_DUR = #{RPT_DUR},
+		<!-- RPT_USER = #{RPT_USER}, RPT_DATE = #{RPT_DATE}, BILL_TYPE = #{BILL_TYPE}, -->
+		STATE = #{STATE}
+		where
 		BILL_CODE = #{BILL_CODE}
 		and
 		RPT_DEPT = #{RPT_DEPT}
 		and
 		RPT_DUR = #{RPT_DUR}
 	</update>
-	
+
 	<!-- 通过ID获取数据 -->
 	<select id="findById" parameterType="pd" resultType="pd">
-		select 
+		select
 		<include refid="Field"></include>
-		from 
+		from
 		<include refid="tableName"></include>
-		where 
-			BILL_CODE = #{BILL_CODE}
+		where
+		BILL_CODE = #{BILL_CODE}
 	</select>
-	
+
 	<!-- 列表 -->
 	<select id="datalistJqPage" parameterType="jqPage" resultType="pd">
 		select
-		<include refid="Field"></include>, OA_DEPARTMENT.NAME
-		
-		from 
-		<include refid="tableName"></include>, OA_DEPARTMENT
+		<include refid="Field"></include>
+		, OA_DEPARTMENT.NAME
+
+		from
+		<include refid="tableName"></include>
+		, OA_DEPARTMENT
 		<where>
-		    		RPT_DEPT = OA_DEPARTMENT.DEPARTMENT_CODE
+			RPT_DEPT = OA_DEPARTMENT.DEPARTMENT_CODE
 			<if test="pd.RPT_DEPT!= null and pd.RPT_DEPT != ''"><!-- 根据本门单位检索 -->
-					and (
-					RPT_DEPT LIKE CONCAT(CONCAT('%', #{pd.RPT_DEPT}),'%')
-					)
-		</if>
-		<if test="pd.BILL_TYPE!= null and pd.BILL_TYPE != ''">
 				and (
-					BILL_TYPE = #{pd.BILL_TYPE}
-					)
-		</if>
-		<if test="pd.STATUS!= null and pd.STATUS != ''">
+				RPT_DEPT LIKE CONCAT(CONCAT('%', #{pd.RPT_DEPT}),'%')
+				)
+			</if>
+			<if test="pd.BILL_TYPE!= null and pd.BILL_TYPE != ''">
 				and (
-					STATE = #{pd.STATUS}
-					)
-		</if>
-		<if test="pd.filterWhereResult != null" >
+				BILL_TYPE = #{pd.BILL_TYPE}
+				)
+			</if>
+			<if test="pd.STATUS!= null and pd.STATUS != ''">
+				and (
+				STATE = #{pd.STATUS}
+				)
+			</if>
+			<if test="pd.filterWhereResult != null">
 				${pd.filterWhereResult}
-    		</if>
-    	</where>
-    		<if test="sidx != null" >
-			order by ${sidx} ${sord} 
-    	</if>
-		<if test="currentResult != null and rowNum != null" >           
-              limit #{currentResult}, #{rowNum} 
-        </if>
+			</if>
+		</where>
+		<if test="sidx != null">
+			order by ${sidx} ${sord}
+		</if>
+		<if test="currentResult != null and rowNum != null">
+			limit #{currentResult}, #{rowNum}
+		</if>
 	</select>
 	<!-- 记录数量 -->
 	<select id="count" parameterType="pd" resultType="int">
-		select count(*) from <include refid="tableName"></include> 
-		<!-- <where>
-			<if test="menuId != null and '' != menuId" >           
-	          AND   menuId = #{menuId}
-	        </if>
-        </where> -->
+		select count(*) from
+		<include refid="tableName"></include>
+		<!-- <where> <if test="menuId != null and '' != menuId" > AND menuId = 
+			#{menuId} </if> </where> -->
 	</select>
-	
+
 	<!-- 列表(全部) -->
 	<select id="listAll" parameterType="pd" resultType="pd">
 		select
 		<include refid="Field"></include>
-		from 
+		from
 		<include refid="tableName"></include>
 	</select>
-	
+
 	<!-- 批量删除 -->
 	<delete id="deleteAll" parameterType="String">
 		delete from
 		<include refid="tableName"></include>
-		where 
-			SYSSEALEDINFO_ID in
-		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
-                 #{item}
+		where
+		SYSSEALEDINFO_ID in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
 		</foreach>
 	</delete>
-	
-	
+
+
 	<!-- 单位列表 -->
 	<select id="deptList" resultType="String">
-		select 
+		select
 		RPT_DEPT
-		from 
+		from
 		<include refid="tableName"></include>
 	</select>
-	
+
 	<!-- 获取状态 -->
 	<select id="getState" parameterType="pd" resultType="String">
 		select STATE
-		from <include refid="tableName"></include>
+		from
+		<include refid="tableName"></include>
 		where RPT_DEPT = ${RPT_DEPT}
 		and RPT_DUR = ${RPT_DUR}
-		and BILL_TYPE = ${BILL_TYPE}
+		and BILL_TYPE =
+		${BILL_TYPE}
 	</select>
-	
-	<!-- 上报-->
+
+	<!-- 上报 -->
 	<delete id="reportDelete" parameterType="com.fh.entity.SysSealed">
-		delete from 
+		delete from
 		<include refid="tableName"></include>
 		where RPT_DUR = #{RPT_DUR}
-	    and RPT_DEPT = #{RPT_DEPT} 
-	    and BILL_TYPE = #{BILL_TYPE} 
+		and RPT_DEPT = #{RPT_DEPT}
+		and BILL_TYPE = #{BILL_TYPE}
 	</delete>
 	<insert id="reportInsert" parameterType="com.fh.entity.SysSealed">
-		insert into 
-	    <include refid="tableName"></include>
+		insert into
+		<include refid="tableName"></include>
 		(
-	    <include refid="Field"></include>
+		<include refid="Field"></include>
 		) values (
-	    <include refid="FieldValue"></include>
+		<include refid="FieldValue"></include>
 		)
 	</insert>
-	
+
 	<!-- 批量保存 -->
 	<update id="updateAll" parameterType="pd">
-		<foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
-		    <if test="item!=null">
-		        update
-		        <include refid="tableName"></include>
-		        set 
-			BILL_CODE = #{item.BILL_CODE},
-			 RPT_DEPT = #{item.RPT_DEPT},
-			RPT_DUR = #{item.RPT_DUR},
-			STATE = #{item.STATE}
-		where 
-		BILL_CODE = #{item.BILL_CODE}
-		and
-		RPT_DEPT = #{item.RPT_DEPT}
-		and
-		RPT_DUR = #{item.RPT_DUR}
-		    </if>
+		<foreach item="item" index="index" collection="list" open=" "
+			separator="; " close=" ">
+			<if test="item!=null">
+				update
+				<include refid="tableName"></include>
+				set
+				BILL_CODE = #{item.BILL_CODE},
+				RPT_DEPT = #{item.RPT_DEPT},
+				RPT_DUR = #{item.RPT_DUR},
+				STATE = #{item.STATE}
+				where
+				BILL_CODE = #{item.BILL_CODE}
+				and
+				RPT_DEPT = #{item.RPT_DEPT}
+				and
+				RPT_DUR = #{item.RPT_DUR}
+			</if>
 		</foreach>
 	</update>
-	
-	<!-- fh313596790qq(青苔) -->
+
+	<!-- 批量生成 -->
+	<insert id="insertBatch" parameterType="com.fh.entity.SysSealed">
+		<!-- 插入保存 -->
+		insert into
+		<include refid="tableName"></include>
+		(
+		<include refid="Field"></include>
+		) values
+		<foreach item="item" index="index" collection="list" open=" "
+			separator=", " close=" ">
+			<if test="item!=null">
+				<trim prefix="(" suffix=")" suffixOverrides=",">
+					#{item.BILL_CODE},#{item.RPT_DEPT},#{item.RPT_DUR},#{item.RPT_USER},#{item.RPT_DATE},#{item.BILL_TYPE},#{item.STATE}
+				</trim>
+			</if>
+		</foreach>
+	</insert>
 </mapper>

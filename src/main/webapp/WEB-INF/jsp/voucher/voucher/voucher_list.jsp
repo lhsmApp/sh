@@ -25,9 +25,11 @@
 <!-- 树形下拉框start -->
 <script type="text/javascript" src="plugins/selectZtree/selectTree.js"></script>
 <script type="text/javascript" src="plugins/selectZtree/framework.js"></script>
-<link rel="stylesheet" type="text/css" href="plugins/selectZtree/import_fh.css"/>
+<link rel="stylesheet" type="text/css"
+	href="plugins/selectZtree/import_fh.css" />
 <script type="text/javascript" src="plugins/selectZtree/ztree/ztree.js"></script>
-<link type="text/css" rel="stylesheet" href="plugins/selectZtree/ztree/ztree.css"></link>
+<link type="text/css" rel="stylesheet"
+	href="plugins/selectZtree/ztree/ztree.css"></link>
 <!-- 树形下拉框end -->
 <!-- 标准页面统一样式 -->
 <link rel="stylesheet" href="static/css/normal.css" />
@@ -74,11 +76,12 @@
 								<div class="widget-body">
 									<div class="widget-main">
 										<form class="form-inline">
-											<span class="input-icon pull-left" style="margin-right:5px;"> <input
-												id="form-field-icon-1" type="text" placeholder="这里输入关键词">
-												<i class="ace-icon fa fa-leaf blue"></i>
+											<span class="input-icon pull-left" style="margin-right: 5px;">
+												<input id="form-field-icon-1" type="text"
+												placeholder="这里输入关键词"> <i
+												class="ace-icon fa fa-leaf blue"></i>
 											</span>
-						
+
 											<%-- <span class="pull-left" style="margin-right:5px;"> 
 												<select
 													class="chosen-select form-control" name="BELONG_AREA"
@@ -92,8 +95,9 @@
 														</c:forEach>
 												</select>
 											</span> --%>
-											<span class="pull-left" style="margin-right:5px;">
-												<div class="selectTree" id="selectTree" multiMode="true" allSelectable="false" noGroup="false"></div>
+											<span class="pull-left" style="margin-right: 5px;">
+												<div class="selectTree" id="selectTree" multiMode="true"
+													allSelectable="false" noGroup="false"></div>
 											</span>
 											<button type="button" class="btn btn-info btn-sm">
 												<i class="ace-icon fa fa-search bigger-110"></i>
@@ -108,8 +112,9 @@
 						<div class="col-xs-12">
 							<div class="tabbable">
 								<ul class="nav nav-tabs padding-18">
-									<li class="active"><a data-toggle="tab" href="#voucherTransfer">
-											<i class="green ace-icon fa fa-user bigger-120"></i> 凭证数据传输
+									<li class="active"><a data-toggle="tab"
+										href="#voucherTransfer"> <i
+											class="green ace-icon fa fa-user bigger-120"></i> 凭证数据传输
 									</a></li>
 
 									<li><a data-toggle="tab" href="#voucherMgr"> <i
@@ -207,10 +212,31 @@
 			//data:{VOUCHER_TYPE:voucherType,TABLE_CODE:'${pd.which}'},
 			if(target.attr('href')=='#voucherTransfer'){
 				voucherType=1;
+				$("[data-original-title='批量上传']").removeClass("hidden");
+				$("[data-original-title='获取凭证号']").addClass("hidden");
+				
+				
 				$("#jqGrid").jqGrid("setGridParam",{postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}'}});
 				$("#jqGrid").trigger("reloadGrid");  
 			}else{
 				voucherType=2;
+				$("[data-original-title='批量上传']").addClass("hidden");
+				$("[data-original-title='获取凭证号']").removeClass("hidden");
+				
+				console.log($("[data-original-title='获取凭证号']").length==0);
+				if($("[data-original-title='获取凭证号']").length==0){
+					//获取凭证号
+			       $('#jqGrid').navButtonAdd('#jqGridPager',
+			       {
+			    	   /* bigger-150 */
+			           buttonicon: "ace-icon fa fa-book purple",
+			           title: "获取凭证号",
+			           caption: "",
+			           position: "last",
+			           onClickButton: batchVoucher
+			       });
+				}
+				
 				$("#jqGrid").jqGrid("setGridParam",{postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}'}});
 				$("#jqGrid").trigger("reloadGrid");  
 			}
@@ -278,6 +304,10 @@
 			},
 			//for this example we are using local data
 			subGridRowExpanded: showChildGrid,
+			 /* loadComplete : function() {
+				$("[data-original-title='批量上传']").removeClass("hidden");
+		   		   $("[data-original-title='获取凭证号']").addClass("hidden");
+			} */ 
 		});
 		
 		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
@@ -323,19 +353,33 @@
        //批量传输
        $('#jqGrid').navButtonAdd('#jqGridPager',
        {
-    	   /* bigger-150 */
            buttonicon: "ace-icon fa fa-cloud-upload green",
            title: "批量上传",
            caption: "",
            position: "last",
            onClickButton: batchSave
        });
+       //获取凭证号
+       /* $('#jqGrid').navButtonAdd('#jqGridPager',
+       {
+           buttonicon: "ace-icon fa fa-book purple",
+           title: "获取凭证号",
+           caption: "",
+           position: "last",
+           onClickButton: batchVoucher
+       }); */
 	});
+	
 
+	//批量获取凭证号
+	function batchVoucher(e) {
+		
+	}
+	
 	//批量传输
 	function batchSave(e) {
 		var listData =new Array();
-		var ids = $("#jqGrid").jqGrid('getDataIDs');
+		var ids = $("#jqGrid").jqGrid('getGridParam','selarrrow');
 		console.log(ids);
 		//遍历访问这个集合  
 		var rowData;
@@ -347,7 +391,7 @@
 		top.jzts();
 		$.ajax({
 			type: "POST",
-			url: '<%=basePath%>jqgridJia/updateAll.do?',
+			url: '<%=basePath%>voucher/voucherTransfer.do?',
 	    	//data: rowData,//可以单独传入一个对象，后台可以直接通过对应模型接受参数。但是传入Array（listData）就不好用了，所以传list方式需将List转为Json字符窜。
 			//data: '{"rows":listData}',
 			data:{DATA_ROWS:JSON.stringify(listData)},
@@ -359,7 +403,7 @@
 					$(top.hangge());//关闭加载状态
 					$("#subTitle").tips({
 						side:3,
-			            msg:'保存成功',
+			            msg:'传输成功',
 			            bg:'#009933',
 			            time:3
 			        });
@@ -367,7 +411,7 @@
 					$(top.hangge());//关闭加载状态
 					$("#subTitle").tips({
 						side:3,
-			            msg:'保存失败,'+response.responseJSON.message,
+			            msg:'传输失败,'+response.message,
 			            bg:'#cc0033',
 			            time:3
 			        });

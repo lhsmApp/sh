@@ -91,5 +91,10 @@ public interface SysSealedInfoManager{
 	 */
 	public void updateAll(List<PageData> pd)throws Exception;
 	
+	/**批量生成
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void insertBatch(List<SysSealed> list)throws Exception;
 }
 

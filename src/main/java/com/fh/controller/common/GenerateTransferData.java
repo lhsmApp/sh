@@ -11,6 +11,8 @@ import com.fh.util.PageData;
 import com.fh.util.StringUtil;
 import com.fh.util.enums.TransferOperType;
 
+import cn.jpush.http.StringUtils;
+
 /**
  * 生成用于传输的Xml格式数据
  * 
@@ -88,10 +90,10 @@ public class GenerateTransferData {
 			for (TableColumns tableColumn : tableColumns) {
 				if (tableColumn.getColumn_key() != null && tableColumn.getColumn_key().trim().equals("PRI")) {
 					Element value = keyValue.addElement("value");// 加入value节点
-					value.setText(transferData.getString(tableColumn.getColumn_name()));// 为value设置内容//定义主键列值
+					value.setText(StringUtil.toString(transferData.getString(tableColumn.getColumn_name()),""));// 为value设置内容//定义主键列值
 				}else{
 					Element value = colValue.addElement("value");// 加入value节点
-					value.setText(transferData.getString(tableColumn.getColumn_name()));// 为value设置内容//定义普通列值
+					value.setText(StringUtil.toString(transferData.getString(tableColumn.getColumn_name()), ""));// 为value设置内容//定义普通列值
 				}
 			}
 		}
