@@ -267,7 +267,7 @@ public class TmplUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public String generateStructure(String tableCode, String departCode) throws Exception {
+	public String generateStructure(String tableCode, String departCode, int columnCount) throws Exception {
 		//默认值
 		m_defaultValueList = new HashMap<String, Object>();
 		//字典
@@ -301,6 +301,8 @@ public class TmplUtil {
 		}
 		//添加配置表设置列，字典（未设置就使用表默认，text或number）、隐藏、表头显示
 		if(m_columnsList != null && m_columnsList.size() > 0){
+			int row = 4;
+			int col = 1;
 			for(int i=0; i < m_columnsList.size(); i++){
 				if(listColModelAll.containsKey(m_columnsList.get(i).getCOL_CODE().toUpperCase())){
 					Map<String, Object> itemColModel = listColModelAll.get(m_columnsList.get(i).getCOL_CODE());
@@ -339,6 +341,15 @@ public class TmplUtil {
 					jqGridColModel.append(" hidden: ").append(intHide == 1 ? "false" : "true").append(", ");
 					if(intHide != 1){
 						jqGridColModel.append(" editable:true, editrules: {edithidden: false}, ");
+					} else {
+						if(notedit!=null && notedit.trim().endsWith("true")){
+							jqGridColModel.append(" formoptions:{ rowpos:" + row + ", colpos:" + col + " }, ");
+							col++;
+							if(col > columnCount){
+								row++;
+								col = 1;
+							} 
+						}
 					}
 					if(notedit != null && !notedit.trim().equals("")){
 						jqGridColModel.append(notedit).append(", ");

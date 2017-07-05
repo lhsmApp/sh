@@ -32,6 +32,10 @@ import com.fh.util.Const;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
 import com.fh.util.SqlTools;
+import com.fh.util.date.DateFormatUtils;
+import com.fh.util.date.DateUtils;
+import com.fh.util.enums.BillType;
+import com.fh.util.enums.DurState;
 import com.fh.util.Jurisdiction;
 import com.fh.util.excel.LeadingInExcel;
 
@@ -73,7 +77,7 @@ public class HouseFundDetailController extends BaseController {
 	//表名
 	String TableName = "tb_house_fund_detail";
 	//枚举类型  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
-	Integer TypeCode = 3;
+	String TypeCode = BillType.GOLD_DETAIL.getNameKey();
 	
 	//页面显示数据的年月
 	String SystemDateTime = "";
@@ -113,12 +117,12 @@ public class HouseFundDetailController extends BaseController {
 		pd.put("RPT_DUR", SystemDateTime);
 		pd.put("BILL_TYPE", TypeCode);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 		String State = syssealedinfoService.getState(pd);
-		mv.addObject("State", State);
+		mv.addObject("State", State.equals(DurState.Release.getNameKey())? true:false);// 枚举  1封存,0解封
 		List<String> userCodeList = housefunddetailService.getHaveUserCodeDic(pd);
 		mv.addObject("userCodeList", userCodeList);
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService);
-		String jqGridColModel = tmpl.generateStructure(TableName, DepartCode);
+		String jqGridColModel = tmpl.generateStructure(TableName, DepartCode, 3);
 		
 		SqlUserdata = tmpl.getSqlUserdata();
 		//默认值
@@ -537,8 +541,7 @@ public class HouseFundDetailController extends BaseController {
 		} else {
 			User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
 			String userId = user.getUSER_ID();
-			SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String time = sdf.format(new Date());
+            String time = DateUtils.getCurrentTime(DateFormatUtils.DATE_FORMAT2);
 			
 			SysSealed item = new SysSealed();
 			item.setBILL_CODE(" ");
@@ -547,7 +550,7 @@ public class HouseFundDetailController extends BaseController {
 			item.setRPT_USER(userId);
 			item.setRPT_DATE(time);//YYYY-MM-DD HH:MM:SS
 			item.setBILL_TYPE(TypeCode.toString());// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
-			item.setSTATE("1");// 枚举  1封存,0解封
+			item.setSTATE(DurState.Sealed.getNameKey());// 枚举  1封存,0解封
 			syssealedinfoService.report(item);
 			commonBase.setCode(0);
 		}
@@ -560,7 +563,7 @@ public class HouseFundDetailController extends BaseController {
 		pd.put("RPT_DUR", SystemDateTime);
 		pd.put("BILL_TYPE", TypeCode);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 		String State = syssealedinfoService.getState(pd);
-		if(State!=null && State.equals("0")){
+		if(State!=null && State.equals(DurState.Release.getNameKey())){// 枚举  1封存,0解封
 			strRut = "";
 		}
 		return strRut;
