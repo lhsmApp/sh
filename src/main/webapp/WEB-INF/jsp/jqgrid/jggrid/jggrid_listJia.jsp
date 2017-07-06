@@ -35,21 +35,15 @@
 				<div class="page-content">
 					<!-- /section:settings.box -->
 					<div class="page-header">
-						<table>
-							<tr>
-								<td><span
-									class="label label-xlg label-success arrowed-right">东部管道</span>
-									<!-- arrowed-in-right --> <span
-									class="label label-xlg label-yellow arrowed-in arrowed-right"
+						<span class="label label-xlg label-success arrowed-right">东部管道</span>
+									<!-- arrowed-in-right --> 
+						<span class="label label-xlg label-yellow arrowed-in arrowed-right"
 									id="subTitle" style="margin-left: 2px;">成本核算</span> <span
 									style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
-
-									<button id="btnQuery" class="btn btn-white btn-info btn-sm"
-										onclick="showQueryCondi()">
-										<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
-									</button></td>
-							</tr>
-						</table>
+						<button id="btnQuery" class="btn btn-white btn-info btn-sm"
+							onclick="showQueryCondi($('#jqGrid'),null,true)">
+							<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
+						</button>
 					</div>
 					<!-- /.page-header -->
 
@@ -154,18 +148,19 @@
 	<script type="text/javascript" src="static/js/util/toolkit.js"></script>
 	<script src="static/ace/js/ace/ace.widget-box.js"></script>
 	<script type="text/javascript"> 
+	//var gridHeight=192;
 	$(document).ready(function () {
 		/* $.jgrid.defaults.width = 780;*/
 		//$.jgrid.defaults.styleUI = 'Bootstrap'; 
 		$(top.hangge());//关闭加载状态
-		
 		//dropDownStyle();
 		
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
 			$("#jqGrid").jqGrid( 'setGridWidth', $(".page-content").width());
 			//console.log("ccc"+$("iframe").height());
-			$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - 200);
+			//$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - gridHeight);
+			resizeGridHeight($("#jqGrid"),null,true);
 	    })
 		
 		$("#jqGrid").jqGrid({
@@ -572,21 +567,6 @@
 	//获取值
 	function myvalue(elem) {
 		return $(elem).val();
-	}
-	
-	//显示隐藏查询
-	function showQueryCondi(){
-		if($(".widget-box").css("display")=="block"){
-			$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass('fa-chevron-down');
-			$("#btnQuery").find("span").text("显示查询");
-			$(window).triggerHandler('resize.jqGrid');
-		}
-		else{
-			$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass('fa-chevron-up');
-			$("#btnQuery").find("span").text("隐藏查询");
-		}
-		$(".widget-box").toggle("fast");
-		
 	}
  	</script>
 </body>

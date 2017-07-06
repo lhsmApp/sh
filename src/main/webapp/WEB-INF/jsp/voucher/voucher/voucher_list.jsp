@@ -49,16 +49,15 @@
 							style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
 
 						<button id="btnQuery" class="btn btn-white btn-info btn-sm"
-							onclick="showQueryCondi()">
+							onclick="showQueryCondi($('#jqGrid'),gridHeight)">
 							<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
 						</button>
 						<button id="btnValidate" class="btn btn-white btn-info btn-sm"
 							onclick="transferValidate()">
 							<i class="ace-icon fa fa-flask  bigger-120 blue"></i> <span>上传校验</span>
 						</button>
-						<sub class="text-warning orange" style="font-size: 14px;"><!-- fa-exclamation-triangle -->
-							&nbsp;<i class="ace-icon fa fa-star"></i>
-							校验还未进行上报的二级单位汇总数据
+						<sub class="text-warning orange" style="font-size: 14px;"> <!-- fa-exclamation-triangle -->
+							&nbsp;<i class="ace-icon fa fa-star"></i> 校验还未进行上报的二级单位汇总数据
 						</sub>
 						<div class="pull-right">
 							<span class="green middle bolder">凭证数据类型: &nbsp;</span>
@@ -177,10 +176,12 @@
 	<script type="text/javascript"> 
 	var jqGridColModelSub;
 	var which='1';
+	var gridHeight;
 	$(document).ready(function () {
 		$(top.hangge());//关闭加载状态
 		//dropDownStyle();
-		
+		console.log('${HasUserData}');
+		console.log(${HasUserData});
 		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 	    var jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
 	    jqGridColModelSub = eval("(${jqGridColModelSub})");
@@ -188,7 +189,12 @@
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
 			$("#jqGrid").jqGrid( 'setGridWidth', $(".page-content").width());
-			$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - 251);//213 //200
+			if(${HasUserData}){
+				gridHeight=251;
+			}else{
+				gridHeight=213;
+			}
+			resizeGridHeight($("#jqGrid"),gridHeight);
 	    });
 		
 		//初始化当前选择凭证类型
@@ -233,8 +239,7 @@
 				$("[data-original-title='批量上传']").addClass("hidden");
 				$("[data-original-title='获取凭证号']").removeClass("hidden");
 				$("[data-original-title='获取冲销凭证号']").removeClass("hidden");
-				
-				console.log($("[data-original-title='获取凭证号']").length==0);
+			
 				if($("[data-original-title='获取凭证号']").length==0){
 					//获取凭证号
 			       $('#jqGrid').navButtonAdd('#jqGridPager',
@@ -280,8 +285,8 @@
 			width:'100%',
 			sortname: 'BILL_CODE',
 			
-			footerrow: true,
-			userDataOnFooter: true, // the calculated sums and/or strings from server are put at footer row.
+			footerrow: ${HasUserData},
+			userDataOnFooter: ${HasUserData}, // the calculated sums and/or strings from server are put at footer row.
 			/*grouping: true,
 			 groupingView: {
                 groupField: ["CATEGORYNAME"],
@@ -408,7 +413,7 @@
 	function batchSave(e) {
 		var listData =new Array();
 		var ids = $("#jqGrid").jqGrid('getGridParam','selarrrow');
-		console.log(ids);
+		//console.log(ids);
 		//遍历访问这个集合  
 		var rowData;
 		$(ids).each(function (index, id){  
@@ -419,7 +424,7 @@
 		top.jzts();
 		$.ajax({
 			type: "POST",
-			url: '<%=basePath%>voucher/voucherTransfer.do?',
+			url: '<%=basePath%>voucher/voucherTransfer.do?TABLE_CODE='+which,
 	    	//data: rowData,//可以单独传入一个对象，后台可以直接通过对应模型接受参数。但是传入Array（listData）就不好用了，所以传list方式需将List转为Json字符窜。
 			//data: '{"rows":listData}',
 			data:{DATA_ROWS:JSON.stringify(listData)},
@@ -491,48 +496,6 @@
 		    }
         });
 	}
-
-	//日期格式化
-    function formateDate(value, row, index) {
-        var formateNewDate=toolkit.dateFormat(new Date(value),"yyyy-MM-dd")
-        return formateNewDate;
-    }
-    
-  	//日期反格式化  
-	function unformateDate(cellValue, options, rowObject){  
-	    var updateDate = new Date(cellValue);  
-	    return updateDate;  
-	}
-  	
-	//创建一个input输入框
-	function myelem (value, options) {
-		var el = document.createElement("input");
-		el.type="number";
-		el.value = value;
-		return el;
-		/* $(el).ace_spinner({value:0,min:0,max:200,step:10, btn_up_class:'btn-info' , btn_down_class:'btn-info'});
-			return el; */
-	}
-/* 	 */
-	//获取值
-	function myvalue(elem) {
-		return $(elem).val();
-	}
-	
-	//显示隐藏查询
-	function showQueryCondi(){
-		if($(".widget-box").css("display")=="block"){
-			$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass('fa-chevron-down');
-			$("#btnQuery").find("span").text("显示查询");
-			
-		}
-		else{
-			$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass('fa-chevron-up');
-			$("#btnQuery").find("span").text("隐藏查询");
-		}
-		$(".widget-box").toggle("fast");
-		//$(window).triggerHandler('resize.jqGrid');
-	}
 	
 	//上传校验
 	function transferValidate(){
@@ -561,7 +524,7 @@
 		var defaultNodes = {"treeNodes":${zTreeNodes}};
 		//绑定change事件
 		$("#selectTree").bind("change",function(){
-			console.log($(this));
+			//console.log($(this));
 			if(!$(this).attr("relValue")){
 		      //  top.Dialog.alert("没有选择节点");
 		    }else{

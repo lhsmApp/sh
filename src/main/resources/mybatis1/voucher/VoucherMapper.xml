@@ -428,7 +428,9 @@
 	
 	<select id="getFooterSummary" parameterType="jqPage" resultType="pd">
 		<if test='pd.BILL_TYPE=="2" or pd.BILL_TYPE=="4" or pd.BILL_TYPE=="6"'>
-			SELECT ${pd.Userdata} FROM ${pd.TABLE_CODE} A
+			SELECT ${pd.Userdata} from
+			(SELECT A.*
+			FROM ${pd.TABLE_CODE} A
 			JOIN
 			(SELECT
 			M.bill_code,M.rpt_dept,m.rpt_dur,m.state FROM tb_sys_sealed_info M
@@ -450,12 +452,14 @@
 		</if>
 
 		<if test='pd.BILL_TYPE=="7" or pd.BILL_TYPE=="8" or pd.BILL_TYPE=="9"'>
-			select ${pd.Userdata},A.* 
+			SELECT ${pd.Userdata} from
+			(select A.*
 			from ${pd.TABLE_CODE} A
 			JOIN tb_sys_sealed_info B
 			ON
 			A.BILL_CODE=B.BILL_CODE
 			AND A.BUSI_DATE=B.RPT_DUR
+			AND A.DEPT_CODE=B.RPT_DEPT
 			WHERE B.STATE='1'
 			AND
 			B.BILL_TYPE=#{pd.BILL_TYPE}
@@ -478,6 +482,7 @@
 		<if test="currentResult != null and rowNum != null">
 			limit #{currentResult}, #{rowNum}
 		</if>
+		) T
 	</select>
 
 	<!-- 列表(全部) -->
