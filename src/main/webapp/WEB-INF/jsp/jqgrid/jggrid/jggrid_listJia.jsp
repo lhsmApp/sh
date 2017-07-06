@@ -45,7 +45,7 @@
 									style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
 
 									<button id="btnQuery" class="btn btn-white btn-info btn-sm"
-										onclick="showQueryCondi(gridHeight)">
+										onclick="showQueryCondi($('#jqGrid'),gridHeight)">
 										<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
 									</button></td>
 							</tr>
@@ -165,7 +165,8 @@
 		$(window).on('resize.jqGrid', function () {
 			$("#jqGrid").jqGrid( 'setGridWidth', $(".page-content").width());
 			//console.log("ccc"+$("iframe").height());
-			$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - gridHeight);
+			//$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - gridHeight);
+			resizeGridHeight($("#jqGrid"),gridHeight);
 	    })
 		
 		$("#jqGrid").jqGrid({
