@@ -44,7 +44,7 @@
                                     <span style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
 								
 									<button id="btnQuery" class="btn btn-white btn-info btn-sm"
-										onclick="showQueryCondi()">
+										onclick="showQueryCondi($('#jqGridBase'),null,true)">
 										<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
 									</button>
 								
@@ -160,7 +160,8 @@
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
 			$(gridBase_selector).jqGrid( 'setGridWidth', $(".page-content").width());
-			$(gridBase_selector).jqGrid( 'setGridHeight', $(window).height() - 240);
+			//$(gridBase_selector).jqGrid( 'setGridHeight', $(window).height() - 240);
+			resizeGridHeight($(gridBase_selector),null,true);
 	    });
 		
 		$(gridBase_selector).jqGrid({
@@ -617,20 +618,6 @@
             });
 		}
 	});
-	
-	//显示隐藏查询
-	function showQueryCondi(){
-		if($(".widget-box").css("display") == "block"){
-			$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass('fa-chevron-down');
-			$("#btnQuery").find("span").text("显示查询");
-			$(window).triggerHandler('resize.jqGrid');
-		}
-		else{
-			$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass('fa-chevron-up');
-			$("#btnQuery").find("span").text("隐藏查询");
-		}
-		$(".widget-box").toggle("fast");
-	}
 	
 	//检索
 	function tosearch() {

@@ -334,122 +334,127 @@ public class StaffDetailController extends BaseController {
 			commonBase.setCode(2);
 			commonBase.setMessage(checkState);
 		} else {
-			// 局部变量
-			LeadingInExcel<StaffDetailModel> testExcel = null;
-			Map<Integer, Object> uploadAndReadMap = null;
-			try {
-				// 定义需要读取的数据
-				String formart = "yyyy-MM-dd";
-				String propertiesFileName = "config";
-				String kyeName = "file_path";
-				int sheetIndex = 0;
-				Class<StaffDetailModel> clazz = StaffDetailModel.class;
-				Map<String, String> titleAndAttribute = null;
-				// 定义对应的标题名与对应属性名
-				titleAndAttribute = new HashMap<String, String>();
-				
-				//配置表设置列
-				if(ColumnsList != null && ColumnsList.size() > 0){
-					for(int i=0; i < ColumnsList.size(); i++){
-						titleAndAttribute.put(ColumnsList.get(i).getCOL_NAME(), ColumnsList.get(i).getCOL_CODE());
-					}
-				}
-
-				// 调用解析工具包
-				testExcel = new LeadingInExcel<StaffDetailModel>(formart);
-				// 解析excel，获取客户信息集合
-
-				uploadAndReadMap = testExcel.uploadAndRead(file, propertiesFileName, kyeName, sheetIndex,
-						titleAndAttribute, clazz, ColumnsList, DicList);
-			} catch (Exception e) {
-				e.printStackTrace();
-				logger.error("读取Excel文件错误", e);
-				throw new CustomException("读取Excel文件错误");
-			}
-			boolean judgement = false;
-			if(uploadAndReadMap.get(1).equals(false)){
-				Map<String, Object> returnError =  (Map<String, Object>) uploadAndReadMap.get(2);
-				String message = "字典无此翻译： "; // \n
-				for (String k : returnError.keySet())  
-			    {
-					message += k + " : " + returnError.get(k);
-			    }
+			if(!(SystemDateTime!=null && !SystemDateTime.trim().equals("")
+					&& DepartCode!=null && !DepartCode.trim().equals(""))){
 				commonBase.setCode(2);
-				commonBase.setMessage(message);
+				commonBase.setMessage("当前区间和当前单位不能为空！");
 			} else {
-				List<StaffDetailModel> uploadAndRead = (List<StaffDetailModel>) uploadAndReadMap.get(2);
-				if (uploadAndRead != null && !"[]".equals(uploadAndRead.toString()) && uploadAndRead.size() >= 1) {
-					judgement = true;
+				// 局部变量
+				LeadingInExcel<StaffDetailModel> testExcel = null;
+				Map<Integer, Object> uploadAndReadMap = null;
+				try {
+					// 定义需要读取的数据
+					String formart = "yyyy-MM-dd";
+					String propertiesFileName = "config";
+					String kyeName = "file_path";
+					int sheetIndex = 0;
+					Class<StaffDetailModel> clazz = StaffDetailModel.class;
+					Map<String, String> titleAndAttribute = null;
+					// 定义对应的标题名与对应属性名
+					titleAndAttribute = new HashMap<String, String>();
+					
+					//配置表设置列
+					if(ColumnsList != null && ColumnsList.size() > 0){
+						for(int i=0; i < ColumnsList.size(); i++){
+							titleAndAttribute.put(ColumnsList.get(i).getCOL_NAME(), ColumnsList.get(i).getCOL_CODE());
+						}
+					}
+
+					// 调用解析工具包
+					testExcel = new LeadingInExcel<StaffDetailModel>(formart);
+					// 解析excel，获取客户信息集合
+
+					uploadAndReadMap = testExcel.uploadAndRead(file, propertiesFileName, kyeName, sheetIndex,
+							titleAndAttribute, clazz, ColumnsList, DicList);
+				} catch (Exception e) {
+					e.printStackTrace();
+					logger.error("读取Excel文件错误", e);
+					throw new CustomException("读取Excel文件错误");
 				}
-				if (judgement) {
-					List<String> sbRet = new ArrayList<String>();
-					String BUSI_DATE = "";
-					String DEPT_CODE = "";
-					List<String> listUserCode = new ArrayList<String>();
-					int listSize = uploadAndRead.size();
-					for(int i=0;i<listSize;i++){
-						if(!(uploadAndRead.get(i).getBUSI_DATE()!=null && !uploadAndRead.get(i).getBUSI_DATE().trim().equals(""))){
-							if(!sbRet.contains("区间不能为空！")){
-								sbRet.add("区间不能为空！");
+				boolean judgement = false;
+				if(uploadAndReadMap.get(1).equals(false)){
+					Map<String, Object> returnError =  (Map<String, Object>) uploadAndReadMap.get(2);
+					String message = "字典无此翻译： "; // \n
+					for (String k : returnError.keySet())  
+				    {
+						message += k + " : " + returnError.get(k);
+				    }
+					commonBase.setCode(2);
+					commonBase.setMessage(message);
+				} else {
+					List<StaffDetailModel> uploadAndRead = (List<StaffDetailModel>) uploadAndReadMap.get(2);
+					if (uploadAndRead != null && !"[]".equals(uploadAndRead.toString()) && uploadAndRead.size() >= 1) {
+						judgement = true;
+					}
+					if (judgement) {
+						List<String> sbRet = new ArrayList<String>();
+						List<String> listUserCode = new ArrayList<String>();
+						int listSize = uploadAndRead.size();
+						for(int i=0;i<listSize;i++){
+							String getBUSI_DATE = uploadAndRead.get(i).getBUSI_DATE();
+							String getDEPT_CODE = uploadAndRead.get(i).getDEPT_CODE();
+							String getUSER_CODE = uploadAndRead.get(i).getUSER_CODE();
+							if(!(getBUSI_DATE!=null && !getBUSI_DATE.trim().equals(""))){
+								uploadAndRead.get(i).setBUSI_DATE(SystemDateTime);
+								getBUSI_DATE = SystemDateTime;
 							}
-						}
-						if(!(uploadAndRead.get(i).getDEPT_CODE()!=null && !uploadAndRead.get(i).getDEPT_CODE().trim().equals(""))){
-							if(!sbRet.contains("单位不能为空！")){
-								sbRet.add("单位不能为空！");
-							}
-						}
-						if(!(uploadAndRead.get(i).getUSER_CODE()!=null && !uploadAndRead.get(i).getUSER_CODE().trim().equals(""))){
-							if(!sbRet.contains("人员编码不能为空！")){
-								sbRet.add("人员编码不能为空！");
-							}
-						}
-						if(i == 0){
-							BUSI_DATE = uploadAndRead.get(i).getBUSI_DATE();
-							DEPT_CODE = uploadAndRead.get(i).getDEPT_CODE();
-						} else {
-							if(!BUSI_DATE.equals(uploadAndRead.get(i).getBUSI_DATE()) || !DEPT_CODE.equals(uploadAndRead.get(i).getDEPT_CODE())){
-								if(!sbRet.contains("区间和单位必须一致！")){
-									sbRet.add("区间和单位必须一致！");
+							if(!SystemDateTime.equals(getBUSI_DATE)){
+								if(!sbRet.contains("导入区间和当前区间必须一致！")){
+									sbRet.add("导入区间和当前区间必须一致！");
 								}
 							}
-						}
-						if(listUserCode.contains(uploadAndRead.get(i).getUSER_CODE())){
-							String strUserAdd = "编码" + uploadAndRead.get(i).getUSER_CODE() + "重复！";
-							if(!sbRet.contains(strUserAdd)){
-								sbRet.add(strUserAdd);
+							if(!(getDEPT_CODE!=null && !getDEPT_CODE.trim().equals(""))){
+								uploadAndRead.get(i).setDEPT_CODE(DepartCode);
+								getDEPT_CODE = DepartCode;
 							}
+							if(!DepartCode.equals(getDEPT_CODE)){
+								if(!sbRet.contains("导入单位和当前单位必须一致！")){
+									sbRet.add("导入单位和当前单位必须一致！");
+								}
+							}
+							if(!(getUSER_CODE!=null && !getUSER_CODE.trim().equals(""))){
+								if(!sbRet.contains("人员编码不能为空！")){
+									sbRet.add("人员编码不能为空！");
+								}
+							}
+							if(listUserCode.contains(getUSER_CODE.trim())){
+								String strUserAdd = "编码" + getUSER_CODE + "重复！";
+								if(!sbRet.contains(strUserAdd)){
+									sbRet.add(strUserAdd);
+								}
+							} else {
+								listUserCode.add(getUSER_CODE.trim());
+							}
+						}
+						if(sbRet.size()>0){
+							StringBuilder sbTitle = new StringBuilder();
+							for(String str : sbRet){
+								sbTitle.append(str + "  "); // \n
+							}
+							commonBase.setCode(2);
+							commonBase.setMessage(sbTitle.toString());
 						} else {
-							listUserCode.add(uploadAndRead.get(i).getUSER_CODE());
+							//此处执行集合添加 
+							staffdetailService.batchImport(uploadAndRead);
+							commonBase.setCode(0);
 						}
-					}
-					if(sbRet.size()>0){
-						StringBuilder sbTitle = new StringBuilder();
-						for(String str : sbRet){
-							sbTitle.append(str + "  "); // \n
-						}
-						commonBase.setCode(2);
-						commonBase.setMessage(sbTitle.toString());
-					} else {
-						//此处执行集合添加 
-						staffdetailService.batchImport(uploadAndRead);
-						commonBase.setCode(0);
-					}
-					
-					/*// 把客户信息分为没100条数据为一组迭代添加客户信息（注：将customerList集合作为参数，在Mybatis的相应映射文件中使用foreach标签进行批量添加。）
-					int listSize = uploadAndRead.size();
-					int toIndex = 100;
-					for (int i = 0; i < listSize; i += 100) {
-						if (i + 100 > listSize) {
-							toIndex = listSize - i;
-						}
-						List<StaffDetailModel> subList = uploadAndRead.subList(i, i + toIndex);
+						
+						/*// 把客户信息分为没100条数据为一组迭代添加客户信息（注：将customerList集合作为参数，在Mybatis的相应映射文件中使用foreach标签进行批量添加。）
+						int listSize = uploadAndRead.size();
+						int toIndex = 100;
+						for (int i = 0; i < listSize; i += 100) {
+							if (i + 100 > listSize) {
+								toIndex = listSize - i;
+							}
+							List<StaffDetailModel> subList = uploadAndRead.subList(i, i + toIndex);
 
-						//此处执行集合添加 
-						staffdetailService.batchImport(subList);
-					}*/
-				} else {
-					commonBase.setCode(-1);
-					commonBase.setMessage("TranslateUtil");
+							//此处执行集合添加 
+							staffdetailService.batchImport(subList);
+						}*/
+					} else {
+						commonBase.setCode(-1);
+						commonBase.setMessage("TranslateUtil");
+					}
 				}
 			}
 		}
@@ -496,31 +501,33 @@ public class StaffDetailController extends BaseController {
 		Map<String,Object> dataMap = new HashMap<String,Object>();
 		dataMap.put("filename", ExcelName);
 		List<String> titles = new ArrayList<String>();
+		List<PageData> varList = new ArrayList<PageData>();
 		if(ColumnsList != null && ColumnsList.size() > 0){
 			for(int i=0; i < ColumnsList.size(); i++){
-				titles.add(ColumnsList.get(i).getCOL_NAME());
+				if(ColumnsList.get(i).getCOL_HIDE().equals("1")){
+					titles.add(ColumnsList.get(i).getCOL_NAME());
+				}
+			}
+			if(varOList!=null && varOList.size()>0){
+				for(int i=0;i<varOList.size();i++){
+					PageData vpd = new PageData();
+					for(int j=1; j <= ColumnsList.size(); j++){
+						String trans = ColumnsList.get(j-1).getDICT_TRANS();
+						Object getCellValue = varOList.get(i).get(ColumnsList.get(j-1).getCOL_CODE().toUpperCase());
+						if(trans != null && !trans.trim().equals("")){
+							String value = "";
+							Map<String, String> dicAdd = (Map<String, String>) DicList.getOrDefault(trans, new HashMap<String, String>());
+							value = dicAdd.getOrDefault(getCellValue, "");
+							vpd.put("var" + j, value);
+						} else {
+							vpd.put("var" + j, getCellValue.toString());
+						}
+					}
+					varList.add(vpd);
+				}
 			}
 		}
 		dataMap.put("titles", titles);
-		List<PageData> varList = new ArrayList<PageData>();
-		for(int i=0;i<varOList.size();i++){
-			PageData vpd = new PageData();
-			if(ColumnsList != null && ColumnsList.size() > 0){
-				for(int j=1; j <= ColumnsList.size(); j++){
-					String trans = ColumnsList.get(j-1).getDICT_TRANS();
-					Object getCellValue = varOList.get(i).get(ColumnsList.get(j-1).getCOL_CODE().toUpperCase());
-					if(trans != null && !trans.trim().equals("")){
-						String value = "";
-						Map<String, String> dicAdd = (Map<String, String>) DicList.getOrDefault(trans, new HashMap<String, String>());
-						value = dicAdd.getOrDefault(getCellValue, "");
-						vpd.put("var" + j, value);
-					} else {
-						vpd.put("var" + j, getCellValue.toString());
-					}
-				}
-			}
-			varList.add(vpd);
-		}
 		dataMap.put("varList", varList);
 		ObjectExcelView erv = new ObjectExcelView();
 		mv = new ModelAndView(erv,dataMap); 
