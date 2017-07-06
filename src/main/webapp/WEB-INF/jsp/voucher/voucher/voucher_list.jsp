@@ -56,9 +56,8 @@
 							onclick="transferValidate()">
 							<i class="ace-icon fa fa-flask  bigger-120 blue"></i> <span>上传校验</span>
 						</button>
-						<sub class="text-warning orange" style="font-size: 14px;"><!-- fa-exclamation-triangle -->
-							&nbsp;<i class="ace-icon fa fa-star"></i>
-							校验还未进行上报的二级单位汇总数据
+						<sub class="text-warning orange" style="font-size: 14px;"> <!-- fa-exclamation-triangle -->
+							&nbsp;<i class="ace-icon fa fa-star"></i> 校验还未进行上报的二级单位汇总数据
 						</sub>
 						<div class="pull-right">
 							<span class="green middle bolder">凭证数据类型: &nbsp;</span>

@@ -4,104 +4,87 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%
 	String path = request.getContextPath();
-	String basePath = request.getScheme() + "://"
-			+ request.getServerName() + ":" + request.getServerPort()
+	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
 			+ path + "/";
 %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<base href="<%=basePath%>">
-	<!-- 下拉框 -->
-	<link rel="stylesheet" href="static/ace/css/chosen.css" />
-	<!-- jsp文件头和头部 ，其中包含旧版本（Ace）Jqgrid Css-->
-	<%@ include file="../../system/index/topWithJqgrid.jsp"%>
-	<!-- 日期框 -->
-	<link rel="stylesheet" href="static/ace/css/datepicker.css" />
-	
-	<!-- 最新版的Jqgrid Css，如果旧版本（Ace）某些方法不好用，尝试用此版本Css，替换旧版本Css -->
-	<!-- <link rel="stylesheet" type="text/css" media="screen" href="static/ace/css/ui.jqgrid-bootstrap.css" /> -->
-	<style>
-		.page-header{
-			padding-top: 9px;
-			padding-bottom: 9px;
-			margin: 0 0 8px;
-		}
-	</style>
+<base href="<%=basePath%>">
+<!-- 下拉框 -->
+<link rel="stylesheet" href="static/ace/css/chosen.css" />
+<!-- jsp文件头和头部 ，其中包含旧版本（Ace）Jqgrid Css-->
+<%@ include file="../../system/index/topWithJqgrid.jsp"%>
+<!-- 日期框 -->
+<link rel="stylesheet" href="static/ace/css/datepicker.css" />
+
+<!-- 最新版的Jqgrid Css，如果旧版本（Ace）某些方法不好用，尝试用此版本Css，替换旧版本Css -->
+<!-- <link rel="stylesheet" type="text/css" media="screen" href="static/ace/css/ui.jqgrid-bootstrap.css" /> -->
+<style>
+.page-header {
+	padding-top: 9px;
+	padding-bottom: 9px;
+	margin: 0 0 8px;
+}
+</style>
 
 </head>
 <body class="no-skin">
 	<div class="main-container" id="main-container">
 		<div class="main-content">
 			<div class="main-content-inner">
-			
-			
-			<div class="page-content">
+				<div class="page-content">
 					<!-- /section:settings.box -->
 					<div class="page-header">
-						<table>
-							<tr>
-								<td><span
-									class="label label-xlg label-success arrowed-right">东部管道</span>
-									<!-- arrowed-in-right --> <span
-									class="label label-xlg label-yellow arrowed-in arrowed-right"
-									id="subTitle" style="margin-left: 2px;">业务封存</span> <span
-									style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
-
-									<button id="btnQuery" class="btn btn-white btn-info btn-sm"
-										onclick="showQueryCondi()">
-										<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
-									</button></td>
-							</tr>
-						</table>
+						<span class="label label-xlg label-success arrowed-right">东部管道</span>
+							<!-- arrowed-in-right --> 
+						<span class="label label-xlg label-yellow arrowed-in arrowed-right"
+							id="subTitle" style="margin-left: 2px;">业务封存</span> <span
+							style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
+						<button id="btnQuery" class="btn btn-white btn-info btn-sm"
+							onclick="showQueryCondi($('#jqGrid'))">
+							<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
+						</button>
 					</div>
 					<!-- /.page-header -->
-			
-						<div class="row">
+
+					<div class="row">
 						<div class="col-xs-12">
 							<div class="widget-box" style="display: none;">
 								<div class="widget-body">
 									<div class="widget-main">
 										<!-- <p class="alert alert-info">Nunc aliquam enim ut arcu.</p> -->
 										<form class="form-inline">
-											
-											<span>
-												<select class="chosen-select form-control" 
-													name="RPT_DEPT" id="RPT_DEPT"
-													data-placeholder="请选单位"
-													style="vertical-align: top; height:32px;width: 150px;">
+
+											<span> <select class="chosen-select form-control"
+												name="RPT_DEPT" id="RPT_DEPT" data-placeholder="请选单位"
+												style="vertical-align: top; height: 32px; width: 150px;">
 													<option value="">请选择单位</option>
 													<c:forEach items="${deptList}" var="dept">
 														<option value="${dept}"
 															<c:if test="${pd.RPT_DEPT==dept}">selected</c:if>>${dept }</option>
 													</c:forEach>
-												</select>
-											</span>
-											<span>
-												<select class="chosen-select form-control" 
-													name="BILL_TYPE" id="BILL_TYPE"
-													data-placeholder="请选类型"
-													style="vertical-align: top; height:32px;width: 150px;">
+											</select>
+											</span> <span> <select class="chosen-select form-control"
+												name="BILL_TYPE" id="BILL_TYPE" data-placeholder="请选类型"
+												style="vertical-align: top; height: 32px; width: 150px;">
 													<option value="">请选择类型</option>
 													<c:forEach items="${billTypeList}" var="billType">
 														<option value="${billType.nameValue}"
 															<c:if test="${pd.BILL_TYPE==billType.nameValue}">selected</c:if>>${billType.nameValue}</option>
 													</c:forEach>
-												</select>
-											</span>
-											
-											<span>
-												<select class="chosen-select form-control" 
-													name="STATUS" id="STATUS"
-													data-placeholder="请选状态"
-													style="vertical-align: top; height:32px;width: 150px;">
+											</select>
+											</span> <span> <select class="chosen-select form-control"
+												name="STATUS" id="STATUS" data-placeholder="请选状态"
+												style="vertical-align: top; height: 32px; width: 150px;">
 													<option value="">请选择状态</option>
 													<option value="0">解封</option>
 													<option value="1">封存</option>
-													
-												</select>
+
+											</select>
 											</span>
-											<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
+											<button type="button" class="btn btn-info btn-sm"
+												onclick="tosearch();">
 												<i class="ace-icon fa fa-search bigger-110"></i>
 											</button>
 										</form>
@@ -110,31 +93,32 @@
 							</div>
 						</div>
 					</div>
-				
+
 					<div class="row">
 						<div class="col-xs-12">
-						    <table id="jqGrid"></table>
-						    <div id="jqGridPager"></div>
+							<table id="jqGrid"></table>
+							<div id="jqGridPager"></div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-	
-		<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
-			<i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
+
+		<a href="#" id="btn-scroll-up"
+			class="btn-scroll-up btn btn-sm btn-inverse"> <i
+			class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
 		</a>
 	</div>
-	
-	
+
+
 	<!-- basic scripts -->
 	<!-- 页面底部js¨ -->
 	<%@ include file="../../system/index/foot.jsp"%>
-	
+
 	<!-- 最新版的Jqgrid Js，如果旧版本（Ace）某些方法不好用，尝试用此版本Js，替换旧版本JS -->
 	<!-- <script src="static/ace/js/jquery.jqGrid.min.js" type="text/javascript"></script>
 	<script src="static/ace/js/grid.locale-cn.js" type="text/javascript"></script> -->
-	
+
 	<!-- 旧版本（Ace）Jqgrid Js -->
 	<script src="static/ace/js/jqGrid/jquery.jqGrid.src.js"></script>
 	<script src="static/ace/js/jqGrid/i18n/grid.locale-cn.js"></script>
@@ -150,15 +134,17 @@
 	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
 	<!-- JqGrid统一样式统一操作 -->
 	<script type="text/javascript" src="static/js/common/jqgrid_style.js"></script>
-		
+
 	<script type="text/javascript"> 
+	//var gridHeight=155;
 	$(document).ready(function () { 
 		$(top.hangge());//关闭加载状态
 		 
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
 			$("#jqGrid").jqGrid( 'setGridWidth', $(".page-content").width());
-			$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - 160);
+			//$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - 160);
+			resizeGridHeight($("#jqGrid"));
 	    })
 		
 		$("#jqGrid").jqGrid({
@@ -350,8 +336,8 @@
         var ids = grid.jqGrid('getDataIDs');
         for (var i = 0; i < ids.length; i++) {
             grid.jqGrid('editRow',ids[i]);
-        }
-    }
+       	}
+   	}
 	
 	//取消批量编辑
 	function batchCancelEdit(e) {
@@ -378,76 +364,62 @@
 		$.ajax({
 			type: "POST",
 			url: '<%=basePath%>syssealedinfo/updateAll.do?',
-	    	//data: rowData,//可以单独传入一个对象，后台可以直接通过对应模型接受参数。但是传入Array（listData）就不好用了，所以传list方式需将List转为Json字符窜。
-			//data: '{"rows":listData}',
-			data:{DATA_ROWS:JSON.stringify(listData)},
-	    	dataType:'json',
-			cache: false,
-			success: function(response){
-				if(response.code==0){
-					$("#jqGrid").trigger("reloadGrid");  
+				//data: rowData,//可以单独传入一个对象，后台可以直接通过对应模型接受参数。但是传入Array（listData）就不好用了，所以传list方式需将List转为Json字符窜。
+				//data: '{"rows":listData}',
+				data : {
+					DATA_ROWS : JSON.stringify(listData)
+				},
+				dataType : 'json',
+				cache : false,
+				success : function(response) {
+					if (response.code == 0) {
+						$("#jqGrid").trigger("reloadGrid");
+						$(top.hangge());//关闭加载状态
+						$("#subTitle").tips({
+							side : 3,
+							msg : '保存成功',
+							bg : '#009933',
+							time : 3
+						});
+					} else {
+						$(top.hangge());//关闭加载状态
+						$("#subTitle").tips({
+							side : 3,
+							msg : '保存失败,' + response.responseJSON.message,
+							bg : '#cc0033',
+							time : 3
+						});
+					}
+				},
+				error : function(e) {
 					$(top.hangge());//关闭加载状态
-					$("#subTitle").tips({
-						side:3,
-			            msg:'保存成功',
-			            bg:'#009933',
-			            time:3
-			        });
-				}else{
-					$(top.hangge());//关闭加载状态
-					$("#subTitle").tips({
-						side:3,
-			            msg:'保存失败,'+response.responseJSON.message,
-			            bg:'#cc0033',
-			            time:3
-			        });
 				}
-			},
-	    	error: function(e) {
-				$(top.hangge());//关闭加载状态
-	    	}
-		}); 
-	 }
+			});
+		}
+	
 		//检索
 		function tosearch() {
 			var RPT_DEPT = $("#RPT_DEPT").val();
 			var STATUS = $("#STATUS").val();
 			var BILL_TYPE = $("#BILL_TYPE").val();
 			$("#jqGrid").jqGrid('setGridParam',{  // 重新加载数据
-				url:'<%=basePath%>syssealedinfo/getPageList.do?RPT_DEPT='+RPT_DEPT+'&STATUS='+STATUS+'&BILL_TYPE='+BILL_TYPE,  
-				datatype:'json',
-			      page:1
-			}).trigger("reloadGrid");
-			
-		}  
-		
-		//显示隐藏查询
-		function showQueryCondi(){
-			if($(".widget-box").css("display")=="block"){
-				$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass('fa-chevron-down');
-				$("#btnQuery").find("span").text("显示查询");
-				$(window).triggerHandler('resize.jqGrid');
-			}
-			else{
-				$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass('fa-chevron-up');
-				$("#btnQuery").find("span").text("隐藏查询");
-			}
-			$(".widget-box").toggle("fast");
-			
+				url:'<%=basePath%>syssealedinfo/getPageList.do?RPT_DEPT='
+										+ RPT_DEPT
+										+ '&STATUS='
+										+ STATUS
+										+ '&BILL_TYPE=' + BILL_TYPE,
+								datatype : 'json',
+								page : 1
+							}).trigger("reloadGrid");
 		}
-		
-		
-		function customFmatterState(cellvalue, options, rowObject){  
-			if (cellvalue==1) {
-				 return '<span class="label label-important arrowed-in">封存</span>';
+
+		function customFmatterState(cellvalue, options, rowObject) {
+			if (cellvalue == 1) {
+				return '<span class="label label-important arrowed-in">封存</span>';
 			} else {
 				return '<span class="label label-success arrowed">解封</span>';
 			}
 		};
-   
-	
-	
-	
- 	</script>
+	</script>
 </body>
 </html>
