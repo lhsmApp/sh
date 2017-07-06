@@ -122,8 +122,15 @@ function beforeDeleteCallback(e) {
 
 function beforeEditOrAddCallback(e) {
 	var form = $(e[0]);
-	form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar')
-	.wrapInner('<div class="widget-header" />')
+	form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />');
+    /* $("tr", form).each(function() {
+        var inputs = $(">td.DataTD:has(input,select)",this);
+        if (inputs.length == 1) {
+            var tds = $(">td", this);
+            tds.eq(1).attr("colSpan", tds.length - 1);
+            tds.slice(2).hide();
+        }
+    }); */
 	style_edit_form(form);
 }
 

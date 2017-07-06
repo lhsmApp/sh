@@ -151,7 +151,7 @@
 	    var jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
 	    
 	    function getState(){
-	        if($.trim(State) == "0"){
+	        if($.trim(State) == "true"){
 	            return true;
 	        }
 	        return false;
@@ -215,6 +215,7 @@
 		        },
 		        {
 					//edit record form
+				    width: 900,
 					closeAfterEdit: true,
 					recreateForm: true,
 					beforeShowForm :beforeEditOrAddCallback,
@@ -222,6 +223,7 @@
 		        },
 		        {
 					//new record form
+				    width: 900,
 					closeAfterAdd: true,
 					recreateForm: true,
 					viewPagerButtons: false,
