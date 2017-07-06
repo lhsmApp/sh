@@ -92,6 +92,14 @@ public class VoucherService implements VoucherManager{
 		return (int)dao.findForObject("VoucherMapper.countJqGrid", pd);
 	}
 	
+	/**获取记录总合计
+	 * @param pd
+	 * @throws Exception
+	 */
+	public PageData getFooterSummary(JqPage page)throws Exception{
+		return (PageData)dao.findForObject("VoucherMapper.getFooterSummary", page);
+	}
+	
 	/**批量删除
 	 * @param ArrayDATA_IDS
 	 * @throws Exception
@@ -100,5 +108,12 @@ public class VoucherService implements VoucherManager{
 		dao.delete("VoucherMapper.deleteAll", ArrayDATA_IDS);
 	}
 	
+	/**获取汇总信息还没有进行上报的信息
+	 * @param page
+	 * @throws Exception
+	 */
+	public List<PageData> getTransferValidate(PageData pd)throws Exception{
+		return (List<PageData>)dao.findForList("VoucherMapper.getTransferValidate", pd);
+	}
 }
 

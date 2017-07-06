@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fh.controller.base.BaseController;
+import com.fh.controller.common.DictsUtil;
 import com.fh.controller.common.GenerateTransferData;
 import com.fh.controller.common.TmplUtil;
 import com.fh.entity.CommonBase;
@@ -78,6 +79,9 @@ public class VoucherController extends BaseController {
 
 	@Resource(name = "syssealedinfoService")
 	private SysSealedInfoManager syssealedinfoService;
+	
+	//底行显示的求和与平均值字段
+	private	StringBuilder SqlUserdata = new StringBuilder();
 
 	/**
 	 * 列表
@@ -105,8 +109,8 @@ public class VoucherController extends BaseController {
 			tableCode = "TB_HOUSE_FUND_SUMMY";
 			tableCodeSub = "TB_HOUSE_FUND_DETAIL";
 		} else {
-			tableCode = "TB_HOUSE_FUND_SUMMY";
-			tableCodeSub = "TB_HOUSE_FUND_DETAIL";
+			tableCode = "TB_STAFF_SUMMY";
+			tableCodeSub = "TB_STAFF_DETAIL";
 		}
 		// 此处放当前页面初始化时用到的一些数据，例如搜索的下拉列表数据，所需的字典数据、权限数据等等。
 		// mv.addObject("pd", pd);
@@ -130,6 +134,9 @@ public class VoucherController extends BaseController {
 		String jqGridColModelSub = tmplUtil.generateStructureNoEdit(tableCodeSub,
 				Jurisdiction.getCurrentDepartmentID());
 		mv.addObject("jqGridColModelSub", jqGridColModelSub);
+		
+		//底行显示的求和与平均值字段
+		SqlUserdata = tmplUtil.getSqlUserdata();
 		return mv;
 	}
 
@@ -150,6 +157,18 @@ public class VoucherController extends BaseController {
 		pd.put("TABLE_CODE", tableCode);
 		String sealType= getSealType(which,voucherType);
 		pd.put("BILL_TYPE", sealType);//封存类型
+		String sealType1="";//汇总封存类型对应的传输接口类型
+		if(sealType.equals(BillType.SALLARY_SUMMARY.getNameKey())){
+			sealType1=BillType.SALLARY_LISTEN.getNameKey();
+		}
+		else if(sealType.equals(BillType.GOLD_SUMMARY.getNameKey())){
+			sealType1=BillType.GOLD_LISTEN.getNameKey();
+		}
+		else if(sealType.equals(BillType.SECURITY_SUMMARY.getNameKey())){
+			sealType1=BillType.SECURITY_LISTEN.getNameKey();
+		}
+		pd.put("BILL_TYPE1", sealType1);//封存类型
+		
 		String keywords = pd.getString("keywords"); // 关键词检索条件
 		if (null != keywords && !"".equals(keywords)) {
 			pd.put("keywords", keywords.trim());
@@ -158,7 +177,7 @@ public class VoucherController extends BaseController {
 		if (null != filters && !"".equals(filters)) {
 			pd.put("filterWhereResult", SqlTools.constructWhere(filters, null));
 		}
-
+		
 		page.setPd(pd);
 		List<PageData> varList = voucherService.list(page); // 列出Betting列表
 		int records = voucherService.countJqGrid(pd);
@@ -167,6 +186,13 @@ public class VoucherController extends BaseController {
 		result.setRowNum(page.getRowNum());
 		result.setRecords(records);
 		result.setPage(page.getPage());
+		PageData userdata = null;
+		if(SqlUserdata!=null && !SqlUserdata.toString().trim().equals("")){
+			//底行显示的求和与平均值字段
+			pd.put("Userdata", SqlUserdata.toString());
+			userdata = voucherService.getFooterSummary(page);
+			result.setUserdata(userdata);
+		}
 		// PageData userData=new PageData();
 		// userData.put("PRICE", 2622.99);
 		// result.setUserdata(userData);
@@ -265,12 +291,8 @@ public class VoucherController extends BaseController {
 					item.setRPT_DUR(pageData.getString("BUSI_DATE"));
 					item.setRPT_USER(userId);
 					item.setRPT_DATE(DateUtils.getCurrentTime());// YYYY-MM-DD HH:MM:SS
-					if(tableCode=="TB_STAFF_SUMMY")
-						item.setBILL_TYPE(BillType.SALLARY_LISTEN.getNameKey());
-					else if(tableCode=="TB_SOCIAL_INC_SUMMY")
-						item.setBILL_TYPE(BillType.SECURITY_LISTEN.getNameKey());
-					else if(tableCode=="TB_HOUSE_FUND_SUMMY")
-						item.setBILL_TYPE(BillType.GOLD_LISTEN.getNameKey());
+					String sealType= getSealType(which,"2");//封存类型
+					item.setBILL_TYPE(sealType);
 					item.setSTATE("1");// 枚举 1封存,0解封
 					listSysSealed.add(item);
 				}
@@ -300,7 +322,7 @@ public class VoucherController extends BaseController {
 		} else if (which != null && which.equals("3")) {
 			tableCode = "TB_HOUSE_FUND_SUMMY";
 		} else {
-			tableCode = "TB_HOUSE_FUND_SUMMY";
+			tableCode = "TB_STAFF_SUMMY";
 		}
 		return tableCode;
 	}
@@ -321,7 +343,7 @@ public class VoucherController extends BaseController {
 			} else if (which != null && which.equals("3")) {
 				sealType = BillType.GOLD_SUMMARY.getNameKey();
 			} else {
-				sealType = BillType.GOLD_SUMMARY.getNameKey();
+				sealType = BillType.SALLARY_SUMMARY.getNameKey();
 			}
 		}else if(voucherType.equals("2")){
 			if (which != null && which.equals("1")) {
@@ -331,10 +353,53 @@ public class VoucherController extends BaseController {
 			} else if (which != null && which.equals("3")) {
 				sealType = BillType.GOLD_LISTEN.getNameKey();
 			} else {
-				sealType = BillType.GOLD_LISTEN.getNameKey();
+				sealType = BillType.SALLARY_LISTEN.getNameKey();
 			}
 		}
 		return sealType;
+	}
+	
+	/**汇总数据未上报单位
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/transferValidate")
+	public ModelAndView transferValidate()throws Exception{
+		ModelAndView mv = this.getModelAndView();
+		PageData pd = this.getPageData();
+		String which = pd.getString("TABLE_CODE");
+		pd.put("TABLE_CODE", which);
+		DictsUtil dictsUtil=new DictsUtil(dictionariesService, departmentService);
+		//String empty=" : ;";
+		String strDict=dictsUtil.getDicValue("oa_department", "2");
+		pd.put("strDict", strDict);
+		mv.setViewName("voucher/voucher/voucher_transvali");
+		mv.addObject("pd", pd);
+		return mv;
+	}
+	
+	/**
+	 * 列表
+	 * 
+	 * @param page
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/getTransferValidate")
+	public @ResponseBody PageResult<PageData> getTransferValidate() throws Exception {
+		PageData pd = this.getPageData();
+		String which = pd.getString("TABLE_CODE");
+		String tableCode = getTableCode(which);
+		pd.put("TABLE_CODE", tableCode);
+		String sealType= getSealType(which,"1");
+		pd.put("BILL_TYPE", sealType);//封存类型
+		String filters = pd.getString("filters"); // 多条件过滤条件
+		if (null != filters && !"".equals(filters)) {
+			pd.put("filterWhereResult", SqlTools.constructWhere(filters, null));
+		}
+		List<PageData> varList = voucherService.getTransferValidate(pd);
+		PageResult<PageData> result = new PageResult<PageData>();
+		result.setRows(varList);
+		return result;
 	}
 
 	/**

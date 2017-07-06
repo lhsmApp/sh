@@ -52,6 +52,14 @@
 							onclick="showQueryCondi()">
 							<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
 						</button>
+						<button id="btnValidate" class="btn btn-white btn-info btn-sm"
+							onclick="transferValidate()">
+							<i class="ace-icon fa fa-flask  bigger-120 blue"></i> <span>上传校验</span>
+						</button>
+						<sub class="text-warning orange" style="font-size: 14px;"><!-- fa-exclamation-triangle -->
+							&nbsp;<i class="ace-icon fa fa-star"></i>
+							校验还未进行上报的二级单位汇总数据
+						</sub>
 						<div class="pull-right">
 							<span class="green middle bolder">凭证数据类型: &nbsp;</span>
 
@@ -168,6 +176,7 @@
 	<script src="static/ace/js/ace/ace.widget-box.js"></script>
 	<script type="text/javascript"> 
 	var jqGridColModelSub;
+	var which='1';
 	$(document).ready(function () {
 		$(top.hangge());//关闭加载状态
 		//dropDownStyle();
@@ -179,7 +188,7 @@
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
 			$("#jqGrid").jqGrid( 'setGridWidth', $(".page-content").width());
-			$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - 213);
+			$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - 251);//213 //200
 	    });
 		
 		//初始化当前选择凭证类型
@@ -187,9 +196,11 @@
 			$('[data-toggle="buttons"] .btn').each(function(index, data){
 				var target = $(this).find('input[type=radio]');
 				$(this).removeClass('active');
-				var which = parseInt(target.val());
-				if(which=='${pd.which}'){
+				var whichCur = parseInt(target.val());
+				console.log(which);
+				if(whichCur=='${pd.which}'){
 					$(this).addClass('active');
+					which=whichCur;
 				}
 			});
 		} 
@@ -197,8 +208,7 @@
 		//凭证类型变化
 		$('[data-toggle="buttons"] .btn').on('click', function(e){
 			var target = $(this).find('input[type=radio]');
-			var which = parseInt(target.val());
-			console.log(which);
+			which = parseInt(target.val());
 			if(which!='${pd.which}'){
 				window.location.href="<%=basePath%>voucher/list.do?TABLE_CODE="+which;
 			}
@@ -214,7 +224,7 @@
 				voucherType=1;
 				$("[data-original-title='批量上传']").removeClass("hidden");
 				$("[data-original-title='获取凭证号']").addClass("hidden");
-				
+				$("[data-original-title='获取冲销凭证号']").addClass("hidden");
 				
 				$("#jqGrid").jqGrid("setGridParam",{postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}'}});
 				$("#jqGrid").trigger("reloadGrid");  
@@ -222,6 +232,7 @@
 				voucherType=2;
 				$("[data-original-title='批量上传']").addClass("hidden");
 				$("[data-original-title='获取凭证号']").removeClass("hidden");
+				$("[data-original-title='获取冲销凭证号']").removeClass("hidden");
 				
 				console.log($("[data-original-title='获取凭证号']").length==0);
 				if($("[data-original-title='获取凭证号']").length==0){
@@ -234,6 +245,18 @@
 			           caption: "",
 			           position: "last",
 			           onClickButton: batchVoucher
+			       });
+				}
+				if($("[data-original-title='获取冲销凭证号']").length==0){
+					//获取冲销凭证号
+			       $('#jqGrid').navButtonAdd('#jqGridPager',
+			       {
+			    	   /* bigger-150 */
+			           buttonicon: "ace-icon fa fa-bookmark orange",
+			           title: "获取冲销凭证号",
+			           caption: "",
+			           position: "last",
+			           onClickButton: batchWriteOffVoucher
 			       });
 				}
 				
@@ -257,8 +280,8 @@
 			width:'100%',
 			sortname: 'BILL_CODE',
 			
-			//footerrow: true,
-			//userDataOnFooter: true, // the calculated sums and/or strings from server are put at footer row.
+			footerrow: true,
+			userDataOnFooter: true, // the calculated sums and/or strings from server are put at footer row.
 			/*grouping: true,
 			 groupingView: {
                 groupField: ["CATEGORYNAME"],
@@ -376,6 +399,11 @@
 		
 	}
 	
+	//批量获取冲销凭证号
+	function batchWriteOffVoucher(e) {
+		
+	}
+	
 	//批量传输
 	function batchSave(e) {
 		var listData =new Array();
@@ -464,7 +492,6 @@
         });
 	}
 
-	
 	//日期格式化
     function formateDate(value, row, index) {
         var formateNewDate=toolkit.dateFormat(new Date(value),"yyyy-MM-dd")
@@ -505,6 +532,27 @@
 		}
 		$(".widget-box").toggle("fast");
 		//$(window).triggerHandler('resize.jqGrid');
+	}
+	
+	//上传校验
+	function transferValidate(){
+		 top.jzts();
+		 var diag = new top.Dialog();
+		 diag.Drag=true;
+		 diag.Title ="汇总数据未上报单位校验";
+		 diag.URL = "<%=basePath%>voucher/transferValidate.do?TABLE_CODE="+which;
+		 diag.Width = 800;
+		 diag.Height = 480;
+		 diag.Modal = true;				//有无遮罩窗口
+		 diag. ShowMaxButton = true;	//最大化按钮
+	     diag.ShowMinButton = true;		//最小化按钮 
+		 diag.CancelEvent = function(){ //关闭事件
+			/* if(diag.innerFrame.contentWindow.document.getElementById('zhongxin').style.display == 'none'){
+				 //执行刷新等
+			} */
+			diag.close();
+		 };
+		 diag.show();
 	}
 	
 	//加载单位树

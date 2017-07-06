@@ -63,10 +63,21 @@ public interface VoucherManager{
 	 */
 	public int countJqGrid(PageData pd)throws Exception;
 	
+	/**获取记录总合计
+	 * @param pd
+	 * @throws Exception
+	 */
+	public PageData getFooterSummary(JqPage page)throws Exception;
+	
 	/**批量删除
 	 * @param ArrayDATA_IDS
 	 * @throws Exception
 	 */
 	public void deleteAll(String[] ArrayDATA_IDS)throws Exception;
 	
+	/**获取汇总信息还没有进行上报的信息
+	 * @param page
+	 * @throws Exception
+	 */
+	public List<PageData> getTransferValidate(PageData pd)throws Exception;
 }

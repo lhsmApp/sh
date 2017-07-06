@@ -307,7 +307,8 @@
 		set
 		BILL_CODE = #{BILL_CODE},
 		BUSI_DATE = #{BUSI_DATE},
-		ESTB_DEPT = #{ESTB_DEPT},
+		ESTB_DEPT =
+		#{ESTB_DEPT},
 		USER_GROP = #{USER_GROP},
 		SOC_INC_BASE = #{SOC_INC_BASE},
 		PER_BASIC_FUND = #{PER_BASIC_FUND},
@@ -318,22 +319,26 @@
 		DEPT_TOTAL = #{DEPT_TOTAL},
 		DEPT_CODE = #{DEPT_CODE},
 		USER_CATG = #{USER_CATG},
-		PMT_PLACE = #{PMT_PLACE},
+		PMT_PLACE =
+		#{PMT_PLACE},
 		CUST_COL1 = #{CUST_COL1},
 		CUST_COL2 = #{CUST_COL2},
 		CUST_COL3 = #{CUST_COL3},
 		CUST_COL4 = #{CUST_COL4},
-		CUST_COL5 = #{CUST_COL5},
+		CUST_COL5 =
+		#{CUST_COL5},
 		CUST_COL6 = #{CUST_COL6},
 		CUST_COL7 = #{CUST_COL7},
 		CUST_COL8 = #{CUST_COL8},
 		CUST_COL9 = #{CUST_COL9},
-		CUST_COL10 = #{CUST_COL10},
+		CUST_COL10 =
+		#{CUST_COL10},
 		ZRZC_CODE = #{ZRZC_CODE},
 		BILL_STATE = #{BILL_STATE},
 		BILL_USER = #{BILL_USER},
 		BILL_DATE = #{BILL_DATE},
-		VOUCHER_ID = VOUCHER_ID
+		VOUCHER_ID =
+		VOUCHER_ID
 		where
 		VOUCHER_ID = #{VOUCHER_ID}
 	</update>
@@ -350,29 +355,45 @@
 
 	<!-- Jq分页列表 -->
 	<select id="datalistJqPage" parameterType="jqPage" resultType="pd">
-		select A.*
-		<!-- <if test="pd.TABLE_CODE=='TB_STAFF_SUMMY'"> <include refid="FieldStaff"></include> 
-			</if> <if test="pd.TABLE_CODE=='TB_SOCIAL_INC_SUMMY'"> <include refid="FieldSocialInc"></include> 
-			</if> <if test="pd.TABLE_CODE=='TB_HOUSE_FUND_SUMMY'"> <include refid="FieldHouseFund"></include> 
-			</if> -->
-		from ${pd.TABLE_CODE} A
-		JOIN tb_sys_sealed_info B
-		ON
-		A.BILL_CODE=B.BILL_CODE
-		AND A.BUSI_DATE=B.RPT_DUR
-		WHERE B.STATE='1'
-		AND
-		B.BILL_TYPE=#{pd.BILL_TYPE}
+		<if test='pd.BILL_TYPE=="2" or pd.BILL_TYPE=="4" or pd.BILL_TYPE=="6"'>
+			SELECT A.* FROM ${pd.TABLE_CODE} A
+			JOIN
+			(SELECT
+			M.bill_code,M.rpt_dept,m.rpt_dur,m.state FROM tb_sys_sealed_info M
+			LEFT JOIN
+			(SELECT bill_code,rpt_dept,rpt_dur,state FROM
+			tb_sys_sealed_info WHERE
+			bill_type=#{pd.BILL_TYPE1} AND state='1') N
+			ON M.bill_code=N.bill_code AND M.rpt_dept=N.rpt_dept
+			AND
+			M.rpt_dur=N.rpt_dur
+			WHERE (M.bill_type=#{pd.BILL_TYPE} AND M.state='1')
+			<!-- OR (M.BILL_TYPE='8' AND M.state='0') -->
+			AND N.bill_code IS NULL) B
+			ON A.BILL_CODE=B.BILL_CODE
+			AND
+			A.BUSI_DATE=B.RPT_DUR
+			AND
+			A.DEPT_CODE=B.RPT_DEPT
+		</if>
 
-		<!-- <if test="TABLE_CODE=='TB_STAFF_SUMMY'"> <include refid="tableNameStaff"></include> 
-			</if> <if test="TABLE_CODE=='TB_SOCIAL_INC_SUMMY'"> <include refid="tableNameSocialInc"></include> 
-			</if> <if test="TABLE_CODE=='TB_HOUSE_FUND_SUMMY'"> <include refid="tableNameHouseFund"></include> 
-			</if> -->
+		<if test='pd.BILL_TYPE=="7" or pd.BILL_TYPE=="8" or pd.BILL_TYPE=="9"'>
+			select A.*
+			from ${pd.TABLE_CODE} A
+			JOIN tb_sys_sealed_info B
+			ON
+			A.BILL_CODE=B.BILL_CODE
+			AND A.BUSI_DATE=B.RPT_DUR
+			WHERE B.STATE='1'
+			AND
+			B.BILL_TYPE=#{pd.BILL_TYPE}
+		</if>
+
 		<where>
 			<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
 				and
 				(
-				<!-- 根据需求自己加检索条件 字段1 LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') or 
+				<!-- 根据需求自己加检索条件 字段1 LIKE CONCAT(CONCAT('%', # {pd.keywords}),'%') or 
 					字段2 LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') -->
 				)
 			</if>
@@ -381,8 +402,8 @@
 			</if>
 		</where>
 		<if test="sidx != null">
-			order by ${sidx} ${sord}
-		</if>
+		 	order by ${sidx} ${sord} 
+		 </if>
 		<if test="currentResult != null and rowNum != null">
 			limit #{currentResult}, #{rowNum}
 		</if>
@@ -390,7 +411,7 @@
 
 	<select id="countJqGrid" parameterType="pd" resultType="int">
 		select count(*) from
-		<include refid="tableNameHouseFund"></include>
+		${TABLE_CODE}
 		<where>
 			<if test="keywords!= null and keywords != ''"><!-- 关键词检索 -->
 				and
@@ -403,6 +424,60 @@
 				${filterWhereResult}
 			</if>
 		</where>
+	</select>
+	
+	<select id="getFooterSummary" parameterType="jqPage" resultType="pd">
+		<if test='pd.BILL_TYPE=="2" or pd.BILL_TYPE=="4" or pd.BILL_TYPE=="6"'>
+			SELECT ${pd.Userdata} FROM ${pd.TABLE_CODE} A
+			JOIN
+			(SELECT
+			M.bill_code,M.rpt_dept,m.rpt_dur,m.state FROM tb_sys_sealed_info M
+			LEFT JOIN
+			(SELECT bill_code,rpt_dept,rpt_dur,state FROM
+			tb_sys_sealed_info WHERE
+			bill_type=#{pd.BILL_TYPE1} AND state='1') N
+			ON M.bill_code=N.bill_code AND M.rpt_dept=N.rpt_dept
+			AND
+			M.rpt_dur=N.rpt_dur
+			WHERE (M.bill_type=#{pd.BILL_TYPE} AND M.state='1')
+			<!-- OR (M.BILL_TYPE='8' AND M.state='0') -->
+			AND N.bill_code IS NULL) B
+			ON A.BILL_CODE=B.BILL_CODE
+			AND
+			A.BUSI_DATE=B.RPT_DUR
+			AND
+			A.DEPT_CODE=B.RPT_DEPT
+		</if>
+
+		<if test='pd.BILL_TYPE=="7" or pd.BILL_TYPE=="8" or pd.BILL_TYPE=="9"'>
+			select ${pd.Userdata},A.* 
+			from ${pd.TABLE_CODE} A
+			JOIN tb_sys_sealed_info B
+			ON
+			A.BILL_CODE=B.BILL_CODE
+			AND A.BUSI_DATE=B.RPT_DUR
+			WHERE B.STATE='1'
+			AND
+			B.BILL_TYPE=#{pd.BILL_TYPE}
+		</if>
+		<where>
+			<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
+				and
+				(
+				<!-- 根据需求自己加检索条件 字段1 LIKE CONCAT(CONCAT('%', # {pd.keywords}),'%') or 
+					字段2 LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') -->
+				)
+			</if>
+			<if test="pd.filterWhereResult != null">
+				${pd.filterWhereResult}
+			</if>
+		</where>
+		<if test="sidx != null">
+		 	order by ${sidx} ${sord} 
+		 </if>
+		<if test="currentResult != null and rowNum != null">
+			limit #{currentResult}, #{rowNum}
+		</if>
 	</select>
 
 	<!-- 列表(全部) -->
@@ -424,6 +499,24 @@
 		<where>
 			A.BILL_CODE=#{BILL_CODE}
 		</where>
+	</select>
+	
+	<!-- 获取汇总信息还没有进行上报的信息 -->
+	<select id="getTransferValidate" parameterType="pd" resultType="pd">
+		SELECT * FROM (
+		SELECT A.*,B.bill_type,B.state 
+		FROM ${TABLE_CODE} A
+		LEFT JOIN tb_sys_sealed_info B
+		ON A.BILL_CODE=B.BILL_CODE
+		AND A.BUSI_DATE=B.RPT_DUR
+		AND A.DEPT_CODE=B.RPT_DEPT
+		where (B.STATE='0' AND B.BILL_TYPE=#{BILL_TYPE}) OR B.bill_code IS NULL) T
+		<where>
+			<if test="filterWhereResult != null">
+				${filterWhereResult}
+			</if>
+		</where>	
+		
 	</select>
 
 	<!-- 批量删除 -->
