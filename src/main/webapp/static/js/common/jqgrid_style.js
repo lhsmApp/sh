@@ -173,17 +173,26 @@ function fn_addSubmit(response,postdata){
 }
 
 //显示隐藏查询   标准高度统一定为200（含底行），如果不含底行高度定为213.
-function showQueryCondi(gridHeight){
+function showQueryCondi(jqgrid,gridHeight){
 	if($(".widget-box").css("display")=="block"){
 		$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass('fa-chevron-down');
 		$("#btnQuery").find("span").text("显示查询");
-		$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - gridHeight);
+		$(jqgrid).jqGrid( 'setGridHeight', $(window).height() - gridHeight);
 	}
 	else{
 		$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass('fa-chevron-up');
 		$("#btnQuery").find("span").text("隐藏查询");
-		$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - gridHeight-64);
+		$(jqgrid).jqGrid( 'setGridHeight', $(window).height() - gridHeight-64);
 	}
 	$(".widget-box").toggle("fast");
 	
+}
+
+//重设GridHeight
+function resizeGridHeight(jqgrid,gridHeight){
+	if($(".widget-box").css("display")=="block"){
+		$(jqgrid).jqGrid( 'setGridHeight', $(window).height() - gridHeight-64);//213 //200
+	}else{
+		$(jqgrid).jqGrid( 'setGridHeight', $(window).height() - gridHeight);//213 //200
+	}
 }

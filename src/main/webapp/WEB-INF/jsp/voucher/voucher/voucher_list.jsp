@@ -49,7 +49,7 @@
 							style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
 
 						<button id="btnQuery" class="btn btn-white btn-info btn-sm"
-							onclick="showQueryCondi()">
+							onclick="showQueryCondi($('#jqGrid'),gridHeight)">
 							<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
 						</button>
 						<button id="btnValidate" class="btn btn-white btn-info btn-sm"
@@ -195,7 +195,7 @@
 			}else{
 				gridHeight=213;
 			}
-			$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - gridHeight);//213 //200
+			resizeGridHeight($("#jqGrid"),gridHeight);
 	    });
 		
 		//初始化当前选择凭证类型
@@ -425,7 +425,7 @@
 		top.jzts();
 		$.ajax({
 			type: "POST",
-			url: '<%=basePath%>voucher/voucherTransfer.do?',
+			url: '<%=basePath%>voucher/voucherTransfer.do?TABLE_CODE='+which,
 	    	//data: rowData,//可以单独传入一个对象，后台可以直接通过对应模型接受参数。但是传入Array（listData）就不好用了，所以传list方式需将List转为Json字符窜。
 			//data: '{"rows":listData}',
 			data:{DATA_ROWS:JSON.stringify(listData)},
@@ -496,49 +496,6 @@
 			    //$("#" + childGridID).parents(".ui-jqgrid-bdiv").css("overflow-x","hidden");
 		    }
         });
-	}
-
-	//日期格式化
-    function formateDate(value, row, index) {
-        var formateNewDate=toolkit.dateFormat(new Date(value),"yyyy-MM-dd")
-        return formateNewDate;
-    }
-    
-  	//日期反格式化  
-	function unformateDate(cellValue, options, rowObject){  
-	    var updateDate = new Date(cellValue);  
-	    return updateDate;  
-	}
-  	
-	//创建一个input输入框
-	function myelem (value, options) {
-		var el = document.createElement("input");
-		el.type="number";
-		el.value = value;
-		return el;
-		/* $(el).ace_spinner({value:0,min:0,max:200,step:10, btn_up_class:'btn-info' , btn_down_class:'btn-info'});
-			return el; */
-	}
-/* 	 */
-	//获取值
-	function myvalue(elem) {
-		return $(elem).val();
-	}
-	
-	//显示隐藏查询
-	function showQueryCondi(){
-		if($(".widget-box").css("display")=="block"){
-			$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass('fa-chevron-down');
-			$("#btnQuery").find("span").text("显示查询");
-			$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - gridHeight);
-		}
-		else{
-			$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass('fa-chevron-up');
-			$("#btnQuery").find("span").text("隐藏查询");
-			$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - gridHeight-64);
-		}
-		$(".widget-box").toggle("fast");
-		//$(window).triggerHandler('resize.jqGrid');
 	}
 	
 	//上传校验
