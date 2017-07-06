@@ -210,13 +210,17 @@ public class TmplUtil {
 			StringBuilder model_name = new StringBuilder();
 			StringBuilder model_edittype = new StringBuilder();
 			StringBuilder model_notedit = new StringBuilder();
+			Boolean editable = null;
 
 			// 设置必定不用编辑的列
-			if (col.getColumn_name().equals("BILL_CODE") || col.getColumn_name().equals("BUSI_DATE")
+			if (col.getColumn_name().equals("BILL_CODE") 
+					|| col.getColumn_name().equals("BUSI_DATE")
 					|| col.getColumn_name().equals("DEPT_CODE")) {
 				model_notedit.append(" editable: false ");
+				editable = false;
 			} else {
 				model_notedit.append(" editable: true ");
+				editable = true;
 			}
 			int intLength = getColumnLength(col.getColumn_type(), col.getData_type());
 			if (col.getData_type() != null
@@ -245,6 +249,7 @@ public class TmplUtil {
 			MapAdd.put("name", model_name.toString());
 			MapAdd.put("edittype", model_edittype.toString());
 			MapAdd.put("notedit", model_notedit.toString());
+			MapAdd.put("editable", editable);
 			list.put(col.getColumn_name(), MapAdd);
 		}
 
@@ -330,6 +335,8 @@ public class TmplUtil {
 		item.setDEPT_CODE(departCode);
 		item.setTABLE_CODE(tableCode);
 		m_columnsList = tmplconfigService.listNeed(item);
+		int row = 1;
+		int col = 1;
 
 		jqGridColModel.append("[");
 		// 添加关键字的保存列
@@ -340,13 +347,17 @@ public class TmplUtil {
 					jqGridColModel.append(", ");
 				}
 				jqGridColModel.append(" {name: '").append(key.toUpperCase()).append(keyExtra)
-						.append("', hidden: true, editable: true, editrules: {edithidden: false}} ");
+						.append("', hidden: true, editable: true, editrules: {edithidden: false}, ");
+				jqGridColModel.append(" formoptions:{ rowpos:" + row + ", colpos:" + col + " }} ");
+				col++;
+				if (col > columnCount) {
+					row++;
+					col = 1;
+				}
 			}
 		}
 		// 添加配置表设置列，字典（未设置就使用表默认，text或number）、隐藏、表头显示
 		if (m_columnsList != null && m_columnsList.size() > 0) {
-			int row = 4;
-			int col = 1;
 			for (int i = 0; i < m_columnsList.size(); i++) {
 				if (listColModelAll.containsKey(m_columnsList.get(i).getCOL_CODE().toUpperCase())) {
 					Map<String, Object> itemColModel = listColModelAll.get(m_columnsList.get(i).getCOL_CODE());
@@ -354,6 +365,7 @@ public class TmplUtil {
 					String name = (String) itemColModel.get("name");
 					String edittype = (String) itemColModel.get("edittype");
 					String notedit = (String) itemColModel.get("notedit");
+					Boolean editable = (Boolean) itemColModel.get("editable");
 					if (name != null && !name.trim().equals("")) {
 						jqGridColModel.append(name).append(", ");
 					} else {
@@ -386,18 +398,17 @@ public class TmplUtil {
 					jqGridColModel.append(" hidden: ").append(intHide == 1 ? "false" : "true").append(", ");
 					if (intHide != 1) {
 						jqGridColModel.append(" editable:true, editrules: {edithidden: false}, ");
-					} else {
-						if (notedit != null && notedit.trim().endsWith("true")) {
-							jqGridColModel.append(" formoptions:{ rowpos:" + row + ", colpos:" + col + " }, ");
-							col++;
-							if (col > columnCount) {
-								row++;
-								col = 1;
-							}
-						}
 					}
 					if (notedit != null && !notedit.trim().equals("")) {
 						jqGridColModel.append(notedit).append(", ");
+					}
+					if(editable){
+						jqGridColModel.append(" formoptions:{ rowpos:" + row + ", colpos:" + col + " }, ");
+						col++;
+						if (col > columnCount) {
+							row++;
+							col = 1;
+						}
 					}
 					// 配置表中的表头显示
 					jqGridColModel.append(" label: '").append(m_columnsList.get(i).getCOL_NAME()).append("' ");
