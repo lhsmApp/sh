@@ -171,3 +171,19 @@ function fn_addSubmit(response,postdata){
 		return [false, response.responseJSON.message];
 	}
 }
+
+//显示隐藏查询   标准高度统一定为200（含底行），如果不含底行高度定为213.
+function showQueryCondi(gridHeight){
+	if($(".widget-box").css("display")=="block"){
+		$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass('fa-chevron-down');
+		$("#btnQuery").find("span").text("显示查询");
+		$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - gridHeight);
+	}
+	else{
+		$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass('fa-chevron-up');
+		$("#btnQuery").find("span").text("隐藏查询");
+		$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - gridHeight-64);
+	}
+	$(".widget-box").toggle("fast");
+	
+}

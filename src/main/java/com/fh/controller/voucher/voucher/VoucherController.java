@@ -137,6 +137,11 @@ public class VoucherController extends BaseController {
 		
 		//底行显示的求和与平均值字段
 		SqlUserdata = tmplUtil.getSqlUserdata();
+		boolean hasUserData=false;
+		if(SqlUserdata!=null && !SqlUserdata.toString().trim().equals("")){
+			hasUserData=true;
+		}
+		mv.addObject("HasUserData",hasUserData );
 		return mv;
 	}
 
@@ -193,10 +198,6 @@ public class VoucherController extends BaseController {
 			userdata = voucherService.getFooterSummary(page);
 			result.setUserdata(userdata);
 		}
-		// PageData userData=new PageData();
-		// userData.put("PRICE", 2622.99);
-		// result.setUserdata(userData);
-
 		return result;
 	}
 

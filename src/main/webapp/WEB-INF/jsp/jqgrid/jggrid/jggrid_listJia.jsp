@@ -45,7 +45,7 @@
 									style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
 
 									<button id="btnQuery" class="btn btn-white btn-info btn-sm"
-										onclick="showQueryCondi()">
+										onclick="showQueryCondi(gridHeight)">
 										<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
 									</button></td>
 							</tr>
@@ -154,18 +154,18 @@
 	<script type="text/javascript" src="static/js/util/toolkit.js"></script>
 	<script src="static/ace/js/ace/ace.widget-box.js"></script>
 	<script type="text/javascript"> 
+	var gridHeight=200;
 	$(document).ready(function () {
 		/* $.jgrid.defaults.width = 780;*/
 		//$.jgrid.defaults.styleUI = 'Bootstrap'; 
 		$(top.hangge());//关闭加载状态
-		
 		//dropDownStyle();
 		
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
 			$("#jqGrid").jqGrid( 'setGridWidth', $(".page-content").width());
 			//console.log("ccc"+$("iframe").height());
-			$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - 200);
+			$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - gridHeight);
 	    })
 		
 		$("#jqGrid").jqGrid({
@@ -572,21 +572,6 @@
 	//获取值
 	function myvalue(elem) {
 		return $(elem).val();
-	}
-	
-	//显示隐藏查询
-	function showQueryCondi(){
-		if($(".widget-box").css("display")=="block"){
-			$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass('fa-chevron-down');
-			$("#btnQuery").find("span").text("显示查询");
-			$(window).triggerHandler('resize.jqGrid');
-		}
-		else{
-			$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass('fa-chevron-up');
-			$("#btnQuery").find("span").text("隐藏查询");
-		}
-		$(".widget-box").toggle("fast");
-		
 	}
  	</script>
 </body>
