@@ -121,9 +121,7 @@ public class PesoInfoController extends BaseController {
 		mv.addObject("varList", varList);
 		mv.addObject("pd", pd);
 		mv.addObject("QX",Jurisdiction.getHC());	//按钮权限
-
-		DictsUtil dictUtil=new DictsUtil(dictionariesService);
-		mv.addObject("areaList", dictUtil.getDictsByParentBianma("001"));
+		mv.addObject("areaList", DictsUtil.getDictsByParentBianma(dictionariesService,"001"));
 		mv.addObject("stateList", getStateList());
 			
 		return mv;
@@ -141,9 +139,7 @@ public class PesoInfoController extends BaseController {
 		mv.setViewName("socialOrganize/pesoinfo/pesoinfo_edit");
 		mv.addObject("msg", "save");
 		mv.addObject("pd", pd);
-
-		DictsUtil dictUtil=new DictsUtil(dictionariesService);
-		mv.addObject("areaList", dictUtil.getDictsByParentBianma("001"));
+		mv.addObject("areaList", DictsUtil.getDictsByParentBianma(dictionariesService,"001"));
 		mv.addObject("stateList", getStateList());
 		
 		return mv;
@@ -162,9 +158,7 @@ public class PesoInfoController extends BaseController {
 		mv.setViewName("socialOrganize/pesoinfo/pesoinfo_edit");
 		mv.addObject("msg", "edit");
 		mv.addObject("pd", pd);
-
-		DictsUtil dictUtil=new DictsUtil(dictionariesService);
-		mv.addObject("areaList", dictUtil.getDictsByParentBianma("001"));
+		mv.addObject("areaList", DictsUtil.getDictsByParentBianma(dictionariesService,"001"));
 		mv.addObject("stateList", getStateList());
 		
 		return mv;
@@ -305,8 +299,7 @@ public class PesoInfoController extends BaseController {
 		mv.addObject("searchJson",jsonArray);
 		mv.addObject("pd", pd);
 		mv.addObject("QX",Jurisdiction.getHC());	//按钮权限
-		DictsUtil dictUtil=new DictsUtil(dictionariesService);
-		mv.addObject("areaList", dictUtil.getDictsByParentBianma("001"));
+		mv.addObject("areaList", DictsUtil.getDictsByParentBianma(dictionariesService,"001"));
 		return mv;
 	}
 	

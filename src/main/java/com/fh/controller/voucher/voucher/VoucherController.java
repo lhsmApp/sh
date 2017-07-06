@@ -369,9 +369,8 @@ public class VoucherController extends BaseController {
 		PageData pd = this.getPageData();
 		String which = pd.getString("TABLE_CODE");
 		pd.put("TABLE_CODE", which);
-		DictsUtil dictsUtil=new DictsUtil(dictionariesService, departmentService);
 		//String empty=" : ;";
-		String strDict=dictsUtil.getDicValue("oa_department", "2");
+		String strDict=DictsUtil.getDepartmentValue(departmentService);
 		pd.put("strDict", strDict);
 		mv.setViewName("voucher/voucher/voucher_transvali");
 		mv.addObject("pd", pd);

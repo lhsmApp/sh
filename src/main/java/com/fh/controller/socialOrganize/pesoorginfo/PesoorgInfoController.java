@@ -116,10 +116,8 @@ public class PesoorgInfoController extends BaseController {
 		mv.addObject("varList", varList);
 		mv.addObject("pd", pd);
 		mv.addObject("QX",Jurisdiction.getHC());	//按钮权限
-
-		DictsUtil dictUtil=new DictsUtil(dictionariesService);
 		mv.addObject("sexList", getSexList());
-		mv.addObject("postList", dictUtil.getDictsByParentBianma("002"));
+		mv.addObject("postList", DictsUtil.getDictsByParentBianma(dictionariesService,"002"));
 		mv.addObject("nameList", getNameList());
 		
 		return mv;
@@ -137,10 +135,8 @@ public class PesoorgInfoController extends BaseController {
 		mv.setViewName("socialOrganize/pesoorginfo/pesoorginfo_edit");
 		mv.addObject("msg", "save");
 		mv.addObject("pd", pd);
-
-		DictsUtil dictUtil=new DictsUtil(dictionariesService);
 		mv.addObject("sexList", getSexList());
-		mv.addObject("postList", dictUtil.getDictsByParentBianma("002"));
+		mv.addObject("postList", DictsUtil.getDictsByParentBianma(dictionariesService,"002"));
 		mv.addObject("nameList", getNameList());
 		
 		return mv;
@@ -159,10 +155,8 @@ public class PesoorgInfoController extends BaseController {
 		mv.setViewName("socialOrganize/pesoorginfo/pesoorginfo_edit");
 		mv.addObject("msg", "edit");
 		mv.addObject("pd", pd);
-
-		DictsUtil dictUtil=new DictsUtil(dictionariesService);
 		mv.addObject("sexList", getSexList());
-		mv.addObject("postList", dictUtil.getDictsByParentBianma("002"));
+		mv.addObject("postList", DictsUtil.getDictsByParentBianma(dictionariesService,"002"));
 		mv.addObject("nameList", getNameList());
 		
 		return mv;

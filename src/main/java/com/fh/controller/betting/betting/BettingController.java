@@ -124,8 +124,7 @@ public class BettingController extends BaseController {
 		
 		mv.addObject("pd", pd);
 		mv.addObject("QX",Jurisdiction.getHC());	//按钮权限
-		DictsUtil dictUtil=new DictsUtil(dictionariesService);
-		mv.addObject("areaList", dictUtil.getDictsByParentBianma("001"));
+		mv.addObject("areaList", DictsUtil.getDictsByParentBianma(dictionariesService,"001"));
 		return mv;
 	}
 	
@@ -141,9 +140,7 @@ public class BettingController extends BaseController {
 		mv.setViewName("betting/betting/betting_edit");
 		mv.addObject("msg", "save");
 		mv.addObject("pd", pd);
-		
-		DictsUtil dictUtil=new DictsUtil(dictionariesService);
-		mv.addObject("areaList", dictUtil.getDictsByParentBianma("001"));
+		mv.addObject("areaList", DictsUtil.getDictsByParentBianma(dictionariesService,"001"));
 		return mv;
 	}	
 	
@@ -160,9 +157,7 @@ public class BettingController extends BaseController {
 		mv.setViewName("betting/betting/betting_edit");
 		mv.addObject("msg", "edit");
 		mv.addObject("pd", pd);
-		
-		DictsUtil dictUtil=new DictsUtil(dictionariesService);
-		mv.addObject("areaList", dictUtil.getDictsByParentBianma("001"));
+		mv.addObject("areaList", DictsUtil.getDictsByParentBianma(dictionariesService,"001"));
 		return mv;
 	}	
 	
@@ -270,8 +265,7 @@ public class BettingController extends BaseController {
 		mv.addObject("searchJson",jsonArray);
 		mv.addObject("pd", pd);
 		mv.addObject("QX",Jurisdiction.getHC());	//按钮权限
-		DictsUtil dictUtil=new DictsUtil(dictionariesService);
-		mv.addObject("areaList", dictUtil.getDictsByParentBianma("001"));
+		mv.addObject("areaList", DictsUtil.getDictsByParentBianma(dictionariesService,"001"));
 		return mv;
 	}
 	

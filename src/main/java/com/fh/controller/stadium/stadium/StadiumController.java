@@ -247,8 +247,7 @@ public class StadiumController extends BaseController {
 		mv.addObject("pd", pd);
 		mv.addObject("QX",Jurisdiction.getHC());	//按钮权限
 		
-		DictsUtil dictUtil=new DictsUtil(dictionariesService);
-		mv.addObject("areaList", dictUtil.getDictsByParentBianma("001"));
+		mv.addObject("areaList", DictsUtil.getDictsByParentBianma(dictionariesService,"001"));
 		mv.addObject("natureList", Nature.values());
 		
 		return mv;
@@ -266,8 +265,7 @@ public class StadiumController extends BaseController {
 		mv.setViewName("stadium/stadium/stadium_edit");
 		mv.addObject("msg", "save");
 		mv.addObject("pd", pd);	
-		DictsUtil dictUtil=new DictsUtil(dictionariesService);
-		mv.addObject("areaList", dictUtil.getDictsByParentBianma("001"));
+		mv.addObject("areaList", DictsUtil.getDictsByParentBianma(dictionariesService,"001"));
 		mv.addObject("natureList", Nature.values());
 		
 		return mv;
@@ -286,9 +284,7 @@ public class StadiumController extends BaseController {
 		mv.setViewName("stadium/stadium/stadium_edit");
 		mv.addObject("msg", "edit");
 		mv.addObject("pd", pd);
-		
-		DictsUtil dictUtil=new DictsUtil(dictionariesService);
-		mv.addObject("areaList", dictUtil.getDictsByParentBianma("001"));
+		mv.addObject("areaList", DictsUtil.getDictsByParentBianma(dictionariesService,"001"));
 		mv.addObject("natureList", Nature.values());
 		
 		
@@ -393,8 +389,7 @@ public class StadiumController extends BaseController {
 		mv.addObject("searchJson",jsonArray);
 		mv.addObject("pd", pd);
 		mv.addObject("QX",Jurisdiction.getHC());	//按钮权限
-		DictsUtil dictUtil=new DictsUtil(dictionariesService);
-		mv.addObject("areaList", dictUtil.getDictsByParentBianma("001"));
+		mv.addObject("areaList", DictsUtil.getDictsByParentBianma(dictionariesService,"001"));
 		return mv;
 	}
 	
