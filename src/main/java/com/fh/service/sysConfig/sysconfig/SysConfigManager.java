@@ -63,5 +63,11 @@ public interface SysConfigManager{
 	 * @throws Exception
 	 */
 	public String currentSection(PageData pd)throws Exception;
+	
+	/**获取系统配置信息
+	 * @param pd
+	 * @throws Exception
+	 */
+	public String getSysConfigByKey(PageData pd)throws Exception;
 }
 

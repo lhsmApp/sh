@@ -113,4 +113,11 @@
 		where KEY_CODE = 'SystemDataTime'
 	</select>
 	
+	<!-- 获取系统配置信息-->
+	<select id="getSysConfigByKey" parameterType="pd" resultType="String">
+		select KEY_VALUE
+		from
+        <include refid="tableName"></include>
+		where KEY_CODE = #{KEY_CODE}
+	</select>
 </mapper>
