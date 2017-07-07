@@ -538,4 +538,32 @@
 			#{item}
 		</foreach>
 	</delete>
+	
+	<!-- 批量更新凭证号-->
+	<update id="updateCertCode" parameterType="pd">
+		<foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
+		    <if test="item!=null">
+		        update
+		        ${item.TABLE_CODE}
+		        set 
+		    	    CERT_CODE = #{item.CERT_CODE}
+		        where 
+		        BILL_CODE = #{item.BILL_CODE}
+		    </if>
+		</foreach>
+	</update>
+	
+	<!-- 批量更新冲销凭证号-->
+	<update id="updateRevCertCode" parameterType="pd">
+		<foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
+		    <if test="item!=null">
+		        update
+		        ${item.TABLE_CODE}
+		        set 
+		    	    REVCERT_CODE = #{item.REVCERT_CODE}
+		        where 
+		        BILL_CODE = #{item.BILL_CODE}
+		    </if>
+		</foreach>
+	</update>
 </mapper>

@@ -20,13 +20,18 @@
 
 <!-- 最新版的Jqgrid Css，如果旧版本（Ace）某些方法不好用，尝试用此版本Css，替换旧版本Css -->
 <!-- <link rel="stylesheet" type="text/css" media="screen" href="static/ace/css/ui.jqgrid-bootstrap.css" /> -->
-<style>
-.page-header {
-	padding-top: 9px;
-	padding-bottom: 9px;
-	margin: 0 0 8px;
-}
-</style>
+<script type="text/javascript" src="static/js/jquery-1.7.2.js"></script>
+<!-- 树形下拉框start -->
+<script type="text/javascript" src="plugins/selectZtree/selectTree.js"></script>
+<script type="text/javascript" src="plugins/selectZtree/framework.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="plugins/selectZtree/import_fh.css" />
+<script type="text/javascript" src="plugins/selectZtree/ztree/ztree.js"></script>
+<link type="text/css" rel="stylesheet"
+	href="plugins/selectZtree/ztree/ztree.css"></link>
+<!-- 树形下拉框end -->
+<!-- 标准页面统一样式 -->
+<link rel="stylesheet" href="static/css/normal.css" />
 
 </head>
 <body class="no-skin">
@@ -37,8 +42,9 @@
 					<!-- /section:settings.box -->
 					<div class="page-header">
 						<span class="label label-xlg label-success arrowed-right">东部管道</span>
-							<!-- arrowed-in-right --> 
-						<span class="label label-xlg label-yellow arrowed-in arrowed-right"
+						<!-- arrowed-in-right -->
+						<span
+							class="label label-xlg label-yellow arrowed-in arrowed-right"
 							id="subTitle" style="margin-left: 2px;">业务封存</span> <span
 							style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
 						<button id="btnQuery" class="btn btn-white btn-info btn-sm"
@@ -55,33 +61,31 @@
 									<div class="widget-main">
 										<!-- <p class="alert alert-info">Nunc aliquam enim ut arcu.</p> -->
 										<form class="form-inline">
-
-											<span> <select class="chosen-select form-control"
-												name="RPT_DEPT" id="RPT_DEPT" data-placeholder="请选单位"
-												style="vertical-align: top; height: 32px; width: 150px;">
-													<option value="">请选择单位</option>
-													<c:forEach items="${deptList}" var="dept">
-														<option value="${dept}"
-															<c:if test="${pd.RPT_DEPT==dept}">selected</c:if>>${dept }</option>
-													</c:forEach>
-											</select>
-											</span> <span> <select class="chosen-select form-control"
-												name="BILL_TYPE" id="BILL_TYPE" data-placeholder="请选类型"
-												style="vertical-align: top; height: 32px; width: 150px;">
-													<option value="">请选择类型</option>
-													<c:forEach items="${billTypeList}" var="billType">
-														<option value="${billType.nameValue}"
-															<c:if test="${pd.BILL_TYPE==billType.nameValue}">selected</c:if>>${billType.nameValue}</option>
-													</c:forEach>
-											</select>
-											</span> <span> <select class="chosen-select form-control"
-												name="STATUS" id="STATUS" data-placeholder="请选状态"
-												style="vertical-align: top; height: 32px; width: 150px;">
-													<option value="">请选择状态</option>
-													<option value="0">解封</option>
-													<option value="1">封存</option>
-
-											</select>
+											<span style="margin-right: 5px;">
+												<div class="selectTree" id="selectTree" multiMode="true"
+													allSelectable="false" noGroup="false"></div>
+												<input type="text" id="RPT_DEPT" hidden></input>
+											 </span> 
+											<span style="margin-right: 5px;"> 
+												<select
+													class="chosen-select form-control" name="BILL_TYPE"
+													id="BILL_TYPE" data-placeholder="请选择类型"
+													style="vertical-align: top; height: 32px; width: 150px;">
+														<option value="">请选择类型</option>
+														<c:forEach items="${billTypeList}" var="billType">
+															<option value="${billType.nameKey}"
+																<c:if test="${pd.BILL_TYPE==billType.nameKey}">selected</c:if>>${billType.nameValue}</option>
+														</c:forEach>
+												</select>
+											</span> 
+											<span style="margin-right: 5px;"> 
+												<select class="chosen-select form-control"
+													name="STATUS" id="STATUS" data-placeholder="请选状态"
+													style="vertical-align: top; height: 32px; width: 150px;">
+														<option value="">请选择状态</option>
+														<option value="0">解封</option>
+														<option value="1">封存</option>
+												</select>
 											</span>
 											<button type="button" class="btn btn-info btn-sm"
 												onclick="tosearch();">
@@ -155,47 +159,35 @@
 					formatter:'actions', 
 					formatoptions:{ 
                         onSuccess: function(response) {
-							
 							if(response.responseJSON.code==0){
 								return [true];
 							}else{
 								return [false, response.responseJSON.message];
-							}
-							
-                            /* if (jsonResponse.State != 'Success') {
-                                return [false, jsonResponse.ResponseMessage];
-                            } else {
-                                return [true];
-                            }  */                    
+							}                
                         },
                         onError :function(rowid, res, stat, err) {
                         	if(err!=null)
                         		console.log(err);
                         },
-                        
                         afterSave:function(rowid, res){
-                        	console.log("afterSave");
                         	$(".tooltip").remove();
                         	/* $("#jqGrid").trigger("reloadGrid"); */
                         },
-					
 						keys:true,
 					    delbutton: false,//disable delete button
 					}
 				},
 				
-				{label: '单据编码',name:'BILL_CODE', width:100,hidden : true,editable: true},
+				{ label: '单据编码',name:'BILL_CODE', width:100,hidden : true,editable: true},
 				{ label: '单据单位', name: 'RPT_DEPT', width: 90,hidden : true,editable: true,},
 				{ label: '单据期间', name: 'RPT_DUR', width: 60,hidden : true,editable: true,},
 				
-				
-				{label: '单据编码',name:'BILL_CODE', width:100},
+				{ label: '单据编码',name:'BILL_CODE', width:100},
 				{ label: '单据单位', name: 'NAME', width: 90},
 				{ label: '单据期间', name: 'RPT_DUR', width: 60},
-				{ label: '上传人', name: 'RPT_USER', width: 60},
+				{ label: '上传人', name: 'USERNAME', width: 60},
 				{ label: '上传时间', name: 'RPT_DATE', width: 80, formatter: 'data'},
-				// sorttype is used only if the data is loaded locally or loadonce is set to true
-				{ label: '单据类型', name: 'BILL_TYPE_TR', width: 80,align:'center'},                  
+				{ label: '单据类型', name: 'BILL_TYPE_TR', width: 80},                  
 				{ label: '状态', name: 'STATE', width: 80, editable: true,align:'center',formatter: customFmatterState,edittype:"checkbox",editoptions: {value:"0:1"},unformat: aceSwitch}                   
 			],
 			reloadAfterSubmit: true, 
@@ -278,7 +270,6 @@
 			}
 		);
 	
-		
 		// 批量编辑
         $('#jqGrid').navButtonAdd('#jqGridPager',
         {
@@ -385,7 +376,7 @@
 						$(top.hangge());//关闭加载状态
 						$("#subTitle").tips({
 							side : 3,
-							msg : '保存失败,' + response.responseJSON.message,
+							msg : '保存失败,' + response.message,
 							bg : '#cc0033',
 							time : 3
 						});
@@ -399,6 +390,7 @@
 	
 		//检索
 		function tosearch() {
+			console.log($("#RPT_DEPT").val());
 			var RPT_DEPT = $("#RPT_DEPT").val();
 			var STATUS = $("#STATUS").val();
 			var BILL_TYPE = $("#BILL_TYPE").val();
@@ -420,6 +412,24 @@
 				return '<span class="label label-success arrowed">解封</span>';
 			}
 		};
+		
+		//加载单位树
+		function initComplete(){
+			//下拉树
+			var defaultNodes = {"treeNodes":${zTreeNodes}};
+			//绑定change事件
+			$("#selectTree").bind("change",function(){
+				if($(this).attr("relValue")){
+					$("#RPT_DEPT").val($(this).attr("relValue"));
+					console.log($(this).attr("relValue"));
+					//$("#DNAME").val($(this).attr("relText"));
+			    }
+			});
+			//赋给data属性
+			$("#selectTree").data("data",defaultNodes);  
+			$("#selectTree").render();
+			$("#selectTree2_input").val("请选择单位");
+		}
 	</script>
 </body>
 </html>

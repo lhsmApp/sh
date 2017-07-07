@@ -1,5 +1,6 @@
 package com.fh.controller.common;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,8 @@ import com.fh.service.system.dictionaries.DictionariesManager;
 import com.fh.service.tmplConfigDict.tmplconfigdict.TmplConfigDictManager;
 import com.fh.util.PageData;
 import com.fh.util.StringUtil;
+
+import net.sf.json.JSONArray;
 
 /**
  * 字典信息通用类
@@ -73,7 +76,6 @@ public class DictsUtil {
 	 */
 	public static String getDepartmentValue(DepartmentManager departmentService) throws Exception {
 		StringBuilder ret = new StringBuilder();
-		Map<String, String> dicAdd = new HashMap<String, String>();
 		PageData pd = new PageData();
 		List<Department> listPara = (List<Department>) departmentService.getDepartDic(pd);
 		for (Department dic : listPara) {
@@ -81,8 +83,38 @@ public class DictsUtil {
 				ret.append(";");
 			}
 			ret.append(dic.getDEPARTMENT_CODE() + ":" + dic.getNAME());
-			dicAdd.put(dic.getDEPARTMENT_CODE(), dic.getNAME());
 		}
 		return ret.toString();
+	}
+	
+	/**
+	 * 获取自定类型信息，生成Jqgrid editOptions和SearchOptions所需的Select格式。
+	 * @param departmentService
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getDicTypeValue(TmplConfigDictManager tmplconfigdictService) throws Exception {
+		StringBuilder ret = new StringBuilder();
+		PageData pd = new PageData();
+		List<PageData> listPara = (List<PageData>) tmplconfigdictService.listAll(pd);
+		for (PageData dic : listPara) {
+			if (ret != null && !ret.toString().trim().equals("")) {
+				ret.append(";");
+			}
+			ret.append(dic.getString("DICT_CODE") + ":" + dic.getString("DICT_NAME"));
+		}
+		return ret.toString();
+	}
+	
+	/**
+	 * 获取组织机构树数据源
+	 * @param departmentService
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getDepartmentSelectTreeSource(DepartmentManager departmentService) throws Exception{
+		List<PageData> zdepartmentPdList = new ArrayList<PageData>();
+		JSONArray arr = JSONArray.fromObject(departmentService.listAllDepartmentToSelect("0", zdepartmentPdList));
+		return (null == arr ? "" : arr.toString());
 	}
 }

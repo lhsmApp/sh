@@ -79,28 +79,29 @@
 	<!-- 列表 -->
 	<select id="datalistJqPage" parameterType="jqPage" resultType="pd">
 		select
-		<include refid="Field"></include>
-		, OA_DEPARTMENT.NAME
-
+		A.*, B.NAME,C.NAME as USERNAME
 		from
-		<include refid="tableName"></include>
-		, OA_DEPARTMENT
+		<include refid="tableName"></include> A
+		left join OA_DEPARTMENT B
+		on A.RPT_DEPT=B.DEPARTMENT_CODE
+		left join sys_user C
+		on A.RPT_USER=C.USER_ID
 		<where>
-			RPT_DEPT = OA_DEPARTMENT.DEPARTMENT_CODE
-			<if test="pd.RPT_DEPT!= null and pd.RPT_DEPT != ''"><!-- 根据本门单位检索 -->
-				and (
-				RPT_DEPT LIKE CONCAT(CONCAT('%', #{pd.RPT_DEPT}),'%')
-				)
+			<!-- <if test="pd.RPT_DEPT!= null and pd.RPT_DEPT != ''">根据本门单位检索
+				and RPT_DEPT LIKE CONCAT(CONCAT('%', #{pd.RPT_DEPT}),'%')
+			</if> -->
+			<if test="pd.RPT_DEPTS!= null and pd.RPT_DEPTS != ''"><!-- 根据本门单位检索 -->
+				and RPT_DEPT in 
+				<foreach item="item" index="index" collection="pd.RPT_DEPTS" open="("
+					separator="," close=")">
+					#{item}
+				</foreach>
 			</if>
 			<if test="pd.BILL_TYPE!= null and pd.BILL_TYPE != ''">
-				and (
-				BILL_TYPE = #{pd.BILL_TYPE}
-				)
+				and BILL_TYPE = #{pd.BILL_TYPE}
 			</if>
 			<if test="pd.STATUS!= null and pd.STATUS != ''">
-				and (
-				STATE = #{pd.STATUS}
-				)
+				and STATE = #{pd.STATUS}
 			</if>
 			<if test="pd.filterWhereResult != null">
 				${pd.filterWhereResult}
@@ -117,8 +118,27 @@
 	<select id="count" parameterType="pd" resultType="int">
 		select count(*) from
 		<include refid="tableName"></include>
-		<!-- <where> <if test="menuId != null and '' != menuId" > AND menuId = 
-			#{menuId} </if> </where> -->
+		<where>
+			<!-- <if test="pd.RPT_DEPT!= null and pd.RPT_DEPT != ''">根据本门单位检索
+				and RPT_DEPT LIKE CONCAT(CONCAT('%', #{pd.RPT_DEPT}),'%')
+			</if> -->
+			<if test="RPT_DEPTS!= null and RPT_DEPTS != ''"><!-- 根据本门单位检索 -->
+				and RPT_DEPT in 
+				<foreach item="item" index="index" collection="RPT_DEPTS" open="("
+					separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="BILL_TYPE!= null and BILL_TYPE != ''">
+				and BILL_TYPE = #{BILL_TYPE}
+			</if>
+			<if test="STATUS!= null and STATUS != ''">
+				and STATE = #{pd.STATUS}
+			</if>
+			<if test="filterWhereResult != null">
+				${filterWhereResult}
+			</if>
+		</where>
 	</select>
 
 	<!-- 列表(全部) -->
@@ -140,15 +160,6 @@
 			#{item}
 		</foreach>
 	</delete>
-
-
-	<!-- 单位列表 -->
-	<select id="deptList" resultType="String">
-		select
-		RPT_DEPT
-		from
-		<include refid="tableName"></include>
-	</select>
 
 	<!-- 获取状态 -->
 	<select id="getState" parameterType="pd" resultType="String">
