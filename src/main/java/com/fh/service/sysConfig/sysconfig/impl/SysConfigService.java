@@ -89,5 +89,14 @@ public class SysConfigService implements SysConfigManager{
 	public String currentSection(PageData pd)throws Exception{
 		return (String) dao.findForObject("SysConfigMapper.currentSection", pd);
 	}
+	
+	/**获取系统期间
+	 * 张晓柳
+	 * @param pd
+	 * @throws Exception
+	 */
+	public String getSysConfigByKey(PageData pd)throws Exception{
+		return (String) dao.findForObject("SysConfigMapper.getSysConfigByKey", pd);
+	}
 }
 

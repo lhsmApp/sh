@@ -1,5 +1,6 @@
 package com.fh.controller.voucher.voucher;
 
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -9,7 +10,10 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.xml.namespace.QName;
 
+import org.apache.axis.client.Call;
+import org.apache.axis.client.Service;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
@@ -31,6 +35,7 @@ import com.fh.entity.SysSealed;
 import com.fh.entity.TableColumns;
 import com.fh.entity.system.User;
 import com.fh.service.fhoa.department.DepartmentManager;
+import com.fh.service.sysConfig.sysconfig.SysConfigManager;
 import com.fh.service.sysSealedInfo.syssealedinfo.SysSealedInfoManager;
 import com.fh.service.system.dictionaries.DictionariesManager;
 import com.fh.service.tmplConfigDict.tmplconfigdict.TmplConfigDictManager;
@@ -79,9 +84,12 @@ public class VoucherController extends BaseController {
 
 	@Resource(name = "syssealedinfoService")
 	private SysSealedInfoManager syssealedinfoService;
-	
-	//底行显示的求和与平均值字段
-	private	StringBuilder SqlUserdata = new StringBuilder();
+
+	@Resource(name = "sysconfigService")
+	private SysConfigManager sysConfigManager;
+
+	// 底行显示的求和与平均值字段
+	private StringBuilder SqlUserdata = new StringBuilder();
 
 	/**
 	 * 列表
@@ -134,14 +142,14 @@ public class VoucherController extends BaseController {
 		String jqGridColModelSub = tmplUtil.generateStructureNoEdit(tableCodeSub,
 				Jurisdiction.getCurrentDepartmentID());
 		mv.addObject("jqGridColModelSub", jqGridColModelSub);
-		
-		//底行显示的求和与平均值字段
+
+		// 底行显示的求和与平均值字段
 		SqlUserdata = tmplUtil.getSqlUserdata();
-		boolean hasUserData=false;
-		if(SqlUserdata!=null && !SqlUserdata.toString().trim().equals("")){
-			hasUserData=true;
+		boolean hasUserData = false;
+		if (SqlUserdata != null && !SqlUserdata.toString().trim().equals("")) {
+			hasUserData = true;
 		}
-		mv.addObject("HasUserData",hasUserData );
+		mv.addObject("HasUserData", hasUserData);
 		return mv;
 	}
 
@@ -157,23 +165,21 @@ public class VoucherController extends BaseController {
 		PageData pd = new PageData();
 		pd = this.getPageData();
 		String which = pd.getString("TABLE_CODE");
-	    String voucherType=pd.getString("VOUCHER_TYPE");
+		String voucherType = pd.getString("VOUCHER_TYPE");
 		String tableCode = getTableCode(which);
 		pd.put("TABLE_CODE", tableCode);
-		String sealType= getSealType(which,voucherType);
-		pd.put("BILL_TYPE", sealType);//封存类型
-		String sealType1="";//汇总封存类型对应的传输接口类型
-		if(sealType.equals(BillType.SALLARY_SUMMARY.getNameKey())){
-			sealType1=BillType.SALLARY_LISTEN.getNameKey();
+		String sealType = getSealType(which, voucherType);
+		pd.put("BILL_TYPE", sealType);// 封存类型
+		String sealType1 = "";// 汇总封存类型对应的传输接口类型
+		if (sealType.equals(BillType.SALLARY_SUMMARY.getNameKey())) {
+			sealType1 = BillType.SALLARY_LISTEN.getNameKey();
+		} else if (sealType.equals(BillType.GOLD_SUMMARY.getNameKey())) {
+			sealType1 = BillType.GOLD_LISTEN.getNameKey();
+		} else if (sealType.equals(BillType.SECURITY_SUMMARY.getNameKey())) {
+			sealType1 = BillType.SECURITY_LISTEN.getNameKey();
 		}
-		else if(sealType.equals(BillType.GOLD_SUMMARY.getNameKey())){
-			sealType1=BillType.GOLD_LISTEN.getNameKey();
-		}
-		else if(sealType.equals(BillType.SECURITY_SUMMARY.getNameKey())){
-			sealType1=BillType.SECURITY_LISTEN.getNameKey();
-		}
-		pd.put("BILL_TYPE1", sealType1);//封存类型
-		
+		pd.put("BILL_TYPE1", sealType1);// 封存类型
+
 		String keywords = pd.getString("keywords"); // 关键词检索条件
 		if (null != keywords && !"".equals(keywords)) {
 			pd.put("keywords", keywords.trim());
@@ -182,7 +188,7 @@ public class VoucherController extends BaseController {
 		if (null != filters && !"".equals(filters)) {
 			pd.put("filterWhereResult", SqlTools.constructWhere(filters, null));
 		}
-		
+
 		page.setPd(pd);
 		List<PageData> varList = voucherService.list(page); // 列出Betting列表
 		int records = voucherService.countJqGrid(pd);
@@ -192,8 +198,8 @@ public class VoucherController extends BaseController {
 		result.setRecords(records);
 		result.setPage(page.getPage());
 		PageData userdata = null;
-		if(SqlUserdata!=null && !SqlUserdata.toString().trim().equals("")){
-			//底行显示的求和与平均值字段
+		if (SqlUserdata != null && !SqlUserdata.toString().trim().equals("")) {
+			// 底行显示的求和与平均值字段
 			pd.put("Userdata", SqlUserdata.toString());
 			userdata = voucherService.getFooterSummary(page);
 			result.setUserdata(userdata);
@@ -266,43 +272,54 @@ public class VoucherController extends BaseController {
 		String strDataRows = pd.getString("DATA_ROWS");
 		JSONArray array = JSONArray.fromObject(strDataRows);
 		List<PageData> listTransferData = (List<PageData>) JSONArray.toCollection(array, PageData.class);// 过时方法
-
-		try{
+		try {
 			if (null != listTransferData && listTransferData.size() > 0) {
 				/********************** 生成传输数据 ************************/
 				String which = pd.getString("TABLE_CODE");
 				String tableCode = getTableCode(which);
 				// String voucherType=pd.getString("VOUCHER_TYPE");
-	
+
 				// 用语句查询出数据库表的所有字段及其属性；拼接成jqgrid全部列
 				List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCode);
 				GenerateTransferData generateTransferData = new GenerateTransferData();
-				String transferData = generateTransferData.generateVoucherData(tableColumns, listTransferData, "001001",
+				String transferData = generateTransferData.generateVoucherData(tableColumns, listTransferData, "3630",
 						TransferOperType.INSERT, tableCode);
+
 				// 执行上传FIMS
-	
-				// 执行上传成功后对数据进行封存
-				List<SysSealed> listSysSealed=new ArrayList<SysSealed>();
-				User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
-				String userId = user.getUSER_ID();
-				for (PageData pageData : listTransferData) {
-					SysSealed item = new SysSealed();
-					item.setBILL_CODE(pageData.getString("BILL_CODE"));
-					item.setRPT_DEPT(pageData.getString("DEPT_CODE"));
-					item.setRPT_DUR(pageData.getString("BUSI_DATE"));
-					item.setRPT_USER(userId);
-					item.setRPT_DATE(DateUtils.getCurrentTime());// YYYY-MM-DD HH:MM:SS
-					String sealType= getSealType(which,"2");//封存类型
-					item.setBILL_TYPE(sealType);
-					item.setSTATE("1");// 枚举 1封存,0解封
-					listSysSealed.add(item);
+				Service service = new Service();
+				Call call = (Call) service.createCall();
+				pd.put("KEY_CODE", "JSynFactTableData");
+				String strUrl = sysConfigManager.getSysConfigByKey(pd);
+				URL url = new URL(strUrl);
+				call.setTargetEndpointAddress(url);
+				call.setOperationName(new QName("http://JSynFactTableData.j2ee", "synFactData"));
+				call.setUseSOAPAction(true);
+				String message = (String) call.invoke(new Object[] { transferData });
+				System.out.println(message);
+				if (message != null) {
+					// 执行上传成功后对数据进行封存
+					List<SysSealed> listSysSealed = new ArrayList<SysSealed>();
+					User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
+					String userId = user.getUSER_ID();
+					for (PageData pageData : listTransferData) {
+						SysSealed item = new SysSealed();
+						item.setBILL_CODE(pageData.getString("BILL_CODE"));
+						item.setRPT_DEPT(pageData.getString("DEPT_CODE"));
+						item.setRPT_DUR(pageData.getString("BUSI_DATE"));
+						item.setRPT_USER(userId);
+						item.setRPT_DATE(DateUtils.getCurrentTime());// YYYY-MM-DD
+																		// HH:MM:SS
+						String sealType = getSealType(which, "2");// 封存类型
+						item.setBILL_TYPE(sealType);
+						item.setSTATE("1");// 枚举 1封存,0解封
+						listSysSealed.add(item);
+					}
+					syssealedinfoService.insertBatch(listSysSealed);
+					/******************************************************/
+					commonBase.setCode(0);
 				}
-				syssealedinfoService.insertBatch(listSysSealed);
-				/******************************************************/
-				commonBase.setCode(0);
 			}
-		}
-		catch(Exception ex){
+		} catch (Exception ex) {
 			commonBase.setMessage(ex.toString());
 		}
 		return commonBase;
@@ -327,16 +344,16 @@ public class VoucherController extends BaseController {
 		}
 		return tableCode;
 	}
-	
+
 	/**
 	 * 根据前端业务表索引,及凭证功能类型获取封存类型
 	 * 
 	 * @param which
 	 * @return
 	 */
-	private String getSealType(String which,String voucherType) {
+	private String getSealType(String which, String voucherType) {
 		String sealType = "";
-		if(voucherType.equals("1")){
+		if (voucherType.equals("1")) {
 			if (which != null && which.equals("1")) {
 				sealType = BillType.SALLARY_SUMMARY.getNameKey();
 			} else if (which != null && which.equals("2")) {
@@ -346,7 +363,7 @@ public class VoucherController extends BaseController {
 			} else {
 				sealType = BillType.SALLARY_SUMMARY.getNameKey();
 			}
-		}else if(voucherType.equals("2")){
+		} else if (voucherType.equals("2")) {
 			if (which != null && which.equals("1")) {
 				sealType = BillType.SALLARY_LISTEN.getNameKey();
 			} else if (which != null && which.equals("2")) {
@@ -359,25 +376,27 @@ public class VoucherController extends BaseController {
 		}
 		return sealType;
 	}
-	
-	/**汇总数据未上报单位
+
+	/**
+	 * 汇总数据未上报单位
+	 * 
 	 * @param
 	 * @throws Exception
 	 */
-	@RequestMapping(value="/transferValidate")
-	public ModelAndView transferValidate()throws Exception{
+	@RequestMapping(value = "/transferValidate")
+	public ModelAndView transferValidate() throws Exception {
 		ModelAndView mv = this.getModelAndView();
 		PageData pd = this.getPageData();
 		String which = pd.getString("TABLE_CODE");
 		pd.put("TABLE_CODE", which);
-		//String empty=" : ;";
-		String strDict=DictsUtil.getDepartmentValue(departmentService);
+		// String empty=" : ;";
+		String strDict = DictsUtil.getDepartmentValue(departmentService);
 		pd.put("strDict", strDict);
 		mv.setViewName("voucher/voucher/voucher_transvali");
 		mv.addObject("pd", pd);
 		return mv;
 	}
-	
+
 	/**
 	 * 列表
 	 * 
@@ -390,8 +409,8 @@ public class VoucherController extends BaseController {
 		String which = pd.getString("TABLE_CODE");
 		String tableCode = getTableCode(which);
 		pd.put("TABLE_CODE", tableCode);
-		String sealType= getSealType(which,"1");
-		pd.put("BILL_TYPE", sealType);//封存类型
+		String sealType = getSealType(which, "1");
+		pd.put("BILL_TYPE", sealType);// 封存类型
 		String filters = pd.getString("filters"); // 多条件过滤条件
 		if (null != filters && !"".equals(filters)) {
 			pd.put("filterWhereResult", SqlTools.constructWhere(filters, null));

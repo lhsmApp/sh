@@ -54,13 +54,12 @@
 									style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
 
 									<button id="btnQuery" class="btn btn-white btn-info btn-sm"
-										onclick="showQueryCondi()">
+										onclick="showQueryCondi($('#jqGrid'))">
 										<i class="ace-icon fa fa-chevron-up bigger-120 blue"></i> <span>隐藏查询</span>
 									</button>
 
-									<button id="btnCopy" class="btn btn-white btn-info btn-sm"
-										style="margin-left: 10px;" onclick="copyData()">
-										<span>复制</span>
+									<button id="btnCopy" class="btn btn-white btn-info btn-sm" onclick="copyData()">
+										<i class="ace-icon fa  fa-exchange  bigger-120 blue"></i><span>复制</span>
 									</button></td>
 							</tr>
 						</table>
@@ -73,35 +72,27 @@
 								<div class="widget-body">
 									<div class="widget-main">
 										<form class="form-inline">
-											<table>
-												<tr>
-													<td><input name="DEPARTMENT_CODE" id="DEPARTMENT_CODE"
-														type="hidden" value="${pd.DEPARTMENT_CODE }" /></td>
-													<td><input name="DNAME" id="DNAME" type="hidden"
-														value="${pd.DNAME }" /></td>
-													<td><span> <select
-															class="chosen-select form-control" name="TABLE_NO"
-															id=TABLE_NO data-placeholder="请选择表明称"
-															style="vertical-align: top; height: 32px; width: 150px;">
-																<option value="">请选择表名称</option>
-																<c:forEach items="${listBase}" var="tableName">
-																	<option value="${tableName.TABLE_NO}"
-																		<c:if test="${pd.TABLE_NO==tableName.TABLE_NO}">selected</c:if>>${tableName.TABLE_NAME  }</option>
-																</c:forEach>
-														</select>
-													</span></td>
-													<td style="padding-left: 5px">
-														<div class="selectTree" id="selectTree" multiMode="false"
-															allSelectable="false" noGroup="false"></div>
-													</td>
-													<td style="padding-left: 5px">
-														<button type="button" class="btn btn-info btn-sm"
-															onclick="tosearch();">
-															<i class="ace-icon fa fa-search bigger-110"></i>
-														</button>
-													</td>
-												</tr>
-											</table>
+											<input name="DEPARTMENT_CODE" id="DEPARTMENT_CODE"
+												type="hidden" value="${pd.DEPARTMENT_CODE }" /> <input
+												name="DNAME" id="DNAME" type="hidden" value="${pd.DNAME }" />
+											<span class="pull-left" style="margin-right: 5px;"> 
+												<select class="chosen-select form-control"
+													name="TABLE_NO" id=TABLE_NO data-placeholder="请选择表明称"
+													style="vertical-align: top; height: 32px; width: 150px;">
+														<option value="">请选择表名称</option>
+														<c:forEach items="${listBase}" var="tableName">
+															<option value="${tableName.TABLE_NO}"
+																<c:if test="${pd.TABLE_NO==tableName.TABLE_NO}">selected</c:if>>${tableName.TABLE_NAME  }</option>
+														</c:forEach>
+												</select>
+											</span>
+											<span class="pull-left" style="margin-right: 5px;">
+												<div class="selectTree" id="selectTree" multiMode="false"
+													allSelectable="false" noGroup="false"></div>
+											</span>
+											<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
+												<i class="ace-icon fa fa-search bigger-110"></i>
+											</button>
 										</form>
 									</div>
 								</div>
@@ -156,7 +147,8 @@
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
 			$("#jqGrid").jqGrid( 'setGridWidth', $(".page-content").width());
-			$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - 230);
+			//$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - 230);
+			resizeGridHeight($("#jqGrid"));
 	    })
 		
 		$("#jqGrid").jqGrid({
@@ -167,8 +159,6 @@
 				{ label: '单位编码', name: 'DEPT_CODE', width: 60,hidden : true,editable: true,},
 				{ label: '表编码', name: 'TABLE_CODE', width: 60,hidden : true,editable: true,},
 				{ label: '列编码', name: 'COL_CODE', width: 60,hidden : true,editable: true,},
-				//{ label: '列编码', name: 'DICT_TRANS', width: 60,hidden : true,editable: true,},
-			
 				{label: '单位',name:'DNAME', width:100}, 
 				{ label: '表名', name: 'TABLE_NAME', width: 90},
 				{ label: '列编码', name: 'COL_CODE', width: 60},
@@ -257,8 +247,7 @@
 				
 			}
 		);
-	
-		
+
 		// 批量编辑
         $('#jqGrid').navButtonAdd('#jqGridPager',
         {
@@ -291,8 +280,6 @@
         });
  	});
 
-	
-	
 	 //批量编辑
 	function batchEdit(e) {
 		var grid = $("#jqGrid");
@@ -364,199 +351,121 @@
 		}); 
 	 }
 	
-	
-	
-	
-	
-		//检索
-		function tosearch() {
-			
-			if($("#TABLE_NO").val()==""){
-				$("#TABLE_NO").tips({
-					side:3,
-		            msg:'请选择表名称',
-		            bg:'#AE81FF',
-		            time:2
-		        });
-				$("#TABLE_NO").focus();
+	//检索
+	function tosearch() {
+		if($("#TABLE_NO").val()==""){
+			$("#TABLE_NO").tips({
+				side:3,
+	            msg:'请选择表名称',
+	            bg:'#AE81FF',
+	            time:2
+	        });
+			$("#TABLE_NO").focus();
 			return false;
-			}
-			if($("#selectTree2_input").val()=="请选择"){
-				document.getElementById("DEPARTMENT_CODE").value="001"; 
-				document.getElementById("DNAME").value="总部"; 
-				
-			}
-			
-			var TABLE_NO = $("#TABLE_NO").val(); 
-			var DEPARTMENT_CODE = $("#DEPARTMENT_CODE").val(); 
-			var TABLE_NAME = $("#TABLE_NO").find("option:selected").text();
-			var DNAME = $("#DNAME").val(); 
-			$("#jqGrid").jqGrid('setGridParam',{  // 重新加载数据
-				url:'<%=basePath%>tmplconfig/getPageList.do?TABLE_NO='+TABLE_NO+'&DEPARTMENT_CODE='+DEPARTMENT_CODE+'&TABLE_NAME='+TABLE_NAME+'&DNAME='+DNAME,  
-				datatype:'json',
-			      page:1
-			}).trigger("reloadGrid");
-			
-		}  
-		
-		//显示隐藏查询
-		function showQueryCondi(){
-			if($(".widget-box").css("display")=="block"){
-				$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass('fa-chevron-down');
-				$("#btnQuery").find("span").text("显示查询");
-				$(window).triggerHandler('resize.jqGrid');
-			}
-			else{
-				$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass('fa-chevron-up');
-				$("#btnQuery").find("span").text("隐藏查询");
-			}
-			$(".widget-box").toggle("fast");
+		}
+		if($("#selectTree2_input").val()=="请选择"){
+			document.getElementById("DEPARTMENT_CODE").value="001"; 
+			document.getElementById("DNAME").value="总部"; 
 			
 		}
+		var TABLE_NO = $("#TABLE_NO").val(); 
+		var DEPARTMENT_CODE = $("#DEPARTMENT_CODE").val(); 
+		var TABLE_NAME = $("#TABLE_NO").find("option:selected").text();
+		var DNAME = $("#DNAME").val(); 
+		$("#jqGrid").jqGrid('setGridParam',{  // 重新加载数据
+			url:'<%=basePath%>tmplconfig/getPageList.do?TABLE_NO='+TABLE_NO+'&DEPARTMENT_CODE='+DEPARTMENT_CODE+'&TABLE_NAME='+TABLE_NAME+'&DNAME='+DNAME,  
+			datatype:'json',
+		      page:1
+		}).trigger("reloadGrid");
 		
+	}  
 		
-		
-		//switch element when editing inline
-		function aceSwitch( cellvalue, options, cell ) {
-		
-			setTimeout(function(){
-				 $(cell).find('input[type=checkbox]')
-					.addClass('ace ace-switch ace-switch-5')
-					.after('<span class="lbl" data-lbl="是             否"></span>'); 
-				 if (cellvalue=="是") {	
-					$(cell).find('input[type=checkbox]').attr('checked','checked');
-				 }else{
-				 	$(cell).find('input[type=checkbox]').removeAttr('checked');
-				 }
-			}, 0);
-			if (cellvalue=="是") {
-				return 1;
-			} else {
-				return 0;
-			} 
-			
+	//switch element when editing inline
+	function aceSwitch( cellvalue, options, cell ) {
+		setTimeout(function(){
+			 $(cell).find('input[type=checkbox]')
+				.addClass('ace ace-switch ace-switch-5')
+				.after('<span class="lbl" data-lbl="是             否"></span>'); 
+			 if (cellvalue=="是") {	
+				$(cell).find('input[type=checkbox]').attr('checked','checked');
+			 }else{
+			 	$(cell).find('input[type=checkbox]').removeAttr('checked');
+			 }
+		}, 0);
+		if (cellvalue=="是") {
+			return 1;
+		} else {
+			return 0;
+		} 
+	}
+	
+	function customFmatterState(cellvalue, options, rowObject){  
+		if (cellvalue==1) {
+			 return '<span class="label label-important arrowed-in">是</span>';
+		} else {
+			return '<span class="label label-success arrowed">否</span>';
 		}
-		
-		function customFmatterState(cellvalue, options, rowObject){  
-			if (cellvalue==1) {
-				 return '<span class="label label-important arrowed-in">是</span>';
-			} else {
-				return '<span class="label label-success arrowed">否</span>';
-			}
-		};
-		
-		
-		
-		 /* function unformatSelect(cellvalue, options, cellobject ) {
-			 var unformatValue = '';
-			 
-			 var strs= new Array(); 
-			 var str = options.colModel.editoptions.value;
-			 strs=str.split(";");
-
-			  $.each(strs, function (index, value)
-			  {
-				  var lastStrs = new Array();
-				  var lastStr = value;
-				  lastStrs=lastStr.split(":");
-				 
-			   if (cellvalue == lastStrs[1])
-			   {
-			    unformatValue = lastStrs[0];
-			    console.log(unformatValue);
-			   }
-			  });
-			  return unformatValue;
-		}
-		  */
-		
-    
-		function initComplete(){
-			console.log("下拉树");
-			//下拉树
-			var defaultNodes = {"treeNodes":${zTreeNodes}};
-			//绑定change事件
-			$("#selectTree").bind("change",function(){
-				console.log($(this));
-				if(!$(this).attr("relValue")){
-			      //  top.Dialog.alert("没有选择节点");
-			    }else{
-					//alert("选中节点文本："+$(this).attr("relText")+"<br/>选中节点值："+$(this).attr("relValue"));
-					$("#DEPARTMENT_CODE").val($(this).attr("relValue"));
-					$("#DNAME").val($(this).attr("relText"));
-			    }
-			});
-			//赋给data属性
-			$("#selectTree").data("data",defaultNodes);  
-			$("#selectTree").render();
-			$("#selectTree2_input").val("${'0'==depname?'请选择':depname}");
-		}
-		
-		
-        
-        function copyData() {
-        	
-        	if('${temporary}'== true){
-				$("#btnCopy").tips({
-					side:3,
-		            msg:'不能复制',
-		            bg:'#AE81FF',
-		            time:2
-		        });
-				$("#btnCopy").focus();
+	};
+	
+	function initComplete(){
+		console.log("下拉树");
+		//下拉树
+		var defaultNodes = {"treeNodes":${zTreeNodes}};
+		//绑定change事件
+		$("#selectTree").bind("change",function(){
+			console.log($(this));
+			if(!$(this).attr("relValue")){
+		      //  top.Dialog.alert("没有选择节点");
+		    }else{
+				//alert("选中节点文本："+$(this).attr("relText")+"<br/>选中节点值："+$(this).attr("relValue"));
+				$("#DEPARTMENT_CODE").val($(this).attr("relValue"));
+				$("#DNAME").val($(this).attr("relText"));
+		    }
+		});
+		//赋给data属性
+		$("#selectTree").data("data",defaultNodes);  
+		$("#selectTree").render();
+		$("#selectTree2_input").val("${'0'==depname?'请选择':depname}");
+	}
+	
+    function copyData() {
+       	if('${temporary}'== true){
+			$("#btnCopy").tips({
+				side:3,
+	            msg:'不能复制',
+	            bg:'#AE81FF',
+	            time:2
+	        });
+			$("#btnCopy").focus();
 			return false;
-			}
-        	
-        	var TABLE_NO = $("#TABLE_NO").val(); 
-			var DEPARTMENT_CODE = $("#DEPARTMENT_CODE").val(); 
-        	 top.jzts();
-			 var diag = new top.Dialog();
-			 diag.Drag = true;
-			 diag.Title = "复制";
-			 diag.URL = '<%=basePath%>department/listAllDepartmentCopy.do?TABLE_NO='+TABLE_NO+'&DEPARTMENT_CODE='+DEPARTMENT_CODE;
-			 diag.Width = 320;
-			 diag.Height = 450;
-			 diag.CancelEvent = function(){ //关闭事件
-				diag.close();
-			 };
-			 diag.show();
 		}
-		
-		<%-- function getDictList() {
-			$.ajax({
-				type: "POST",
-				url: '<%=basePath%>tmplconfig/getDictList.do?',
-		    	dataType:'json',
-				cache: false,
-				success: function(response){
-					if(response.code==0){
-						
-					}else{
-						
-					}
-				},
-		    	error: function(e) {
-					$(top.hangge());//关闭加载状态
-		    	}
-			}); 
-			
-		} --%>
-		var lastSelection;
-		function dbClickRow(rowId, rowIndex, colnumIndex, event){ 
-			if (rowId && rowId !== lastSelection) {
-                var grid = $("#jqGrid");
-                //grid.jqGrid('saveRow',lastSelection);
-                grid.jqGrid('saveRow',lastSelection,false, 'clientArray');
-                grid.jqGrid('restoreRow',lastSelection);
-                grid.jqGrid('editRow',rowId, {keys: true} );
-                lastSelection = rowId;
-            }
-			console.log("双击表格");
-		}
+       	
+       	var TABLE_NO = $("#TABLE_NO").val(); 
+		var DEPARTMENT_CODE = $("#DEPARTMENT_CODE").val(); 
+       	 top.jzts();
+		 var diag = new top.Dialog();
+		 diag.Drag = true;
+		 diag.Title = "复制";
+		 diag.URL = '<%=basePath%>department/listAllDepartmentCopy.do?TABLE_NO='+TABLE_NO+'&DEPARTMENT_CODE='+DEPARTMENT_CODE;
+		 diag.Width = 320;
+		 diag.Height = 450;
+		 diag.CancelEvent = function(){ //关闭事件
+			diag.close();
+		 };
+		 diag.show();
+	}
 	
-	
+	var lastSelection;
+	function dbClickRow(rowId, rowIndex, colnumIndex, event){ 
+		if (rowId && rowId !== lastSelection) {
+              var grid = $("#jqGrid");
+              //grid.jqGrid('saveRow',lastSelection);
+              grid.jqGrid('saveRow',lastSelection,false, 'clientArray');
+              grid.jqGrid('restoreRow',lastSelection);
+              grid.jqGrid('editRow',rowId, {keys: true} );
+              lastSelection = rowId;
+        }
+	}
  	</script>
-
-
 </body>
 </html>

@@ -203,8 +203,7 @@
 
 	<!-- 批量生成 -->
 	<insert id="insertBatch" parameterType="com.fh.entity.SysSealed">
-		<!-- 插入保存 -->
-		insert into
+		<!-- insert into
 		<include refid="tableName"></include>
 		(
 		<include refid="Field"></include>
@@ -216,6 +215,20 @@
 					#{item.BILL_CODE},#{item.RPT_DEPT},#{item.RPT_DUR},#{item.RPT_USER},#{item.RPT_DATE},#{item.BILL_TYPE},#{item.STATE}
 				</trim>
 			</if>
+		</foreach> -->
+		
+		<foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
+		    <if test="item!=null">
+		    	delete from
+				<include refid="tableName"></include>
+				where BILL_CODE = #{item.BILL_CODE}
+				and RPT_DUR = #{item.RPT_DUR}
+				and RPT_DEPT = #{item.RPT_DEPT}
+				and BILL_TYPE = #{item.BILL_TYPE};
+		        insert into
+		        <include refid="tableName"></include>
+		        values (#{item.BILL_CODE},#{item.RPT_DEPT},#{item.RPT_DUR},#{item.RPT_USER},#{item.RPT_DATE},#{item.BILL_TYPE},#{item.STATE})
+		    </if>
 		</foreach>
 	</insert>
 </mapper>
