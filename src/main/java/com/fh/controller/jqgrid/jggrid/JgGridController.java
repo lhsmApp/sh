@@ -35,7 +35,6 @@ import com.fh.util.Jurisdiction;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
 import com.mysql.jdbc.RowData;
-import com.sun.tools.internal.xjc.model.Model;
 
 import net.sf.json.JSONObject;
 
