@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="StaffSummyMapper">
+	
+	<!--表名 -->
+	<sql id="tableName">
+		tb_staff_summy
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="FieldSelectKey">
+		BILL_CODE BILL_CODE__,	
+	</sql>
+	<sql id="Field">
+		BILL_CODE,	
+		BUSI_DATE,	
+		ESTB_DEPT,	
+		USER_GROP,	
+		USER_CATG,	
+		DEPT_CODE,	
+		ORG_UNIT,	
+		SAL_RANGE,	
+		POST_SALY,	
+		BONUS,	
+		CASH_BONUS,	
+		WORK_OT,	
+		BACK_SALY,	
+		RET_SALY,	
+		CHK_CASH,	
+		INTR_SGL_AWAD,	
+		SENY_ALLE,	
+		POST_ALLE,	
+		NS_ALLE,	
+		AREA_ALLE,	
+		EXPT_ALLE,	
+		TECH_ALLE,	
+		LIVE_EXPE,	
+		LIVE_ALLE,	
+		LEAVE_DM,	
+		HOUSE_ALLE,	
+		ITEM_ALLE,	
+		MEAL_EXPE,	
+		TRF_ALLE,	
+		TEL_EXPE,	
+		HLDY_ALLE,	
+		KID_ALLE,	
+		COOL_EXPE,	
+		EXT_SGL_AWAD,	
+		PRE_TAX_PLUS,	
+		GROSS_PAY,	
+		ENDW_INS,	
+		UNEMPL_INS,	
+		MED_INS,	
+		CASD_INS,	
+		HOUSE_FUND,	
+		SUP_PESN,	
+		TAX_BASE_ADJ,	
+		ACCRD_TAX,	
+		AFTER_TAX,	
+		ACT_SALY,	
+		GUESS_DIFF,	
+		CUST_COL1,	
+		CUST_COL2,	
+		CUST_COL3,	
+		CUST_COL4,	
+		CUST_COL5,	
+		CUST_COL6,	
+		CUST_COL7,	
+		CUST_COL8,	
+		CUST_COL9,	
+		CUST_COL10,	
+		ZRZC_CODE,	
+		BILL_STATE,	
+		BILL_USER,	
+		BILL_DATE
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{BILL_CODE},	
+		#{BUSI_DATE},	
+		#{ESTB_DEPT},	
+		#{USER_GROP},	
+		#{USER_CATG},	
+		#{DEPT_CODE},	
+		#{ORG_UNIT},	
+		#{SAL_RANGE},	
+		#{POST_SALY},	
+		#{BONUS},	
+		#{CASH_BONUS},	
+		#{WORK_OT},	
+		#{BACK_SALY},	
+		#{RET_SALY},	
+		#{CHK_CASH},	
+		#{INTR_SGL_AWAD},	
+		#{SENY_ALLE},	
+		#{POST_ALLE},	
+		#{NS_ALLE},	
+		#{AREA_ALLE},	
+		#{EXPT_ALLE},	
+		#{TECH_ALLE},	
+		#{LIVE_EXPE},	
+		#{LIVE_ALLE},	
+		#{LEAVE_DM},	
+		#{HOUSE_ALLE},	
+		#{ITEM_ALLE},	
+		#{MEAL_EXPE},	
+		#{TRF_ALLE},	
+		#{TEL_EXPE},	
+		#{HLDY_ALLE},	
+		#{KID_ALLE},	
+		#{COOL_EXPE},	
+		#{EXT_SGL_AWAD},	
+		#{PRE_TAX_PLUS},	
+		#{GROSS_PAY},	
+		#{ENDW_INS},	
+		#{UNEMPL_INS},	
+		#{MED_INS},	
+		#{CASD_INS},	
+		#{HOUSE_FUND},	
+		#{SUP_PESN},	
+		#{TAX_BASE_ADJ},	
+		#{ACCRD_TAX},	
+		#{AFTER_TAX},	
+		#{ACT_SALY},	
+		#{GUESS_DIFF},	
+		#{CUST_COL1},	
+		#{CUST_COL2},	
+		#{CUST_COL3},	
+		#{CUST_COL4},	
+		#{CUST_COL5},	
+		#{CUST_COL6},	
+		#{CUST_COL7},	
+		#{CUST_COL8},	
+		#{CUST_COL9},	
+		#{CUST_COL10},	
+		#{ZRZC_CODE},	
+		#{BILL_STATE},	
+		#{BILL_USER},	
+		#{BILL_DATE}
+	</sql>
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into 
+	<include refid="tableName"></include>
+		(
+	<include refid="Field"></include>
+		) values (
+	<include refid="FieldValue"></include>
+		)
+	</insert>
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			BILL_CODE = #{BILL_CODE__}
+	</delete>
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+			BILL_CODE = #{BILL_CODE},
+			BUSI_DATE = #{BUSI_DATE},
+			ESTB_DEPT = #{ESTB_DEPT},
+			USER_GROP = #{USER_GROP},
+			USER_CATG = #{USER_CATG},
+			DEPT_CODE = #{DEPT_CODE},
+			ORG_UNIT = #{ORG_UNIT},
+			SAL_RANGE = #{SAL_RANGE},
+			POST_SALY = #{POST_SALY},
+			BONUS = #{BONUS},
+			CASH_BONUS = #{CASH_BONUS},
+			WORK_OT = #{WORK_OT},
+			BACK_SALY = #{BACK_SALY},
+			RET_SALY = #{RET_SALY},
+			CHK_CASH = #{CHK_CASH},
+			INTR_SGL_AWAD = #{INTR_SGL_AWAD},
+			SENY_ALLE = #{SENY_ALLE},
+			POST_ALLE = #{POST_ALLE},
+			NS_ALLE = #{NS_ALLE},
+			AREA_ALLE = #{AREA_ALLE},
+			EXPT_ALLE = #{EXPT_ALLE},
+			TECH_ALLE = #{TECH_ALLE},
+			LIVE_EXPE = #{LIVE_EXPE},
+			LIVE_ALLE = #{LIVE_ALLE},
+			LEAVE_DM = #{LEAVE_DM},
+			HOUSE_ALLE = #{HOUSE_ALLE},
+			ITEM_ALLE = #{ITEM_ALLE},
+			MEAL_EXPE = #{MEAL_EXPE},
+			TRF_ALLE = #{TRF_ALLE},
+			TEL_EXPE = #{TEL_EXPE},
+			HLDY_ALLE = #{HLDY_ALLE},
+			KID_ALLE = #{KID_ALLE},
+			COOL_EXPE = #{COOL_EXPE},
+			EXT_SGL_AWAD = #{EXT_SGL_AWAD},
+			PRE_TAX_PLUS = #{PRE_TAX_PLUS},
+			GROSS_PAY = #{GROSS_PAY},
+			ENDW_INS = #{ENDW_INS},
+			UNEMPL_INS = #{UNEMPL_INS},
+			MED_INS = #{MED_INS},
+			CASD_INS = #{CASD_INS},
+			HOUSE_FUND = #{HOUSE_FUND},
+			SUP_PESN = #{SUP_PESN},
+			TAX_BASE_ADJ = #{TAX_BASE_ADJ},
+			ACCRD_TAX = #{ACCRD_TAX},
+			AFTER_TAX = #{AFTER_TAX},
+			ACT_SALY = #{ACT_SALY},
+			GUESS_DIFF = #{GUESS_DIFF},
+			CUST_COL1 = #{CUST_COL1},
+			CUST_COL2 = #{CUST_COL2},
+			CUST_COL3 = #{CUST_COL3},
+			CUST_COL4 = #{CUST_COL4},
+			CUST_COL5 = #{CUST_COL5},
+			CUST_COL6 = #{CUST_COL6},
+			CUST_COL7 = #{CUST_COL7},
+			CUST_COL8 = #{CUST_COL8},
+			CUST_COL9 = #{CUST_COL9},
+			CUST_COL10 = #{CUST_COL10},
+			ZRZC_CODE = #{ZRZC_CODE},
+			BILL_STATE = #{BILL_STATE},
+			BILL_USER = #{BILL_USER},
+			BILL_DATE = #{BILL_DATE}
+		where 
+		BILL_CODE = #{BILL_CODE__}
+	</update>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 
+			BILL_CODE = #{BILL_CODE__}
+	</select>
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 1=1
+		<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
+			and
+				(
+				<!--	根据需求自己加检索条件
+					字段1 LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+					 or 
+					字段2 LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') 
+				-->
+				)
+		</if>
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from
+		<include refid="tableName"></include>
+		where 
+			BILL_CODE in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+	
+</mapper>

@@ -51,8 +51,8 @@
 						            <div class="pull-right">
 									    <span class="label label-xlg label-blue arrowed-left"
 									        id = "showDur" style="background:#428bca; margin-right: 2px;"></span> 
-								        <span class="label label-xlg label-blue arrowed-left"
-								            id = "showDept" style="background:#428bca"></span>
+								        <!-- <span class="label label-xlg label-blue arrowed-left"
+								            id = "showDept" style="background:#428bca"></span> -->
 								    </div>
 					</div><!-- /.page-header -->
 			
@@ -140,21 +140,48 @@
 	    
 		//当前期间,取自tb_system_config的SystemDateTime字段
 	    var SystemDateTime = '${SystemDateTime}';
-	    $("#showDur").text('当前期间：' + SystemDateTime);
 		//当前登录人所在二级单位
 	    var DepartName = '${DepartName}';
-	    $("#showDept").text('当前单位：' + DepartName);
+	    $("#showDur").text('当前期间：' + SystemDateTime + ' 当前单位：' + DepartName);
+	    //$("#showDept").text('当前单位：' + DepartName);
 		//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
 	    // 枚举  1封存,0解封
 		var State = '${State}';
 		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 	    var jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
 	    
+	    function setStateFalse(){
+	    	State = "false";
+	    }
 	    function getState(){
 	        if($.trim(State) == "true"){
-	            return true;
+	            return true; 
 	        }
 	        return false;
+	    };
+	    
+	    function setNavButtonState(){
+	        if($.trim(State) == "true"){
+	            $("#edit").removeClass('ui-state-disabled'); //Disable 按钮灰掉不可用
+	            $("#add").removeClass('ui-state-disabled'); //Disable 按钮灰掉不可用
+	            $("#del").removeClass('ui-state-disabled'); //Disable 按钮灰掉不可用
+	            $("#batchDelete").removeClass('ui-state-disabled'); //Disable 按钮灰掉不可用
+	            $("#batchEdit").removeClass('ui-state-disabled'); //Disable 按钮灰掉不可用
+	            $("#batchCancelEdit").removeClass('ui-state-disabled'); //Disable 按钮灰掉不可用
+	            $("#batchSave").removeClass('ui-state-disabled'); //Disable 按钮灰掉不可用
+	            $("#importItems").removeClass('ui-state-disabled'); //Disable 按钮灰掉不可用
+	            $("#report").removeClass('ui-state-disabled'); //Disable 按钮灰掉不可用
+	        } else {
+	            $("#edit").addClass('ui-state-disabled'); //Enable 按钮可用
+	            $("#add").addClass('ui-state-disabled'); //Enable 按钮可用
+	            $("#del").addClass('ui-state-disabled'); //Enable 按钮可用
+	            $("#batchDelete").addClass('ui-state-disabled'); //Enable 按钮可用
+	            $("#batchEdit").addClass('ui-state-disabled'); //Enable 按钮可用
+	            $("#batchCancelEdit").addClass('ui-state-disabled'); //Enable 按钮可用
+	            $("#batchSave").addClass('ui-state-disabled'); //Enable 按钮可用
+	            $("#importItems").addClass('ui-state-disabled'); //Enable 按钮可用
+	            $("#report").addClass('ui-state-disabled'); //Enable 按钮可用
+	        }
 	    };
 	    
 		//resize to fit page size
@@ -197,13 +224,14 @@
 		});
 	    
 		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
-		
+
+
 		$(gridBase_selector).navGrid(pagerBase_selector, 
 				{
 		            //navbar options
-			        edit: getState(),
+			        edit: true,
 		            editicon : 'ace-icon fa fa-pencil blue',
-		            add: getState(),
+		            add: true,
 		            addicon : 'ace-icon fa fa-plus-circle purple',
 		            del: false,
 		            delicon : 'ace-icon fa fa-trash-o red',
@@ -213,9 +241,11 @@
 		            refreshicon : 'ace-icon fa fa-refresh green',
 		            view: false,
 		            viewicon : 'ace-icon fa fa-search-plus grey',
+		            //delfunc : batchDelete(),
 	        },
 	        {
 				//edit record form
+				id: "edit",
 				width: 900,
 				closeAfterEdit: true,
 				recreateForm: true,
@@ -224,11 +254,11 @@
 	        },
 	        {
 				//new record form
+				id: "add",
 				width: 900,
 				closeAfterAdd: true,
 				recreateForm: true,
 				viewPagerButtons: false,
-				//width: 700,
 				//reloadAfterSubmit: true,
 				beforeShowForm : beforeEditOrAddCallback,
 			    onclickSubmit: function(params, posdata) {
@@ -238,10 +268,10 @@
 	        },
 	        {
 				//delete record form
+				id: "del",
 				recreateForm: true,
 				beforeShowForm : beforeDeleteCallback,
 				onClick : function(e) {
-
 				}
 	        },
 	        {
@@ -253,52 +283,63 @@
 				},
 				multipleSearch: true,
 				//multipleGroup:true,
-				showQuery: true
+				showQuery: false
 	        },
 	        {},{});
-
-	if(getState()){
-        $(gridBase_selector).navButtonAdd(pagerBase_selector,
-                {
-                    buttonicon: "ace-icon fa fa-pencil-square-o purple",
-                    title: "批量编辑",
-                    caption: "",
-                    position: "last",
-                    onClickButton: batchEdit
-                });
-        $(gridBase_selector).navButtonAdd(pagerBase_selector,
-                {
-                    buttonicon: "ace-icon fa fa-undo",
+		
+		$(gridBase_selector).navSeparatorAdd(pagerBase_selector, {
+			sepclass : "ui-separator",
+			sepcontent: ""
+		});
+        $(gridBase_selector).navButtonAdd(pagerBase_selector, {
+			id : "batchEdit",
+            title: "批量编辑",
+            caption: "",
+        	buttonicon: "ace-icon fa fa-pencil-square-o purple",
+            position: "last",
+            onClickButton: batchEdit,
+            cursor : "pointer"
+        });
+        $(gridBase_selector).navButtonAdd(pagerBase_selector, {
+        	id : "batchCancelEdit",
+        	buttonicon: "ace-icon fa fa-undo",
                     title: "取消批量编辑",
                     caption: "",
                     position: "last",
-                    onClickButton: batchCancelEdit
+                    onClickButton: batchCancelEdit,
+                    cursor : "pointer"
                 });
         		$(gridBase_selector).navButtonAdd(pagerBase_selector, {
-                     caption : "",
+        			id : "batchSave",
+        			caption : "",
                      buttonicon : "ace-icon fa fa-save green",
                      onClickButton : batchSave,
                      position : "last",
                      title : "批量保存",
                      cursor : "pointer"
                  });
-        		$(gridBase_selector).navButtonAdd(pagerBase_selector, {
-                    caption : "",
+        	    $(gridBase_selector).navButtonAdd(pagerBase_selector, {
+        			id : "batchDelete",
+                    title : "批量删除",
+                    caption: "",
                     buttonicon : "ace-icon fa fa-trash-o red",
                     onClickButton : batchDelete,
-                    position : "last",
-                    title : "批量删除",
+                    position : "3",
                     cursor : "pointer"
-                });
+                }); 
+        		$(gridBase_selector).navSeparatorAdd(pagerBase_selector, {
+        			sepclass : "ui-separator",
+        			sepcontent: ""
+        		});
         			$(gridBase_selector).navButtonAdd(pagerBase_selector, {
-        	             caption : "",
+        				id : "importItems",
+        				caption : "",
         	             buttonicon : "ace-icon fa fa-cloud-upload",
         	             onClickButton : importItems,
         	             position : "last",
         	             title : "导入",
         	             cursor : "pointer"
         	         });
-	};
 				$(gridBase_selector).navButtonAdd(pagerBase_selector, {
 		             caption : "",
 		             buttonicon : "ace-icon fa fa-cloud-download",
@@ -307,17 +348,16 @@
 		             title : "导出",
 		             cursor : "pointer"
 		         });
-				if(getState()){
 					$(gridBase_selector).navButtonAdd(pagerBase_selector, {
+        				id : "report",
 			             caption : "",
-			             buttonicon : "ace-icon fa fa-check-square green",
+			             buttonicon : "ace-icon fa fa-check-square-o green",
 			             onClickButton : report,
 			             position : "last",
 			             title : "上报",
 			             cursor : "pointer"
 			         });
-				};
-		
+					setNavButtonState();
 			//双击编辑行
             var lastSelection;
 			function doubleClickRow(rowid,iRow,iCol,e){
@@ -584,9 +624,8 @@
 						cache: false,
 						success: function(response){
 							if(response.code==0){
-								// 枚举  1封存,0解封
-								State = '1';
-								$(gridBase_selector).trigger("reloadGrid");  
+								setStateFalse();  
+								setNavButtonState();
 								$(top.hangge());//关闭加载状态
 								$("#subTitle").tips({
 									side:3,
