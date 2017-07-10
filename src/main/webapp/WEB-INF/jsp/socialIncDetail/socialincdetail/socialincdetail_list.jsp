@@ -40,7 +40,7 @@
 								    <span class="label label-xlg label-success arrowed-right">东部管道</span>
 									<!-- arrowed-in-right --> 
 									<span class="label label-xlg label-yellow arrowed-in arrowed-right"
-									    id="subTitle" style="margin-left: 2px;">工资数据导入</span> 
+									    id="subTitle" style="margin-left: 2px;">社保数据导入</span> 
                                     <span style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
 								
 									<button id="btnQuery" class="btn btn-white btn-info btn-sm"
