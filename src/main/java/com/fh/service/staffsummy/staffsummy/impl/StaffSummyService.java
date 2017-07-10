@@ -10,7 +10,7 @@ import com.fh.service.staffsummy.staffsummy.StaffSummyManager;
 
 /** 
  * 说明： 工资汇总
- * 创建人：lhsmplus
+ * 创建人：zhangxiaoliu
  * 创建时间：2017-07-07
  * @version
  */

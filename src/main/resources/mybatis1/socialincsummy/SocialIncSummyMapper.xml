@@ -93,14 +93,6 @@
 		)
 	</insert>
 	
-	<!-- 删除-->
-	<delete id="delete" parameterType="pd">
-		delete from
-		<include refid="tableName"></include>
-		where 
-			BILL_CODE = #{BILL_CODE__}
-	</delete>
-	
 	<!-- 修改 -->
 	<update id="edit" parameterType="pd">
 		update
@@ -178,16 +170,5 @@
 		from 
 		<include refid="tableName"></include>
 	</select>
-	
-	<!-- 批量删除 -->
-	<delete id="deleteAll" parameterType="String">
-		delete from
-		<include refid="tableName"></include>
-		where 
-			BILL_CODE in
-		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
-                 #{item}
-		</foreach>
-	</delete>
 	
 </mapper>

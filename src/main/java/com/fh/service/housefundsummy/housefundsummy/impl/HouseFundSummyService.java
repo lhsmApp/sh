@@ -10,10 +10,10 @@ import com.fh.service.housefundsummy.housefundsummy.HouseFundSummyManager;
 
 /** 
  * 说明： 公积金汇总
- * 创建人：lhsmplus
+ * 创建人：zhangxiaoliu
  * 创建时间：2017-07-07
  * @version
- */
+ */ 
 @Service("housefundsummyService")
 public class HouseFundSummyService implements HouseFundSummyManager{
 

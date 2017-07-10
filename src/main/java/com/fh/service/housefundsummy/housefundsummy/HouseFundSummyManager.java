@@ -6,10 +6,10 @@ import com.fh.util.PageData;
 
 /** 
  * 说明： 公积金汇总接口
- * 创建人：lhsmplus
+ * 创建人：zhangxiaoliu
  * 创建时间：2017-07-07
  * @version
- */
+ */ 
 public interface HouseFundSummyManager{
 
 	/**新增
