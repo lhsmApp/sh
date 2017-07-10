@@ -126,14 +126,6 @@ public class TmplConfigService implements TmplConfigManager{
 	public PageData findTableCodeByTableNo(PageData pd) throws Exception {
 		return (PageData)dao.findForObject("TmplConfigMapper.findTableCodeByTableNo", pd);
 	}
-
-	/**
-	 * 字典翻译集合
-	 */
-	@SuppressWarnings("unchecked")
-	public List<PageData> dictList(PageData pd) throws Exception {
-		return (List<PageData>)dao.findForList("TmplConfigMapper.dictList", pd);
-	}
 	
 	/**获取某表的所有列
 	 * @param 

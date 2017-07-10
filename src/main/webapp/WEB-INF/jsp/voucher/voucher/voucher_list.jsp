@@ -177,15 +177,18 @@
 	var jqGridColModelSub;
 	var which='1';
 	var gridHeight;
+	var jqGridColModel;
 	$(document).ready(function () {
 		$(top.hangge());//关闭加载状态
 		//dropDownStyle();
-		console.log('${HasUserData}');
-		console.log(${HasUserData});
 		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-	    var jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
+	    jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
 	    jqGridColModelSub = eval("(${jqGridColModelSub})");
-		
+	    var certCode={label: '凭证号',name:'CERT_CODE', width:100};
+	    var revcertCode={label: '冲销凭证号',name:'REVCERT_CODE', width:100};
+	    jqGridColModel.unshift(certCode,revcertCode);
+	    //jqGridColModel1=jqGridColModel.concat();
+	    //jqGridColModel1.unshift(certCode,revcertCode);
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
 			$("#jqGrid").jqGrid( 'setGridWidth', $(".page-content").width());
@@ -231,7 +234,7 @@
 				$("[data-original-title='批量上传']").removeClass("hidden");
 				$("[data-original-title='获取凭证号']").addClass("hidden");
 				$("[data-original-title='获取冲销凭证号']").addClass("hidden");
-				
+				jQuery('#jqGrid').hideCol(['CERT_CODE','REVCERT_CODE']);
 				$("#jqGrid").jqGrid("setGridParam",{postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}'}});
 				$("#jqGrid").trigger("reloadGrid");  
 			}else{
@@ -264,15 +267,14 @@
 			           onClickButton: batchWriteOffVoucher
 			       });
 				}
-				
+				jQuery('#jqGrid').showCol(['CERT_CODE','REVCERT_CODE']);
 				$("#jqGrid").jqGrid("setGridParam",{postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}'}});
 				$("#jqGrid").trigger("reloadGrid");  
 			}
 		});
 		
-		$("#jqGrid").jqGrid({
-			url: '<%=basePath%>voucher/getPageList.do',
-			postData:{"VOUCHER_TYPE":1,"TABLE_CODE":'${pd.which}'},
+		$("#jqGrid").jqGrid({url: '<%=basePath%>voucher/getPageList.do',
+			postData:{"VOUCHER_TYPE":1,"TABLE_CODE":"${pd.which}"},
 			datatype: "json",
 			colModel: jqGridColModel,
 			reloadAfterSubmit: true, 
@@ -284,7 +286,6 @@
 			//height: '100%', 
 			width:'100%',
 			sortname: 'BILL_CODE',
-			
 			footerrow: ${HasUserData},
 			userDataOnFooter: ${HasUserData}, // the calculated sums and/or strings from server are put at footer row.
 			/*grouping: true,
@@ -337,7 +338,7 @@
 		   		   $("[data-original-title='获取凭证号']").addClass("hidden");
 			} */ 
 		});
-		
+		jQuery('#jqGrid').hideCol(['CERT_CODE','REVCERT_CODE']);
 		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
 	
 		//navButtons

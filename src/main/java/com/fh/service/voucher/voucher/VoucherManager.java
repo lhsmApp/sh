@@ -80,4 +80,16 @@ public interface VoucherManager{
 	 * @throws Exception
 	 */
 	public List<PageData> getTransferValidate(PageData pd)throws Exception;
+	
+	/**批量更新凭证号
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void updateCertCode(List<PageData> pd)throws Exception;
+	
+	/**批量更新冲销凭证号
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void updateRevCertCode(List<PageData> pd)throws Exception;
 }

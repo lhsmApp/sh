@@ -123,9 +123,7 @@ public class VoucherController extends BaseController {
 		// 此处放当前页面初始化时用到的一些数据，例如搜索的下拉列表数据，所需的字典数据、权限数据等等。
 		// mv.addObject("pd", pd);
 		// *********************加载单位树*******************************
-		List<PageData> zdepartmentPdList = new ArrayList<PageData>();
-		JSONArray arr = JSONArray.fromObject(departmentService.listAllDepartmentToSelect("0", zdepartmentPdList));
-		mv.addObject("zTreeNodes", (null == arr ? "" : arr.toString()));
+		mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService));
 		// ***********************************************************
 
 		pd.put("which", which);

@@ -59,12 +59,8 @@ public class SysSealedInfoService implements SysSealedInfoManager{
 	public List<PageData> list(JqPage page)throws Exception{
 		List<PageData> listPageData = (List<PageData>)dao.findForList("SysSealedInfoMapper.datalistJqPage", page);
 		for (PageData pageData : listPageData) {
-			
 			pageData.put("BILL_TYPE_TR", BillType.getValueByKey(pageData.getString("BILL_TYPE")));
-			
-			
 		}
-		
 		return listPageData;
 	}
 	
@@ -100,11 +96,6 @@ public class SysSealedInfoService implements SysSealedInfoManager{
 	 */
 	public void deleteAll(String[] ArrayDATA_IDS)throws Exception{
 		dao.delete("SysSealedInfoMapper.deleteAll", ArrayDATA_IDS);
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<String> deptList() throws Exception {
-		return (List<String>)dao.findForList("SysSealedInfoMapper.deptList", null);
 	}
 	
 	/**获取状态 

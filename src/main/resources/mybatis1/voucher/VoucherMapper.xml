@@ -378,12 +378,15 @@
 		</if>
 
 		<if test='pd.BILL_TYPE=="7" or pd.BILL_TYPE=="8" or pd.BILL_TYPE=="9"'>
-			select A.*
+			select A.*,C.CERT_CODE,C.REVCERT_CODE 
 			from ${pd.TABLE_CODE} A
 			JOIN tb_sys_sealed_info B
 			ON
 			A.BILL_CODE=B.BILL_CODE
 			AND A.BUSI_DATE=B.RPT_DUR
+			AND A.DEPT_CODE=B.RPT_DEPT
+			LEFT JOIN tb_gl_cert C
+			ON A.BILL_CODE=C.BILL_CODE
 			WHERE B.STATE='1'
 			AND
 			B.BILL_TYPE=#{pd.BILL_TYPE}
@@ -535,4 +538,32 @@
 			#{item}
 		</foreach>
 	</delete>
+	
+	<!-- 批量更新凭证号-->
+	<update id="updateCertCode" parameterType="pd">
+		<foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
+		    <if test="item!=null">
+		        update
+		        ${item.TABLE_CODE}
+		        set 
+		    	    CERT_CODE = #{item.CERT_CODE}
+		        where 
+		        BILL_CODE = #{item.BILL_CODE}
+		    </if>
+		</foreach>
+	</update>
+	
+	<!-- 批量更新冲销凭证号-->
+	<update id="updateRevCertCode" parameterType="pd">
+		<foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
+		    <if test="item!=null">
+		        update
+		        ${item.TABLE_CODE}
+		        set 
+		    	    REVCERT_CODE = #{item.REVCERT_CODE}
+		        where 
+		        BILL_CODE = #{item.BILL_CODE}
+		    </if>
+		</foreach>
+	</update>
 </mapper>

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
+import com.fh.controller.common.DictsUtil;
 import com.fh.entity.CommonBase;
 import com.fh.entity.JqPage;
 import com.fh.entity.Page;
@@ -31,6 +32,7 @@ import com.fh.util.enums.BillType;
 
 import net.sf.json.JSONArray;
 
+import com.fh.service.fhoa.department.DepartmentManager;
 import com.fh.service.sysSealedInfo.syssealedinfo.SysSealedInfoManager;
 
 /** 
@@ -46,24 +48,8 @@ public class SysSealedInfoController extends BaseController {
 	@Resource(name="syssealedinfoService")
 	private SysSealedInfoManager syssealedinfoService;
 	
-//	/**修改
-//	 * @param
-//	 * @throws Exception
-//	 */
-//	@RequestMapping(value="/edit")
-//	public ModelAndView edit() throws Exception{
-//		CommonBase commonBase = new CommonBase();
-//		logBefore(logger, Jurisdiction.getUsername()+"修改SysSealedInfo");
-//		if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限
-//		ModelAndView mv = this.getModelAndView();
-//		PageData pd = new PageData();
-//		pd = this.getPageData();
-//		syssealedinfoService.edit(pd);
-//		commonBase.setCode(0);
-//		mv.addObject("msg","success");
-//		mv.setViewName("save_result");
-//		return mv;
-//	}
+	@Resource(name = "departmentService")
+	private DepartmentManager departmentService;
 	
 	/**修改
 	 * @param
@@ -80,8 +66,6 @@ public class SysSealedInfoController extends BaseController {
 			syssealedinfoService.edit(pd);
 			commonBase.setCode(0);
 		}
-		
-		
 		/**此处为业务错误返回值，例如返回当前删除的信息含有业务关联字段，不能删除，自行设定setCode(返回码，客户端按码抓取并返回提示信息)和setMessage("自定义提示信息，提示给用户的")信息，并由界面进行展示。
 		 * 此处不是异常返回的错误信息，异常返回错误信息统一由框架抓取异常。
 		 */
@@ -99,9 +83,8 @@ public class SysSealedInfoController extends BaseController {
 		logBefore(logger, Jurisdiction.getUsername()+"列表SysSealedInfo");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
 		ModelAndView mv = this.getModelAndView();
-		List<String> deptList = syssealedinfoService.deptList();//单位列表
 		mv.setViewName("sysSealedInfo/syssealedinfo/syssealedinfo_list");
-		mv.addObject("deptList", deptList);
+		mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService));
 		mv.addObject("billTypeList", BillType.values());
 		return mv;
 	}
@@ -113,55 +96,30 @@ public class SysSealedInfoController extends BaseController {
 	@RequestMapping(value="/getPageList")
 	public @ResponseBody PageResult<PageData> getPageList(JqPage page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"列表Betting");
-		PageData pd = new PageData();
-		pd = this.getPageData();
-//		String keywords = pd.getString("keywords");				//关键词检索条件
-//		if(null != keywords && !"".equals(keywords)){
-//			pd.put("keywords", keywords.trim());
-//		}
+		PageData pd = this.getPageData();
+		/*String keywords = pd.getString("keywords");				//关键词检索条件
+		if(null != keywords && !"".equals(keywords)){
+			pd.put("keywords", keywords.trim());
+		}*/
 		
-		String RPT_DEPT = pd.getString("RPT_DEPT");				//单位检索条件
-		if(null != RPT_DEPT && !"".equals(RPT_DEPT)){
-			pd.put("RPT_DEPT", RPT_DEPT.trim());
-		}
-		String BILL_TYPE = pd.getString("BILL_TYPE");				//单位检索条件
-		if(null != BILL_TYPE && !"".equals(BILL_TYPE)){
-			pd.put("BILL_TYPE", BILL_TYPE.trim());
-		}
-		String STATUS = pd.getString("STATUS");				//单位检索条件
-		if(null != STATUS && !"".equals(STATUS)){
-			pd.put("STATUS", STATUS.trim());
+		String strRptDept = pd.getString("RPT_DEPT");				//单位检索条件
+		if(null != strRptDept && !"".equals(strRptDept)){
+			String RPT_DEPTS[] = strRptDept.split(",");
+			pd.put("RPT_DEPTS", RPT_DEPTS);
 		}
 		String filters = pd.getString("filters");				//多条件过滤条件
 		if(null != filters && !"".equals(filters)){
 			pd.put("filterWhereResult", SqlTools.constructWhere(filters,null));
 		}
-		
 		page.setPd(pd);
 		List<PageData> varList = syssealedinfoService.list(page);	//列出Betting列表
-		int records = syssealedinfoService.count(pd);
-		
+		//int records = syssealedinfoService.count(pd);
 		PageResult<PageData> result = new PageResult<PageData>();
 		result.setRows(varList);
 		result.setRowNum(page.getRowNum());
-		result.setRecords(records);
+		//result.setRecords(records);
 		result.setPage(page.getPage());
-		
 		return result;
-	}
-	
-	/**单位列表
-	 * @param
-	 * @throws Exception
-	 */
-	@RequestMapping(value="/deptList")
-	@ResponseBody
-	public List<String> deptList() throws Exception{
-		
-		
-		List<String>	deptList = syssealedinfoService.deptList();
-		
-		return deptList;
 	}
 	
 	/**批量修改

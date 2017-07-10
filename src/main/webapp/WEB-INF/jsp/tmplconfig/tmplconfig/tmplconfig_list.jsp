@@ -350,35 +350,6 @@
 	    	}
 		}); 
 	 }
-	
-	//检索
-	function tosearch() {
-		if($("#TABLE_NO").val()==""){
-			$("#TABLE_NO").tips({
-				side:3,
-	            msg:'请选择表名称',
-	            bg:'#AE81FF',
-	            time:2
-	        });
-			$("#TABLE_NO").focus();
-			return false;
-		}
-		if($("#selectTree2_input").val()=="请选择"){
-			document.getElementById("DEPARTMENT_CODE").value="001"; 
-			document.getElementById("DNAME").value="总部"; 
-			
-		}
-		var TABLE_NO = $("#TABLE_NO").val(); 
-		var DEPARTMENT_CODE = $("#DEPARTMENT_CODE").val(); 
-		var TABLE_NAME = $("#TABLE_NO").find("option:selected").text();
-		var DNAME = $("#DNAME").val(); 
-		$("#jqGrid").jqGrid('setGridParam',{  // 重新加载数据
-			url:'<%=basePath%>tmplconfig/getPageList.do?TABLE_NO='+TABLE_NO+'&DEPARTMENT_CODE='+DEPARTMENT_CODE+'&TABLE_NAME='+TABLE_NAME+'&DNAME='+DNAME,  
-			datatype:'json',
-		      page:1
-		}).trigger("reloadGrid");
-		
-	}  
 		
 	//switch element when editing inline
 	function aceSwitch( cellvalue, options, cell ) {
@@ -428,6 +399,36 @@
 		$("#selectTree2_input").val("${'0'==depname?'请选择':depname}");
 	}
 	
+	//检索
+	function tosearch() {
+		if($("#TABLE_NO").val()==""){
+			$("#TABLE_NO").tips({
+				side:3,
+	            msg:'请选择表名称',
+	            bg:'#AE81FF',
+	            time:2
+	        });
+			$("#TABLE_NO").focus();
+			return false;
+		}
+		if($("#selectTree2_input").val()=="请选择"){
+			document.getElementById("DEPARTMENT_CODE").value="001"; 
+			document.getElementById("DNAME").value="总部"; 
+			
+		}
+		var TABLE_NO = $("#TABLE_NO").val(); 
+		var DEPARTMENT_CODE = $("#DEPARTMENT_CODE").val(); 
+		var TABLE_NAME = $("#TABLE_NO").find("option:selected").text();
+		var DNAME = $("#DNAME").val(); 
+		$("#jqGrid").jqGrid('setGridParam',{  // 重新加载数据
+			url:'<%=basePath%>tmplconfig/getPageList.do?TABLE_NO='+TABLE_NO+'&DEPARTMENT_CODE='+DEPARTMENT_CODE+'&TABLE_NAME='+TABLE_NAME+'&DNAME='+DNAME,  
+			datatype:'json',
+		      page:1
+		}).trigger("reloadGrid");
+		
+	}  
+	
+	//复制
     function copyData() {
        	if('${temporary}'== true){
 			$("#btnCopy").tips({

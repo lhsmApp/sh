@@ -112,8 +112,25 @@ public class VoucherService implements VoucherManager{
 	 * @param page
 	 * @throws Exception
 	 */
+	@SuppressWarnings("unchecked")
 	public List<PageData> getTransferValidate(PageData pd)throws Exception{
 		return (List<PageData>)dao.findForList("VoucherMapper.getTransferValidate", pd);
+	}
+	
+	/**批量更新凭证号
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void updateCertCode(List<PageData> pd)throws Exception{
+		dao.update("VoucherMapper.updateCertCode", pd);
+	}
+	
+	/**批量更新冲销凭证号
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void updateRevCertCode(List<PageData> pd)throws Exception{
+		dao.update("VoucherMapper.updateRevCertCode", pd);
 	}
 }
 

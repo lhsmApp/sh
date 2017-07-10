@@ -96,14 +96,6 @@ public interface TmplConfigManager{
 	 */
 	public PageData findTableCodeByTableNo(PageData pd) throws Exception;
 	
-	/**
-	 * 字典翻译集合
-	 * @param pd
-	 * @return
-	 * @throws Exception
-	 */
-	public List<PageData> dictList(PageData pd) throws Exception;
-	
 	/**获取某表的所有列
 	 * @param 
 	 * @throws Exception
@@ -123,6 +115,5 @@ public interface TmplConfigManager{
 	 * @throws Exception
 	 */
 	public void copyAll(List<String> st) throws Exception;
-	
 }
 

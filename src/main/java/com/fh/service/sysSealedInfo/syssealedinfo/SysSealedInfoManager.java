@@ -66,13 +66,6 @@ public interface SysSealedInfoManager{
 	public void deleteAll(String[] ArrayDATA_IDS)throws Exception;
 	
 	/**
-	 * 单位列表
-	 * @return
-	 * @throws Exception
-	 */
-	public List<String> deptList() throws Exception;
-	
-	/**
 	 * 获取状态 
 	 * @return
 	 * @throws Exception
