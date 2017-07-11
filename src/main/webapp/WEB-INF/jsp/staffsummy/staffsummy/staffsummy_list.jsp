@@ -21,7 +21,18 @@
 		
 		<!-- 最新版的Jqgrid Css，如果旧版本（Ace）某些方法不好用，尝试用此版本Css，替换旧版本Css -->
 		<!-- <link rel="stylesheet" type="text/css" media="screen" href="static/ace/css/ui.jqgrid-bootstrap.css" /> -->
-		
+		<script type="text/javascript" src="static/js/jquery-1.7.2.js"></script>
+		<!-- 树形下拉框start -->
+		<script type="text/javascript" src="plugins/selectZtree/selectTree.js"></script>
+		<script type="text/javascript" src="plugins/selectZtree/framework.js"></script>
+		<link rel="stylesheet" type="text/css"
+			href="plugins/selectZtree/import_fh.css" />
+		<script type="text/javascript" src="plugins/selectZtree/ztree/ztree.js"></script>
+		<link type="text/css" rel="stylesheet"
+			href="plugins/selectZtree/ztree/ztree.css"></link>
+		<!-- 树形下拉框end -->
+		<!-- 标准页面统一样式 -->
+		<link rel="stylesheet" href="static/css/normal.css" />
 	    <style>
 			.page-header{
 				padding-top: 9px;
@@ -47,6 +58,11 @@
 											onclick="showQueryCondi($('#jqGrid'),null,true)">
 											<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
 										</button>
+								
+						            <div class="pull-right">
+									    <span class="label label-xlg label-blue arrowed-left"
+									        id = "showDur" style="background:#428bca; margin-right: 2px;"></span>
+								    </div>
 						</div><!-- /.page-header -->
 				
 							<div class="row">
@@ -55,18 +71,11 @@
 									<div class="widget-body">
 										<div class="widget-main">
 											<form class="form-inline">
-												<span>
-													<select class="chosen-select form-control" 
-														name="UserCode" id="UserCode"
-														data-placeholder="请选择员工编号"
-														style="vertical-align: top; height:32px;width: 150px;">
-														<option value="">全部</option>
-														<c:forEach items="${userCodeList}" var="usercode">
-															<option value="${usercode}"
-																<c:if test="${pd.UserCode==usercode}">selected</c:if>>${usercode}</option>
-														</c:forEach>
-													</select>
-												</span>
+											    <span style="margin-right: 5px;">
+												    <div class="selectTree" id="selectTree" multiMode="true"
+												    	allSelectable="false" noGroup="false"></div>
+											    	<input type="text" id="RPT_DEPT" hidden></input>
+											    </span> 
 												<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
 													<i class="ace-icon fa fa-search bigger-110"></i>
 												</button>
@@ -127,6 +136,10 @@
 	    
 		$(document).ready(function () {
 			$(top.hangge());//关闭加载状态
+		    
+			//当前期间,取自tb_system_config的SystemDateTime字段
+		    var SystemDateTime = '${SystemDateTime}';
+		    $("#showDur").text('当前期间：' + SystemDateTime);
 		    
 			//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 		    var jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
@@ -290,53 +303,91 @@
 			 * 上报
 			 */
 			function report(){
-	            var msg = '确定要上报吗?';
-	            bootbox.confirm(msg, function(result) {
-					if(result) {
-						top.jzts();
-						$.ajax({
-							type: "POST",
-							url: '<%=basePath%>staffsummy/report.do?',
-							cache: false,
-							success: function(response){
-								if(response.code==0){
+		    	//获得选中的行ids的方法
+		    	var ids = $(gridBase_selector).getGridParam("selarrrow");  
+		    	
+				if(!(ids!=null && ids.length>0)){
+					bootbox.dialog({
+						message: "<span class='bigger-110'>您没有选择任何内容!</span>",
+						buttons: 			
+						{ "button":{ "label":"确定", "className":"btn-sm btn-success"}}
+					});
+				}else{
+	                var msg = '确定要上报吗??';
+	                bootbox.confirm(msg, function(result) {
+	    				if(result) {
+	    					var listData =new Array();
+	    					
+	    					//遍历访问这个集合  
+	    					$(ids).each(function (index, id){  
+	    			            var rowData = $(gridBase_selector).getRowData(id);
+	    			            listData.push(rowData);
+	    					});
+							top.jzts();
+							$.ajax({
+								type: "POST",
+								url: '<%=basePath%>staffsummy/report.do?',
+	    				    	data: {DATA_ROWS:JSON.stringify(listData)},
+	    						dataType:'json',
+	    						cache: false,
+								success: function(response){
+									if(response.code==0){
+										$(top.hangge());//关闭加载状态
+										$("#subTitle").tips({
+											side:3,
+								            msg:'上报成功',
+								            bg:'#009933',
+								            time:3
+								        });
+									}else{
+										$(top.hangge());//关闭加载状态
+										$("#subTitle").tips({
+											side:3,
+								            msg:'上报失败,'+response.message,
+								            bg:'#cc0033',
+								            time:3
+								        });
+									}
+								},
+						    	error: function(e) {
 									$(top.hangge());//关闭加载状态
 									$("#subTitle").tips({
 										side:3,
-							            msg:'上报成功',
-							            bg:'#009933',
-							            time:3
-							        });
-								}else{
-									$(top.hangge());//关闭加载状态
-									$("#subTitle").tips({
-										side:3,
-							            msg:'上报失败,'+response.message,
+							            msg:'上报出错',
 							            bg:'#cc0033',
 							            time:3
 							        });
-								}
-							},
-					    	error: function(e) {
-								$(top.hangge());//关闭加载状态
-								$("#subTitle").tips({
-									side:3,
-						            msg:'上报出错',
-						            bg:'#cc0033',
-						            time:3
-						        });
-					    	}
-						});
-					}
-	            });
+						    	}
+							});
+	    				}
+	                });
+				}
 			}
 		});
 		
+		//加载单位树
+		function initComplete(){
+			//下拉树
+			var defaultNodes = {"treeNodes":${zTreeNodes}};
+			//绑定change事件
+			$("#selectTree").bind("change",function(){
+				if($(this).attr("relValue")){
+					$("#RPT_DEPT").val($(this).attr("relValue"));
+					console.log($(this).attr("relValue"));
+			    }
+			});
+			//赋给data属性
+			$("#selectTree").data("data",defaultNodes);  
+			$("#selectTree").render();
+			$("#selectTree2_input").val("请选择单位");
+		}
+		
 		//检索
 		function tosearch() {
-			var UserCode = $("#UserCode").val();
+			console.log($("#RPT_DEPT").val());
+			var RPT_DEPT = $("#RPT_DEPT").val();
 			$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据
-				url:'<%=basePath%>staffsummy/getPageList.do?UserCode='+UserCode,  
+				url:'<%=basePath%>staffsummy/getPageList.do?DepartCode='+RPT_DEPT,  
 				datatype:'json',
 			      page:1
 			}).trigger("reloadGrid");
