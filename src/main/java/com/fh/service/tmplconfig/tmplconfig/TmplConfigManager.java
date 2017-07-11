@@ -114,6 +114,6 @@ public interface TmplConfigManager{
 	 * @param pd
 	 * @throws Exception
 	 */
-	public void copyAll(List<String> st) throws Exception;
+	public void copyAll(PageData pd) throws Exception;
 }
 

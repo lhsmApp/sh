@@ -9,9 +9,6 @@ import org.dom4j.Element;
 import com.fh.entity.TableColumns;
 import com.fh.util.PageData;
 import com.fh.util.StringUtil;
-import com.fh.util.enums.TransferOperType;
-
-import cn.jpush.http.StringUtils;
 
 /**
  * 生成用于传输的Xml格式数据

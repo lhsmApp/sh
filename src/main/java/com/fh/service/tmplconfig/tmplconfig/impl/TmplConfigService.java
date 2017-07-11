@@ -147,8 +147,8 @@ public class TmplConfigService implements TmplConfigManager{
 	/**
 	 * 复制
 	 */
-	public void copyAll(List<String> st) throws Exception {
-		dao.update("TmplConfigMapper.copyAll", st);
+	public void copyAll(PageData pd) throws Exception {
+		dao.update("TmplConfigMapper.copyAll", pd);
 		
 	}
 }

@@ -77,9 +77,9 @@
 												name="DNAME" id="DNAME" type="hidden" value="${pd.DNAME }" />
 											<span class="pull-left" style="margin-right: 5px;"> 
 												<select class="chosen-select form-control"
-													name="TABLE_NO" id=TABLE_NO data-placeholder="请选择表明称"
+													name="TABLE_NO" id=TABLE_NO data-placeholder="请选择配置表"
 													style="vertical-align: top; height: 32px; width: 150px;">
-														<option value="">请选择表名称</option>
+														<option value="">请选择配置表</option>
 														<c:forEach items="${listBase}" var="tableName">
 															<option value="${tableName.TABLE_NO}"
 																<c:if test="${pd.TABLE_NO==tableName.TABLE_NO}">selected</c:if>>${tableName.TABLE_NAME  }</option>
@@ -159,7 +159,8 @@
 				{ label: '单位编码', name: 'DEPT_CODE', width: 60,hidden : true,editable: true,},
 				{ label: '表编码', name: 'TABLE_CODE', width: 60,hidden : true,editable: true,},
 				{ label: '列编码', name: 'COL_CODE', width: 60,hidden : true,editable: true,},
-				{label: '单位',name:'DNAME', width:100}, 
+				
+				{ label: '单位',name:'DNAME', width:100}, 
 				{ label: '表名', name: 'TABLE_NAME', width: 90},
 				{ label: '列编码', name: 'COL_CODE', width: 60},
 				{ label: '列名称', name: 'COL_NAME', width: 60,editable: true,},
@@ -379,16 +380,11 @@
 	};
 	
 	function initComplete(){
-		console.log("下拉树");
 		//下拉树
 		var defaultNodes = {"treeNodes":${zTreeNodes}};
 		//绑定change事件
 		$("#selectTree").bind("change",function(){
-			console.log($(this));
-			if(!$(this).attr("relValue")){
-		      //  top.Dialog.alert("没有选择节点");
-		    }else{
-				//alert("选中节点文本："+$(this).attr("relText")+"<br/>选中节点值："+$(this).attr("relValue"));
+			if($(this).attr("relValue")){
 				$("#DEPARTMENT_CODE").val($(this).attr("relValue"));
 				$("#DNAME").val($(this).attr("relText"));
 		    }
@@ -396,7 +392,10 @@
 		//赋给data属性
 		$("#selectTree").data("data",defaultNodes);  
 		$("#selectTree").render();
-		$("#selectTree2_input").val("${'0'==depname?'请选择':depname}");
+		console.log('${pd.rootDepartName}');
+		$("#selectTree2_input").val('${pd.rootDepartName}');
+		document.getElementById("DEPARTMENT_CODE").value='${pd.rootDepartCode}'; 
+		document.getElementById("DNAME").value='${pd.rootDepartName}'; //总部
 	}
 	
 	//检索
@@ -404,18 +403,17 @@
 		if($("#TABLE_NO").val()==""){
 			$("#TABLE_NO").tips({
 				side:3,
-	            msg:'请选择表名称',
+	            msg:'请选择配置表',
 	            bg:'#AE81FF',
 	            time:2
 	        });
 			$("#TABLE_NO").focus();
 			return false;
 		}
-		if($("#selectTree2_input").val()=="请选择"){
+		/* if($("#selectTree2_input").val()=="请选择"){
 			document.getElementById("DEPARTMENT_CODE").value="001"; 
 			document.getElementById("DNAME").value="总部"; 
-			
-		}
+		} */
 		var TABLE_NO = $("#TABLE_NO").val(); 
 		var DEPARTMENT_CODE = $("#DEPARTMENT_CODE").val(); 
 		var TABLE_NAME = $("#TABLE_NO").find("option:selected").text();
@@ -430,17 +428,16 @@
 	
 	//复制
     function copyData() {
-       	if('${temporary}'== true){
-			$("#btnCopy").tips({
+    	if($("#TABLE_NO").val()==""){
+			$("#TABLE_NO").tips({
 				side:3,
-	            msg:'不能复制',
+	            msg:'请选择配置表',
 	            bg:'#AE81FF',
 	            time:2
 	        });
-			$("#btnCopy").focus();
+			$("#TABLE_NO").focus();
 			return false;
 		}
-       	
        	var TABLE_NO = $("#TABLE_NO").val(); 
 		var DEPARTMENT_CODE = $("#DEPARTMENT_CODE").val(); 
        	 top.jzts();

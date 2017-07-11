@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.fh.dao.DaoSupport;
+import com.fh.entity.JqPage;
 import com.fh.entity.Page;
 import com.fh.entity.system.Dictionaries;
 import com.fh.util.PageData;
@@ -118,6 +119,32 @@ public class DictionariesService implements DictionariesManager{
 	@SuppressWarnings("unchecked")
 	public List<Dictionaries> getSysDictionaries(String dicName)throws Exception{
 		return (List<Dictionaries>)dao.findForList("DictionariesMapper.getSysDictionaries", dicName);
+	}
+	
+	/**列表
+	 * @param page
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PageData> listJq(JqPage page)throws Exception{
+		return (List<PageData>)dao.findForList("DictionariesMapper.datalistJqPage", page);
+	}
+	
+	/**列表(全部)
+	 * @param pd
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PageData> listAll(PageData pd)throws Exception{
+		return (List<PageData>)dao.findForList("DictionariesMapper.listAll", pd);
+	}
+	
+	/**获取记录数量
+	 * @param pd
+	 * @throws Exception
+	 */
+	public int count(PageData pd)throws Exception{
+		return (int)dao.findForObject("DictionariesMapper.count", pd);
 	}
 }
 
