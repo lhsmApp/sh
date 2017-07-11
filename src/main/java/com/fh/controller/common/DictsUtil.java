@@ -117,4 +117,15 @@ public class DictsUtil {
 		JSONArray arr = JSONArray.fromObject(departmentService.listAllDepartmentToSelect("0", zdepartmentPdList));
 		return (null == arr ? "" : arr.toString());
 	}
+	
+	/**
+	 * 获取组织机构树数据源
+	 * @param departmentService
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<PageData> getDepartmentSelectTreeSourceList(DepartmentManager departmentService) throws Exception{
+		List<PageData> zdepartmentPdList = new ArrayList<PageData>();
+		return departmentService.listAllDepartmentToSelect("0", zdepartmentPdList);
+	}
 }

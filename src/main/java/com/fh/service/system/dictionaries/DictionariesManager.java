@@ -2,6 +2,7 @@ package com.fh.service.system.dictionaries;
 
 import java.util.List;
 
+import com.fh.entity.JqPage;
 import com.fh.entity.Page;
 import com.fh.entity.system.Dictionaries;
 import com.fh.util.PageData;
@@ -80,5 +81,24 @@ public interface DictionariesManager{
 	 * @throws Exception
 	 */
 	public List<Dictionaries> getSysDictionaries(String dicName)throws Exception;
+	
+	/**列表
+	 * @param page
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PageData> listJq(JqPage page)throws Exception;
+	
+	/**列表(全部)
+	 * @param pd
+	 * @throws Exception
+	 */
+	public List<PageData> listAll(PageData pd)throws Exception;
+	
+	/**获取记录数量
+	 * @param pd
+	 * @throws Exception
+	 */
+	public int count(PageData pd)throws Exception;
 }
 

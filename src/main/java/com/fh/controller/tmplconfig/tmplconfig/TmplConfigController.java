@@ -1,22 +1,10 @@
 package com.fh.controller.tmplconfig.tmplconfig;
 
-import java.io.Console;
-import java.io.PrintWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.aspectj.weaver.ast.Var;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -24,19 +12,13 @@ import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
 import com.fh.controller.common.DictsUtil;
 import com.fh.entity.CommonBase;
-import com.fh.entity.JqGridModel;
-import com.fh.entity.JqPage;
 import com.fh.entity.Page;
 import com.fh.entity.PageResult;
 import com.fh.service.fhoa.department.DepartmentManager;
 import com.fh.service.tmplConfigDict.tmplconfigdict.TmplConfigDictManager;
 import com.fh.service.tmplconfig.tmplconfig.TmplConfigManager;
-import com.fh.util.AppUtil;
 import com.fh.util.Jurisdiction;
-import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
-import com.fh.util.SqlTools;
-import com.fh.util.Tools;
 
 import net.sf.json.JSONArray;
 
@@ -73,7 +55,14 @@ public class TmplConfigController extends BaseController {
 		page.setPd(pd);
 		
 		List<PageData>	listBase = tmplconfigService.listBase(page);	//列出TmplConfigBase列表
-		mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService));
+		List<PageData> treeSource=DictsUtil.getDepartmentSelectTreeSourceList(departmentService);
+		if(treeSource!=null&&treeSource.size()>0){
+			JSONArray arr = JSONArray.fromObject(treeSource);
+			mv.addObject("zTreeNodes", null == arr ? "" : arr.toString());
+			PageData rootDepart=treeSource.get(0);
+			pd.put("rootDepartCode", rootDepart.getString("id"));
+			pd.put("rootDepartName", rootDepart.getString("name"));
+		}
 		
 		String dicTypeValus=DictsUtil.getDicTypeValue(tmplconfigdictService);
 		String dictString=" : ;"+dicTypeValus;
@@ -104,9 +93,7 @@ public class TmplConfigController extends BaseController {
 			List<PageData> temporaryList = tmplconfigService.temporaryList(page);	
 			result.setRows(temporaryList);
 		}
-		
 		return result;
-		
 	}
 	
 	/**批量修改
@@ -149,16 +136,15 @@ public class TmplConfigController extends BaseController {
 		PageData pd = this.getPageData();
 		PageData tpd = tmplconfigService.findTableCodeByTableNo(pd);
 		pd.put("TABLE_CODE", tpd.getString("TABLE_CODE"));
-		
+		pd.put("DEPT_CODE", pd.getString("DEPARTMENT_CODE"));
 		String strCode = pd.getString("deptIds");
 		JSONArray array = JSONArray.fromObject(strCode);  
-        List<String> listCode = (List<String>) JSONArray.toCollection(array,String.class);// 过时方法
-        for (String string : listCode) {
-        	pd.put("DEPT_CODE", string);
-        	tmplconfigService.deleteTable(pd);
-		}
+        @SuppressWarnings("unchecked")
+		List<String> listCode = (List<String>) JSONArray.toCollection(array,String.class);// 过时方法
+        listCode.remove(pd.getString("DEPARTMENT_CODE"));
         if(null != listCode && listCode.size() > 0){
-			tmplconfigService.copyAll(listCode);
+        	pd.put("DEPT_CODES", listCode);
+			tmplconfigService.copyAll(pd);
 			commonBase.setCode(0);
 		}
 		return commonBase;
