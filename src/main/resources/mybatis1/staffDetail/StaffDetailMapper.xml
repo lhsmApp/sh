@@ -33,7 +33,6 @@
 	<!-- 获取数据 验证数据重复 -->
 	<select id="findByPd" parameterType="pd" resultType="com.fh.entity.StaffDetailModel">
 		select 
-		    <include refid="FieldSelectKey"></include>
 		    <include refid="Field"></include>
 		from 
 		    <include refid="tableName"></include>
@@ -42,7 +41,6 @@
 	</select>
 	<select id="findByModel" parameterType="com.fh.entity.StaffDetailModel" resultType="com.fh.entity.StaffDetailModel">
 		select 
-		    <include refid="FieldSelectKey"></include>
 		    <include refid="Field"></include>
 		from 
 		    <include refid="tableName"></include>
@@ -303,5 +301,60 @@
 	    <include refid="FieldValue"></include>
 		)
 	</insert>
+	
+	<select id="getSum" parameterType="java.util.Map" resultType="com.fh.entity.StaffSummyModel">
+        select 
+                    ${GroupbyFeild},
+                    sum(POST_SALY) POST_SALY,
+			        sum(BONUS) BONUS,
+			        sum(CASH_BONUS) CASH_BONUS,
+			        sum(WORK_OT) WORK_OT,
+			        sum(BACK_SALY) BACK_SALY,
+			        sum(RET_SALY) RET_SALY,
+			        sum(CHK_CASH) CHK_CASH,
+			        sum(INTR_SGL_AWAD) INTR_SGL_AWAD,
+			        sum(SENY_ALLE) SENY_ALLE,
+			        sum(POST_ALLE) POST_ALLE,
+			        sum(NS_ALLE) NS_ALLE,
+			        sum(AREA_ALLE) AREA_ALLE,
+			        sum(EXPT_ALLE) EXPT_ALLE,
+			        sum(TECH_ALLE) TECH_ALLE,
+			        sum(LIVE_EXPE) LIVE_EXPE,
+			        sum(LIVE_ALLE) LIVE_ALLE,
+			        sum(LEAVE_DM) LEAVE_DM,
+			        sum(HOUSE_ALLE) HOUSE_ALLE,
+			        sum(ITEM_ALLE) ITEM_ALLE,
+			        sum(MEAL_EXPE) MEAL_EXPE,
+			        sum(TRF_ALLE) TRF_ALLE,
+			        sum(TEL_EXPE) TEL_EXPE,
+			        sum(HLDY_ALLE) HLDY_ALLE,
+			        sum(KID_ALLE) KID_ALLE,
+			        sum(COOL_EXPE) COOL_EXPE,
+			        sum(EXT_SGL_AWAD) EXT_SGL_AWAD,
+			        sum(PRE_TAX_PLUS) PRE_TAX_PLUS,
+			        sum(GROSS_PAY) GROSS_PAY,
+			        sum(ENDW_INS) ENDW_INS,
+			        sum(UNEMPL_INS) UNEMPL_INS,
+		        	sum(MED_INS) MED_INS,
+		        	sum(CASD_INS) CASD_INS,
+			        sum(HOUSE_FUND) HOUSE_FUND,
+			        sum(SUP_PESN) SUP_PESN,
+		        	sum(TAX_BASE_ADJ) TAX_BASE_ADJ,
+			        sum(ACCRD_TAX) ACCRD_TAX,
+			        sum(AFTER_TAX) AFTER_TAX,
+			        sum(ACT_SALY) ACT_SALY,
+			        sum(GUESS_DIFF) GUESS_DIFF,
+			        sum(CUST_COL1) CUST_COL1,
+			        sum(CUST_COL2) CUST_COL2,
+			        sum(CUST_COL3) CUST_COL3,
+			        sum(CUST_COL4) CUST_COL4,
+			        sum(CUST_COL5) CUST_COL5,
+		        	sum(CUST_COL6) CUST_COL6
+		from 
+		<include refid="tableName"></include>
+		where BUSI_DATE = ${BUSI_DATE}
+	    and DEPT_CODE = ${DEPT_CODE} 
+	    group by ${GroupbyFeild}
+    </select>
 	
 </mapper>

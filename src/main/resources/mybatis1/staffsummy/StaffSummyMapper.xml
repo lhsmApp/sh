@@ -283,5 +283,13 @@
 		where 
 			BILL_CODE = #{BILL_CODE__}
 	</select>
+	<!-- <select id="findById" parameterType="pd" resultType="com.fh.entity.StaffDetailModel">
+		select 
+		    <include refid="Field"></include>
+		from 
+		    <include refid="tableName"></include>
+		where BUSI_DATE = #{BUSI_DATE}
+		and (USER_CODE = #{USER_CODE} and USER_CODE != #{USER_CODE__})
+	</select> -->
 	
 </mapper>

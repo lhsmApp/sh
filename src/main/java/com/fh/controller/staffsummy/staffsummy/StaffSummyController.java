@@ -164,15 +164,15 @@ public class StaffSummyController extends BaseController {
         String time = DateUtils.getCurrentTime(DateFormatUtils.DATE_FORMAT2);
 
 		PageData pd = this.getPageData();
-		Object DATA_ROWS = pd.get("DATA_ROWS");
-		String json = DATA_ROWS.toString();  
+		Object DATA_ROWS_REPORT = pd.get("DATA_ROWS_REPORT");
+		String json = DATA_ROWS_REPORT.toString();  
         JSONArray array = JSONArray.fromObject(json);  
         List<StaffSummyModel> listData = (List<StaffSummyModel>) JSONArray.toCollection(array,StaffSummyModel.class);
         List<SysSealed> listTransfer = new ArrayList<SysSealed>();
         if(null != listData && listData.size() > 0){
         	for(StaffSummyModel summy : listData){
     			SysSealed item = new SysSealed();
-    			item.setBILL_CODE(summy.getBILL_CODE());
+    			//item.setBILL_CODE(summy.getBILL_CODE());
     			item.setRPT_DEPT(summy.getDEPT_CODE());
     			item.setRPT_DUR(SystemDateTime);
     			item.setRPT_USER(userId);
@@ -201,27 +201,73 @@ public class StaffSummyController extends BaseController {
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	@RequestMapping(value="/summary")
-	public @ResponseBody CommonBase summary() throws Exception{
+	@RequestMapping(value="/summaryModelList")
+	public @ResponseBody CommonBase summaryModelList() throws Exception{
 		if(!Jurisdiction.buttonJurisdiction(menuUrl, "delete")){return null;} //校验权限	
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
 		
 		PageData pd = this.getPageData();
-		String checkState = CheckState(null);
-		if(checkState!=null && checkState.trim() != ""){
-			commonBase.setCode(2);
-			commonBase.setMessage(checkState);
-		} else {
-			Object DATA_ROWS = pd.get("DATA_ROWS");
-			String json = DATA_ROWS.toString();  
-	        JSONArray array = JSONArray.fromObject(json);  
-	        List<StaffSummyModel> listData = (List<StaffSummyModel>) JSONArray.toCollection(array,StaffSummyModel.class);
-	        if(null != listData && listData.size() > 0){
-				//staffsummyService.deleteAll(listData);
-				commonBase.setCode(0);
-			}
+		Object DATA_ROWS_SUM = pd.get("DATA_ROWS_SUM");
+		String json = DATA_ROWS_SUM.toString();  
+        JSONArray array = JSONArray.fromObject(json);  
+        List<StaffSummyModel> listData = (List<StaffSummyModel>) JSONArray.toCollection(array,StaffSummyModel.class);
+        if(null != listData && listData.size() > 0){
+        	for(StaffSummyModel summy : listData){
+    			SysSealed item = new SysSealed();
+    			//item.setBILL_CODE(summy.getBILL_CODE());
+    			item.setRPT_DEPT(summy.getDEPT_CODE());
+    			item.setRPT_DUR(SystemDateTime);
+    			item.setBILL_TYPE(TypeCode.toString());// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+    			
+    			String checkState = CheckState(item);
+    			if(checkState!=null && checkState.trim() != ""){
+    				commonBase.setCode(2);
+    				commonBase.setMessage(checkState);
+    				break;
+    			}
+        	}
 		}
+        if(commonBase.getCode() == -1){
+			//staffsummyService.deleteAll(listData);
+			commonBase.setCode(0);
+        }
+		return commonBase;
+	}
+	
+	 /**汇总
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/summaryDepartString")
+	public @ResponseBody CommonBase summaryDepartString() throws Exception{
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "delete")){return null;} //校验权限	
+		CommonBase commonBase = new CommonBase();
+		commonBase.setCode(-1);
+		
+		PageData pd = this.getPageData();
+		Object DATA_DEPART = pd.get("DATA_DEPART");
+		String[] listDepart = DATA_DEPART.toString().split(",");  
+        if(null != listDepart && listDepart.length > 0){
+        	for(String depart : listDepart){
+    			SysSealed item = new SysSealed();
+    			//item.setBILL_CODE(summy.getBILL_CODE());
+    			item.setRPT_DEPT(depart);
+    			item.setRPT_DUR(SystemDateTime);
+    			item.setBILL_TYPE(TypeCode.toString());// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+    			
+    			String checkState = CheckState(item);
+    			if(checkState!=null && checkState.trim() != ""){
+    				commonBase.setCode(2);
+    				commonBase.setMessage(checkState);
+    				break;
+    			}
+        	}
+		}
+        if(commonBase.getCode() == -1){
+			//staffsummyService.deleteAll(listData);
+			commonBase.setCode(0);
+        }
 		return commonBase;
 	}
 	

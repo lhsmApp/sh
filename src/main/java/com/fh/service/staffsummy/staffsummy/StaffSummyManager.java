@@ -31,18 +31,6 @@ public interface StaffSummyManager{
 	 * @throws Exception
 	 */
 	public PageData getFooterSummary(JqPage page)throws Exception;
-
-	/**新增
-	 * @param pd
-	 * @throws Exception
-	 */
-	public void save(PageData pd)throws Exception;
-	
-	/**修改
-	 * @param pd
-	 * @throws Exception
-	 */
-	public void edit(PageData pd)throws Exception;
 	
 	/**通过id获取数据
 	 * @param pd

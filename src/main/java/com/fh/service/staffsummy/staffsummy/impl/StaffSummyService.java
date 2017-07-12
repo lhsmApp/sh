@@ -46,22 +46,6 @@ public class StaffSummyService implements StaffSummyManager{
 		return (PageData)dao.findForObject("StaffSummyMapper.getFooterSummary", page);
 	}
 	
-	/**新增
-	 * @param pd
-	 * @throws Exception
-	 */
-	public void save(PageData pd)throws Exception{
-		dao.save("StaffSummyMapper.save", pd);
-	}
-	
-	/**修改
-	 * @param pd
-	 * @throws Exception
-	 */
-	public void edit(PageData pd)throws Exception{
-		dao.update("StaffSummyMapper.edit", pd);
-	}
-	
 	/**通过id获取数据
 	 * @param pd
 	 * @throws Exception
