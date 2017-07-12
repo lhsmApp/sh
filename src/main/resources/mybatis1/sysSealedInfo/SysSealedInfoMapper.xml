@@ -171,6 +171,14 @@
 		and BILL_TYPE =
 		${BILL_TYPE}
 	</select>
+	<select id="getStateFromModel" parameterType="SysSealed" resultType="String">
+		select STATE
+		from
+		<include refid="tableName"></include>
+		where RPT_DEPT = #{RPT_DEPT}
+		and RPT_DUR = #{RPT_DUR}
+		and BILL_TYPE = #{BILL_TYPE}
+	</select>
 
 	<!-- 上报 -->
 	<delete id="reportDelete" parameterType="com.fh.entity.SysSealed">

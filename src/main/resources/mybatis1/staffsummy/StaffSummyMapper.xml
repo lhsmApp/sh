@@ -146,6 +146,9 @@
 		#{BILL_USER},	
 		#{BILL_DATE}
 	</sql>
+	
+	<!-- 获取 -->
+	
 	<!-- 列表 -->
 	<select id="datalistJqPage" parameterType="jqPage" resultType="pd">
 		select 
@@ -154,12 +157,11 @@
 		from 
 		<include refid="tableName"></include>
 		where BUSI_DATE = ${pd.SystemDateTime}
-		and DEPT_CODE = ${pd.DepartCode}
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
-		<if test="pd.UserCode!= null and pd.UserCode != ''"><!-- 关键词检索 -->
-		    and USER_CODE = ${pd.UserCode}
+		<if test="pd.DepartCode!= null and pd.DepartCode != ''"><!-- 关键词检索 -->
+		    and DEPT_CODE in (${pd.DepartCode})
 		</if>
 		<if test="sidx != null and sidx.trim() != ''" >
 			order by ${sidx} ${sord} 
@@ -171,24 +173,22 @@
 	<select id="countJqGridExtend" parameterType="jqPage" resultType="int">
 		select count(*) from <include refid="tableName"></include> 
 		where BUSI_DATE = ${pd.SystemDateTime}
-		and DEPT_CODE = ${pd.DepartCode}
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
-		<if test="pd.UserCode!= null and pd.UserCode != ''"><!-- 关键词检索 -->
-		    and USER_CODE = ${pd.UserCode}
+		<if test="pd.DepartCode!= null and pd.DepartCode != ''"><!-- 关键词检索 -->
+		    and DEPT_CODE in (${pd.DepartCode})
 		</if>
 	</select>
 	<select id="getFooterSummary" parameterType="jqPage" resultType="pd">
 		select ${pd.Userdata} 
 		from <include refid="tableName"></include> 
 		where BUSI_DATE = ${pd.SystemDateTime}
-		and DEPT_CODE = ${pd.DepartCode}
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
-		<if test="pd.UserCode!= null and pd.UserCode != ''"><!-- 关键词检索 -->
-		    and USER_CODE = ${pd.UserCode}
+		<if test="pd.DepartCode!= null and pd.DepartCode != ''"><!-- 关键词检索 -->
+		    and DEPT_CODE in (${pd.DepartCode})
 		</if>
 	</select>
 	

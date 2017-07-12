@@ -71,6 +71,7 @@ public interface SysSealedInfoManager{
 	 * @throws Exception
 	 */
 	public String getState(PageData pd) throws Exception;
+	public String getStateFromModel(SysSealed item) throws Exception;
 
 	/**上报
 	 * @param
