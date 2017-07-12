@@ -47,6 +47,9 @@ import com.fh.util.Jurisdiction;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
 import com.fh.util.SqlTools;
+import com.fh.util.SqlTools.CallBack;
+import com.fh.util.StringUtil;
+import com.fh.util.Tools;
 import com.fh.util.date.DateUtils;
 import com.fh.util.enums.BillType;
 import com.fh.util.enums.TransferOperType;
@@ -128,7 +131,12 @@ public class VoucherController extends BaseController {
 
 		pd.put("which", which);
 		mv.addObject("pd", pd);
-
+		
+		//设置期间
+		pd.put("KEY_CODE", "SystemDataTime");
+		String busiDate = sysConfigManager.getSysConfigByKey(pd);
+		pd.put("busiDate", busiDate);
+		
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 		// 生成主表结构
 		TmplUtil tmplUtil = new TmplUtil(tmplconfigService, tmplConfigDictService, dictionariesService,
@@ -178,13 +186,26 @@ public class VoucherController extends BaseController {
 		}
 		pd.put("BILL_TYPE1", sealType1);// 封存类型
 
+		String strDeptCode = pd.getString("DEPT_CODE");// 单位检索条件
+		if (StringUtil.isNotEmpty(strDeptCode)) {
+			String[] strDeptCodes = strDeptCode.split(",");
+			pd.put("DEPT_CODES", strDeptCodes);
+		}
+
 		String keywords = pd.getString("keywords"); // 关键词检索条件
 		if (null != keywords && !"".equals(keywords)) {
 			pd.put("keywords", keywords.trim());
 		}
 		String filters = pd.getString("filters"); // 多条件过滤条件
 		if (null != filters && !"".equals(filters)) {
-			pd.put("filterWhereResult", SqlTools.constructWhere(filters, null));
+			pd.put("filterWhereResult", SqlTools.constructWhere(filters, new CallBack() {
+				public String executeField(String f) {
+					if (f.equals("BILL_CODE"))
+						return "A.BILL_CODE";
+					else
+						return f;
+				}
+			}));
 		}
 
 		page.setPd(pd);
@@ -215,42 +236,12 @@ public class VoucherController extends BaseController {
 	public @ResponseBody PageResult<PageData> getDetailList() throws Exception {
 		PageData pd = this.getPageData();
 		String which = pd.getString("TABLE_CODE");
-		String tableCode = getTableCode(which);
-		pd.put("TABLE_CODE", tableCode);
+		String subTableCode = getSubTableCode(which);
+		pd.put("TABLE_CODE", subTableCode);
 		List<PageData> varList = voucherService.listDetail(pd); // 列出Betting列表
 		PageResult<PageData> result = new PageResult<PageData>();
 		result.setRows(varList);
 		return result;
-	}
-
-	/**
-	 * 批量删除
-	 * 
-	 * @param
-	 * @throws Exception
-	 */
-	@RequestMapping(value = "/deleteAll")
-	@ResponseBody
-	public Object deleteAll() throws Exception {
-		logBefore(logger, Jurisdiction.getUsername() + "批量删除Voucher");
-		if (!Jurisdiction.buttonJurisdiction(menuUrl, "del")) {
-			return null;
-		} // 校验权限
-		PageData pd = new PageData();
-		Map<String, Object> map = new HashMap<String, Object>();
-		pd = this.getPageData();
-		List<PageData> pdList = new ArrayList<PageData>();
-		String DATA_IDS = pd.getString("DATA_IDS");
-		if (null != DATA_IDS && !"".equals(DATA_IDS)) {
-			String ArrayDATA_IDS[] = DATA_IDS.split(",");
-			voucherService.deleteAll(ArrayDATA_IDS);
-			pd.put("msg", "ok");
-		} else {
-			pd.put("msg", "no");
-		}
-		pdList.add(pd);
-		map.put("list", pdList);
-		return AppUtil.returnObject(pd, map);
 	}
 
 	/**
@@ -262,6 +253,7 @@ public class VoucherController extends BaseController {
 	@RequestMapping(value = "/voucherTransfer")
 	public @ResponseBody CommonBase voucherTransfer() throws Exception {
 		logBefore(logger, Jurisdiction.getUsername() + "凭证传输");
+		String orgCode = Tools.readTxtFile(Const.ORG_CODE); // 读取总部组织机构编码
 		// if(!Jurisdiction.buttonJurisdiction(menuUrl, "del")){return null;}
 		// //校验权限
 		CommonBase commonBase = new CommonBase();
@@ -281,9 +273,9 @@ public class VoucherController extends BaseController {
 				// 用语句查询出数据库表的所有字段及其属性；拼接成jqgrid全部列
 				List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCode);
 				GenerateTransferData generateTransferData = new GenerateTransferData();
-				Map<String, List<PageData>> mapTransferData=new HashMap<String, List<PageData>>();
-				mapTransferData.put("tableCode", listTransferData);
-				String transferData = generateTransferData.generateTransferData(tableColumns, mapTransferData, "3630",
+				Map<String, List<PageData>> mapTransferData = new HashMap<String, List<PageData>>();
+				mapTransferData.put(tableCode, listTransferData);
+				String transferData = generateTransferData.generateTransferData(tableColumns, mapTransferData, orgCode,
 						TransferOperType.INSERT);
 
 				// 执行上传FIMS
@@ -297,7 +289,7 @@ public class VoucherController extends BaseController {
 				call.setUseSOAPAction(true);
 				String message = (String) call.invoke(new Object[] { transferData });
 				System.out.println(message);
-				if (message != null) {
+				if (message.equals("TRUE")) {
 					// 执行上传成功后对数据进行封存
 					List<SysSealed> listSysSealed = new ArrayList<SysSealed>();
 					User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
@@ -342,6 +334,26 @@ public class VoucherController extends BaseController {
 			tableCode = "TB_HOUSE_FUND_SUMMY";
 		} else {
 			tableCode = "TB_STAFF_SUMMY";
+		}
+		return tableCode;
+	}
+	
+	/**
+	 * 根据前端业务表索引获取表名称
+	 * 
+	 * @param which
+	 * @return
+	 */
+	private String getSubTableCode(String which) {
+		String tableCode = "";
+		if (which != null && which.equals("1")) {
+			tableCode = "TB_STAFF_DETAIL";
+		} else if (which != null && which.equals("2")) {
+			tableCode = "TB_SOCIAL_INC_DETAIL";
+		} else if (which != null && which.equals("3")) {
+			tableCode = "TB_HOUSE_FUND_DETAIL";
+		} else {
+			tableCode = "TB_STAFF_DETAIL";
 		}
 		return tableCode;
 	}

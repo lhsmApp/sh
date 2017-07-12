@@ -26,3 +26,12 @@
 /* .ui-jqgrid .ui-jqgrid-htable th div{
 	height:0px !important;
 } */
+
+.ui-jqgrid .ui-jqgrid-pager{
+	height:40px;
+	padding-top: 0px !important;
+}
+
+.ui-jqgrid .ui-pager-control{
+	height:40px;
+}

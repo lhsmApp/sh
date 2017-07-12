@@ -17,7 +17,7 @@ import com.google.gson.JsonParser;
  */
 public class SqlTools {
 	public interface CallBack {//回调函数接口  
-        public String executeData(String f,String o,String d);  
+        //public String executeData(String f,String o,String d);  
         public String executeField(String f);  
     }  
   
@@ -69,7 +69,8 @@ public class SqlTools {
                         i++; 
                         if(cb!=null){
                         	field = cb.executeField(field);  
-                        	data = cb.executeData(field, op, data);  
+                        	//data = cb.executeData(field, op, data); 
+                        	data = executeData(field, op, data);
                         }else{
                         	data = executeData(field, op, data);    
                         }

@@ -221,7 +221,7 @@
         });
  	});
 	
-	//批量保存
+	//批量传输
 	function batchSave(e) {
 		var listData =new Array();
 		//var ids = $("#jqGrid").jqGrid('getGridParam','selarrrow');
@@ -263,8 +263,15 @@
 			        });
 				}
 			},
-	    	error: function(e) {
+	    	error: function(response) {
+	    		console.log(response);
 				$(top.hangge());//关闭加载状态
+				$("#subTitle").tips({
+					side:3,
+		            msg:'传输失败,'+response.responseJSON.message,
+		            bg:'#cc0033',
+		            time:3
+		        });
 	    	}
 		});
 		}

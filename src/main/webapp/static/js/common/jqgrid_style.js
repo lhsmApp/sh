@@ -179,9 +179,11 @@ function fn_addSubmit(response, postdata) {
 function showQueryCondi(jqgrid, gridHeight,withBottom) {
 	if (gridHeight=="undefined"||gridHeight == null || gridHeight == "" || gridHeight == 0) {
 		if (withBottom) {
-			gridHeight = 192;
+			//gridHeight = 192;
+			gridHeight = 176;
 		} else {
-			gridHeight = 155;
+			//gridHeight = 155;
+			gridHeight = 139;
 		}
 	}
 	if ($(".widget-box").css("display") == "block") {
@@ -193,7 +195,7 @@ function showQueryCondi(jqgrid, gridHeight,withBottom) {
 		$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass(
 				'fa-chevron-up');
 		$("#btnQuery").find("span").text("隐藏查询");
-		$(jqgrid).jqGrid('setGridHeight', $(window).height() - gridHeight - 64);
+		$(jqgrid).jqGrid('setGridHeight', $(window).height() - gridHeight - 65);
 	}
 	$(".widget-box").toggle("fast");
 }
@@ -202,13 +204,15 @@ function showQueryCondi(jqgrid, gridHeight,withBottom) {
 function resizeGridHeight(jqgrid, gridHeight, withBottom) {
 	if (gridHeight=="undefined"||gridHeight == null || gridHeight == "" || gridHeight == 0) {
 		if (withBottom) {
-			gridHeight = 192;
+			//gridHeight = 192;
+			gridHeight = 176;
 		} else {
-			gridHeight = 155;
+			//gridHeight = 155;
+			gridHeight = 139;
 		}
 	}
 	if ($(".widget-box").css("display") == "block") {
-		$(jqgrid).jqGrid('setGridHeight', $(window).height() - gridHeight - 64);
+		$(jqgrid).jqGrid('setGridHeight', $(window).height() - gridHeight - 65);
 	} else {
 		$(jqgrid).jqGrid('setGridHeight', $(window).height() - gridHeight);
 	}

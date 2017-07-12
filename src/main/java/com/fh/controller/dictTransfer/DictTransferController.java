@@ -21,6 +21,7 @@ import com.fh.entity.CommonBase;
 import com.fh.entity.Page;
 import com.fh.entity.PageResult;
 import com.fh.entity.TableColumns;
+import com.fh.exception.CustomException;
 import com.fh.service.sysConfig.sysconfig.SysConfigManager;
 import com.fh.service.system.dictionaries.DictionariesManager;
 import com.fh.service.tmplconfig.tmplconfig.impl.TmplConfigService;
@@ -57,7 +58,7 @@ public class DictTransferController extends BaseController {
 
 	@Resource(name = "sysconfigService")
 	private SysConfigManager sysConfigManager;
-	
+
 	/**
 	 * 列表
 	 * 
@@ -84,7 +85,7 @@ public class DictTransferController extends BaseController {
 		logBefore(logger, Jurisdiction.getUsername() + "字典传输列表");
 		PageData pd = new PageData();
 		pd = this.getPageData();
-		
+
 		String keywords = pd.getString("keywords"); // 关键词检索条件
 		if (null != keywords && !"".equals(keywords)) {
 			pd.put("keywords", keywords.trim());
@@ -93,14 +94,14 @@ public class DictTransferController extends BaseController {
 		if (null != filters && !"".equals(filters)) {
 			pd.put("filterWhereResult", SqlTools.constructWhere(filters, null));
 		}
-		//page.setPd(pd);
+		// page.setPd(pd);
 		List<PageData> varList = dictionariesService.listAll(pd);
-		//int records = dictionariesService.count(pd);
+		// int records = dictionariesService.count(pd);
 		PageResult<PageData> result = new PageResult<PageData>();
 		result.setRows(varList);
-		//result.setRowNum(page.getRowNum());
-		//result.setRecords(records);
-		//result.setPage(page.getPage());
+		// result.setRowNum(page.getRowNum());
+		// result.setRecords(records);
+		// result.setPage(page.getPage());
 		return result;
 	}
 
@@ -112,8 +113,8 @@ public class DictTransferController extends BaseController {
 	 */
 	@RequestMapping(value = "/dictTransfer")
 	public @ResponseBody CommonBase dictTransfer() throws Exception {
-		logBefore(logger, Jurisdiction.getUsername() + "凭证传输");
-		String orgCode=Tools.readTxtFile(Const.ORG_CODE); //读取总部组织机构编码
+		logBefore(logger, Jurisdiction.getUsername() + "字典传输");
+		String orgCode = Tools.readTxtFile(Const.ORG_CODE); // 读取总部组织机构编码
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
 		PageData pd = this.getPageData();
@@ -121,63 +122,66 @@ public class DictTransferController extends BaseController {
 		JSONArray array = JSONArray.fromObject(strDataRows);
 		@SuppressWarnings("unchecked")
 		List<PageData> listTransferData = (List<PageData>) JSONArray.toCollection(array, PageData.class);// 过时方法
-		try {
-			if (null != listTransferData && listTransferData.size() > 0) {
-				for(PageData item:listTransferData){
-					item.put("UNITID", orgCode);
+		if (null != listTransferData && listTransferData.size() > 0) {
+			/*
+			 * for(PageData item:listTransferData){ item.put("UNITID", orgCode);
+			 * }
+			 */
+			/********************** 生成字典传输数据 ************************/
+			List<TableColumns> tableColumns = new ArrayList<TableColumns>();
+			/*
+			 * TableColumns tableColumn2=new TableColumns();
+			 * tableColumn2.setColumn_key("PRI");
+			 * tableColumn2.setColumn_name("UNITID");
+			 * tableColumn2.setColumn_type("VARCHAR");
+			 */
+			TableColumns tableColumn = new TableColumns();
+			tableColumn.setColumn_key("PRI");
+			tableColumn.setColumn_name("BIANMA");
+			tableColumn.setColumn_type("VARCHAR");
+			TableColumns tableColumn1 = new TableColumns();
+			tableColumn1.setColumn_name("NAME");
+			tableColumn1.setColumn_type("VARCHAR");
+			// tableColumns.add(tableColumn2);
+			tableColumns.add(tableColumn);
+
+			tableColumns.add(tableColumn1);
+
+			// 将获取的字典数据进行分组
+			Map<String, List<PageData>> mapTransferData = GroupUtils.group(listTransferData, new GroupBy<String>() {
+				@Override
+				public String groupby(Object obj) {
+					PageData d = (PageData) obj;
+					return d.getString("PARENT_BIANMA"); // 分组依据为PARENT_ID
 				}
-				/********************** 生成字典传输数据 ************************/
-				List<TableColumns> tableColumns = new ArrayList<TableColumns>();
-				TableColumns tableColumn2=new TableColumns();
-				tableColumn2.setColumn_key("PRI");
-				tableColumn2.setColumn_name("UNITID");
-				tableColumn2.setColumn_type("VARCHAR");
-				TableColumns tableColumn=new TableColumns();
-				tableColumn.setColumn_key("PRI");
-				tableColumn.setColumn_name("BIANMA");
-				tableColumn.setColumn_type("VARCHAR");
-				TableColumns tableColumn1=new TableColumns();
-				tableColumn1.setColumn_name("NAME");
-				tableColumn1.setColumn_type("VARCHAR");
-				tableColumns.add(tableColumn2);
-				tableColumns.add(tableColumn);
-				
-				tableColumns.add(tableColumn1);
-				
-				//将获取的字典数据进行分组
-				Map<String, List<PageData>> mapTransferData = GroupUtils.group(listTransferData, new GroupBy<String>() {  
-		            @Override  
-		            public String groupby(Object obj) {  
-		            	PageData d = (PageData) obj;  
-		                return d.getString("PARENT_BIANMA"); //分组依据为PARENT_ID
-		            }  
-		        }); 
-				//获取上传XML数据
-				GenerateTransferData generateTransferData = new GenerateTransferData();
-				//3630100020
-				String transferData = generateTransferData.generateTransferData(tableColumns, mapTransferData, orgCode,
-						TransferOperType.INSERT);
-				//String a=transferData.replaceAll("<Keys/>", "").replaceAll("<KeyValue/>", "");
-				// 执行上传FIMS
-				Service service = new Service();
-				Call call = (Call) service.createCall();
-				pd.put("KEY_CODE", "JSynFactTableData");
-				String strUrl = sysConfigManager.getSysConfigByKey(pd);
-				URL url = new URL(strUrl);
-				call.setTargetEndpointAddress(url);
-				call.setOperationName(new QName("http://JSynFactTableData.j2ee", "synFactData"));
-				call.setUseSOAPAction(true);
-				String message = (String) call.invoke(new Object[] { transferData });
-				System.out.println(message);
-				if (message =="ok") {
-					/******************************************************/
-					commonBase.setCode(0);
-				}
+			});
+			// 获取上传XML数据
+			GenerateTransferData generateTransferData = new GenerateTransferData();
+			// 3630100020
+			String transferData = generateTransferData.generateTransferData(tableColumns, mapTransferData, orgCode,
+					TransferOperType.INSERT);
+			// String a=transferData.replaceAll("<Keys/>",
+			// "").replaceAll("<KeyValue/>", "");
+			// 执行上传FIMS
+			Service service = new Service();
+			Call call = (Call) service.createCall();
+			pd.put("KEY_CODE", "JSynFactTableData");
+			String strUrl = sysConfigManager.getSysConfigByKey(pd);
+			URL url = new URL(strUrl);
+			call.setTargetEndpointAddress(url);
+			call.setOperationName(new QName("http://JSynFactTableData.j2ee", "synFactData"));
+			call.setUseSOAPAction(true);
+			String message = (String) call.invoke(new Object[] { transferData });
+			System.out.println(message);
+			if (message.equals("TRUE")) {
+				/******************************************************/
+				commonBase.setCode(0);
+			} else {
+				commonBase.setCode(-1);
+				commonBase.setMessage(message);
 			}
-		} catch (Exception ex) {
-			commonBase.setMessage(ex.toString());
-			throw new Exception(ex);
 		}
+
 		return commonBase;
 	}
 }

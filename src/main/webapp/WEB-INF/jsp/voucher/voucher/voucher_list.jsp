@@ -83,30 +83,23 @@
 								<div class="widget-body">
 									<div class="widget-main">
 										<form class="form-inline">
-											<span class="input-icon pull-left" style="margin-right: 5px;">
+											<input name="DEPT_CODE" id="departCode"
+												type="hidden" value="" />
+											<!-- <span class="input-icon pull-left" style="margin-right: 5px;">
 												<input id="form-field-icon-1" type="text"
 												placeholder="这里输入关键词"> <i
 												class="ace-icon fa fa-leaf blue"></i>
+											</span> -->
+											<span class="input-icon pull-left" style="margin-right: 5px;">
+												<input id="busiDate" class="input-mask-date" type="text"
+												placeholder="请输入业务区间"> <i
+												class="ace-icon fa fa-calendar blue"></i>
 											</span>
-
-											<%-- <span class="pull-left" style="margin-right:5px;"> 
-												<select
-													class="chosen-select form-control" name="BELONG_AREA"
-													id="belong_area" data-placeholder="请选择所属区域"
-													style="vertical-align: top; height: 32px; width: 150px;">
-														<option value="" selected>请选择国家</option>
-														<option value="">USA</option>
-														<c:forEach items="${areaList}" var="area">
-															<option value="${area.BIANMA }"
-																<c:if test="${pd.BELONG_AREA==area.BIANMA}">selected</c:if>>${area.NAME }</option>
-														</c:forEach>
-												</select>
-											</span> --%>
 											<span class="pull-left" style="margin-right: 5px;">
 												<div class="selectTree" id="selectTree" multiMode="true"
 													allSelectable="false" noGroup="false"></div>
 											</span>
-											<button type="button" class="btn btn-info btn-sm">
+											<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
 												<i class="ace-icon fa fa-search bigger-110"></i>
 											</button>
 										</form>
@@ -167,6 +160,8 @@
 	<script src="static/ace/js/date-time/bootstrap-datepicker.js"></script>
 	<!--提示框-->
 	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
+	<!-- 输入格式化 -->
+	<script src="static/ace/js/jquery.maskedinput.js"></script>
 	<!-- JqGrid统一样式统一操作 -->
 	<script type="text/javascript" src="static/js/common/jqgrid_style.js"></script>
 	<script type="text/javascript"
@@ -178,8 +173,11 @@
 	var which='1';
 	var gridHeight;
 	var jqGridColModel;
+	var voucherType;
 	$(document).ready(function () {
 		$(top.hangge());//关闭加载状态
+		$('.input-mask-date').mask('999999');
+		$("#busiDate").val('${pd.busiDate}');
 		//dropDownStyle();
 		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 	    jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
@@ -193,9 +191,11 @@
 		$(window).on('resize.jqGrid', function () {
 			$("#jqGrid").jqGrid( 'setGridWidth', $(".page-content").width());
 			if(${HasUserData}){
-				gridHeight=251;
+				//gridHeight=251;
+				gridHeight=236;
 			}else{
-				gridHeight=213;
+				//gridHeight=213;
+				gridHeight=198;
 			}
 			resizeGridHeight($("#jqGrid"),gridHeight);
 	    });
@@ -227,7 +227,7 @@
 		$('.nav-tabs li').on('click', function(e){
 			if($(this).hasClass('active')) return;
 			var target = $(this).find('a');
-			var voucherType;
+			
 			//data:{VOUCHER_TYPE:voucherType,TABLE_CODE:'${pd.which}'},
 			if(target.attr('href')=='#voucherTransfer'){
 				voucherType=1;
@@ -235,7 +235,9 @@
 				$("[data-original-title='获取凭证号']").addClass("hidden");
 				$("[data-original-title='获取冲销凭证号']").addClass("hidden");
 				jQuery('#jqGrid').hideCol(['CERT_CODE','REVCERT_CODE']);
-				$("#jqGrid").jqGrid("setGridParam",{postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}'}});
+				var busiDate = $("#busiDate").val(); 
+				var deptCode = $("#departCode").val(); 
+				$("#jqGrid").jqGrid("setGridParam",{postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}',"BUSI_DATE":busiDate,"DEPT_CODE":deptCode}});
 				$("#jqGrid").trigger("reloadGrid");  
 			}else{
 				voucherType=2;
@@ -268,21 +270,24 @@
 			       });
 				}
 				jQuery('#jqGrid').showCol(['CERT_CODE','REVCERT_CODE']);
-				$("#jqGrid").jqGrid("setGridParam",{postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}'}});
+				var busiDate = $("#busiDate").val(); 
+				var deptCode = $("#departCode").val(); 
+				$("#jqGrid").jqGrid("setGridParam",{postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}',"BUSI_DATE":busiDate,"DEPT_CODE":deptCode}});
 				$("#jqGrid").trigger("reloadGrid");  
 			}
 		});
 		
-		$("#jqGrid").jqGrid({url: '<%=basePath%>voucher/getPageList.do',
-			postData:{"VOUCHER_TYPE":1,"TABLE_CODE":"${pd.which}"},
+		$("#jqGrid").jqGrid({
+			url: "<%=basePath%>voucher/getPageList.do",
+			postData:{"VOUCHER_TYPE":1,"TABLE_CODE":"${pd.which}","BUSI_DATE":$("#busiDate").val()},
 			datatype: "json",
 			colModel: jqGridColModel,
 			reloadAfterSubmit: true, 
 			//autowidth:true,
 			shrinkToFit:false,
-			viewrecords: true, // show the current page, data rang and total records on the toolbar
+			viewrecords: true,
 			rowNum: 10,
-			rowList:[10,20,30,100000],
+			rowList:[10,20,30,10000],
 			//height: '100%', 
 			width:'100%',
 			sortname: 'BILL_CODE',
@@ -302,6 +307,7 @@
             }, */
 			
 			pager: "#jqGridPager",
+			//pagerpos: 'left' ,
 			loadComplete : function() {
 				var table = this;
 				setTimeout(function(){
@@ -331,12 +337,7 @@
 				minusicon  : "ace-icon fa fa-minus center bigger-110 blue",
 				openicon : "ace-icon fa fa-chevron-right center orange"
 			},
-			//for this example we are using local data
 			subGridRowExpanded: showChildGrid,
-			 /* loadComplete : function() {
-				$("[data-original-title='批量上传']").removeClass("hidden");
-		   		   $("[data-original-title='获取凭证号']").addClass("hidden");
-			} */ 
 		});
 		jQuery('#jqGrid').hideCol(['CERT_CODE','REVCERT_CODE']);
 		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
@@ -466,8 +467,7 @@
         var childGridPagerID = parentRowID + "_pager";
      // send the parent row primary key to the server so that we know which grid to show
      	var parentRowData=$("#jqGrid").jqGrid('getRowData',parentRowKey);
-     	var tableCode="TB_HOUSE_FUND_DETAIL";
-        var childGridURL = '<%=basePath%>voucher/getDetailList.do?BILL_CODE='+parentRowData.BILL_CODE+'&TABLE_CODE='+tableCode+'';
+        var childGridURL = '<%=basePath%>voucher/getDetailList.do?BILL_CODE='+parentRowData.BILL_CODE+'&TABLE_CODE='+which;
         //childGridURL = childGridURL + "&parentRowID=" + encodeURIComponent(parentRowKey)
 
         // add a table and pager HTML elements to the parent grid row - we will render the child grid here
@@ -482,6 +482,10 @@
             height: '100%',
             shrinkToFit:true,
             autowidth:true,
+            toppager : "#"+childGridPagerID,
+            //toolbar: [true,"top"],
+            //toppager:true ,
+            //pagerpos:"left",
             //pager: "#" + childGridPagerID,
             loadComplete : function() {
 				var table = this;
@@ -496,6 +500,43 @@
 			    //$("#" + childGridID).parents(".ui-jqgrid-bdiv").css("overflow-x","hidden");
 		    }
         });
+        
+      	//navButtons
+		jQuery("#" + childGridID).jqGrid('navGrid',"#"+childGridPagerID,
+			{ 	//navbar options
+				edit: false,
+				add: false,
+				del: false,
+				search: true,
+				searchicon : 'ace-icon fa fa-search orange',
+				/* searchtext:"查询明细",
+				searchtitle:"查询明细", */
+				refresh: false,
+				refreshicon : 'ace-icon fa fa-refresh blue',
+				view: false,
+				cloneToTop :true
+			},
+			{
+				//edit record form
+			},
+			{
+				//new record form
+			},
+			{
+				//delete record form
+			},
+			{
+				//search form
+				recreateForm: true,
+				afterShowSearch: beforeSearchCallback,
+				afterRedraw: function(){
+					style_search_filters($(this));
+				},
+				multipleSearch: true,
+				//multipleGroup:true,
+				showQuery: false
+			}
+		);
 	}
 	
 	//上传校验
@@ -519,25 +560,28 @@
 		 diag.show();
 	}
 	
+	//检索
+	function tosearch() {
+		var busiDate = $("#busiDate").val(); 
+		var deptCode = $("#departCode").val(); 
+		$("#jqGrid").jqGrid("setGridParam",{postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}',"BUSI_DATE":busiDate,"DEPT_CODE":deptCode}})
+		.trigger("reloadGrid");
+	}  
+	
 	//加载单位树
 	function initComplete(){
 		//下拉树
 		var defaultNodes = {"treeNodes":${zTreeNodes}};
 		//绑定change事件
 		$("#selectTree").bind("change",function(){
-			//console.log($(this));
-			if(!$(this).attr("relValue")){
-		      //  top.Dialog.alert("没有选择节点");
-		    }else{
-				//alert("选中节点文本："+$(this).attr("relText")+"<br/>选中节点值："+$(this).attr("relValue"));
-				$("#DEPARTMENT_CODE").val($(this).attr("relValue"));
-				$("#DNAME").val($(this).attr("relText"));
+			if($(this).attr("relValue")){
+				$("#departCode").val($(this).attr("relValue"));
 		    }
 		});
 		//赋给data属性
 		$("#selectTree").data("data",defaultNodes);  
 		$("#selectTree").render();
-		$("#selectTree2_input").val("${'0'==depname?'请选择':depname}");
+		$("#selectTree2_input").val("请选择");
 	}
  	</script>
 </body>
