@@ -52,4 +52,5 @@ public class Const {
 	public static final String[] APP_GETAPPUSER_VALUE_ARRAY = new String[]{"用户名"};
 	
 	public static final int CUT_STRING_NUM = 15;	//截取的字符串长度
+	public static final String ORG_CODE = "admin/config/ORG.txt";//总部组织机构编码
 }

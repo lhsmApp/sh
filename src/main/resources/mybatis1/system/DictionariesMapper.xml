@@ -153,7 +153,8 @@
 	<!-- 列表(全部) -->
 	<select id="listAll" parameterType="pd" resultType="pd">
 		select
-		A.NAME,A.NAME_EN,A.BIANMA,A.ORDER_BY,A.PARENT_ID,A.BZ,A.TBSNAME,A.DICTIONARIES_ID,IFNULL(B.NAME,'所有字典') AS PARENT_NAME
+		A.NAME,A.NAME_EN,A.BIANMA,A.ORDER_BY,A.PARENT_ID,A.BZ,A.TBSNAME,
+		A.DICTIONARIES_ID,IFNULL(B.NAME,'所有字典') AS PARENT_NAME,B.BIANMA AS PARENT_BIANMA 
 		from
 		<include refid="tableName"></include> A
 		LEFT JOIN <include refid="tableName"></include> B
