@@ -269,6 +269,7 @@ public class VoucherController extends BaseController {
 		PageData pd = this.getPageData();
 		String strDataRows = pd.getString("DATA_ROWS");
 		JSONArray array = JSONArray.fromObject(strDataRows);
+		@SuppressWarnings("unchecked")
 		List<PageData> listTransferData = (List<PageData>) JSONArray.toCollection(array, PageData.class);// 过时方法
 		try {
 			if (null != listTransferData && listTransferData.size() > 0) {
@@ -280,8 +281,10 @@ public class VoucherController extends BaseController {
 				// 用语句查询出数据库表的所有字段及其属性；拼接成jqgrid全部列
 				List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCode);
 				GenerateTransferData generateTransferData = new GenerateTransferData();
-				String transferData = generateTransferData.generateVoucherData(tableColumns, listTransferData, "3630",
-						TransferOperType.INSERT, tableCode);
+				Map<String, List<PageData>> mapTransferData=new HashMap<String, List<PageData>>();
+				mapTransferData.put("tableCode", listTransferData);
+				String transferData = generateTransferData.generateTransferData(tableColumns, mapTransferData, "3630",
+						TransferOperType.INSERT);
 
 				// 执行上传FIMS
 				Service service = new Service();

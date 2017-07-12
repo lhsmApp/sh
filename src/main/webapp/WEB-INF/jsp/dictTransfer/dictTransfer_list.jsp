@@ -36,7 +36,7 @@
 							style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
 						<button id="btnQuery" class="btn btn-white btn-info btn-sm"
 							onclick="showQueryCondi($('#jqGrid'))">
-							<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
+							<i class="ace-icon fa fa-chevron-up bigger-120 blue"></i> <span>隐藏查询</span>
 						</button>
 					</div>
 					<!-- /.page-header -->
@@ -131,6 +131,8 @@
 				{ label: '名称', name: 'NAME', width: 90},
 				{ label: '英文', name: 'NAME_EN', width: 60},
 				{ label: '排序', name: 'ORDER_BY', width: 60},
+				{ label: '上级ID', name: 'PARENT_ID', width: 80,hidden:true},
+				{ label: '上级编码', name: 'PARENT_BIANMA', width: 80,hidden:true},
 				{ label: '上级', name: 'PARENT_NAME', width: 80},
 				{ label: '备注', name: 'BZ', width: 80}
 			],
