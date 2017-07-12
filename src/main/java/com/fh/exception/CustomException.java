@@ -15,11 +15,14 @@ public class CustomException extends Exception {
 	 */
 	private static final long serialVersionUID = 1L;
 	//异常信息
-	public String message;
+	private String message;
+	//是否是Ajax异常
+	private boolean isAjaxExp;
 	
-	public CustomException(String message){
+	public CustomException(String message,boolean isAjaxExp){
 		super(message);
 		this.message = message;
+		this.isAjaxExp=isAjaxExp;
 	}
 
 	public String getMessage() {
@@ -28,5 +31,13 @@ public class CustomException extends Exception {
 
 	public void setMessage(String message) {
 		this.message = message;
+	}
+
+	public boolean isAjaxExp() {
+		return isAjaxExp;
+	}
+
+	public void setAjaxExp(boolean isAjaxExp) {
+		this.isAjaxExp = isAjaxExp;
 	}
 }
