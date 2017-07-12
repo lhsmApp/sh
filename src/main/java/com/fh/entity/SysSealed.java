@@ -1,5 +1,5 @@
 package com.fh.entity;
-
+ 
 public class SysSealed {
 	
 	private String BILL_CODE; 
