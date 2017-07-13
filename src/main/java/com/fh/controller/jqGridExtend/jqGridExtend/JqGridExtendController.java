@@ -300,7 +300,7 @@ public class JqGridExtendController extends BaseController {
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("读取Excel文件错误", e);
-			throw new CustomException("读取Excel文件错误");
+			throw new CustomException("读取Excel文件错误",true);
 		}
 		boolean judgement = false;
 		if (uploadAndRead != null && !"[]".equals(uploadAndRead.toString()) && uploadAndRead.size() >= 1) {
