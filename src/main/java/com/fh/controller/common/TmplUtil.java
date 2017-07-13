@@ -176,7 +176,7 @@ public class TmplUtil {
 					&& (col.getData_type().trim().equals("DECIMAL") || col.getData_type().trim().equals("DOUBLE")
 							|| col.getData_type().trim().equals("INT") || col.getData_type().trim().equals("FLOAT"))) {
 				model_name.append(" width: '150', ");
-				model_name.append(" align: 'right', search: false, sorttype: 'number', formatter: 'number', ");
+				model_name.append(" align: 'right', search: false, sorttype: 'number', formatter: 'number',summaryTpl: 'sum: {0}', summaryType: 'sum', ");
 			} else {
 				if (intLength > 50) {
 					model_name.append(" width: '200', ");

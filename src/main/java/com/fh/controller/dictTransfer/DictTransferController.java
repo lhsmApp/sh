@@ -159,9 +159,7 @@ public class DictTransferController extends BaseController {
 			GenerateTransferData generateTransferData = new GenerateTransferData();
 			// 3630100020
 			String transferData = generateTransferData.generateTransferData(tableColumns, mapTransferData, orgCode,
-					TransferOperType.INSERT);
-			// String a=transferData.replaceAll("<Keys/>",
-			// "").replaceAll("<KeyValue/>", "");
+					TransferOperType.DELETE);
 			// 执行上传FIMS
 			Service service = new Service();
 			Call call = (Call) service.createCall();
@@ -173,15 +171,22 @@ public class DictTransferController extends BaseController {
 			call.setUseSOAPAction(true);
 			String message = (String) call.invoke(new Object[] { transferData });
 			System.out.println(message);
-			if (message.equals("TRUE")) {
+			if (message.equals("TRUE")) {//删除成功
+				String transferDataInsert = generateTransferData.generateTransferData(tableColumns, mapTransferData, orgCode,
+						TransferOperType.INSERT);
+				String messageInsert = (String) call.invoke(new Object[] { transferDataInsert });
 				/******************************************************/
-				commonBase.setCode(0);
+				if(messageInsert.equals("TRUE")){//插入成功
+					commonBase.setCode(0);
+				}else{
+					commonBase.setCode(-1);
+					commonBase.setMessage(message);
+				}
 			} else {
 				commonBase.setCode(-1);
 				commonBase.setMessage(message);
 			}
 		}
-
 		return commonBase;
 	}
 }

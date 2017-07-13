@@ -285,27 +285,29 @@
 			reloadAfterSubmit: true, 
 			//autowidth:true,
 			shrinkToFit:false,
-			viewrecords: true,
+			viewrecords: false,
 			rowNum: 10,
-			rowList:[10,20,30,10000],
+			//rowList:[10,20,30,10000],
+			pgbuttons: false,//上下按钮 
+			pginput:false,//输入框
 			//height: '100%', 
 			width:'100%',
 			sortname: 'BILL_CODE',
 			footerrow: ${HasUserData},
 			userDataOnFooter: ${HasUserData}, // the calculated sums and/or strings from server are put at footer row.
-			/*grouping: true,
-			 groupingView: {
-                groupField: ["CATEGORYNAME"],
+			grouping: true,
+			groupingView: {
+                groupField: ["DEPT_CODE"],
                 groupColumnShow: [true],
                 groupText: ["<b>{0}</b>"],
-                groupOrder: ["desc"],
+                groupOrder: ["asc"],
                 groupDataSorted : false,
                 groupSummary: [true],
                 groupCollapse: false,
                 plusicon : 'fa fa-chevron-down bigger-110',
 				minusicon : 'fa fa-chevron-up bigger-110'
-            }, */
-			
+            },
+
 			pager: "#jqGridPager",
 			//pagerpos: 'left' ,
 			loadComplete : function() {
@@ -338,6 +340,28 @@
 				openicon : "ace-icon fa fa-chevron-right center orange"
 			},
 			subGridRowExpanded: showChildGrid,
+			/*beforeSelectRow: function (rowid, e) { 
+				  i = $.jgrid.getCellIndex($(e.target).closest('td')[0]),  
+			       cm = $("#jqGrid").jqGrid('getGridParam', 'colModel');  
+			   return (cm[i].name === 'cb');   
+			},*/
+			cellEdit: true,
+			gridComplete:function(){
+				$("[role='checkbox']").on('click',function(e){
+					var target = $(this);
+					var curRow=target.closest('tr');
+					var curRowId=curRow.attr('id');
+					var curRowData=$("#jqGrid").getRowData(curRowId);
+					var ids = $("#jqGrid").jqGrid('getDataIDs');
+					
+					$("#jqGrid").setSelection(curRowId,true);
+                    for (i = 0; i < ids.length; i++) { 
+                    	var item=$("#jqGrid").getRowData(ids[i]);
+                    	if(item.DEPT_CODE==curRowData.DEPT_CODE)
+                    		$("#jqGrid").setSelection(ids[i],true);
+                    }
+				});
+		    }
 		});
 		jQuery('#jqGrid').hideCol(['CERT_CODE','REVCERT_CODE']);
 		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
