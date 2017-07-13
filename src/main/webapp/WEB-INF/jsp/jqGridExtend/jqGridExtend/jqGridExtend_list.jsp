@@ -327,7 +327,6 @@
     					updateActionIcons(table);
     					updatePagerIcons(table);
     					enableTooltips(table);
-    					//$("#" + childGridID).jqGrid( 'setGridWidth', $(".page-content").width() - 100);
     				}, 0);
     			},
             });
