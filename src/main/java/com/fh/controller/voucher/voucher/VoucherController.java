@@ -48,6 +48,8 @@ import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
 import com.fh.util.SqlTools;
 import com.fh.util.SqlTools.CallBack;
+import com.fh.util.collectionSql.GroupUtils;
+import com.fh.util.collectionSql.GroupUtils.GroupBy;
 import com.fh.util.StringUtil;
 import com.fh.util.Tools;
 import com.fh.util.date.DateUtils;
@@ -131,12 +133,12 @@ public class VoucherController extends BaseController {
 
 		pd.put("which", which);
 		mv.addObject("pd", pd);
-		
-		//设置期间
+
+		// 设置期间
 		pd.put("KEY_CODE", "SystemDataTime");
 		String busiDate = sysConfigManager.getSysConfigByKey(pd);
 		pd.put("busiDate", busiDate);
-		
+
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 		// 生成主表结构
 		TmplUtil tmplUtil = new TmplUtil(tmplconfigService, tmplConfigDictService, dictionariesService,
@@ -209,13 +211,13 @@ public class VoucherController extends BaseController {
 		}
 
 		page.setPd(pd);
-		List<PageData> varList = voucherService.list(page); // 列出Betting列表
-		int records = voucherService.countJqGrid(pd);
+		List<PageData> varList = voucherService.listAll(pd); // 列出Voucher列表
+		// int records = voucherService.countJqGrid(pd);
 		PageResult<PageData> result = new PageResult<PageData>();
 		result.setRows(varList);
-		result.setRowNum(page.getRowNum());
-		result.setRecords(records);
-		result.setPage(page.getPage());
+		// result.setRowNum(page.getRowNum());
+		// result.setRecords(records);
+		// result.setPage(page.getPage());
 		PageData userdata = null;
 		if (SqlUserdata != null && !SqlUserdata.toString().trim().equals("")) {
 			// 底行显示的求和与平均值字段
@@ -263,42 +265,58 @@ public class VoucherController extends BaseController {
 		JSONArray array = JSONArray.fromObject(strDataRows);
 		@SuppressWarnings("unchecked")
 		List<PageData> listTransferData = (List<PageData>) JSONArray.toCollection(array, PageData.class);// 过时方法
-		try {
-			if (null != listTransferData && listTransferData.size() > 0) {
-				/********************** 生成传输数据 ************************/
-				String which = pd.getString("TABLE_CODE");
-				String tableCode = getTableCode(which);
-				// String voucherType=pd.getString("VOUCHER_TYPE");
+		if (null != listTransferData && listTransferData.size() > 0) {
+			/********************** 生成传输数据 ************************/
+			String which = pd.getString("TABLE_CODE");
+			String tableCode = getTableCode(which);
+			// String voucherType=pd.getString("VOUCHER_TYPE");
 
-				// 用语句查询出数据库表的所有字段及其属性；拼接成jqgrid全部列
-				List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCode);
-				GenerateTransferData generateTransferData = new GenerateTransferData();
-				Map<String, List<PageData>> mapTransferData = new HashMap<String, List<PageData>>();
-				mapTransferData.put(tableCode, listTransferData);
-				String transferData = generateTransferData.generateTransferData(tableColumns, mapTransferData, orgCode,
-						TransferOperType.INSERT);
+			// 用语句查询出数据库表的所有字段及其属性；拼接成jqgrid全部列
+			List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCode);
+			GenerateTransferData generateTransferData = new GenerateTransferData();
+			Map<String, List<PageData>> mapTransferData = new HashMap<String, List<PageData>>();
+			mapTransferData.put(tableCode, listTransferData);
+			String transferData = generateTransferData.generateTransferData(tableColumns, mapTransferData, orgCode,
+					TransferOperType.DELETE);
 
-				// 执行上传FIMS
-				Service service = new Service();
-				Call call = (Call) service.createCall();
-				pd.put("KEY_CODE", "JSynFactTableData");
-				String strUrl = sysConfigManager.getSysConfigByKey(pd);
-				URL url = new URL(strUrl);
-				call.setTargetEndpointAddress(url);
-				call.setOperationName(new QName("http://JSynFactTableData.j2ee", "synFactData"));
-				call.setUseSOAPAction(true);
-				String message = (String) call.invoke(new Object[] { transferData });
-				System.out.println(message);
-				if (message.equals("TRUE")) {
+			// 执行上传FIMS
+			Service service = new Service();
+			Call call = (Call) service.createCall();
+			pd.put("KEY_CODE", "JSynFactTableData");
+			String strUrl = sysConfigManager.getSysConfigByKey(pd);
+			URL url = new URL(strUrl);
+			call.setTargetEndpointAddress(url);
+			call.setOperationName(new QName("http://JSynFactTableData.j2ee", "synFactData"));
+			call.setUseSOAPAction(true);
+			String message = (String) call.invoke(new Object[] { transferData });
+			System.out.println(message);
+			if (message.equals("TRUE")) {
+				String transferDataInsert = generateTransferData.generateTransferData(tableColumns, mapTransferData,
+						orgCode, TransferOperType.INSERT);
+				String messageInsert = (String) call.invoke(new Object[] { transferDataInsert });
+				if (messageInsert.equals("TRUE")) {
 					// 执行上传成功后对数据进行封存
 					List<SysSealed> listSysSealed = new ArrayList<SysSealed>();
 					User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
 					String userId = user.getUSER_ID();
-					for (PageData pageData : listTransferData) {
+					// 将获取的字典数据进行分组
+					Map<String, List<PageData>> mapListTransferData = GroupUtils.group(listTransferData,
+							new GroupBy<String>() {
+								@Override
+								public String groupby(Object obj) {
+									PageData d = (PageData) obj;
+									return d.getString("DEPT_CODE"); // 分组依据为DEPT_CODE
+								}
+							});
+					// for (PageData pageData : mapListTransferData) {
+					for (Map.Entry<String, List<PageData>> entry : mapListTransferData.entrySet()) {
 						SysSealed item = new SysSealed();
-						item.setBILL_CODE(pageData.getString("BILL_CODE"));
-						item.setRPT_DEPT(pageData.getString("DEPT_CODE"));
-						item.setRPT_DUR(pageData.getString("BUSI_DATE"));
+						// item.setBILL_CODE(pageData.getString("BILL_CODE"));
+						item.setBILL_CODE(" ");
+						item.setRPT_DEPT(entry.getKey());
+						List<PageData> listItem = entry.getValue();
+						PageData pgItem = listItem.get(0);
+						item.setRPT_DUR(pgItem.getString("BUSI_DATE"));
 						item.setRPT_USER(userId);
 						item.setRPT_DATE(DateUtils.getCurrentTime());// YYYY-MM-DD
 																		// HH:MM:SS
@@ -310,10 +328,14 @@ public class VoucherController extends BaseController {
 					syssealedinfoService.insertBatch(listSysSealed);
 					/******************************************************/
 					commonBase.setCode(0);
+				} else {
+					commonBase.setCode(-1);
+					commonBase.setMessage(message);
 				}
+			} else {
+				commonBase.setCode(-1);
+				commonBase.setMessage(message);
 			}
-		} catch (Exception ex) {
-			commonBase.setMessage(ex.toString());
 		}
 		return commonBase;
 	}
@@ -337,7 +359,7 @@ public class VoucherController extends BaseController {
 		}
 		return tableCode;
 	}
-	
+
 	/**
 	 * 根据前端业务表索引获取表名称
 	 * 
