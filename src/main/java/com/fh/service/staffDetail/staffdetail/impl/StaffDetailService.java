@@ -136,6 +136,40 @@ public class StaffDetailService implements StaffDetailManager{
 	public List<String> getHaveUserCodeDic(PageData pd)throws Exception{
 		return (List<String>)dao.findForList("StaffDetailMapper.getHaveUserCodeDic", pd);
 	}
+
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	
+	/**获取汇总里的明细
+	 * @param
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PageData> getDetailList(PageData pd)throws Exception{
+		return (List<PageData>)dao.findForList("StaffDetailMapper.getDetailList", pd);
+	}
 }
 

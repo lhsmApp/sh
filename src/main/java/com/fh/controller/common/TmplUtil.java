@@ -73,6 +73,16 @@ public class TmplUtil {
 		this.departmentService = departmentService;
 	}
 
+	public TmplUtil(TmplConfigManager tmplconfigService, TmplConfigDictManager tmplConfigDictService,
+			DictionariesManager dictionariesService, DepartmentManager departmentService,
+			List<String> keyList) {
+		this.tmplconfigService = tmplconfigService;
+		this.tmplConfigDictService = tmplConfigDictService;
+		this.dictionariesService = dictionariesService;
+		this.departmentService = departmentService;
+		this.keyList = keyList;
+	}
+
 	/**
 	 * 
 	 * @return
@@ -410,10 +420,6 @@ public class TmplUtil {
 							col = 1;
 						}
 					}
-					// 配置表中的表头显示
-					jqGridColModel.append(" label: '").append(m_columnsList.get(i).getCOL_NAME()).append("' ");
-
-					jqGridColModel.append("}");
 					/*
 					 * if(i < m_columnsList.size() -1){
 					 * jqGridColModel.append(","); }
@@ -426,6 +432,7 @@ public class TmplUtil {
 						}
 						m_sqlUserdata.append(" sum(" + m_columnsList.get(i).getCOL_CODE() + ") "
 								+ m_columnsList.get(i).getCOL_CODE());
+						jqGridColModel.append(" summaryType:'sum', summaryTpl:'<b>sum:{0}</b>', ");
 					}
 					// 0不计算 1计算 默认0
 					else if (Integer.parseInt(m_columnsList.get(i).getCOL_AVE()) == 1) {
@@ -434,7 +441,12 @@ public class TmplUtil {
 						}
 						m_sqlUserdata.append(" round(avg(" + m_columnsList.get(i).getCOL_CODE() + "), 2) "
 								+ m_columnsList.get(i).getCOL_CODE());
+						jqGridColModel.append(" summaryType:'avg', summaryTpl:'<b>avg:{0}</b>', ");
 					}
+					// 配置表中的表头显示
+					jqGridColModel.append(" label: '").append(m_columnsList.get(i).getCOL_NAME()).append("' ");
+
+					jqGridColModel.append("}");
 				}
 			}
 		}

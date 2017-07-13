@@ -302,6 +302,35 @@
 		)
 	</insert>
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<!-- 获取汇总里的明细 -->
+	<select id="getDetailList" parameterType="pd" resultType="pd">
+		select * 
+		from <include refid="tableName"></include>
+	    where BILL_CODE = #{BILL_CODE}
+	</select>
+	
 	<select id="getSum" parameterType="java.util.Map" resultType="com.fh.entity.StaffSummyModel">
         select 
                     ${GroupbyFeild},

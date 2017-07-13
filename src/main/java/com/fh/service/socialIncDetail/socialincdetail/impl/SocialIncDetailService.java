@@ -132,6 +132,40 @@ public class SocialIncDetailService implements SocialIncDetailManager{
 	public List<String> getHaveUserCodeDic(PageData pd)throws Exception{
 		return (List<String>)dao.findForList("SocialIncDetailMapper.getHaveUserCodeDic", pd);
 	}
+
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	
+	/**获取汇总里的明细
+	 * @param
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PageData> getDetailList(PageData pd)throws Exception{
+		return (List<PageData>)dao.findForList("SocialIncDetailMapper.getDetailList", pd);
+	}
 }
 

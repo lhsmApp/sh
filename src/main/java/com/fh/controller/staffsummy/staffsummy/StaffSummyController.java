@@ -3,6 +3,7 @@ package com.fh.controller.staffsummy.staffsummy;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import javax.annotation.Resource;
@@ -35,6 +36,7 @@ import com.fh.util.enums.DurState;
 import net.sf.json.JSONArray;
 
 import com.fh.service.fhoa.department.impl.DepartmentService;
+import com.fh.service.staffDetail.staffdetail.StaffDetailManager;
 import com.fh.service.staffsummy.staffsummy.StaffSummyManager;
 import com.fh.service.sysConfig.sysconfig.SysConfigManager;
 import com.fh.service.sysSealedInfo.syssealedinfo.impl.SysSealedInfoService;
@@ -54,6 +56,8 @@ public class StaffSummyController extends BaseController {
 	String menuUrl = "staffsummy/list.do"; //菜单地址(权限用)
 	@Resource(name="staffsummyService")
 	private StaffSummyManager staffsummyService;
+	@Resource(name="staffdetailService")
+	private StaffDetailManager staffdetailService;
 	@Resource(name="tmplconfigService")
 	private TmplConfigService tmplconfigService;
 	@Resource(name="syssealedinfoService")
@@ -68,11 +72,17 @@ public class StaffSummyController extends BaseController {
 	private SysConfigManager sysConfigManager;
 
 	//表名
-	String TableName = "tb_staff_summy";
+	String TableNameBase = "tb_staff_summy";
+	String TableNameDetail = "tb_staff_detail";
 	//枚举类型  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 	String TypeCode = BillType.SALLARY_SUMMARY.getNameKey();
 	//显示结构的单位
     String ShowDepartCode = "001001";
+	// 查询表的主键字段
+	private List<String> keyListBase = Arrays.asList("BILL_CODE", "DEPT_CODE");
+    
+    //汇总字段
+    List<String> SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "USER_CATG", "USER_GROP");
 	
 	//页面显示数据的年月
 	String SystemDateTime = "";
@@ -97,8 +107,8 @@ public class StaffSummyController extends BaseController {
 		
 		mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService));
 		
-		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService);
-		String jqGridColModel = tmpl.generateStructure(TableName, ShowDepartCode, 1);
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService, keyListBase);
+		String jqGridColModel = tmpl.generateStructure(TableNameBase, ShowDepartCode, 1);
 
 		//底行显示的求和与平均值字段
 		SqlUserdata = tmpl.getSqlUserdata();
@@ -116,18 +126,21 @@ public class StaffSummyController extends BaseController {
 		logBefore(logger, Jurisdiction.getUsername()+"列表StaffSummy");
 		PageData pd = new PageData();
 		pd = this.getPageData();
-		//
-		String DepartCode = pd.getString("DepartCode");	
-		if(null != DepartCode && !"".equals(DepartCode)){
-			pd.put("DepartCode", DepartCode.trim());
-		}
 		//多条件过滤条件
 		String filters = pd.getString("filters");
 		if(null != filters && !"".equals(filters)){
 			pd.put("filterWhereResult", SqlTools.constructWhere(filters,null));
 		}
+		//
+		String DepartCode = pd.getString("DepartCode");	
+		if(null != DepartCode && !"".equals(DepartCode)){
+			pd.put("DepartCode", DepartCode.trim());
+		}
 		//页面显示数据的年月
 		pd.put("SystemDateTime", SystemDateTime);
+		//类型
+		pd.put("TypeCode", TypeCode);
+		pd.put("DurState", DurState.Sealed.getNameKey());
 		page.setPd(pd);
 		List<PageData> varList = staffsummyService.JqPage(page);	//列出Betting列表
 		int records = staffsummyService.countJqGridExtend(page);
@@ -144,6 +157,43 @@ public class StaffSummyController extends BaseController {
 		result.setRecords(records);
 		result.setPage(page.getPage());
 		result.setUserdata(userdata);
+		
+		return result;
+	}
+
+	/**明细显示结构
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/getDetailColModel")
+	public @ResponseBody CommonBase getDetailColModel() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"getDetailColModel");
+		CommonBase commonBase = new CommonBase();
+		commonBase.setCode(-1);
+		
+		PageData pd = this.getPageData();
+		String DEPT_CODE = (String) pd.get("DATA_DEPT_CODE");
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService);
+		String detailColModel = tmpl.generateStructure(TableNameDetail, DEPT_CODE, 1);
+		
+		commonBase.setCode(0);
+		commonBase.setMessage(detailColModel);
+		
+		return commonBase;
+	}
+
+	/**明细数据
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/getDetailList")
+	public @ResponseBody PageResult<PageData> getDetailList() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"getDetailList");
+		PageData pd = this.getPageData();
+		
+		List<PageData> varList = staffdetailService.getDetailList(pd);	//列出Betting列表
+		PageResult<PageData> result = new PageResult<PageData>();
+		result.setRows(varList);
 		
 		return result;
 	}
@@ -173,6 +223,7 @@ public class StaffSummyController extends BaseController {
         	for(StaffSummyModel summy : listData){
     			SysSealed item = new SysSealed();
     			//item.setBILL_CODE(summy.getBILL_CODE());
+    			item.setBILL_CODE(" ");
     			item.setRPT_DEPT(summy.getDEPT_CODE());
     			item.setRPT_DUR(SystemDateTime);
     			item.setRPT_USER(userId);
@@ -214,6 +265,7 @@ public class StaffSummyController extends BaseController {
         List<StaffSummyModel> listData = (List<StaffSummyModel>) JSONArray.toCollection(array,StaffSummyModel.class);
         if(null != listData && listData.size() > 0){
         	for(StaffSummyModel summy : listData){
+        		//summy.get
     			SysSealed item = new SysSealed();
     			//item.setBILL_CODE(summy.getBILL_CODE());
     			item.setRPT_DEPT(summy.getDEPT_CODE());
@@ -229,7 +281,7 @@ public class StaffSummyController extends BaseController {
         	}
 		}
         if(commonBase.getCode() == -1){
-			//staffsummyService.deleteAll(listData);
+			staffsummyService.summaryModelList(listData, SumField);
 			commonBase.setCode(0);
         }
 		return commonBase;
@@ -265,7 +317,7 @@ public class StaffSummyController extends BaseController {
         	}
 		}
         if(commonBase.getCode() == -1){
-			//staffsummyService.deleteAll(listData);
+			staffsummyService.summaryDepartString(listDepart, SystemDateTime, SumField);
 			commonBase.setCode(0);
         }
 		return commonBase;

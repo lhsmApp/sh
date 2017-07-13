@@ -133,5 +133,38 @@ public class HouseFundDetailService implements HouseFundDetailManager{
 		return (List<String>)dao.findForList("HouseFundDetailMapper.getHaveUserCodeDic", pd);
 	}
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	
+	/**获取汇总里的明细
+	 * @param
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PageData> getDetailList(PageData pd)throws Exception{
+		return (List<PageData>)dao.findForList("HouseFundDetailMapper.getDetailList", pd);
+	}
 }
 

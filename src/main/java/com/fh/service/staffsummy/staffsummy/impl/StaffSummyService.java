@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.fh.dao.DaoSupport;
 import com.fh.entity.JqPage;
 import com.fh.entity.Page;
+import com.fh.entity.StaffSummyModel;
 import com.fh.util.PageData;
 import com.fh.service.staffsummy.staffsummy.StaffSummyManager;
 
@@ -29,7 +30,6 @@ public class StaffSummyService implements StaffSummyManager{
 	public List<PageData> JqPage(JqPage page)throws Exception{
 		return (List<PageData>)dao.findForList("StaffSummyMapper.datalistJqPage", page);
 	}
-	
 	/**获取记录数量
 	 * @param pd
 	 * @throws Exception
@@ -37,7 +37,6 @@ public class StaffSummyService implements StaffSummyManager{
 	public int countJqGridExtend(JqPage page)throws Exception{
 		return (int)dao.findForObject("StaffSummyMapper.countJqGridExtend", page);
 	}
-	
 	/**获取记录总合计
 	 * @param pd
 	 * @throws Exception
@@ -45,6 +44,22 @@ public class StaffSummyService implements StaffSummyManager{
 	public PageData getFooterSummary(JqPage page)throws Exception{
 		return (PageData)dao.findForObject("StaffSummyMapper.getFooterSummary", page);
 	}
+
+	
+	/**汇总
+	 * @param 
+	 * @throws Exception
+	 */
+	public void summaryModelList(List<StaffSummyModel> listData, List<String> SumField)throws Exception{
+		//dao.findForObject("StaffSummyMapper.getFooterSummary", page);
+	}
+	public void summaryDepartString(String[] listDepart, String SystemDateTime, List<String> SumField)throws Exception{
+		//dao.findForObject("StaffSummyMapper.getFooterSummary", page);
+	}
+	
+	
+	
+	
 	
 	/**通过id获取数据
 	 * @param pd

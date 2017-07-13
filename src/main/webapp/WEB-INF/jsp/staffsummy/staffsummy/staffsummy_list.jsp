@@ -155,18 +155,12 @@
 				url: '<%=basePath%>staffsummy/getPageList.do',
 				datatype: "json",
 				colModel: jqGridColModel,
-				reloadAfterSubmit: true, 
 				viewrecords: true, 
 				shrinkToFit: false,
 				rowNum: 10,
-				rowList: [10,20,30],
-				page: 1,
-				scroll: 1,
-                scrollPopUp:true,
-				scrollLeftOffset: "83%",
+				//rowList: [10,20,30],
 	            multiselect: true,
 	            multiboxonly: true,
-	            sortable: true,
 				altRows: true, //斑马条纹
 				
 				pager: pagerBase_selector,
@@ -192,10 +186,15 @@
 				
 				subGrid: true,
 				subGridOptions: {
-					plusicon: "glyphicon-hand-right",
-					minusicon: "glyphicon-hand-down"
+					plusicon : "ace-icon fa fa-plus center bigger-110 blue",
+					minusicon  : "ace-icon fa fa-minus center bigger-110 blue",
+					openicon : "ace-icon fa fa-chevron-right center orange"
 	            },
-	            //subGridRowExpanded: showChildGrid,
+	            subGridRowExpanded: showChildGrid,
+
+				scroll: 1,
+                //scrollPopUp:true,
+				//scrollLeftOffset: "83%",
 				
 				loadComplete : function() {
 					var table = this;
@@ -315,11 +314,11 @@
 			    						        });
 			    							}
 			    						},
-			    				    	error: function(e) {
+			    				    	error: function(response) {
 			    							$(top.hangge());//关闭加载状态
 		    								$("#subTitle").tips({
 		    									side:3,
-		    						            msg:'汇总出错',
+		    						            msg:'汇总出错:'+response.responseJSON.message,
 		    						            bg:'#cc0033',
 		    						            time:3
 		    						        });
@@ -359,11 +358,11 @@
 		    						        });
 		    							}
 		    						},
-		    				    	error: function(e) {
+		    				    	error: function(response) {
 		    							$(top.hangge());//关闭加载状态
 	    								$("#subTitle").tips({
 	    									side:3,
-	    						            msg:'重新汇总出错',
+	    						            msg:'重新汇总出错:'+response.responseJSON.message,
 	    						            bg:'#cc0033',
 	    						            time:3
 	    						        });
@@ -425,11 +424,11 @@
 								        });
 									}
 								},
-						    	error: function(e) {
+						    	error: function(response) {
 									$(top.hangge());//关闭加载状态
 									$("#subTitle").tips({
 										side:3,
-							            msg:'上报出错',
+							            msg:'上报出错:'+response.responseJSON.message,
 							            bg:'#cc0033',
 							            time:3
 							        });
@@ -440,6 +439,82 @@
 				}
 			}
 		});
+
+        // the event handler on expanding parent row receives two parameters
+        // the ID of the grid tow  and the primary key of the row
+        function showChildGrid(parentRowID, parentRowKey) {
+        	console.log(parentRowID+"  "+parentRowKey);
+			var rowData = $(gridBase_selector).getRowData(parentRowKey);
+        	var BILL_CODE = rowData.BILL_CODE__;
+        	console.log(BILL_CODE);
+        	var DEPT_CODE = rowData.DEPT_CODE__;
+        	console.log(DEPT_CODE);
+        	
+            var detailColModel = "[]";
+			$.ajax({
+				type: "GET",
+				url: '<%=basePath%>staffsummy/getDetailColModel.do?',
+		    	data: {DATA_DEPT_CODE:DEPT_CODE},
+				dataType:'json',
+				cache: false,
+				success: function(response){
+					if(response.code==0){
+						$(top.hangge());//关闭加载状态
+						detailColModel = response.message;
+
+			            detailColModel = eval(detailColModel);
+			            var childGridID = parentRowID + "_table";
+			            var childGridPagerID = parentRowID + "_pager";
+			            // send the parent row primary key to the server so that we know which grid to show
+			            var childGridURL = '<%=basePath%>staffsummy/getDetailList.do?BILL_CODE='+BILL_CODE+'';
+			            //childGridURL = childGridURL + "&parentRowID=" + encodeURIComponent(parentRowKey)
+
+			            // add a table and pager HTML elements to the parent grid row - we will render the child grid here
+			            $('#' + parentRowID).append('<table id=' + childGridID + '></table><div id=' + childGridPagerID + ' class=scroll></div>');
+
+			            $("#" + childGridID).jqGrid({
+			                url: childGridURL,
+			                datatype: "json",
+			                colModel: detailColModel,
+			                page: 1,
+			                rowNum: 10,	
+			                scrollPopUp:true,
+							scrollLeftOffset: "83%",
+			                scroll: 1, 
+			                viewrecords: true,
+			                pager: "#" + childGridPagerID,
+			    			
+			    			loadComplete : function() {
+			    				var table = this;
+			    				setTimeout(function(){
+			    					styleCheckbox(table);
+			    					updateActionIcons(table);
+			    					updatePagerIcons(table);
+			    					enableTooltips(table);
+			    				}, 0);
+			    			},
+			            });
+					}else{
+						$(top.hangge());//关闭加载状态
+						$("#subTitle").tips({
+							side:3,
+				            msg:'获取结构失败：'+response.message,
+				            bg:'#cc0033',
+				            time:3
+				        });
+					}
+				},
+		    	error: function(response) {
+					$(top.hangge());//关闭加载状态
+					$("#subTitle").tips({
+						side:3,
+			            msg:'获取结构出错:'+response.responseJSON.message,
+			            bg:'#cc0033',
+			            time:3
+			        });
+		    	}
+			});
+        };
 		
 		//加载单位树
 		function initComplete(){

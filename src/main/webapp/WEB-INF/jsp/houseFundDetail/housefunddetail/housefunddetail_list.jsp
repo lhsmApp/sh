@@ -410,7 +410,7 @@
 									$(top.hangge());//关闭加载状态
 									$("#subTitle").tips({
 										side:3,
-								        msg:'保存失败,'+response.responseJSON.message,
+								        msg:'保存失败:'+response.responseJSON.message,
 								        bg:'#cc0033',
 								        time:3
 								    });
@@ -418,7 +418,7 @@
 							} else {
 								$("#subTitle").tips({
 									side:3,
-						            msg:'保存出错:' + res.toString(),
+						            msg:'保存出错:'+response.responseJSON.message,
 						            bg:'#cc0033',
 						            time:3
 						        });
@@ -504,7 +504,7 @@
 	    							$(top.hangge());//关闭加载状态
     								$("#subTitle").tips({
     									side:3,
-    						            msg:'删除出错,'+ response.responseJSON.message,
+    						            msg:'删除出错:'+response.responseJSON.message,
     						            bg:'#cc0033',
     						            time:3
     						        });
@@ -569,12 +569,12 @@
     						        });
     							}
     						},
-    				    	error: function(e) {
-    							batchEdit(e);
+    				    	error: function(response) {
+    							batchEdit(null);
     							$(top.hangge());//关闭加载状态
 								$("#subTitle").tips({
 									side:3,
-						            msg:'保存出错,'+ response.responseJSON.message,
+						            msg:'保存出错:'+response.responseJSON.message,
 						            bg:'#cc0033',
 						            time:3
 						        });
@@ -654,7 +654,7 @@
 							$(top.hangge());//关闭加载状态
 							$("#subTitle").tips({
 								side:3,
-					            msg:'上报出错,'+ response.responseJSON.message,
+					            msg:'上报出错:'+response.responseJSON.message,
 					            bg:'#cc0033',
 					            time:3
 					        });
