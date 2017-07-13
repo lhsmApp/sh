@@ -158,8 +158,12 @@
 				reloadAfterSubmit: true, 
 				viewrecords: true, 
 				shrinkToFit: false,
-				//rowNum: 10,
-				//rowList: [10,20,30],
+				rowNum: 10,
+				rowList: [10,20,30],
+				page: 1,
+				scroll: 1,
+                scrollPopUp:true,
+				scrollLeftOffset: "83%",
 	            multiselect: true,
 	            multiboxonly: true,
 	            sortable: true,
@@ -168,6 +172,30 @@
 				pager: pagerBase_selector,
 				footerrow: true,
 				userDataOnFooter: true,
+
+	            sortable: true,
+	            sortname: 'DEPT_CODE',
+				sortorder: 'asc',
+
+				grouping: true,
+				groupingView: {
+					groupField: ['DEPT_CODE'],
+					groupOrder: ['asc'],
+					groupColumnShow: [true],
+					groupText: ['<b>{0}</b>'],
+					groupSummary: [true],
+					groupSummaryPos: ['footer'], //header
+					groupCollapse: false,
+	                plusicon : 'fa fa-chevron-down bigger-110',
+					minusicon : 'fa fa-chevron-up bigger-110'
+				},
+				
+				subGrid: true,
+				subGridOptions: {
+					plusicon: "glyphicon-hand-right",
+					minusicon: "glyphicon-hand-down"
+	            },
+	            //subGridRowExpanded: showChildGrid,
 				
 				loadComplete : function() {
 					var table = this;
