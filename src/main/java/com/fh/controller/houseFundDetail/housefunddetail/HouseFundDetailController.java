@@ -368,7 +368,7 @@ public class HouseFundDetailController extends BaseController {
 				} catch (Exception e) {
 					e.printStackTrace();
 					logger.error("读取Excel文件错误", e);
-					throw new CustomException("读取Excel文件错误");
+					throw new CustomException("读取Excel文件错误",false);
 				}
 				boolean judgement = false;
 				if(uploadAndReadMap.get(1).equals(false)){
