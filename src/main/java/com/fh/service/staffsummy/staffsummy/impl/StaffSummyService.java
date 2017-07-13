@@ -50,11 +50,8 @@ public class StaffSummyService implements StaffSummyManager{
 	 * @param 
 	 * @throws Exception
 	 */
-	public void summaryModelList(List<StaffSummyModel> listData, List<String> SumField)throws Exception{
-		//dao.findForObject("StaffSummyMapper.getFooterSummary", page);
-	}
-	public void summaryDepartString(String[] listDepart, String SystemDateTime, List<String> SumField)throws Exception{
-		//dao.findForObject("StaffSummyMapper.getFooterSummary", page);
+	public void summaryModelList(List<PageData> listPd)throws Exception{
+		dao.batch_One_del_Ins("StaffSummyMapper.delete", "StaffSummyMapper.save", listPd);
 	}
 	
 	

@@ -195,7 +195,25 @@
 				scroll: 1,
                 //scrollPopUp:true,
 				//scrollLeftOffset: "83%",
-				
+
+				cellEdit: true,
+				gridComplete:function(){
+					$("[role='checkbox']").on('click',function(e){
+						var target = $(this);
+						var curRow=target.closest('tr');
+						var curRowId=curRow.attr('id');
+						var curRowData=$(gridBase_selector).getRowData(curRowId);
+						var ids = $(gridBase_selector).jqGrid('getDataIDs');
+						
+						$(gridBase_selector).setSelection(curRowId,true);
+	                    for (i = 0; i < ids.length; i++) { 
+	                    	var item=$(gridBase_selector).getRowData(ids[i]);
+	                    	if(item.DEPT_CODE==curRowData.DEPT_CODE)
+	                    		$(gridBase_selector).setSelection(ids[i],true);
+	                    }
+					});
+			    },
+	            
 				loadComplete : function() {
 					var table = this;
 					setTimeout(function(){

@@ -331,7 +331,8 @@
 	    where BILL_CODE = #{BILL_CODE}
 	</select>
 	
-	<select id="getSum" parameterType="java.util.Map" resultType="com.fh.entity.StaffSummyModel">
+	<!-- 获取汇总数据 -->
+	<select id="getSum" parameterType="java.util.Map" resultType="pd">
         select 
                     ${GroupbyFeild},
                     sum(POST_SALY) POST_SALY,

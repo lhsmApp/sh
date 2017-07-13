@@ -36,8 +36,7 @@ public interface StaffSummyManager{
 	 * @param pd
 	 * @throws Exception
 	 */
-	public void summaryModelList(List<StaffSummyModel> listData, List<String> SumField)throws Exception;
-	public void summaryDepartString(String[] listDepart, String SystemDateTime, List<String> SumField)throws Exception;
+	public void summaryModelList(List<PageData> listPd)throws Exception;
 	
 	
 	
