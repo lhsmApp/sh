@@ -22,6 +22,9 @@
 	<!-- 最新版的Jqgrid Css，如果旧版本（Ace）某些方法不好用，尝试用此版本Css，替换旧版本Css -->
 	<!-- <link rel="stylesheet" type="text/css" media="screen" href="static/ace/css/ui.jqgrid-bootstrap.css" /> -->
 	
+    <!-- 标准页面统一样式 -->
+    <link rel="stylesheet" href="static/css/normal.css" />
+
     <style>
 		.page-header{
 			padding-top: 9px;
@@ -497,11 +500,11 @@
 	    						        });
 	    							}
 	    						},
-	    				    	error: function(e) {
+	    				    	error: function(response) {
 	    							$(top.hangge());//关闭加载状态
     								$("#subTitle").tips({
     									side:3,
-    						            msg:'删除出错',
+    						            msg:'删除出错,'+ response.responseJSON.message,
     						            bg:'#cc0033',
     						            time:3
     						        });
@@ -571,7 +574,7 @@
     							$(top.hangge());//关闭加载状态
 								$("#subTitle").tips({
 									side:3,
-						            msg:'保存出错',
+						            msg:'保存出错,'+ response.responseJSON.message,
 						            bg:'#cc0033',
 						            time:3
 						        });
@@ -647,11 +650,11 @@
 						        });
 							}
 						},
-				    	error: function(e) {
+				    	error: function(response) {
 							$(top.hangge());//关闭加载状态
 							$("#subTitle").tips({
 								side:3,
-					            msg:'上报出错',
+					            msg:'上报出错,'+ response.responseJSON.message,
 					            bg:'#cc0033',
 					            time:3
 					        });
