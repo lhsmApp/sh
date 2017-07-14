@@ -1,6 +1,7 @@
 package com.fh.service.staffsummy.staffsummy;
 
 import java.util.List;
+import java.util.Map;
 
 import com.fh.entity.JqPage;
 import com.fh.entity.Page;
@@ -30,23 +31,19 @@ public interface StaffSummyManager{
 	 * @throws Exception
 	 */
 	public PageData getFooterSummary(JqPage page)throws Exception;
-	
+
+
+	/**获取汇总数据
+	 * @param
+	 * @throws Exception
+	 */
+	public List<PageData> getHave(Map<String, String> map)throws Exception;
 
 	/**获取记录总合计
 	 * @param pd
 	 * @throws Exception
 	 */
-	public void summaryModelList(List<PageData> listPd)throws Exception;
-	
-	
-	
-	
-	
-	/**通过id获取数据
-	 * @param pd
-	 * @throws Exception
-	 */
-	public PageData findById(PageData pd)throws Exception;
+	public void summaryModelList(List<PageData> listPd, PageData pdBillNum)throws Exception;
 	
 }
 

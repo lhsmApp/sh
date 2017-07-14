@@ -89,6 +89,13 @@ public class TmplUtil {
 	 * @throws Exception
 	 */
 	public String generateStructureNoEdit(String tableCode, String departCode) throws Exception {
+		// 默认值
+		m_defaultValueList = new HashMap<String, Object>();
+		// 底行显示的求和与平均值字段
+		m_sqlUserdata = new StringBuilder();
+		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
+		m_columnsList = new ArrayList<TmplConfigDetail>();
+		
 		// 用语句查询出数据库表的所有字段及其属性；拼接成jqgrid全部列
 		List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCode);
 		Map<String, Map<String, Object>> listColModelAll = jqGridColModelAllNoEdit(tableColumns);
@@ -96,28 +103,46 @@ public class TmplUtil {
 		TmplConfigDetail item = new TmplConfigDetail();
 		item.setDEPT_CODE(departCode);
 		item.setTABLE_CODE(tableCode);
-		List<TmplConfigDetail> listColumns = tmplconfigService.listNeed(item);
+		m_columnsList = tmplconfigService.listNeed(item);
 		// 拼接真正设置的jqGrid的ColModel
 		StringBuilder jqGridColModel = new StringBuilder();
+
 		jqGridColModel.append("[");
+		// 添加关键字的保存列
+		if (keyList != null && keyList.size() > 0) {
+			for (int i = 0; i < keyList.size(); i++) {
+				String key = keyList.get(i);
+				if (i != 0) {
+					jqGridColModel.append(", ");
+				}
+				jqGridColModel.append(" {name: '").append(key.toUpperCase()).append(keyExtra).append("', hidden: true, editable: false} ");
+			}
+		}
 		// 添加配置表设置列，字典（未设置就使用表默认，text或number）、隐藏、表头显示
-		if (listColumns != null && listColumns.size() > 0) {
-			for (int i = 0; i < listColumns.size(); i++) {
-				if (listColModelAll.containsKey(listColumns.get(i).getCOL_CODE())) {
-					Map<String, Object> itemColModel = listColModelAll.get(listColumns.get(i).getCOL_CODE());
-					jqGridColModel.append("{");
+		if (m_columnsList != null && m_columnsList.size() > 0) {
+			for (int i = 0; i < m_columnsList.size(); i++) {
+				if (listColModelAll.containsKey(m_columnsList.get(i).getCOL_CODE().toUpperCase())) {
+					Map<String, Object> itemColModel = listColModelAll.get(m_columnsList.get(i).getCOL_CODE());
+					jqGridColModel.append(", {");
 					String name = (String) itemColModel.get("name");
 					String notedit = (String) itemColModel.get("notedit");
-					if (name != null && name.trim() != "") {
+					if (name != null && !name.trim().equals("")) {
 						jqGridColModel.append(name).append(", ");
+					} else {
+						continue;
 					}
 					// 配置表中的字典
-					if (listColumns.get(i).getDICT_TRANS() != null
-							&& !listColumns.get(i).getDICT_TRANS().trim().equals("")) {
-						String strDicValue = getDicValue(listColumns.get(i).getDICT_TRANS());
+					if (m_columnsList.get(i).getDICT_TRANS() != null
+							&& !m_columnsList.get(i).getDICT_TRANS().trim().equals("")) {
+						String strDicValue = getDicValue(m_columnsList.get(i).getDICT_TRANS());
+
+						String strSelectValue = ":";
+						if (strDicValue != null && !strDicValue.trim().equals("")) {
+							strSelectValue += ";" + strDicValue;
+						}
 						// 选择
 						jqGridColModel.append(" edittype:'select', ");
-						jqGridColModel.append(" editoptions:{value:'" + strDicValue + "'}, ");
+						jqGridColModel.append(" editoptions:{value:'" + strSelectValue + "'}, ");
 						// 翻译
 						jqGridColModel.append(" formatter: 'select', ");
 						jqGridColModel.append(" formatoptions: {value: '" + strDicValue + "'}, ");
@@ -126,41 +151,38 @@ public class TmplUtil {
 						jqGridColModel.append(" searchoptions: {value: ':[All];" + strDicValue + "'}, ");
 					}
 					// 配置表中的隐藏
-					int intHide = Integer.parseInt(listColumns.get(i).getCOL_HIDE());
+					int intHide = Integer.parseInt(m_columnsList.get(i).getCOL_HIDE());
 					jqGridColModel.append(" hidden: ").append(intHide == 1 ? "false" : "true").append(", ");
-					if (notedit != null && notedit.trim() != "") {
+					if (notedit != null && !notedit.trim().equals("")) {
 						jqGridColModel.append(notedit).append(", ");
 					}
-					// 配置表中的表头显示
-					jqGridColModel.append(" label: '").append(listColumns.get(i).getCOL_NAME()).append("' ");
-
-					jqGridColModel.append("}");
-					if (i < listColumns.size() - 1) {
-						jqGridColModel.append(",");
-					}
-
 					// 底行显示的求和与平均值字段
 					// 1汇总 0不汇总,默认0
-					if (Integer.parseInt(listColumns.get(i).getCOL_SUM()) == 1) {
+					if (Integer.parseInt(m_columnsList.get(i).getCOL_SUM()) == 1) {
 						if (m_sqlUserdata != null && !m_sqlUserdata.toString().trim().equals("")) {
 							m_sqlUserdata.append(", ");
 						}
-						m_sqlUserdata.append(
-								" sum(" + listColumns.get(i).getCOL_CODE() + ") " + listColumns.get(i).getCOL_CODE());
+						m_sqlUserdata.append(" sum(" + m_columnsList.get(i).getCOL_CODE() + ") "
+								+ m_columnsList.get(i).getCOL_CODE());
+						jqGridColModel.append(" summaryType:'sum', summaryTpl:'<b>sum:{0}</b>', ");
 					}
 					// 0不计算 1计算 默认0
-					else if (Integer.parseInt(listColumns.get(i).getCOL_AVE()) == 1) {
+					else if (Integer.parseInt(m_columnsList.get(i).getCOL_AVE()) == 1) {
 						if (m_sqlUserdata != null && !m_sqlUserdata.toString().trim().equals("")) {
 							m_sqlUserdata.append(", ");
 						}
-						m_sqlUserdata.append(" round(avg(" + listColumns.get(i).getCOL_CODE() + "), 2) "
-								+ listColumns.get(i).getCOL_CODE());
+						m_sqlUserdata.append(" round(avg(" + m_columnsList.get(i).getCOL_CODE() + "), 2) "
+								+ m_columnsList.get(i).getCOL_CODE());
+						jqGridColModel.append(" summaryType:'avg', summaryTpl:'<b>avg:{0}</b>', ");
 					}
+					// 配置表中的表头显示
+					jqGridColModel.append(" label: '").append(m_columnsList.get(i).getCOL_NAME()).append("' ");
+
+					jqGridColModel.append("}");
 				}
 			}
 		}
 		jqGridColModel.append("]");
-
 		return jqGridColModel.toString();
 	}
 
@@ -175,6 +197,7 @@ public class TmplUtil {
 		Map<String, Map<String, Object>> list = new HashMap<String, Map<String, Object>>();
 
 		for (TableColumns col : columns) {
+			m_defaultValueList.put(col.getColumn_name(), col.getColumn_default());
 			Map<String, Object> MapAdd = new HashMap<String, Object>();
 
 			StringBuilder model_name = new StringBuilder();
@@ -313,7 +336,7 @@ public class TmplUtil {
 		for (Field field : fields) {
 			String fieldName = field.getName().toUpperCase();
 			if (!(pd.containsKey(fieldName) && pd.get(fieldName) != null
-					&& !pd.getString(fieldName).trim().equals(""))) {
+					&& !pd.get(fieldName).toString().trim().equals(""))) {
 				Object defaultValue = DefaultValueList.get(fieldName);
 				pd.put(fieldName, defaultValue);
 			}

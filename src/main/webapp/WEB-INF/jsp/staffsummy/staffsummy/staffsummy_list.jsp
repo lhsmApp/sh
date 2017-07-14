@@ -281,7 +281,7 @@
 
 				//汇总
 				function summary(e) {
-					var listData =new Array();
+					var transfer_RPT_DEPT = "";
 			    	//获得选中的行ids的方法
 			    	var ids = $(gridBase_selector).getGridParam("selarrrow");  
 
@@ -289,71 +289,30 @@
 						//遍历访问这个集合  
 						$(ids).each(function (index, id){  
 				            var rowData = $(gridBase_selector).getRowData(id);
-				            listData.push(rowData);
+				        	var DEPT_CODE = rowData.DEPT_CODE__;
+				        	if(transfer_RPT_DEPT!=null && transfer_RPT_DEPT.trim()!=""){
+				        		transfer_RPT_DEPT += ",";
+				        	}
+				        	transfer_RPT_DEPT += DEPT_CODE;
 						});
+					} else {
+						transfer_RPT_DEPT = $("#RPT_DEPT").val();
 					}
-					
-					if(!(listData!=null && listData.length>0)){
-						var RPT_DEPT = $("#RPT_DEPT").val();
-						if(!(RPT_DEPT!=null && RPT_DEPT.trim()!="")){
-						    bootbox.dialog({
-							    message: "<span class='bigger-110'>您没有选择任何内容!</span>",
-							    buttons: 			
-							    { "button":{ "label":"确定", "className":"btn-sm btn-success"}}
-						    }); 
-						} else {
-			                var msg = '确定要汇总吗??';
-			                bootbox.confirm(msg, function(result) {
-			    				if(result) {
-			    					top.jzts();
-			    					$.ajax({
-			    						type: "POST",
-			    						url: '<%=basePath%>staffsummy/summaryDepartString.do?',
-			    				    	data: {DATA_DEPART:RPT_DEPT},
-			    						dataType:'json',
-			    						cache: false,
-			    						success: function(response){
-			    							if(response.code==0){
-			    								$(gridBase_selector).trigger("reloadGrid");  
-			    								$(top.hangge());//关闭加载状态
-			    								$("#subTitle").tips({
-			    									side:3,
-			    						            msg:'汇总成功',
-			    						            bg:'#009933',
-			    						            time:3
-			    						        });
-			    							}else{
-			    								$(top.hangge());//关闭加载状态
-			    								$("#subTitle").tips({
-			    									side:3,
-			    						            msg:'汇总失败,'+response.message,
-			    						            bg:'#cc0033',
-			    						            time:3
-			    						        });
-			    							}
-			    						},
-			    				    	error: function(response) {
-			    							$(top.hangge());//关闭加载状态
-		    								$("#subTitle").tips({
-		    									side:3,
-		    						            msg:'汇总出错:'+response.responseJSON.message,
-		    						            bg:'#cc0033',
-		    						            time:3
-		    						        });
-			    				    	}
-			    					});
-			    				}
-			                });
-						}
-					}else{
-		                var msg = '确定要重新汇总选择的记录吗??';
+					if(!(transfer_RPT_DEPT!=null && transfer_RPT_DEPT.trim()!="")){
+					    bootbox.dialog({
+						    message: "<span class='bigger-110'>您没有选择任何内容!</span>",
+						    buttons: 			
+						    { "button":{ "label":"确定", "className":"btn-sm btn-success"}}
+					    }); 
+					} else {
+		                var msg = '确定要汇总吗??';
 		                bootbox.confirm(msg, function(result) {
 		    				if(result) {
 		    					top.jzts();
 		    					$.ajax({
 		    						type: "POST",
-		    						url: '<%=basePath%>staffsummy/summaryModelList.do?',
-		    				    	data: {DATA_ROWS_SUM:JSON.stringify(listData)},
+		    						url: '<%=basePath%>staffsummy/summaryDepartString.do?',
+		    				    	data: {DATA_DEPART:transfer_RPT_DEPT},
 		    						dataType:'json',
 		    						cache: false,
 		    						success: function(response){
@@ -362,7 +321,7 @@
 		    								$(top.hangge());//关闭加载状态
 		    								$("#subTitle").tips({
 		    									side:3,
-		    						            msg:'重新汇总成功',
+		    						            msg:'汇总成功',
 		    						            bg:'#009933',
 		    						            time:3
 		    						        });
@@ -370,7 +329,7 @@
 		    								$(top.hangge());//关闭加载状态
 		    								$("#subTitle").tips({
 		    									side:3,
-		    						            msg:'重新汇总失败,'+response.message,
+		    						            msg:'汇总失败,'+response.message,
 		    						            bg:'#cc0033',
 		    						            time:3
 		    						        });
@@ -380,7 +339,7 @@
 		    							$(top.hangge());//关闭加载状态
 	    								$("#subTitle").tips({
 	    									side:3,
-	    						            msg:'重新汇总出错:'+response.responseJSON.message,
+	    						            msg:'汇总出错:'+response.responseJSON.message,
 	    						            bg:'#cc0033',
 	    						            time:3
 	    						        });
