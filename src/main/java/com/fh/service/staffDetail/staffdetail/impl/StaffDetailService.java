@@ -1,6 +1,8 @@
 package com.fh.service.staffDetail.staffdetail.impl;
 
 import java.util.List;
+import java.util.Map;
+
 import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import com.fh.dao.DaoSupport;
@@ -136,6 +138,49 @@ public class StaffDetailService implements StaffDetailManager{
 	public List<String> getHaveUserCodeDic(PageData pd)throws Exception{
 		return (List<String>)dao.findForList("StaffDetailMapper.getHaveUserCodeDic", pd);
 	}
+
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	
+	/**获取汇总里的明细
+	 * @param
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PageData> getDetailList(PageData pd)throws Exception{
+		return (List<PageData>)dao.findForList("StaffDetailMapper.getDetailList", pd);
+	}
+	
+	/**获取汇总数据
+	 * @param
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PageData> getSum(Map<String, String> map)throws Exception{
+		return (List<PageData>)dao.findForList("StaffDetailMapper.getSum", map);
+	}
 }
 

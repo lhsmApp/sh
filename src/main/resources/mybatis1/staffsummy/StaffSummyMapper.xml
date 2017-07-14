@@ -16,7 +16,7 @@
 	
 	<!-- 字段 -->
 	<sql id="FieldSelectKey">
-		BILL_CODE BILL_CODE__,	
+		BILL_CODE BILL_CODE__, DEPT_CODE DEPT_CODE__, BUSI_DATE BUSI_DATE__, USER_CATG USER_CATG__, USER_GROP USER_GROP__,
 	</sql>
 	<sql id="Field">
 		BILL_CODE,	
@@ -157,6 +157,12 @@
 		from 
 		<include refid="tableName"></include>
 		where BUSI_DATE = ${pd.SystemDateTime}
+		and DEPT_CODE not in (select RPT_DEPT 
+		                      from tb_sys_sealed_info 
+		                      where RPT_DUR = ${pd.SystemDateTime} 
+		                      and STATE = ${pd.DurState} 
+		                      and BILL_TYPE = ${pd.TypeCode} 
+		                      )
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
@@ -192,6 +198,11 @@
 		</if>
 	</select>
 	
+	<!-- 通过ID获取数据 -->
+	<delete id="delete" parameterType="pd">
+		delete from <include refid="tableName"></include>
+		where ${deleteFilter}
+	</delete>
 	
 	<!-- 新增-->
 	<insert id="save" parameterType="pd">
@@ -204,75 +215,6 @@
 		)
 	</insert>
 	
-	<!-- 修改 -->
-	<update id="edit" parameterType="pd">
-		update
-		<include refid="tableName"></include>
-		set 
-			BILL_CODE = #{BILL_CODE},
-			BUSI_DATE = #{BUSI_DATE},
-			ESTB_DEPT = #{ESTB_DEPT},
-			USER_GROP = #{USER_GROP},
-			USER_CATG = #{USER_CATG},
-			DEPT_CODE = #{DEPT_CODE},
-			ORG_UNIT = #{ORG_UNIT},
-			SAL_RANGE = #{SAL_RANGE},
-			POST_SALY = #{POST_SALY},
-			BONUS = #{BONUS},
-			CASH_BONUS = #{CASH_BONUS},
-			WORK_OT = #{WORK_OT},
-			BACK_SALY = #{BACK_SALY},
-			RET_SALY = #{RET_SALY},
-			CHK_CASH = #{CHK_CASH},
-			INTR_SGL_AWAD = #{INTR_SGL_AWAD},
-			SENY_ALLE = #{SENY_ALLE},
-			POST_ALLE = #{POST_ALLE},
-			NS_ALLE = #{NS_ALLE},
-			AREA_ALLE = #{AREA_ALLE},
-			EXPT_ALLE = #{EXPT_ALLE},
-			TECH_ALLE = #{TECH_ALLE},
-			LIVE_EXPE = #{LIVE_EXPE},
-			LIVE_ALLE = #{LIVE_ALLE},
-			LEAVE_DM = #{LEAVE_DM},
-			HOUSE_ALLE = #{HOUSE_ALLE},
-			ITEM_ALLE = #{ITEM_ALLE},
-			MEAL_EXPE = #{MEAL_EXPE},
-			TRF_ALLE = #{TRF_ALLE},
-			TEL_EXPE = #{TEL_EXPE},
-			HLDY_ALLE = #{HLDY_ALLE},
-			KID_ALLE = #{KID_ALLE},
-			COOL_EXPE = #{COOL_EXPE},
-			EXT_SGL_AWAD = #{EXT_SGL_AWAD},
-			PRE_TAX_PLUS = #{PRE_TAX_PLUS},
-			GROSS_PAY = #{GROSS_PAY},
-			ENDW_INS = #{ENDW_INS},
-			UNEMPL_INS = #{UNEMPL_INS},
-			MED_INS = #{MED_INS},
-			CASD_INS = #{CASD_INS},
-			HOUSE_FUND = #{HOUSE_FUND},
-			SUP_PESN = #{SUP_PESN},
-			TAX_BASE_ADJ = #{TAX_BASE_ADJ},
-			ACCRD_TAX = #{ACCRD_TAX},
-			AFTER_TAX = #{AFTER_TAX},
-			ACT_SALY = #{ACT_SALY},
-			GUESS_DIFF = #{GUESS_DIFF},
-			CUST_COL1 = #{CUST_COL1},
-			CUST_COL2 = #{CUST_COL2},
-			CUST_COL3 = #{CUST_COL3},
-			CUST_COL4 = #{CUST_COL4},
-			CUST_COL5 = #{CUST_COL5},
-			CUST_COL6 = #{CUST_COL6},
-			CUST_COL7 = #{CUST_COL7},
-			CUST_COL8 = #{CUST_COL8},
-			CUST_COL9 = #{CUST_COL9},
-			CUST_COL10 = #{CUST_COL10},
-			ZRZC_CODE = #{ZRZC_CODE},
-			BILL_STATE = #{BILL_STATE},
-			BILL_USER = #{BILL_USER},
-			BILL_DATE = #{BILL_DATE}
-		where 
-		BILL_CODE = #{BILL_CODE__}
-	</update>
 	
 	<!-- 通过ID获取数据 -->
 	<select id="findById" parameterType="pd" resultType="pd">

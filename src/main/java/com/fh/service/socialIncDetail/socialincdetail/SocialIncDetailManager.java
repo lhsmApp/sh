@@ -94,5 +94,41 @@ public interface SocialIncDetailManager{
 	 * @throws Exception
 	 */
 	public List<String> getHaveUserCodeDic(PageData pd)throws Exception;
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	/**获取汇总里的明细
+	 * @param
+	 * @throws Exception
+	 */
+	public List<PageData> getDetailList(PageData pd)throws Exception;
+	
+	
+	
+	
 }
 

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.fh.entity.JqPage;
 import com.fh.entity.Page;
+import com.fh.entity.StaffSummyModel;
 import com.fh.util.PageData;
 
 /** 
@@ -19,18 +20,27 @@ public interface StaffSummyManager{
 	 * @throws Exception
 	 */
 	public List<PageData> JqPage(JqPage page)throws Exception;
-	
 	/**获取记录数量
 	 * @param pd
 	 * @throws Exception
 	 */
 	public int countJqGridExtend(JqPage page)throws Exception;
-	
 	/**获取记录总合计
 	 * @param pd
 	 * @throws Exception
 	 */
 	public PageData getFooterSummary(JqPage page)throws Exception;
+	
+
+	/**获取记录总合计
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void summaryModelList(List<PageData> listPd)throws Exception;
+	
+	
+	
+	
 	
 	/**通过id获取数据
 	 * @param pd

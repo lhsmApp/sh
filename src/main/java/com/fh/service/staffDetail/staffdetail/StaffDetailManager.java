@@ -1,6 +1,7 @@
 package com.fh.service.staffDetail.staffdetail;
 
 import java.util.List;
+import java.util.Map;
 
 import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
@@ -98,5 +99,47 @@ public interface StaffDetailManager{
 	 * @throws Exception
 	 */
 	public List<String> getHaveUserCodeDic(PageData pd)throws Exception;
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	/**获取汇总里的明细
+	 * @param
+	 * @throws Exception
+	 */
+	public List<PageData> getDetailList(PageData pd)throws Exception;
+
+	/**获取汇总数据
+	 * @param
+	 * @throws Exception
+	 */
+	public List<PageData> getSum(Map<String, String> map)throws Exception;
+	
+	
+	
+	
 }
 
