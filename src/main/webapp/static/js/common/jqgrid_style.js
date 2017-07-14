@@ -180,10 +180,10 @@ function showQueryCondi(jqgrid, gridHeight,withBottom) {
 	if (gridHeight=="undefined"||gridHeight == null || gridHeight == "" || gridHeight == 0) {
 		if (withBottom) {
 			//gridHeight = 192;
-			gridHeight = 176;
+			gridHeight = 177;
 		} else {
 			//gridHeight = 155;
-			gridHeight = 139;
+			gridHeight = 140;
 		}
 	}
 	if ($(".widget-box").css("display") == "block") {
@@ -205,10 +205,10 @@ function resizeGridHeight(jqgrid, gridHeight, withBottom) {
 	if (gridHeight=="undefined"||gridHeight == null || gridHeight == "" || gridHeight == 0) {
 		if (withBottom) {
 			//gridHeight = 192;
-			gridHeight = 176;
+			gridHeight = 177;
 		} else {
 			//gridHeight = 155;
-			gridHeight = 139;
+			gridHeight = 140;
 		}
 	}
 	if ($(".widget-box").css("display") == "block") {
