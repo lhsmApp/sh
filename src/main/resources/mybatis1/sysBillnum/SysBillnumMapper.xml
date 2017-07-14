@@ -33,6 +33,25 @@
 		and BILL_DATE=#{BILL_DATE}
 	</update>
 	
+	<!-- 删除 -->
+	<update id="delete" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where BILL_CODE = #{BILL_CODE} 
+		and BILL_DATE=#{BILL_DATE}
+	</update>
+	
+	<!-- 增加 -->
+	<update id="save" parameterType="pd">
+		insert into 
+	    <include refid="tableName"></include>
+		(
+	    <include refid="Field"></include>
+		) values (
+	    <include refid="FieldValue"></include>
+		)
+	</update>
+	
 	<!-- 通过ID获取数据 -->
 	<select id="findById" parameterType="pd" resultType="pd">
 		select 

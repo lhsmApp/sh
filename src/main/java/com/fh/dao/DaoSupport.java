@@ -9,6 +9,8 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
+
+import com.fh.util.PageData;
 /**
  *  
 * @ClassName: DaoSupport
@@ -187,15 +189,22 @@ public class DaoSupport implements DAO {
 	 * @return
 	 * @throws Exception
 	 */
-	public void batch_One_del_Ins(String del, String ins, List<?> objs )throws Exception{
+	public void batch_One_del_Ins(String del, String ins, String editBillCode, List<?> objs, String deleteBillNum, String insertBillNum, PageData pdBillNum)throws Exception{
 		SqlSessionFactory sqlSessionFactory = sqlSessionTemplate.getSqlSessionFactory();
 		//批量执行器
 		SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH,false);
 		try{
 			if(objs!=null&&objs.size()>0){
+				if(pdBillNum != null){
+					sqlSession.update(deleteBillNum, pdBillNum);
+					sqlSession.update(insertBillNum, pdBillNum);
+				}
 				for(int i=0,size=objs.size();i<size;i++){
 				    sqlSession.delete(del, objs.get(i));
+				}
+				for(int i=0,size=objs.size();i<size;i++){
 					sqlSession.update(ins, objs.get(i));
+					sqlSession.update(editBillCode, objs.get(i));
 				}
 				sqlSession.flushStatements();
 				sqlSession.commit();

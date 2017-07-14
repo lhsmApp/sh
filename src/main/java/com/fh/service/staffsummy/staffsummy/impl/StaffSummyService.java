@@ -1,6 +1,8 @@
 package com.fh.service.staffsummy.staffsummy.impl;
 
 import java.util.List;
+import java.util.Map;
+
 import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import com.fh.dao.DaoSupport;
@@ -44,26 +46,22 @@ public class StaffSummyService implements StaffSummyManager{
 	public PageData getFooterSummary(JqPage page)throws Exception{
 		return (PageData)dao.findForObject("StaffSummyMapper.getFooterSummary", page);
 	}
-
+	
+	/**获取汇总数据
+	 * @param
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PageData> getHave(Map<String, String> map)throws Exception{
+		return (List<PageData>)dao.findForList("StaffSummyMapper.getHave", map);
+	}
 	
 	/**汇总
 	 * @param 
 	 * @throws Exception
 	 */
-	public void summaryModelList(List<PageData> listPd)throws Exception{
-		dao.batch_One_del_Ins("StaffSummyMapper.delete", "StaffSummyMapper.save", listPd);
-	}
-	
-	
-	
-	
-	
-	/**通过id获取数据
-	 * @param pd
-	 * @throws Exception
-	 */
-	public PageData findById(PageData pd)throws Exception{
-		return (PageData)dao.findForObject("StaffSummyMapper.findById", pd);
+	public void summaryModelList(List<PageData> listPd, PageData pdBillNum)throws Exception{
+		dao.batch_One_del_Ins("StaffSummyMapper.delete", "StaffSummyMapper.save", "StaffDetailMapper.editBillCode", listPd, "SysBillnumMapper.delete", "SysBillnumMapper.save", pdBillNum);
 	}
 	
 }

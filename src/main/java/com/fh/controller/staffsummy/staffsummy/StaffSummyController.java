@@ -1,20 +1,18 @@
 package com.fh.controller.staffsummy.staffsummy;
 
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
-import javax.xml.namespace.QName;
 
-import org.apache.axis.client.Call;
-import org.apache.axis.client.Service;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
@@ -23,19 +21,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
+import com.fh.controller.common.BillCodeUtil;
 import com.fh.controller.common.DictsUtil;
-import com.fh.controller.common.GenerateTransferData;
 import com.fh.controller.common.TmplUtil;
 import com.fh.entity.CommonBase;
 import com.fh.entity.JqPage;
 import com.fh.entity.Page;
 import com.fh.entity.PageResult;
-import com.fh.entity.StaffDetailModel;
 import com.fh.entity.StaffSummyModel;
 import com.fh.entity.SysSealed;
-import com.fh.entity.TableColumns;
 import com.fh.entity.system.User;
 import com.fh.util.Const;
+import com.fh.util.DateUtil;
 import com.fh.util.PageData;
 import com.fh.util.SqlTools;
 import com.fh.util.collectionSql.GroupUtils;
@@ -43,15 +40,17 @@ import com.fh.util.collectionSql.GroupUtils.GroupBy;
 import com.fh.util.Jurisdiction;
 import com.fh.util.date.DateFormatUtils;
 import com.fh.util.date.DateUtils;
+import com.fh.util.enums.BillNumType;
+import com.fh.util.enums.BillState;
 import com.fh.util.enums.BillType;
 import com.fh.util.enums.DurState;
-import com.fh.util.enums.TransferOperType;
 
 import net.sf.json.JSONArray;
 
 import com.fh.service.fhoa.department.impl.DepartmentService;
 import com.fh.service.staffDetail.staffdetail.StaffDetailManager;
 import com.fh.service.staffsummy.staffsummy.StaffSummyManager;
+import com.fh.service.sysBillnum.sysbillnum.SysBillnumManager;
 import com.fh.service.sysConfig.sysconfig.SysConfigManager;
 import com.fh.service.sysSealedInfo.syssealedinfo.impl.SysSealedInfoService;
 import com.fh.service.system.dictionaries.impl.DictionariesService;
@@ -84,6 +83,8 @@ public class StaffSummyController extends BaseController {
 	private DepartmentService departmentService;
 	@Resource(name="sysconfigService")
 	private SysConfigManager sysConfigManager;
+	@Resource(name="sysbillnumService")
+	private SysBillnumManager sysbillnumService;
 
 	//表名
 	String TableNameBase = "tb_staff_summy";
@@ -92,7 +93,7 @@ public class StaffSummyController extends BaseController {
 	String TypeCode = BillType.SALLARY_SUMMARY.getNameKey();
 	//显示结构的单位
     String ShowDepartCode = "001001";
-	// 查询表的主键字段
+	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
 	private List<String> keyListBase = Arrays.asList("BILL_CODE", "DEPT_CODE", "BUSI_DATE", "USER_CATG", "USER_GROP");
     
     //汇总字段
@@ -125,7 +126,7 @@ public class StaffSummyController extends BaseController {
 		mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService));
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService, keyListBase);
-		String jqGridColModel = tmpl.generateStructure(TableNameBase, ShowDepartCode, 1);
+		String jqGridColModel = tmpl.generateStructureNoEdit(TableNameBase, ShowDepartCode);
 
 		//底行显示的求和与平均值字段
 		SqlUserdata = tmpl.getSqlUserdata();
@@ -193,7 +194,7 @@ public class StaffSummyController extends BaseController {
 		PageData pd = this.getPageData();
 		String DEPT_CODE = (String) pd.get("DATA_DEPT_CODE");
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService);
-		String detailColModel = tmpl.generateStructure(TableNameDetail, DEPT_CODE, 1);
+		String detailColModel = tmpl.generateStructureNoEdit(TableNameDetail, DEPT_CODE);
 		
 		commonBase.setCode(0);
 		commonBase.setMessage(detailColModel);
@@ -237,7 +238,6 @@ public class StaffSummyController extends BaseController {
 		String json = DATA_ROWS_REPORT.toString();  
         JSONArray array = JSONArray.fromObject(json);  
         
-
 		List<PageData> listTransferData = (List<PageData>) JSONArray.toCollection(array, PageData.class);// 过时方法
 		if (null != listTransferData && listTransferData.size() > 0) {
 			List<SysSealed> listSysSealed = new ArrayList<SysSealed>();
@@ -267,10 +267,7 @@ public class StaffSummyController extends BaseController {
 			syssealedinfoService.insertBatch(listSysSealed);
 			commonBase.setCode(0);
 		}
-        
-        
-        
-        
+
         /*List<StaffSummyModel> listData = (List<StaffSummyModel>) JSONArray.toCollection(array,StaffSummyModel.class);
         List<SysSealed> listTransfer = new ArrayList<SysSealed>();
         if(null != listData && listData.size() > 0){
@@ -286,8 +283,8 @@ public class StaffSummyController extends BaseController {
     			item.setSTATE(DurState.Sealed.getNameKey());// 枚举  1封存,0解封
     			listTransfer.add(item);
     			
-    			String checkState = CheckState(item);
-    			if(checkState!=null && checkState.trim() != ""){
+    			String checkState = CheckStateLast(item);
+    			if(checkState!=null && !checkState.trim().equals("")){
     				commonBase.setCode(2);
     				commonBase.setMessage(checkState);
     				break;
@@ -305,144 +302,162 @@ public class StaffSummyController extends BaseController {
 	 * @param
 	 * @throws Exception
 	 */
-	@SuppressWarnings("unchecked")
-	@RequestMapping(value="/summaryModelList")
-	public @ResponseBody CommonBase summaryModelList() throws Exception{
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "delete")){return null;} //校验权限	
-		CommonBase commonBase = new CommonBase();
-		commonBase.setCode(-1);
-		
-		PageData pd = this.getPageData();
-		Object DATA_ROWS_SUM = pd.get("DATA_ROWS_SUM");
-		String json = DATA_ROWS_SUM.toString();  
-        JSONArray array = JSONArray.fromObject(json);  
-        List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);
-		if (null != listData && listData.size() > 0) {
-			// 将获取的字典数据进行分组
-			Map<String, List<PageData>> mapListTransferData = GroupUtils.group(listData,
-					new GroupBy<String>() {
-						@Override
-						public String groupby(Object obj) {
-							PageData d = (PageData) obj;
-							return d.getString("DEPT_CODE"); // 分组依据为DEPT_CODE
-						}
-					});
-			for (Map.Entry<String, List<PageData>> entry : mapListTransferData.entrySet()) {
-				List<PageData> listItem = entry.getValue();
-				PageData pgItem = listItem.get(0);
-				
-				SysSealed item = new SysSealed();
-				// item.setBILL_CODE(pageData.getString("BILL_CODE"));
-				item.setRPT_DEPT(entry.getKey());
-				item.setRPT_DUR(pgItem.getString("BUSI_DATE"));
-				item.setBILL_TYPE(TypeCode.toString());
-				
-    			String checkState = CheckState(item);
-    			if(checkState!=null && checkState.trim() != ""){
-    				commonBase.setCode(2);
-    				commonBase.setMessage(checkState);
-    				break;
-    			}
-    			Map<String, String> map = new HashMap<String, String>();
-    			map.put("BUSI_DATE", pgItem.getString("BUSI_DATE"));
-    			map.put("DEPT_CODE", entry.getKey());
-    			map.put("GroupbyFeild", SumFieldToString);
-    			List<PageData> getSaveDate = staffdetailService.getSum(map);
-    			
-    			
-    			
-
-    			/***************获取最大单号及更新最大单号********************
-    			/*PageData pdBillNum=new PageData();
-    			pdBillNum.put("BILL_CODE", BillNumType.SHBX);
-    			pdBillNum.put("BILL_DATE", DateUtil.getMonth());
-    			PageData pdBillNumResult=sysbillnumService.findById(pdBillNum);
-    			int billNum=ConvertUtils.strToInt(pdBillNumResult.getString("BILL_NUMBER"),0);
-    			pdBillNum.put("BILL_NUMBER", billNum++);
-    			sysbillnumService.edit(pdBillNum);*/
-    			/***************************************************/
-    			//TmplUtil.setModelDefault(pd, StaffDetailModel.class, DefaultValueList);
-    			//pd.put("deleteFilter", "");
-			}
-		}
-        
-        /* if(null != listData && listData.size() > 0){
-        	for(StaffSummyModel summy : listData){
-    			SysSealed item = new SysSealed();
-    			//item.setBILL_CODE(summy.getBILL_CODE());
-    			item.setRPT_DEPT(summy.getDEPT_CODE());
-    			item.setRPT_DUR(SystemDateTime);
-    			item.setBILL_TYPE(TypeCode.toString());// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
-    			
-    			String checkState = CheckState(item);
-    			if(checkState!=null && checkState.trim() != ""){
-    				commonBase.setCode(2);
-    				commonBase.setMessage(checkState);
-    				break;
-    			}
-        	}
-		} */
-        if(commonBase.getCode() == -1){
-			staffsummyService.summaryModelList(listData);
-			commonBase.setCode(0);
-        }
-		return commonBase;
-	}
-	
-	 /**汇总
-	 * @param
-	 * @throws Exception
-	 */
 	@RequestMapping(value="/summaryDepartString")
 	public @ResponseBody CommonBase summaryDepartString() throws Exception{
 		if(!Jurisdiction.buttonJurisdiction(menuUrl, "delete")){return null;} //校验权限	
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
-		
-		PageData pd = this.getPageData();
-		Object DATA_DEPART = pd.get("DATA_DEPART");
-		String[] listDepart = DATA_DEPART.toString().split(",");  
+		List<PageData> listTo = new ArrayList<PageData>();
+		PageData pdBillNum=new PageData();
+
+		/***************获取最大单号及更新最大单号********************/
+		String billNumType = BillNumType.YGGZ;
+		String month = DateUtil.getMonth();
+		pdBillNum.put("BILL_CODE", billNumType);
+		pdBillNum.put("BILL_DATE", month);
+		PageData pdBillNumResult=sysbillnumService.findById(pdBillNum);
+		if(pdBillNumResult == null){
+			pdBillNumResult = new PageData();
+		}
+		Object objGetNum = pdBillNumResult.get("BILL_NUMBER");
+		if(!(objGetNum != null && !objGetNum.toString().trim().equals(""))){
+			objGetNum = 0;
+		}
+		int getNum = (int) objGetNum;
+		int billNum=getNum;
+		/***************************************************/
+
+		/***************去掉重复的单位编码********************/
+		PageData getPd = this.getPageData();
+		Object DATA_DEPART = getPd.get("DATA_DEPART");
+		String[] listDATA_DEPART = DATA_DEPART.toString().split(",");  
+		List<String> list = Arrays.asList(listDATA_DEPART);
+        Set<String> set = new HashSet<String>(list);
+        String [] listDepart=(String[])set.toArray(new String[0]);
+		/***************************************************/
+        
         if(null != listDepart && listDepart.length > 0){
         	for(String depart : listDepart){
-    			SysSealed item = new SysSealed();
+        		//判断汇总信息为未上报
+    			SysSealed itemLast = new SysSealed();
     			//item.setBILL_CODE(summy.getBILL_CODE());
-    			item.setRPT_DEPT(depart);
-    			item.setRPT_DUR(SystemDateTime);
-    			item.setBILL_TYPE(TypeCode.toString());// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
-    			
-    			String checkState = CheckState(item);
-    			if(checkState!=null && checkState.trim() != ""){
+    			itemLast.setRPT_DEPT(depart);
+    			itemLast.setRPT_DUR(SystemDateTime);
+    			itemLast.setBILL_TYPE(TypeCode.toString());// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+    			String checkStateLast = CheckStateLast(itemLast);
+    			if(checkStateLast!=null && !checkStateLast.trim().equals("")){
     				commonBase.setCode(2);
-    				commonBase.setMessage(checkState);
+    				commonBase.setMessage(checkStateLast);
     				break;
+    			}
+    			//判断明细信息为已上报
+    			SysSealed itemBefore = new SysSealed();
+    			//itemBefore.setBILL_CODE(summy.getBILL_CODE());
+    			itemBefore.setRPT_DEPT(depart);
+    			itemBefore.setRPT_DUR(SystemDateTime);
+    			itemBefore.setBILL_TYPE(BillType.SALLARY_DETAIL.getNameKey().toString());// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+    			String checkStateBefore = CheckStateBefore(itemBefore);
+    			if(checkStateBefore!=null && !checkStateBefore.trim().equals("")){
+    				commonBase.setCode(2);
+    				commonBase.setMessage(checkStateBefore);
+    				break;
+    			}
+                //获取单位已有的汇总信息
+    			Map<String, String> mapHave = new HashMap<String, String>();
+    			mapHave.put("BUSI_DATE", SystemDateTime);
+    			mapHave.put("DEPT_CODE", depart);
+    			List<PageData> getHaveDate = staffsummyService.getHave(mapHave);
+    			//获取单位重新汇总信息
+    			Map<String, String> mapSave = new HashMap<String, String>();
+    			mapSave.put("BUSI_DATE", SystemDateTime);
+    			mapSave.put("DEPT_CODE", depart);
+    			mapSave.put("GroupbyFeild", SumFieldToString);
+    			List<PageData> getSaveDate = staffdetailService.getSum(mapSave);
+    			
+    			List<PageData> listAdd = getListTo(getHaveDate, getSaveDate);
+    			
+    			for(PageData addTo : listAdd){
+    				Object getBILL_CODE = addTo.get("BILL_CODE");
+    				if(!(getBILL_CODE != null && !getBILL_CODE.toString().trim().equals(""))){
+    					billNum++;
+                        String billCode = BillCodeUtil.getBillCode(billNumType, month, billNum);
+                        addTo.put("BILL_CODE", billCode);
+                        addTo.put("BUSI_DATE", SystemDateTime);
+                        addTo.put("DEPT_CODE", depart);
+                        addTo.put("BILL_STATE", BillState.Normal.getNameKey());
+                		User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
+                        addTo.put("BILL_USER", user.getUSER_ID());
+                        addTo.put("BILL_DATE", DateUtil.getTime());
+                        
+                        StringBuilder updateFilter = new StringBuilder();
+                        for(String field : SumField){
+                        	if(updateFilter != null && !updateFilter.toString().trim().equals("")){
+                            	updateFilter.append(" and ");
+                        	}
+                        	updateFilter.append(field + " = '" + addTo.getString(field) + "' ");
+                        }
+    	    			addTo.put("updateFilter", updateFilter);
+                        
+    	    			TmplUtil.setModelDefault(addTo, StaffSummyModel.class, DefaultValueList);
+    				}
+    				listTo.add(addTo);
     			}
         	}
 		}
+		//单号没变化，pdBillNum为null，不更新数据库单号
+		if(getNum == billNum){
+			pdBillNum = null;
+		} else {
+			pdBillNum.put("BILL_NUMBER", billNum);
+		}
         if(commonBase.getCode() == -1){
-			//staffsummyService.summaryDepartString(listDepart, SystemDateTime, SumField);
+			staffsummyService.summaryModelList(listTo, pdBillNum);
 			commonBase.setCode(0);
         }
 		return commonBase;
 	}
 	
-	private String CheckState(SysSealed item) throws Exception{
-		String strRut = "编号：" + item.getBILL_CODE() + "期间已封存！";
+	private List<PageData> getListTo(List<PageData> listHave, List<PageData> listSave){
+		List<PageData> listAdd = new ArrayList<PageData>();
+		if(listHave!=null && listHave.size()>0){
+			for(PageData each : listSave){
+				listAdd.add(each);
+			}
+		} else {
+			for(PageData each : listSave){
+				listAdd.add(each);
+			}
+		}
+		//SumField
+		return listAdd;
+	}
+	
+	private String CheckStateLast(SysSealed item) throws Exception{
+		String strRut = "单位：" + item.getRPT_DEPT() + "汇总期间已封存！";
 		String State = syssealedinfoService.getStateFromModel(item);
 		if(!DurState.Sealed.getNameKey().equals(State)){// 枚举  1封存,0解封
 			strRut = "";
 		}
 		return strRut;
 	}
+	private String CheckStateBefore(SysSealed item) throws Exception{
+		String strRut = "单位：" + item.getRPT_DEPT() + "明细期间未封存！";
+		String State = syssealedinfoService.getStateFromModel(item);
+		if(DurState.Sealed.getNameKey().equals(State)){// 枚举  1封存,0解封
+			strRut = "";
+		}
+		return strRut;
+	}
 	
 	private String tranferSumFieldToString(){
-		StringBuilder SumFieldToString = new StringBuilder();
+		StringBuilder ret = new StringBuilder();
 		for(String field : SumField){
-			if(SumFieldToString.toString().trim() != ""){
-				SumFieldToString.append(",");
+			if(!ret.toString().trim().equals("")){
+				ret.append(",");
 			}
-			SumFieldToString.append(field);
+			ret.append(field);
 		}
-		return SumFieldToString.toString();
+		return ret.toString();
 	}
 	@InitBinder
 	public void initBinder(WebDataBinder binder){

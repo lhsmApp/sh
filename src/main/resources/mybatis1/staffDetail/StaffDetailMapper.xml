@@ -386,5 +386,14 @@
 	    and DEPT_CODE = ${DEPT_CODE} 
 	    group by ${GroupbyFeild}
     </select>
-	
+
+	<!-- 修改单号 -->
+	<update id="editBillCode" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set 
+			BILL_CODE = #{BILL_CODE}
+		where ${updateFilter}
+	</update>
+		
 </mapper>

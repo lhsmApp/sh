@@ -198,10 +198,12 @@
 		</if>
 	</select>
 	
-	<!-- 通过ID获取数据 -->
+	<!-- 删除数据 -->
 	<delete id="delete" parameterType="pd">
-		delete from <include refid="tableName"></include>
-		where ${deleteFilter}
+		delete from 
+		<include refid="tableName"></include>
+		where BUSI_DATE = #{BUSI_DATE}
+	    and DEPT_CODE = #{DEPT_CODE} 
 	</delete>
 	
 	<!-- 新增-->
@@ -216,22 +218,13 @@
 	</insert>
 	
 	
-	<!-- 通过ID获取数据 -->
-	<select id="findById" parameterType="pd" resultType="pd">
-		select 
-		<include refid="Field"></include>
+	<!-- 获取汇总数据 -->
+	<select id="getHave" parameterType="java.util.Map" resultType="pd">
+        select * 
 		from 
 		<include refid="tableName"></include>
-		where 
-			BILL_CODE = #{BILL_CODE__}
-	</select>
-	<!-- <select id="findById" parameterType="pd" resultType="com.fh.entity.StaffDetailModel">
-		select 
-		    <include refid="Field"></include>
-		from 
-		    <include refid="tableName"></include>
 		where BUSI_DATE = #{BUSI_DATE}
-		and (USER_CODE = #{USER_CODE} and USER_CODE != #{USER_CODE__})
-	</select> -->
+	    and DEPT_CODE = #{DEPT_CODE} 
+    </select>
 	
 </mapper>
