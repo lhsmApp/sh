@@ -19,6 +19,7 @@ import com.fh.service.tmplConfigDict.tmplconfigdict.TmplConfigDictManager;
 import com.fh.service.tmplconfig.tmplconfig.TmplConfigManager;
 import com.fh.util.Jurisdiction;
 import com.fh.util.PageData;
+import com.fh.util.SqlTools;
 
 import net.sf.json.JSONArray;
 
@@ -80,12 +81,15 @@ public class TmplConfigController extends BaseController {
 	 */
 	@RequestMapping(value="/getPageList")
 	public @ResponseBody PageResult<PageData> getPageList(Page page) throws Exception{
-		PageData pd = new PageData();
-		pd = this.getPageData();
+		PageData pd = this.getPageData();
 		PageData tpd = tmplconfigService.findTableCodeByTableNo(pd);
 		pd.put("TABLE_CODE", tpd.getString("TABLE_CODE"));
+		String filters = pd.getString("filters");				//多条件过滤条件
+		if(null != filters && !"".equals(filters)){
+			pd.put("filterWhereResult", SqlTools.constructWhere(filters,null));
+		}
 		page.setPd(pd);
-		List<PageData> varList = tmplconfigService.listAll(page);	
+		List<PageData> varList = tmplconfigService.listAll(pd);	
 		PageResult<PageData> result = new PageResult<PageData>();
 		if (varList.size()!=0) {
 			result.setRows(varList);
