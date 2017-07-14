@@ -179,16 +179,16 @@
 				},
 				
 				{ label: '单据编码',name:'BILL_CODE', width:100,hidden : true,editable: true},
-				{ label: '单据单位', name: 'RPT_DEPT', width: 90,hidden : true,editable: true,},
+				{ label: '单据单位', name: 'RPT_DEPT', width: 90,hidden : true,editable: true,edittype: 'select',formatter:'select',formatoptions:{value:"${departmentStr}"},editoptions:{value:"${departmentStr}"},stype: 'select',searchoptions:{value:"${departmentStr}"}},
 				{ label: '单据期间', name: 'RPT_DUR', width: 60,hidden : true,editable: true,},
 				
-				{ label: '单据编码',name:'BILL_CODE', width:100},
-				{ label: '单据单位', name: 'NAME', width: 90},
+				{ label: '单据编码',name:'BILL_CODE', width:90},
+				{ label: '单据单位', name: 'RPT_DEPT', width: 90,edittype: 'select',formatter:'select',formatoptions:{value:"${departmentStr}"},editoptions:{value:"${departmentStr}"},stype: 'select',searchoptions:{value:"${departmentStr}"}},
 				{ label: '单据期间', name: 'RPT_DUR', width: 60},
-				{ label: '上传人', name: 'USERNAME', width: 60},
+				{ label: '上传人', name: 'RPT_USER', width: 60,edittype: 'select',formatter:'select',formatoptions:{value:"${userStr}"},editoptions:{value:"${userStr}"},stype: 'select',searchoptions:{value:"${userStr}"}},
 				{ label: '上传时间', name: 'RPT_DATE', width: 80, formatter: 'data'},
-				{ label: '单据类型', name: 'BILL_TYPE_TR', width: 80},                  
-				{ label: '状态', name: 'STATE', width: 80, editable: true,align:'center',formatter: customFmatterState,edittype:"checkbox",editoptions: {value:"0:1"},unformat: aceSwitch}                   
+				{ label: '单据类型', name: 'BILL_TYPE', width: 80,edittype: 'select',formatter:'select',formatoptions:{value:"${billTypeStr}"},editoptions:{value:"${billTypeStr}"},stype: 'select',searchoptions:{value:"${billTypeStr}"}},                  
+				{ label: '状态', name: 'STATE', width: 80, editable: true,align:'center',formatter: customFmatterState,edittype:"checkbox",editoptions: {value:"0:1"},unformat: aceSwitch,search:false}                   
 			],
 			reloadAfterSubmit: true, 
 			viewrecords: true, // show the current page, data rang and total records on the toolbar

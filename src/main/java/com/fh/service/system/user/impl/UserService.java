@@ -193,4 +193,12 @@ public class UserService implements UserManager{
 		return (PageData)dao.findForObject("UserMapper.getUserCount", value);
 	}
 	
+	/**用户信息
+	 * @param page
+	 * @return
+	 * @throws Exception
+	 */
+	public List<PageData> getUserValue(PageData pd)throws Exception{
+		return (List<PageData>) dao.findForList("UserMapper.getUserValue",pd);
+	}
 }

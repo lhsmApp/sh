@@ -88,7 +88,7 @@
 			 colModel: [
 				{ label: '单据编号', name: 'BILL_CODE', width: 75,editable: false},
 				{ label: '业务区间', name: 'BUSI_DATE', width: 90,editable: false},
-				{ label: '二级单位', name: 'DEPT_CODE', width: 100,editable: false,edittype: 'select',editoptions:{value:"${pd.strDict}"},formatter:'select',formatoptions:{value:"${pd.strDict}"}},          
+				{ label: '二级单位', name: 'DEPT_CODE', width: 100,editable: false,edittype: 'select',editoptions:{value:"${pd.strDict}"},formatter:'select',formatoptions:{value:"${pd.strDict}"},stype: 'select',searchoptions:{value:"${pd.strDict}"},},          
 			],
 			//reloadAfterSubmit: true, 
 			//caption: "jqGrid with inline editing",
@@ -108,14 +108,14 @@
 			
 			footerrow: false,
 			userDataOnFooter: false, // the calculated sums and/or strings from server are put at footer row.
-			grouping: false,
+			grouping: true,
 			groupingView: {
-                groupField: ["CATEGORYNAME"],
+                groupField: ["DEPT_CODE"],
                 groupColumnShow: [true],
                 groupText: ["<b>{0}</b>"],
                 groupOrder: ["desc"],
                 groupDataSorted : false,
-                groupSummary: [true],
+                groupSummary: [false],
                 groupCollapse: false,
                 plusicon : 'fa fa-chevron-down bigger-110',
 				minusicon : 'fa fa-chevron-up bigger-110'

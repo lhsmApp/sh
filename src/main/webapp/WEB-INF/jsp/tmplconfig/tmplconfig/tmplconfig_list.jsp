@@ -455,14 +455,14 @@
 	
 	var lastSelection;
 	function dbClickRow(rowId, rowIndex, colnumIndex, event){ 
-		if (rowId && rowId !== lastSelection) {
+		//if (rowId && rowId !== lastSelection) {
               var grid = $("#jqGrid");
               //grid.jqGrid('saveRow',lastSelection);
               grid.jqGrid('saveRow',lastSelection,false, 'clientArray');
               grid.jqGrid('restoreRow',lastSelection);
               grid.jqGrid('editRow',rowId, {keys: true} );
               lastSelection = rowId;
-        }
+        //}
 	}
  	</script>
 </body>

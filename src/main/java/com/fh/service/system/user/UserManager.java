@@ -141,4 +141,11 @@ public interface UserManager {
 	 */
 	public PageData getUserCount(String value)throws Exception;
 	
+	/**用户信息
+	 * @param page
+	 * @return
+	 * @throws Exception
+	 */
+	public List<PageData> getUserValue(PageData pd)throws Exception;
+	
 }

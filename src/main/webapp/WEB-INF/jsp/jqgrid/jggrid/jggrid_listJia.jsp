@@ -20,13 +20,8 @@
 
 <!-- 最新版的Jqgrid Css，如果旧版本（Ace）某些方法不好用，尝试用此版本Css，替换旧版本Css -->
 <!-- <link rel="stylesheet" type="text/css" media="screen" href="static/ace/css/ui.jqgrid-bootstrap.css" /> -->
-<style>
-.page-header {
-	padding-top: 9px;
-	padding-bottom: 9px;
-	margin: 0 0 8px;
-}
-</style>
+<!-- 标准页面统一样式 -->
+<link rel="stylesheet" href="static/css/normal.css" />
 </head>
 <body class="no-skin">
 	<div class="main-container" id="main-container">
