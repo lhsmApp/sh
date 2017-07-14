@@ -205,7 +205,7 @@
 				addicon : 'ace-icon fa fa-plus-circle purple',
 				del: false,
 				delicon : 'ace-icon fa fa-trash-o red', 
-				search: true,
+				search: false,
 				searchicon : 'ace-icon fa fa-search orange',
 				refresh: true,
 				refreshicon : 'ace-icon fa fa-refresh green',

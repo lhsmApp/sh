@@ -62,7 +62,7 @@ public class TmplConfigService implements TmplConfigManager{
 	 */
 	@SuppressWarnings("unchecked")
 	public List<PageData> list(Page page)throws Exception{
-		return (List<PageData>)dao.findForList("TmplConfigMapper.datalistPage", page);
+		return (List<PageData>)dao.findForList("TmplConfigMapper.datalistJqPage", page);
 	}
 	
 	/**列表(全部)
@@ -70,7 +70,7 @@ public class TmplConfigService implements TmplConfigManager{
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	public List<PageData> listAll(Page pd)throws Exception{
+	public List<PageData> listAll(PageData pd)throws Exception{
 		return (List<PageData>)dao.findForList("TmplConfigMapper.listAll", pd);
 	}
 	

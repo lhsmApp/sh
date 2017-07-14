@@ -330,7 +330,7 @@ public class VoucherController extends BaseController {
 					commonBase.setCode(0);
 				} else {
 					commonBase.setCode(-1);
-					commonBase.setMessage(message);
+					commonBase.setMessage(messageInsert);
 				}
 			} else {
 				commonBase.setCode(-1);

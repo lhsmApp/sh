@@ -106,27 +106,23 @@
 	</select>
 
 	<!-- 列表 -->
-	<select id="datalistPage" parameterType="page" resultType="pd">
+	<select id="datalistJqPage" parameterType="page" resultType="pd">
 		select
 		<include refid="Field"></include>
 		from
 		<include refid="tableName"></include>
 		<where>
 			<if test="pd.DEPT_BIANMA!= null and pd.DEPT_BIANMA != ''"><!-- 检索 -->
-				and (
-				DEPT_CODE = #{pd.DEPT_BIANMA}
-				)
+				and DEPT_CODE = #{pd.DEPT_BIANMA}
 			</if>
 			<if test="pd.TABLE_CODE!= null and pd.TABLE_CODE != ''"><!-- 检索 -->
-				and (
-				TABLE_CODE = #{pd.TABLE_CODE}
-				)
+				and TABLE_CODE = #{pd.TABLE_CODE}
 			</if>
 		</where>
 	</select>
 
 	<!-- 列表(全部) -->
-	<select id="listAll" parameterType="page" resultType="pd">
+	<select id="listAll" parameterType="pd" resultType="pd">
 		SELECT
 		a.DEPT_CODE,
 		a.TABLE_CODE,
@@ -150,18 +146,20 @@
 		LEFT JOIN
 		tb_tmpl_config_dict d
 		on a.DICT_TRANS = d.DICT_CODE
-		where 1=1
-		<if test="pd.DEPARTMENT_CODE!= null and pd.DEPARTMENT_CODE != ''">
-			and (
-			a.DEPT_CODE = #{pd.DEPARTMENT_CODE}
-			)
+		<where>
+			<if test="DEPARTMENT_CODE!= null and DEPARTMENT_CODE != ''">
+				and a.DEPT_CODE = #{DEPARTMENT_CODE}
+			</if>
+			<if test="TABLE_CODE!= null and TABLE_CODE != ''">
+				and a.TABLE_CODE = #{TABLE_CODE}
+			</if>
+			<if test="filterWhereResult != null">
+				${filterWhereResult}
+			</if>
+		</where>
+		<if test="sidx != null">
+			order by ${sidx} ${sord}
 		</if>
-		<if test="pd.TABLE_CODE!= null and pd.TABLE_CODE != ''">
-			and (
-			a.TABLE_CODE = #{pd.TABLE_CODE}
-			)
-		</if>
-
 	</select>
 
 	<!-- 批量删除 -->
