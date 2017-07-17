@@ -172,9 +172,9 @@
 		<if test="sidx != null and sidx.trim() != ''" >
 			order by ${sidx} ${sord} 
     	</if>
-		<if test="currentResult != null and rowNum != null" >           
-              limit #{currentResult}, #{rowNum} 
-        </if>
+		<!-- <if test="currentResult != null and rowNum != null" >           
+              limit #{currentResult}, #{rowNum}  
+        </if> -->
 	</select>
 	<select id="countJqGridExtend" parameterType="jqPage" resultType="int">
 		select count(*) from <include refid="tableName"></include> 

@@ -11,413 +11,578 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<base href="<%=basePath%>">
-<!-- 下拉框 -->
-<link rel="stylesheet" href="static/ace/css/chosen.css" />
-<!-- jsp文件头和头部 -->
-<%@ include file="../../system/index/top.jsp"%>
-<!-- 日期框 -->
-<link rel="stylesheet" href="static/ace/css/datepicker.css" />
-    <!-- 标准页面统一样式 -->
-    <link rel="stylesheet" href="static/css/normal.css" />
-
-</head>
-<body class="no-skin">
-
-	<!-- /section:basics/navbar.layout -->
-	<div class="main-container" id="main-container">
-		<!-- /section:basics/sidebar -->
-		<div class="main-content">
-			<div class="main-content-inner">
-				<div class="page-content">
-					<div class="row">
-						<div class="col-xs-12">
-							
-						<!-- 检索  -->
-						<form action="housefundsummy/list.do" method="post" name="Form" id="Form">
-						<table style="margin-top:5px;">
-							<tr>
-								<td>
-									<div class="nav-search">
-										<span class="input-icon">
-											<input type="text" placeholder="这里输入关键词" class="nav-search-input" id="nav-search-input" autocomplete="off" name="keywords" value="${pd.keywords }" placeholder="这里输入关键词"/>
-											<i class="ace-icon fa fa-search nav-search-icon"></i>
-										</span>
-									</div>
-								</td>
-								<td style="padding-left:2px;"><input class="span10 date-picker" name="lastStart" id="lastStart"  value="" type="text" data-date-format="yyyy-mm-dd" readonly="readonly" style="width:88px;" placeholder="开始日期" title="开始日期"/></td>
-								<td style="padding-left:2px;"><input class="span10 date-picker" name="lastEnd" name="lastEnd"  value="" type="text" data-date-format="yyyy-mm-dd" readonly="readonly" style="width:88px;" placeholder="结束日期" title="结束日期"/></td>
-								<td style="vertical-align:top;padding-left:2px;">
-								 	<select class="chosen-select form-control" name="name" id="id" data-placeholder="请选择" style="vertical-align:top;width: 120px;">
-									<option value=""></option>
-									<option value="">全部</option>
-									<option value="">1</option>
-									<option value="">2</option>
-								  	</select>
-								</td>
-								<c:if test="${QX.cha == 1 }">
-								<td style="vertical-align:top;padding-left:2px"><a class="btn btn-light btn-xs" onclick="tosearch();"  title="检索"><i id="nav-search-icon" class="ace-icon fa fa-search bigger-110 nav-search-icon blue"></i></a></td>
-								</c:if>
-								<c:if test="${QX.toExcel == 1 }"><td style="vertical-align:top;padding-left:2px;"><a class="btn btn-light btn-xs" onclick="toExcel();" title="导出到EXCEL"><i id="nav-search-icon" class="ace-icon fa fa-download bigger-110 nav-search-icon blue"></i></a></td></c:if>
-							</tr>
-						</table>
-						<!-- 检索  -->
-					
-						<table id="simple-table" class="table table-striped table-bordered table-hover" style="margin-top:5px;">	
-							<thead>
-								<tr>
-									<th class="center" style="width:35px;">
-									<label class="pos-rel"><input type="checkbox" class="ace" id="zcheckbox" /><span class="lbl"></span></label>
-									</th>
-									<th class="center" style="width:50px;">序号</th>
-									<th class="center">备注1</th>
-									<th class="center">备注2</th>
-									<th class="center">备注3</th>
-									<th class="center">备注4</th>
-									<th class="center">备注5</th>
-									<th class="center">备注6</th>
-									<th class="center">备注7</th>
-									<th class="center">备注8</th>
-									<th class="center">备注9</th>
-									<th class="center">备注10</th>
-									<th class="center">备注11</th>
-									<th class="center">备注12</th>
-									<th class="center">备注13</th>
-									<th class="center">备注14</th>
-									<th class="center">备注15</th>
-									<th class="center">备注16</th>
-									<th class="center">备注17</th>
-									<th class="center">备注18</th>
-									<th class="center">备注19</th>
-									<th class="center">备注20</th>
-									<th class="center">备注21</th>
-									<th class="center">备注22</th>
-									<th class="center">备注23</th>
-									<th class="center">备注24</th>
-									<th class="center">备注25</th>
-									<th class="center">备注26</th>
-									<th class="center">备注27</th>
-									<th class="center">备注28</th>
-									<th class="center">操作</th>
-								</tr>
-							</thead>
-													
-							<tbody>
-							<!-- 开始循环 -->	
-							<c:choose>
-								<c:when test="${not empty varList}">
-									<c:if test="${QX.cha == 1 }">
-									<c:forEach items="${varList}" var="var" varStatus="vs">
-										<tr>
-											<td class='center'>
-												<label class="pos-rel"><input type='checkbox' name='ids' value="${var.HOUSEFUNDSUMMY_ID}" class="ace" /><span class="lbl"></span></label>
-											</td>
-											<td class='center' style="width: 30px;">${vs.index+1}</td>
-											<td class='center'>${var.BILL_CODE}</td>
-											<td class='center'>${var.BUSI_DATE}</td>
-											<td class='center'>${var.ESTB_DEPT}</td>
-											<td class='center'>${var.USER_GROP}</td>
-											<td class='center'>${var.SOC_INC_BASE}</td>
-											<td class='center'>${var.PER_BASIC_FUND}</td>
-											<td class='center'>${var.PER_SUPP_FUND}</td>
-											<td class='center'>${var.PER_TOTAL}</td>
-											<td class='center'>${var.DEPT_BASIC_FUND}</td>
-											<td class='center'>${var.DEPT_SUPP_FUND}</td>
-											<td class='center'>${var.DEPT_TOTAL}</td>
-											<td class='center'>${var.DEPT_CODE}</td>
-											<td class='center'>${var.USER_CATG}</td>
-											<td class='center'>${var.PMT_PLACE}</td>
-											<td class='center'>${var.CUST_COL1}</td>
-											<td class='center'>${var.CUST_COL2}</td>
-											<td class='center'>${var.CUST_COL3}</td>
-											<td class='center'>${var.CUST_COL4}</td>
-											<td class='center'>${var.CUST_COL5}</td>
-											<td class='center'>${var.CUST_COL6}</td>
-											<td class='center'>${var.CUST_COL7}</td>
-											<td class='center'>${var.CUST_COL8}</td>
-											<td class='center'>${var.CUST_COL9}</td>
-											<td class='center'>${var.CUST_COL10}</td>
-											<td class='center'>${var.ZRZC_CODE}</td>
-											<td class='center'>${var.BILL_STATE}</td>
-											<td class='center'>${var.BILL_USER}</td>
-											<td class='center'>${var.BILL_DATE}</td>
-											<td class="center">
-												<c:if test="${QX.edit != 1 && QX.del != 1 }">
-												<span class="label label-large label-grey arrowed-in-right arrowed-in"><i class="ace-icon fa fa-lock" title="无权限"></i></span>
-												</c:if>
-												<div class="hidden-sm hidden-xs btn-group">
-													<c:if test="${QX.edit == 1 }">
-													<a class="btn btn-xs btn-success" title="编辑" onclick="edit('${var.HOUSEFUNDSUMMY_ID}');">
-														<i class="ace-icon fa fa-pencil-square-o bigger-120" title="编辑"></i>
-													</a>
-													</c:if>
-													<c:if test="${QX.del == 1 }">
-													<a class="btn btn-xs btn-danger" onclick="del('${var.HOUSEFUNDSUMMY_ID}');">
-														<i class="ace-icon fa fa-trash-o bigger-120" title="删除"></i>
-													</a>
-													</c:if>
-												</div>
-												<div class="hidden-md hidden-lg">
-													<div class="inline pos-rel">
-														<button class="btn btn-minier btn-primary dropdown-toggle" data-toggle="dropdown" data-position="auto">
-															<i class="ace-icon fa fa-cog icon-only bigger-110"></i>
-														</button>
-			
-														<ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
-															<c:if test="${QX.edit == 1 }">
-															<li>
-																<a style="cursor:pointer;" onclick="edit('${var.HOUSEFUNDSUMMY_ID}');" class="tooltip-success" data-rel="tooltip" title="修改">
-																	<span class="green">
-																		<i class="ace-icon fa fa-pencil-square-o bigger-120"></i>
-																	</span>
-																</a>
-															</li>
-															</c:if>
-															<c:if test="${QX.del == 1 }">
-															<li>
-																<a style="cursor:pointer;" onclick="del('${var.HOUSEFUNDSUMMY_ID}');" class="tooltip-error" data-rel="tooltip" title="删除">
-																	<span class="red">
-																		<i class="ace-icon fa fa-trash-o bigger-120"></i>
-																	</span>
-																</a>
-															</li>
-															</c:if>
-														</ul>
-													</div>
-												</div>
-											</td>
-										</tr>
-									
-									</c:forEach>
-									</c:if>
-									<c:if test="${QX.cha == 0 }">
-										<tr>
-											<td colspan="100" class="center">您无权查看</td>
-										</tr>
-									</c:if>
-								</c:when>
-								<c:otherwise>
-									<tr class="main_info">
-										<td colspan="100" class="center" >没有相关数据</td>
-									</tr>
-								</c:otherwise>
-							</c:choose>
-							</tbody>
-						</table>
-						<div class="page-header position-relative">
-						<table style="width:100%;">
-							<tr>
-								<td style="vertical-align:top;">
-									<c:if test="${QX.add == 1 }">
-									<a class="btn btn-mini btn-success" onclick="add();">新增</a>
-									</c:if>
-									<c:if test="${QX.del == 1 }">
-									<a class="btn btn-mini btn-danger" onclick="makeAll('确定要删除选中的数据吗?');" title="批量删除" ><i class='ace-icon fa fa-trash-o bigger-120'></i></a>
-									</c:if>
-								</td>
-								<td style="vertical-align:top;"><div class="pagination" style="float: right;padding-top: 0px;margin-top: 0px;">${page.pageStr}</div></td>
-							</tr>
-						</table>
-						</div>
-						</form>
-					
-						</div>
-						<!-- /.col -->
-					</div>
-					<!-- /.row -->
-				</div>
-				<!-- /.page-content -->
-			</div>
-		</div>
-		<!-- /.main-content -->
-
-		<!-- 返回顶部 -->
-		<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
-			<i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
-		</a>
-
-	</div>
-	<!-- /.main-container -->
-
-	<!-- basic scripts -->
-	<!-- 页面底部js¨ -->
-	<%@ include file="../../system/index/foot.jsp"%>
-	<!-- 删除时确认窗口 -->
-	<script src="static/ace/js/bootbox.js"></script>
-	<!-- ace scripts -->
-	<script src="static/ace/js/ace/ace.js"></script>
-	<!-- 下拉框 -->
-	<script src="static/ace/js/chosen.jquery.js"></script>
-	<!-- 日期框 -->
-	<script src="static/ace/js/date-time/bootstrap-datepicker.js"></script>
-	<!--提示框-->
-	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
-	<script type="text/javascript">
-		$(top.hangge());//关闭加载状态
-		//检索
-		function tosearch(){
-			top.jzts();
-			$("#Form").submit();
-		}
-		$(function() {
+		<base href="<%=basePath%>">
+		<!-- 下拉框 -->
+		<link rel="stylesheet" href="static/ace/css/chosen.css" />
+		<!-- jsp文件头和头部 ，其中包含旧版本（Ace）Jqgrid Css-->
+		<%@ include file="../../system/index/topWithJqgrid.jsp"%>
+		<!-- 日期框 -->
+		<link rel="stylesheet" href="static/ace/css/datepicker.css" />
 		
-			//日期框
-			$('.date-picker').datepicker({
-				autoclose: true,
-				todayHighlight: true
-			});
-			
-			//下拉框
-			if(!ace.vars['touch']) {
-				$('.chosen-select').chosen({allow_single_deselect:true}); 
-				$(window)
-				.off('resize.chosen')
-				.on('resize.chosen', function() {
-					$('.chosen-select').each(function() {
-						 var $this = $(this);
-						 $this.next().css({'width': $this.parent().width()});
-					});
-				}).trigger('resize.chosen');
-				$(document).on('settings.ace.chosen', function(e, event_name, event_val) {
-					if(event_name != 'sidebar_collapsed') return;
-					$('.chosen-select').each(function() {
-						 var $this = $(this);
-						 $this.next().css({'width': $this.parent().width()});
-					});
-				});
-				$('#chosen-multiple-style .btn').on('click', function(e){
-					var target = $(this).find('input[type=radio]');
-					var which = parseInt(target.val());
-					if(which == 2) $('#form-field-select-4').addClass('tag-input-style');
-					 else $('#form-field-select-4').removeClass('tag-input-style');
-				});
+		<!-- 最新版的Jqgrid Css，如果旧版本（Ace）某些方法不好用，尝试用此版本Css，替换旧版本Css -->
+		<!-- <link rel="stylesheet" type="text/css" media="screen" href="static/ace/css/ui.jqgrid-bootstrap.css" /> -->
+		<script type="text/javascript" src="static/js/jquery-1.7.2.js"></script>
+		<!-- 树形下拉框start -->
+		<script type="text/javascript" src="plugins/selectZtree/selectTree.js"></script>
+		<script type="text/javascript" src="plugins/selectZtree/framework.js"></script>
+		<link rel="stylesheet" type="text/css"
+			href="plugins/selectZtree/import_fh.css" />
+		<script type="text/javascript" src="plugins/selectZtree/ztree/ztree.js"></script>
+		<link type="text/css" rel="stylesheet"
+			href="plugins/selectZtree/ztree/ztree.css"></link>
+		<!-- 树形下拉框end -->
+		<!-- 标准页面统一样式 -->
+		<link rel="stylesheet" href="static/css/normal.css" />
+	    <style>
+			.page-header{
+				padding-top: 9px;
+				padding-bottom: 9px;
+				margin: 0 0 8px;
 			}
-			
-			
-			//复选框全选控制
-			var active_class = 'active';
-			$('#simple-table > thead > tr > th input[type=checkbox]').eq(0).on('click', function(){
-				var th_checked = this.checked;//checkbox inside "TH" table header
-				$(this).closest('table').find('tbody > tr').each(function(){
-					var row = this;
-					if(th_checked) $(row).addClass(active_class).find('input[type=checkbox]').eq(0).prop('checked', true);
-					else $(row).removeClass(active_class).find('input[type=checkbox]').eq(0).prop('checked', false);
-				});
-			});
-		});
+		</style>
+	</head>
+	<body class="no-skin">
+		<div class="main-container" id="main-container">
+			<div class="main-content">
+				<div class="main-content-inner">
+					<div class="page-content">
+						<!-- /section:settings.box -->
+						<div class="page-header">
+									    <span class="label label-xlg label-success arrowed-right">东部管道</span>
+										<!-- arrowed-in-right --> 
+										<span class="label label-xlg label-yellow arrowed-in arrowed-right"
+										    id="subTitle" style="margin-left: 2px;">公积金汇总</span> 
+	                                    <span style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
+									
+										<button id="btnQuery" class="btn btn-white btn-info btn-sm"
+											onclick="showQueryCondi($('#jqGrid'),null,true)">
+											<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
+										</button>
+						<button id="btnSummy" class="btn btn-white btn-info btn-sm"
+							onclick="btnSummyClick()">
+							<i class="ace-icon fa fa-pencil-square-o bigger-120 blue"></i> <span>汇总</span>
+						</button>
+								
+						            <div class="pull-right">
+									    <span class="label label-xlg label-blue arrowed-left"
+									        id = "showDur" style="background:#428bca; margin-right: 2px;"></span>
+								    </div>
+						</div><!-- /.page-header -->
+				
+							<div class="row">
+							<div class="col-xs-12">
+								<div class="widget-box" style="display: none;">
+									<div class="widget-body">
+										<div class="widget-main">
+											<form class="form-inline">
+											    <span style="margin-right: 5px;">
+												    <div class="selectTree" id="selectTree" multiMode="true"
+												    	allSelectable="false" noGroup="false"></div>
+											    	<input type="text" id="RPT_DEPT" hidden></input>
+											    </span> 
+												<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
+													<i class="ace-icon fa fa-search bigger-110"></i>
+												</button>
+											</form>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-xs-12">
+							    <table id="jqGrid"></table>
+							    <div id="jqGridPager"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		
-		//新增
-		function add(){
-			 top.jzts();
-			 var diag = new top.Dialog();
-			 diag.Drag=true;
-			 diag.Title ="新增";
-			 diag.URL = '<%=basePath%>housefundsummy/goAdd.do';
-			 diag.Width = 450;
-			 diag.Height = 355;
-			 diag.Modal = true;				//有无遮罩窗口
-			 diag. ShowMaxButton = true;	//最大化按钮
-		     diag.ShowMinButton = true;		//最小化按钮
-			 diag.CancelEvent = function(){ //关闭事件
-				 if(diag.innerFrame.contentWindow.document.getElementById('zhongxin').style.display == 'none'){
-					 if('${page.currentPage}' == '0'){
-						 top.jzts();
-						 setTimeout("self.location=self.location",100);
-					 }else{
-						 nextPage(${page.currentPage});
-					 }
-				}
-				diag.close();
-			 };
-			 diag.show();
-		}
+			<!-- 返回顶部 -->
+			<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+				<i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
+			</a>
+		</div>
+	</body>
 		
-		//删除
-		function del(Id){
-			bootbox.confirm("确定要删除吗?", function(result) {
-				if(result) {
-					top.jzts();
-					var url = "<%=basePath%>housefundsummy/delete.do?HOUSEFUNDSUMMY_ID="+Id+"&tm="+new Date().getTime();
-					$.get(url,function(data){
-						nextPage(${page.currentPage});
+		
+		<!-- basic scripts -->
+		<!-- 页面底部js¨ -->
+		<%@ include file="../../system/index/foot.jsp"%>
+		
+		<!-- 最新版的Jqgrid Js，如果旧版本（Ace）某些方法不好用，尝试用此版本Js，替换旧版本JS -->
+		<!-- <script src="static/ace/js/jquery.jqGrid.min.js" type="text/javascript"></script>
+		<script src="static/ace/js/grid.locale-cn.js" type="text/javascript"></script> -->
+		
+		<!-- 旧版本（Ace）Jqgrid Js -->
+		<script src="static/ace/js/jqGrid/jquery.jqGrid.src.js"></script>
+		<script src="static/ace/js/jqGrid/i18n/grid.locale-cn.js"></script>
+		<!-- 删除时确认窗口 -->
+		<script src="static/ace/js/bootbox.js"></script>
+		<!-- ace scripts -->
+		<script src="static/ace/js/ace/ace.js"></script>
+		<!-- 下拉框 -->
+		<script src="static/ace/js/chosen.jquery.js"></script>
+		<!-- 日期框 -->
+		<script src="static/ace/js/date-time/bootstrap-datepicker.js"></script>
+		<!--提示框-->
+		<script type="text/javascript" src="static/js/jquery.tips.js"></script>
+		<!-- JqGrid统一样式统一操作 -->
+		<script type="text/javascript" src="static/js/common/jqgrid_style.js"></script>
+		<!-- 上传控件 -->
+		<script src="static/ace/js/ace/elements.fileinput.js"></script>
+		
+		<script type="text/javascript"> 
+	    var gridBase_selector = "#jqGrid";  
+	    var pagerBase_selector = "#jqGridPager";  
+	    
+		$(document).ready(function () {
+			$(top.hangge());//关闭加载状态
+		    
+			//当前期间,取自tb_system_config的SystemDateTime字段
+		    var SystemDateTime = '${SystemDateTime}';
+		    $("#showDur").text('当前期间：' + SystemDateTime);
+		    
+			//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
+		    var jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
+		    
+			//resize to fit page size
+			$(window).on('resize.jqGrid', function () {
+				$(gridBase_selector).jqGrid( 'setGridWidth', $(".page-content").width());
+				//$(gridBase_selector).jqGrid( 'setGridHeight', $(window).height() - 240);
+				resizeGridHeight($(gridBase_selector),null,true);
+		    });
+			
+			$(gridBase_selector).jqGrid({
+				url: '<%=basePath%>housefundsummy/getPageList.do',
+				datatype: "json",
+				colModel: jqGridColModel,
+				viewrecords: true, 
+				shrinkToFit: false,
+				rowNum: 0,
+				//rowList: [10,20,30],
+	            multiselect: true,
+	            multiboxonly: true,
+				altRows: true, //斑马条纹
+				
+				pager: pagerBase_selector,
+				pgbuttons: false, // 分页按钮是否显示 
+				pginput: false, // 是否允许输入分页页数 
+				footerrow: true,
+				userDataOnFooter: true,
+
+	            sortable: true,
+	            sortname: 'DEPT_CODE',
+				sortorder: 'asc',
+
+				grouping: true,
+				groupingView: {
+					groupField: ['DEPT_CODE'],
+					groupOrder: ['asc'],
+					groupColumnShow: [true],
+					groupText: ['<b>{0}</b>'],
+					groupSummary: [true],
+					groupSummaryPos: ['footer'], //header
+					groupCollapse: false,
+	                plusicon : 'fa fa-chevron-down bigger-110',
+					minusicon : 'fa fa-chevron-up bigger-110'
+				},
+				
+				subGrid: true,
+				subGridOptions: {
+					plusicon : "ace-icon fa fa-plus center bigger-110 blue",
+					minusicon  : "ace-icon fa fa-minus center bigger-110 blue",
+					openicon : "ace-icon fa fa-chevron-right center orange"
+	            },
+	            subGridRowExpanded: showChildGrid,
+
+				scroll: 1,
+                //scrollPopUp:true,
+				//scrollLeftOffset: "83%",
+
+				cellEdit: true,
+				gridComplete:function(){
+					$("[role='checkbox']").on('click',function(e){
+						var target = $(this);
+						var curRow=target.closest('tr');
+						var curRowId=curRow.attr('id');
+						var curRowData=$(gridBase_selector).getRowData(curRowId);
+						var ids = $(gridBase_selector).jqGrid('getDataIDs');
+						
+						$(gridBase_selector).setSelection(curRowId,true);
+	                    for (i = 0; i < ids.length; i++) { 
+	                    	var item=$(gridBase_selector).getRowData(ids[i]);
+	                    	if(item.DEPT_CODE==curRowData.DEPT_CODE)
+	                    		$(gridBase_selector).setSelection(ids[i],true);
+	                    }
 					});
-				}
+			    },
+	            
+				loadComplete : function(data) {
+					var table = this;
+					setTimeout(function(){
+						styleCheckbox(table);
+						updateActionIcons(table);
+						updatePagerIcons(table);
+						enableTooltips(table);
+					}, 0);
+				},
 			});
-		}
-		
-		//修改
-		function edit(Id){
-			 top.jzts();
-			 var diag = new top.Dialog();
-			 diag.Drag=true;
-			 diag.Title ="编辑";
-			 diag.URL = '<%=basePath%>housefundsummy/goEdit.do?HOUSEFUNDSUMMY_ID='+Id;
-			 diag.Width = 450;
-			 diag.Height = 355;
-			 diag.Modal = true;				//有无遮罩窗口
-			 diag. ShowMaxButton = true;	//最大化按钮
-		     diag.ShowMinButton = true;		//最小化按钮 
-			 diag.CancelEvent = function(){ //关闭事件
-				 if(diag.innerFrame.contentWindow.document.getElementById('zhongxin').style.display == 'none'){
-					 nextPage(${page.currentPage});
-				}
-				diag.close();
-			 };
-			 diag.show();
-		}
-		
-		//批量操作
-		function makeAll(msg){
-			bootbox.confirm(msg, function(result) {
-				if(result) {
-					var str = '';
-					for(var i=0;i < document.getElementsByName('ids').length;i++){
-					  if(document.getElementsByName('ids')[i].checked){
-					  	if(str=='') str += document.getElementsByName('ids')[i].value;
-					  	else str += ',' + document.getElementsByName('ids')[i].value;
-					  }
-					}
-					if(str==''){
-						bootbox.dialog({
-							message: "<span class='bigger-110'>您没有选择任何内容!</span>",
-							buttons: 			
-							{ "button":{ "label":"确定", "className":"btn-sm btn-success"}}
+		    
+			$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
+
+			$(gridBase_selector).navGrid(pagerBase_selector, 
+					{
+			            //navbar options
+				        edit: false,
+			            editicon : 'ace-icon fa fa-pencil blue',
+			            add: false,
+			            addicon : 'ace-icon fa fa-plus-circle purple',
+			            del: false,
+			            delicon : 'ace-icon fa fa-trash-o red',
+			            search: true,
+			            searchicon : 'ace-icon fa fa-search orange',
+			            refresh: true,
+			            refreshicon : 'ace-icon fa fa-refresh green',
+			            view: false,
+			            viewicon : 'ace-icon fa fa-search-plus grey',
+		        }, {}, {}, {},
+		        {
+					//search form
+					recreateForm: true,
+					afterShowSearch: beforeSearchCallback,
+					afterRedraw: function(){
+						style_search_filters($(this));
+					},
+					multipleSearch: true,
+					//multipleGroup:true,
+					showQuery: false
+		        },
+		        {},{});
+			
+			$(gridBase_selector).navSeparatorAdd(pagerBase_selector, {
+				sepclass : "ui-separator",
+				sepcontent: ""
+			});
+	        $(gridBase_selector).navButtonAdd(pagerBase_selector, {
+				id : "batchEdit",
+	            title: "汇总",
+	            caption: "",
+	        	buttonicon: "ace-icon fa fa-pencil-square-o purple",
+	            position: "last",
+	            onClickButton: summary,
+	            cursor : "pointer"
+	        });
+			$(gridBase_selector).navButtonAdd(pagerBase_selector, {
+				id : "report",
+	             caption : "",
+	             buttonicon : "ace-icon fa fa-check-square-o green",
+	             onClickButton : report,
+	             position : "last",
+	             title : "上报",
+	             cursor : "pointer"
+	         });
+
+				//汇总
+				function summary(e) {
+					var transfer_RPT_DEPT = "";
+			    	//获得选中的行ids的方法
+			    	var ids = $(gridBase_selector).getGridParam("selarrrow");  
+
+					if(ids!=null && ids.length>0){
+						//遍历访问这个集合  
+						$(ids).each(function (index, id){  
+				            var rowData = $(gridBase_selector).getRowData(id);
+				        	var DEPT_CODE = rowData.DEPT_CODE__;
+				        	if(transfer_RPT_DEPT!=null && transfer_RPT_DEPT.trim()!=""){
+				        		transfer_RPT_DEPT += ",";
+				        	}
+				        	transfer_RPT_DEPT += DEPT_CODE;
 						});
-						$("#zcheckbox").tips({
-							side:1,
-				            msg:'点这里全选',
-				            bg:'#AE81FF',
-				            time:8
-				        });
-						return;
-					}else{
-						if(msg == '确定要删除选中的数据吗?'){
+					} 
+					if(!(transfer_RPT_DEPT!=null && transfer_RPT_DEPT.trim()!="")){
+					    bootbox.dialog({
+						    message: "<span class='bigger-110'>您没有选择任何列表内容!</span>",
+						    buttons: 			
+						    { "button":{ "label":"确定", "className":"btn-sm btn-success"}}
+					    }); 
+					} else {
+		                var msg = '确定要汇总吗??';
+		                bootbox.confirm(msg, function(result) {
+		    				if(result) {
+		    					top.jzts();
+		    					$.ajax({
+		    						type: "POST",
+		    						url: '<%=basePath%>housefundsummy/summaryDepartString.do?',
+		    				    	data: {DATA_DEPART:transfer_RPT_DEPT},
+		    						dataType:'json',
+		    						cache: false,
+		    						success: function(response){
+		    							if(response.code==0){
+		    								$(gridBase_selector).trigger("reloadGrid");  
+		    								$(top.hangge());//关闭加载状态
+		    								$("#subTitle").tips({
+		    									side:3,
+		    						            msg:'汇总成功',
+		    						            bg:'#009933',
+		    						            time:3
+		    						        });
+		    							}else{
+		    								$(top.hangge());//关闭加载状态
+		    								$("#subTitle").tips({
+		    									side:3,
+		    						            msg:'汇总失败,'+response.message,
+		    						            bg:'#cc0033',
+		    						            time:3
+		    						        });
+		    							}
+		    						},
+		    				    	error: function(response) {
+		    							$(top.hangge());//关闭加载状态
+	    								$("#subTitle").tips({
+	    									side:3,
+	    						            msg:'汇总出错:'+response.responseJSON.message,
+	    						            bg:'#cc0033',
+	    						            time:3
+	    						        });
+		    				    	}
+		    					});
+		    				}
+		                });
+					}
+				}
+
+			/**
+			 * 上报
+			 */
+			function report(){
+		    	//获得选中的行ids的方法
+		    	var ids = $(gridBase_selector).getGridParam("selarrrow");  
+		    	
+				if(!(ids!=null && ids.length>0)){
+					bootbox.dialog({
+						message: "<span class='bigger-110'>您没有选择任何内容!</span>",
+						buttons: 			
+						{ "button":{ "label":"确定", "className":"btn-sm btn-success"}}
+					});
+				}else{
+	                var msg = '确定要上报吗??';
+	                bootbox.confirm(msg, function(result) {
+	    				if(result) {
+	    					var listData =new Array();
+	    					
+	    					//遍历访问这个集合  
+	    					$(ids).each(function (index, id){  
+	    			            var rowData = $(gridBase_selector).getRowData(id);
+	    			            listData.push(rowData);
+	    					});
 							top.jzts();
 							$.ajax({
 								type: "POST",
-								url: '<%=basePath%>housefundsummy/deleteAll.do?tm='+new Date().getTime(),
-						    	data: {DATA_IDS:str},
-								dataType:'json',
-								//beforeSend: validateData,
-								cache: false,
-								success: function(data){
-									 $.each(data.list, function(i, list){
-											nextPage(${page.currentPage});
-									 });
-								}
+								url: '<%=basePath%>housefundsummy/report.do?',
+	    				    	data: {DATA_ROWS_REPORT:JSON.stringify(listData)},
+	    						dataType:'json',
+	    						cache: false,
+								success: function(response){
+									if(response.code==0){
+	    								$(gridBase_selector).trigger("reloadGrid");  
+										$(top.hangge());//关闭加载状态
+										$("#subTitle").tips({
+											side:3,
+								            msg:'上报成功',
+								            bg:'#009933',
+								            time:3
+								        });
+									}else{
+										$(top.hangge());//关闭加载状态
+										$("#subTitle").tips({
+											side:3,
+								            msg:'上报失败,'+response.message,
+								            bg:'#cc0033',
+								            time:3
+								        });
+									}
+								},
+						    	error: function(response) {
+									$(top.hangge());//关闭加载状态
+									$("#subTitle").tips({
+										side:3,
+							            msg:'上报出错:'+response.responseJSON.message,
+							            bg:'#cc0033',
+							            time:3
+							        });
+						    	}
 							});
-						}
-					}
+	    				}
+	                });
 				}
+			}
+		});
+
+        // the event handler on expanding parent row receives two parameters
+        // the ID of the grid tow  and the primary key of the row
+        function showChildGrid(parentRowID, parentRowKey) {
+        	console.log(parentRowID+"  "+parentRowKey);
+			var rowData = $(gridBase_selector).getRowData(parentRowKey);
+        	var BILL_CODE = rowData.BILL_CODE__;
+        	console.log(BILL_CODE);
+        	var DEPT_CODE = rowData.DEPT_CODE__;
+        	console.log(DEPT_CODE);
+        	
+            var detailColModel = "[]";
+			$.ajax({
+				type: "GET",
+				url: '<%=basePath%>housefundsummy/getDetailColModel.do?',
+		    	data: {DATA_DEPT_CODE:DEPT_CODE},
+				dataType:'json',
+				cache: false,
+				success: function(response){
+					if(response.code==0){
+						$(top.hangge());//关闭加载状态
+						detailColModel = response.message;
+
+			            detailColModel = eval(detailColModel);
+			            var childGridID = parentRowID + "_table";
+			            var childGridPagerID = parentRowID + "_pager";
+			            // send the parent row primary key to the server so that we know which grid to show
+			            var childGridURL = '<%=basePath%>housefundsummy/getDetailList.do?BILL_CODE='+BILL_CODE+'';
+			            //childGridURL = childGridURL + "&parentRowID=" + encodeURIComponent(parentRowKey)
+
+			            // add a table and pager HTML elements to the parent grid row - we will render the child grid here
+			            $('#' + parentRowID).append('<table id=' + childGridID + '></table><div id=' + childGridPagerID + ' class=scroll></div>');
+
+			            $("#" + childGridID).jqGrid({
+			                url: childGridURL,
+			                mtype: "GET",
+			                datatype: "json",
+			                colModel: detailColModel,
+			                page: 1,
+			                width: '100%',
+			                //height: '100%',
+			                rowNum: 0,	
+			                pager: "#" + childGridPagerID,
+							pgbuttons: false, // 分页按钮是否显示 
+							pginput: false, // 是否允许输入分页页数 
+			                viewrecords: true,
+			                recordpos: "left", // 记录数显示位置 
+			                
+			    			loadComplete : function() {
+			    				var table = this;
+			    				setTimeout(function(){
+			    					styleCheckbox(table);
+			    					updateActionIcons(table);
+			    					updatePagerIcons(table);
+			    					enableTooltips(table);
+			    				}, 0);
+			    			},
+			            });
+					}else{
+						$(top.hangge());//关闭加载状态
+						$("#subTitle").tips({
+							side:3,
+				            msg:'获取结构失败：'+response.message,
+				            bg:'#cc0033',
+				            time:3
+				        });
+					}
+				},
+		    	error: function(response) {
+					$(top.hangge());//关闭加载状态
+					$("#subTitle").tips({
+						side:3,
+			            msg:'获取结构出错:'+response.responseJSON.message,
+			            bg:'#cc0033',
+			            time:3
+			        });
+		    	}
 			});
-		};
+        };
 		
-		//导出excel
-		function toExcel(){
-			window.location.href='<%=basePath%>housefundsummy/excel.do';
+		//加载单位树
+		function initComplete(){
+			//下拉树
+			var defaultNodes = {"treeNodes":${zTreeNodes}};
+			//绑定change事件
+			$("#selectTree").bind("change",function(){
+				if($(this).attr("relValue")){
+					$("#RPT_DEPT").val($(this).attr("relValue"));
+					console.log($(this).attr("relValue"));
+			    }
+			});
+			//赋给data属性
+			$("#selectTree").data("data",defaultNodes);  
+			$("#selectTree").render();
+			$("#selectTree2_input").val("请选择单位");
 		}
-	</script>
+		
+		//汇总
+		function btnSummyClick(){
+			var transfer_RPT_DEPT = transfer_RPT_DEPT = $("#RPT_DEPT").val();
+			
+			if(!(transfer_RPT_DEPT!=null && transfer_RPT_DEPT.trim()!="")){
+			    bootbox.dialog({
+				    message: "<span class='bigger-110'>您没有选择任何单位!</span>",
+				    buttons: 			
+				    { "button":{ "label":"确定", "className":"btn-sm btn-success"}}
+			    }); 
+			} else {
+                var msg = '确定要汇总吗??';
+                bootbox.confirm(msg, function(result) {
+    				if(result) {
+    					top.jzts();
+    					$.ajax({
+    						type: "POST",
+    						url: '<%=basePath%>housefundsummy/summaryDepartString.do?',
+    				    	data: {DATA_DEPART:transfer_RPT_DEPT},
+    						dataType:'json',
+    						cache: false,
+    						success: function(response){
+    							if(response.code==0){
+    								$(gridBase_selector).trigger("reloadGrid");  
+    								$(top.hangge());//关闭加载状态
+    								$("#subTitle").tips({
+    									side:3,
+    						            msg:'汇总成功',
+    						            bg:'#009933',
+    						            time:3
+    						        });
+    							}else{
+    								$(top.hangge());//关闭加载状态
+    								$("#subTitle").tips({
+    									side:3,
+    						            msg:'汇总失败,'+response.message,
+    						            bg:'#cc0033',
+    						            time:3
+    						        });
+    							}
+    						},
+    				    	error: function(response) {
+    							$(top.hangge());//关闭加载状态
+								$("#subTitle").tips({
+									side:3,
+						            msg:'汇总出错:'+response.responseJSON.message,
+						            bg:'#cc0033',
+						            time:3
+						        });
+    				    	}
+    					});
+    				}
+                });
+			}
+		}
+		
+		//检索
+		function tosearch() {
+			console.log($("#RPT_DEPT").val());
+			var RPT_DEPT = $("#RPT_DEPT").val();
+			$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据
+				url:'<%=basePath%>housefundsummy/getPageList.do?DepartCode='+RPT_DEPT,  
+				datatype:'json',
+			      page:1
+			}).trigger("reloadGrid");
+		}  
 
-
-</body>
-</html>
+	 	</script>
+	</html>

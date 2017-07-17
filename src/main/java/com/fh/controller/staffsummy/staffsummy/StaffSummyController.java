@@ -380,26 +380,27 @@ public class StaffSummyController extends BaseController {
     				Object getBILL_CODE = addTo.get("BILL_CODE");
     				if(!(getBILL_CODE != null && !getBILL_CODE.toString().trim().equals(""))){
     					billNum++;
-                        String billCode = BillCodeUtil.getBillCode(billNumType, month, billNum);
-                        addTo.put("BILL_CODE", billCode);
-                        addTo.put("BUSI_DATE", SystemDateTime);
-                        addTo.put("DEPT_CODE", depart);
-                        addTo.put("BILL_STATE", BillState.Normal.getNameKey());
-                		User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
-                        addTo.put("BILL_USER", user.getUSER_ID());
-                        addTo.put("BILL_DATE", DateUtil.getTime());
-                        
-                        StringBuilder updateFilter = new StringBuilder();
-                        for(String field : SumField){
-                        	if(updateFilter != null && !updateFilter.toString().trim().equals("")){
-                            	updateFilter.append(" and ");
-                        	}
-                        	updateFilter.append(field + " = '" + addTo.getString(field) + "' ");
-                        }
-    	    			addTo.put("updateFilter", updateFilter);
-                        
-    	    			TmplUtil.setModelDefault(addTo, StaffSummyModel.class, DefaultValueList);
+    					getBILL_CODE = BillCodeUtil.getBillCode(billNumType, month, billNum);
     				}
+                    addTo.put("BILL_CODE", getBILL_CODE);
+                    addTo.put("BUSI_DATE", SystemDateTime);
+                    addTo.put("DEPT_CODE", depart);
+                    addTo.put("BILL_STATE", BillState.Normal.getNameKey());
+            		User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
+                    addTo.put("BILL_USER", user.getUSER_ID());
+                    addTo.put("BILL_DATE", DateUtil.getTime());
+                    
+                    //更新明细单号的条件
+                    StringBuilder updateFilter = new StringBuilder();
+                    for(String field : SumField){
+                    	if(updateFilter != null && !updateFilter.toString().trim().equals("")){
+                        	updateFilter.append(" and ");
+                    	}
+                    	updateFilter.append(field + " = '" + addTo.getString(field) + "' ");
+                    }
+	    			addTo.put("updateFilter", updateFilter);
+                    //添加未设置字段默认值
+	    			TmplUtil.setModelDefault(addTo, StaffSummyModel.class, DefaultValueList);
     				listTo.add(addTo);
     			}
         	}
@@ -418,18 +419,44 @@ public class StaffSummyController extends BaseController {
 	}
 	
 	private List<PageData> getListTo(List<PageData> listHave, List<PageData> listSave){
-		List<PageData> listAdd = new ArrayList<PageData>();
+		List<String> listNotSetCode = new ArrayList<String>();
+		//根据汇总字段匹配单号
 		if(listHave!=null && listHave.size()>0){
-			for(PageData each : listSave){
-				listAdd.add(each);
-			}
-		} else {
-			for(PageData each : listSave){
-				listAdd.add(each);
+			for(PageData eachHave : listHave){
+				Object getBILL_CODE = eachHave.get("BILL_CODE");
+				if(getBILL_CODE!=null && !getBILL_CODE.toString().equals("")){
+					for(PageData eachSave : listSave){
+						Boolean bol = true;
+						for(String field : SumField){
+							String strHave = (String) eachHave.get(field);
+							if(strHave == null) strHave = "";
+							String strSave = (String) eachSave.get(field);
+							if(strSave == null) strSave = "";
+							if(!strHave.equals(strSave)){
+								bol = false;
+							}
+						}
+						if(bol){
+						    eachSave.put("BILL_CODE", getBILL_CODE);
+						} else {
+							listNotSetCode.add(getBILL_CODE.toString());
+						}
+					}
+				}
 			}
 		}
-		//SumField
-		return listAdd;
+		//未匹配的单号和没有单号的记录设置
+		for(PageData eachSave : listSave){
+			if(!(listNotSetCode!=null && listNotSetCode.size()>0)){
+				break;
+			}
+			Object getBILL_CODE = eachSave.get("BILL_CODE");
+			if(!(getBILL_CODE != null && !getBILL_CODE.toString().trim().equals(""))){
+				eachSave.put("BILL_CODE", listNotSetCode.get(0));
+				listNotSetCode.remove(0);
+			}
+		}
+		return listSave;
 	}
 	
 	private String CheckStateLast(SysSealed item) throws Exception{

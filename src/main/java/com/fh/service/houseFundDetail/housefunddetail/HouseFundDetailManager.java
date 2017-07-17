@@ -1,6 +1,7 @@
 package com.fh.service.houseFundDetail.housefunddetail;
 
 import java.util.List;
+import java.util.Map;
 
 import com.fh.entity.JqPage;
 import com.fh.entity.HouseFundDetailModel;
@@ -126,6 +127,12 @@ public interface HouseFundDetailManager{
 	 * @throws Exception
 	 */
 	public List<PageData> getDetailList(PageData pd)throws Exception;
+
+	/**获取汇总数据
+	 * @param
+	 * @throws Exception
+	 */
+	public List<PageData> getSum(Map<String, String> map)throws Exception;
 	
 	
 	

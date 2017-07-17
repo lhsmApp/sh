@@ -58,6 +58,10 @@
 											onclick="showQueryCondi($('#jqGrid'),null,true)">
 											<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
 										</button>
+						<button id="btnSummy" class="btn btn-white btn-info btn-sm"
+							onclick="btnSummyClick()">
+							<i class="ace-icon fa fa-pencil-square-o bigger-120 blue"></i> <span>汇总</span>
+						</button>
 								
 						            <div class="pull-right">
 									    <span class="label label-xlg label-blue arrowed-left"
@@ -157,13 +161,15 @@
 				colModel: jqGridColModel,
 				viewrecords: true, 
 				shrinkToFit: false,
-				rowNum: 10,
+				rowNum: 0,
 				//rowList: [10,20,30],
 	            multiselect: true,
 	            multiboxonly: true,
 				altRows: true, //斑马条纹
 				
 				pager: pagerBase_selector,
+				pgbuttons: false, // 分页按钮是否显示 
+				pginput: false, // 是否允许输入分页页数 
 				footerrow: true,
 				userDataOnFooter: true,
 
@@ -214,7 +220,7 @@
 					});
 			    },
 	            
-				loadComplete : function() {
+				loadComplete : function(data) {
 					var table = this;
 					setTimeout(function(){
 						styleCheckbox(table);
@@ -295,12 +301,10 @@
 				        	}
 				        	transfer_RPT_DEPT += DEPT_CODE;
 						});
-					} else {
-						transfer_RPT_DEPT = $("#RPT_DEPT").val();
-					}
+					} 
 					if(!(transfer_RPT_DEPT!=null && transfer_RPT_DEPT.trim()!="")){
 					    bootbox.dialog({
-						    message: "<span class='bigger-110'>您没有选择任何内容!</span>",
+						    message: "<span class='bigger-110'>您没有选择任何列表内容!</span>",
 						    buttons: 			
 						    { "button":{ "label":"确定", "className":"btn-sm btn-success"}}
 					    }); 
@@ -451,16 +455,19 @@
 
 			            $("#" + childGridID).jqGrid({
 			                url: childGridURL,
+			                mtype: "GET",
 			                datatype: "json",
 			                colModel: detailColModel,
 			                page: 1,
-			                rowNum: 10,	
-			                scrollPopUp:true,
-							scrollLeftOffset: "83%",
-			                scroll: 1, 
-			                viewrecords: true,
+			                width: '100%',
+			                //height: '100%',
+			                rowNum: 0,	
 			                pager: "#" + childGridPagerID,
-			    			
+							pgbuttons: false, // 分页按钮是否显示 
+							pginput: false, // 是否允许输入分页页数 
+			                viewrecords: true,
+			                recordpos: "left", // 记录数显示位置 
+			                
 			    			loadComplete : function() {
 			    				var table = this;
 			    				setTimeout(function(){
@@ -508,6 +515,62 @@
 			$("#selectTree").data("data",defaultNodes);  
 			$("#selectTree").render();
 			$("#selectTree2_input").val("请选择单位");
+		}
+		
+		//汇总
+		function btnSummyClick(){
+			var transfer_RPT_DEPT = transfer_RPT_DEPT = $("#RPT_DEPT").val();
+			
+			if(!(transfer_RPT_DEPT!=null && transfer_RPT_DEPT.trim()!="")){
+			    bootbox.dialog({
+				    message: "<span class='bigger-110'>您没有选择任何单位!</span>",
+				    buttons: 			
+				    { "button":{ "label":"确定", "className":"btn-sm btn-success"}}
+			    }); 
+			} else {
+                var msg = '确定要汇总吗??';
+                bootbox.confirm(msg, function(result) {
+    				if(result) {
+    					top.jzts();
+    					$.ajax({
+    						type: "POST",
+    						url: '<%=basePath%>staffsummy/summaryDepartString.do?',
+    				    	data: {DATA_DEPART:transfer_RPT_DEPT},
+    						dataType:'json',
+    						cache: false,
+    						success: function(response){
+    							if(response.code==0){
+    								$(gridBase_selector).trigger("reloadGrid");  
+    								$(top.hangge());//关闭加载状态
+    								$("#subTitle").tips({
+    									side:3,
+    						            msg:'汇总成功',
+    						            bg:'#009933',
+    						            time:3
+    						        });
+    							}else{
+    								$(top.hangge());//关闭加载状态
+    								$("#subTitle").tips({
+    									side:3,
+    						            msg:'汇总失败,'+response.message,
+    						            bg:'#cc0033',
+    						            time:3
+    						        });
+    							}
+    						},
+    				    	error: function(response) {
+    							$(top.hangge());//关闭加载状态
+								$("#subTitle").tips({
+									side:3,
+						            msg:'汇总出错:'+response.responseJSON.message,
+						            bg:'#cc0033',
+						            time:3
+						        });
+    				    	}
+    					});
+    				}
+                });
+			}
 		}
 		
 		//检索

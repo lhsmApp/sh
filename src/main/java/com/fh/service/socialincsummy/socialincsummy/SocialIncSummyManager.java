@@ -1,7 +1,9 @@
 package com.fh.service.socialincsummy.socialincsummy;
 
 import java.util.List;
-import com.fh.entity.Page;
+import java.util.Map;
+
+import com.fh.entity.JqPage;
 import com.fh.util.PageData;
 
 /** 
@@ -11,48 +13,36 @@ import com.fh.util.PageData;
  * @version
  */
 public interface SocialIncSummyManager{
-
-	/**新增
-	 * @param pd
-	 * @throws Exception
-	 */
-	public void save(PageData pd)throws Exception;
-	
-	/**删除
-	 * @param pd
-	 * @throws Exception
-	 */
-	public void delete(PageData pd)throws Exception;
-	
-	/**修改
-	 * @param pd
-	 * @throws Exception
-	 */
-	public void edit(PageData pd)throws Exception;
 	
 	/**列表
 	 * @param page
 	 * @throws Exception
 	 */
-	public List<PageData> list(Page page)throws Exception;
-	
-	/**列表(全部)
+	public List<PageData> JqPage(JqPage page)throws Exception;
+	/**获取记录数量
 	 * @param pd
 	 * @throws Exception
 	 */
-	public List<PageData> listAll(PageData pd)throws Exception;
-	
-	/**通过id获取数据
+	public int countJqGridExtend(JqPage page)throws Exception;
+	/**获取记录总合计
 	 * @param pd
 	 * @throws Exception
 	 */
-	public PageData findById(PageData pd)throws Exception;
-	
-	/**批量删除
-	 * @param ArrayDATA_IDS
+	public PageData getFooterSummary(JqPage page)throws Exception;
+
+
+	/**获取汇总数据
+	 * @param
 	 * @throws Exception
 	 */
-	public void deleteAll(String[] ArrayDATA_IDS)throws Exception;
+	public List<PageData> getHave(Map<String, String> map)throws Exception;
+
+	/**获取记录总合计
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void summaryModelList(List<PageData> listPd, PageData pdBillNum)throws Exception;
+	
 	
 }
 

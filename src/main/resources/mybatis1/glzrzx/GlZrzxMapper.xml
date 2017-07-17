@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="GlZrzxMapper">
+	<!--表名 -->
+	<sql id="tableName">
+		tb_house_fund_detail
+	</sql>
+	
+	<!-- 字段 -->
+	<sql id="Field"> BILL_CODE, BUSI_DATE, USER_CODE, USER_NAME, USER_GROP, SOC_INC_BASE, PER_BASIC_FUND, PER_SUPP_FUND, PER_TOTAL, DEPT_BASIC_FUND, DEPT_SUPP_FUND, DEPT_TOTAL, DEPT_CODE, USER_CATG, PMT_PLACE, CUST_COL1, CUST_COL2, CUST_COL3, CUST_COL4, CUST_COL5, CUST_COL6, CUST_COL7, CUST_COL8, CUST_COL9, CUST_COL10, ESTB_DEPT </sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValue"> #{BILL_CODE}, #{BUSI_DATE}, #{USER_CODE}, #{USER_NAME}, #{USER_GROP}, #{SOC_INC_BASE}, #{PER_BASIC_FUND}, #{PER_SUPP_FUND}, #{PER_TOTAL}, #{DEPT_BASIC_FUND}, #{DEPT_SUPP_FUND}, #{DEPT_TOTAL}, #{DEPT_CODE}, #{USER_CATG}, #{PMT_PLACE}, #{CUST_COL1}, #{CUST_COL2}, #{CUST_COL3}, #{CUST_COL4}, #{CUST_COL5}, #{CUST_COL6}, #{CUST_COL7}, #{CUST_COL8}, #{CUST_COL9}, #{CUST_COL10}, #{ESTB_DEPT} </sql>
+	
+</mapper>
