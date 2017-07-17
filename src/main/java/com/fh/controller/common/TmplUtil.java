@@ -13,9 +13,12 @@ import com.fh.entity.system.Department;
 import com.fh.entity.system.Dictionaries;
 import com.fh.service.fhoa.department.DepartmentManager;
 import com.fh.service.system.dictionaries.DictionariesManager;
+import com.fh.service.system.user.UserManager;
 import com.fh.service.tmplConfigDict.tmplconfigdict.TmplConfigDictManager;
 import com.fh.service.tmplconfig.tmplconfig.TmplConfigManager;
 import com.fh.util.PageData;
+import com.fh.util.enums.BillState;
+import com.fh.util.enums.BillType;
 
 /**
  * 模板通用类
@@ -32,6 +35,7 @@ public class TmplUtil {
 	private TmplConfigDictManager tmplConfigDictService;
 	private DictionariesManager dictionariesService;
 	private DepartmentManager departmentService;
+	private UserManager userService;
 
 	// 查询表的主键字段后缀，区别于主键字段，用于修改或删除
 	private String keyExtra = "__";
@@ -66,20 +70,22 @@ public class TmplUtil {
 	}
 
 	public TmplUtil(TmplConfigManager tmplconfigService, TmplConfigDictManager tmplConfigDictService,
-			DictionariesManager dictionariesService, DepartmentManager departmentService) {
+			DictionariesManager dictionariesService, DepartmentManager departmentService,UserManager userService) {
 		this.tmplconfigService = tmplconfigService;
 		this.tmplConfigDictService = tmplConfigDictService;
 		this.dictionariesService = dictionariesService;
 		this.departmentService = departmentService;
+		this.userService=userService;
 	}
 
 	public TmplUtil(TmplConfigManager tmplconfigService, TmplConfigDictManager tmplConfigDictService,
-			DictionariesManager dictionariesService, DepartmentManager departmentService,
+			DictionariesManager dictionariesService, DepartmentManager departmentService,UserManager userService,
 			List<String> keyList) {
 		this.tmplconfigService = tmplconfigService;
 		this.tmplConfigDictService = tmplConfigDictService;
 		this.dictionariesService = dictionariesService;
 		this.departmentService = departmentService;
+		this.userService=userService;
 		this.keyList = keyList;
 	}
 
@@ -321,6 +327,27 @@ public class TmplUtil {
 					}
 					ret.append(dic.getDEPARTMENT_CODE() + ":" + dic.getNAME());
 					dicAdd.put(dic.getDEPARTMENT_CODE(), dic.getNAME());
+				}
+			}else if (dicName.toUpperCase().equals(("sys_user").toUpperCase())) {
+				PageData pd = new PageData();
+				List<PageData> listUser = (List<PageData>) userService.getUserValue(pd);
+				for (PageData dic : listUser) {
+					if (ret != null && !ret.toString().trim().equals("")) {
+						ret.append(";");
+					}
+					ret.append(dic.getString("USER_ID") + ":" + dic.getString("NAME"));
+					dicAdd.put(dic.getString("USER_ID"), dic.getString("NAME"));
+				}
+			}
+		}else if (strDicType.equals("3")) {//枚举
+			if (dicName.toUpperCase().equals(("BILL_STATE").toUpperCase())) {
+				for(BillState billState:BillState.values()){
+					ret.append(billState.getNameKey() + ":" + billState.getNameValue());
+					ret.append(';');
+					dicAdd.put(billState.getNameKey(), billState.getNameValue());
+				}
+				if (!ret.toString().trim().equals("")) {
+					ret.deleteCharAt(ret.length()-1);
 				}
 			}
 		}

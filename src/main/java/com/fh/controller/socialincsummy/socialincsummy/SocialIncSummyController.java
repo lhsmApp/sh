@@ -53,6 +53,7 @@ import com.fh.service.sysBillnum.sysbillnum.SysBillnumManager;
 import com.fh.service.sysConfig.sysconfig.SysConfigManager;
 import com.fh.service.sysSealedInfo.syssealedinfo.impl.SysSealedInfoService;
 import com.fh.service.system.dictionaries.impl.DictionariesService;
+import com.fh.service.system.user.UserManager;
 import com.fh.service.tmplConfigDict.tmplconfigdict.impl.TmplConfigDictService;
 import com.fh.service.tmplconfig.tmplconfig.impl.TmplConfigService;
 
@@ -84,6 +85,8 @@ public class SocialIncSummyController extends BaseController {
 	private SysConfigManager sysConfigManager;
 	@Resource(name="sysbillnumService")
 	private SysBillnumManager sysbillnumService;
+	@Resource(name = "userService")
+	private UserManager userService;
 
 	//表名
 	String TableNameBase = "tb_social_inc_summy";
@@ -124,7 +127,7 @@ public class SocialIncSummyController extends BaseController {
 		
 		mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService));
 		
-		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService, keyListBase);
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService, userService,keyListBase);
 		String jqGridColModel = tmpl.generateStructureNoEdit(TableNameBase, ShowDepartCode);
 
 		//底行显示的求和与平均值字段
@@ -192,7 +195,7 @@ public class SocialIncSummyController extends BaseController {
 		
 		PageData pd = this.getPageData();
 		String DEPT_CODE = (String) pd.get("DATA_DEPT_CODE");
-		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService);
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
 		String detailColModel = tmpl.generateStructureNoEdit(TableNameDetail, DEPT_CODE);
 		
 		commonBase.setCode(0);
