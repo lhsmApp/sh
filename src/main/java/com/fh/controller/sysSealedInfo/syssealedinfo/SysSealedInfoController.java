@@ -1,14 +1,12 @@
 package com.fh.controller.sysSealedInfo.syssealedinfo;
 
-import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 import javax.annotation.Resource;
+
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
@@ -16,24 +14,22 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+
 import com.fh.controller.base.BaseController;
 import com.fh.controller.common.DictsUtil;
 import com.fh.entity.CommonBase;
 import com.fh.entity.JqPage;
 import com.fh.entity.Page;
 import com.fh.entity.PageResult;
-import com.fh.util.AppUtil;
-import com.fh.util.ObjectExcelView;
+import com.fh.service.fhoa.department.DepartmentManager;
+import com.fh.service.sysSealedInfo.syssealedinfo.SysSealedInfoManager;
+import com.fh.service.system.user.UserManager;
+import com.fh.util.Jurisdiction;
 import com.fh.util.PageData;
 import com.fh.util.SqlTools;
-import com.fh.util.Jurisdiction;
-import com.fh.util.Tools;
 import com.fh.util.enums.BillType;
 
 import net.sf.json.JSONArray;
-
-import com.fh.service.fhoa.department.DepartmentManager;
-import com.fh.service.sysSealedInfo.syssealedinfo.SysSealedInfoManager;
 
 /** 
  * 说明：业务封存信息
@@ -50,6 +46,9 @@ public class SysSealedInfoController extends BaseController {
 	
 	@Resource(name = "departmentService")
 	private DepartmentManager departmentService;
+	
+	@Resource(name = "userService")
+	private UserManager userService;
 	
 	/**修改
 	 * @param
@@ -86,6 +85,23 @@ public class SysSealedInfoController extends BaseController {
 		mv.setViewName("sysSealedInfo/syssealedinfo/syssealedinfo_list");
 		mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService));
 		mv.addObject("billTypeList", BillType.values());
+		
+		String departmentValus=DictsUtil.getDepartmentValue(departmentService);
+		String departmentString=":[All];"+departmentValus;	
+		mv.addObject("departmentStr", departmentString);
+		
+		String userValus=DictsUtil.getSysUserValue(userService);
+		String userString=":[All];"+userValus;	
+		mv.addObject("userStr", userString);
+		
+		StringBuilder sbBillType=new StringBuilder();
+		for(BillType billType:BillType.values()){
+			sbBillType.append(billType.getNameKey() + ":" + billType.getNameValue());
+			sbBillType.append(';');
+		}
+		sbBillType.deleteCharAt(sbBillType.length()-1);
+		String billTypeString=":[All];"+sbBillType.toString();
+		mv.addObject("billTypeStr", billTypeString);
 		return mv;
 	}
 	

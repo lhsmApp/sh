@@ -445,4 +445,9 @@
 		from 
 		<include refid="tableName"></include>
 	</select>
+	
+	<!-- 获取用户信息-->
+	<select id="getUserValue" parameterType="pd" resultType="pd" >
+		select * from <include refid="tableName"></include>
+	</select>
 </mapper>

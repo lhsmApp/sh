@@ -11,6 +11,7 @@ import com.fh.entity.system.Department;
 import com.fh.entity.system.Dictionaries;
 import com.fh.service.fhoa.department.DepartmentManager;
 import com.fh.service.system.dictionaries.DictionariesManager;
+import com.fh.service.system.user.UserManager;
 import com.fh.service.tmplConfigDict.tmplconfigdict.TmplConfigDictManager;
 import com.fh.util.PageData;
 import com.fh.util.StringUtil;
@@ -83,6 +84,25 @@ public class DictsUtil {
 				ret.append(";");
 			}
 			ret.append(dic.getDEPARTMENT_CODE() + ":" + dic.getNAME());
+		}
+		return ret.toString();
+	}
+	
+	/**
+	 * 获取组织结构信息，生成Jqgrid editOptions和SearchOptions所需的Select格式。
+	 * @param departmentService
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getSysUserValue(UserManager userService) throws Exception {
+		StringBuilder ret = new StringBuilder();
+		PageData pd = new PageData();
+		List<PageData> listPara = (List<PageData>) userService.getUserValue(pd);
+		for (PageData dic : listPara) {
+			if (ret != null && !ret.toString().trim().equals("")) {
+				ret.append(";");
+			}
+			ret.append(dic.getString("USER_ID") + ":" + dic.getString("NAME"));
 		}
 		return ret.toString();
 	}

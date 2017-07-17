@@ -79,13 +79,13 @@
 	<!-- 列表 -->
 	<select id="datalistJqPage" parameterType="jqPage" resultType="pd">
 		select
-		A.*, B.NAME,C.NAME as USERNAME
+		A.*<!-- , B.NAME,C.NAME as USERNAME -->
 		from
 		<include refid="tableName"></include> A
-		left join OA_DEPARTMENT B
+		<!-- left join OA_DEPARTMENT B
 		on A.RPT_DEPT=B.DEPARTMENT_CODE
 		left join sys_user C
-		on A.RPT_USER=C.USER_ID
+		on A.RPT_USER=C.USER_ID -->
 		<where>
 			<!-- <if test="pd.RPT_DEPT!= null and pd.RPT_DEPT != ''">根据本门单位检索
 				and RPT_DEPT LIKE CONCAT(CONCAT('%', #{pd.RPT_DEPT}),'%')
