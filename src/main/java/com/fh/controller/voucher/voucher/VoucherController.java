@@ -52,6 +52,7 @@ import com.fh.util.collectionSql.GroupUtils;
 import com.fh.util.collectionSql.GroupUtils.GroupBy;
 import com.fh.util.StringUtil;
 import com.fh.util.Tools;
+import com.fh.util.date.DateFormatUtils;
 import com.fh.util.date.DateUtils;
 import com.fh.util.enums.BillType;
 import com.fh.util.enums.TransferOperType;
@@ -110,21 +111,7 @@ public class VoucherController extends BaseController {
 		mv.setViewName("voucher/voucher/voucher_list");
 		PageData pd = this.getPageData();
 		String which = pd.getString("TABLE_CODE");
-		String tableCode = "";
-		String tableCodeSub = "";
-		if (which != null && which.equals("1")) {
-			tableCode = "TB_STAFF_SUMMY";
-			tableCodeSub = "TB_STAFF_DETAIL";
-		} else if (which != null && which.equals("2")) {
-			tableCode = "TB_SOCIAL_INC_SUMMY";
-			tableCodeSub = "TB_SOCIAL_INC_DETAIL";
-		} else if (which != null && which.equals("3")) {
-			tableCode = "TB_HOUSE_FUND_SUMMY";
-			tableCodeSub = "TB_HOUSE_FUND_DETAIL";
-		} else {
-			tableCode = "TB_STAFF_SUMMY";
-			tableCodeSub = "TB_STAFF_DETAIL";
-		}
+		String tableCode = getTableCode(which);
 		// 此处放当前页面初始化时用到的一些数据，例如搜索的下拉列表数据，所需的字典数据、权限数据等等。
 		// mv.addObject("pd", pd);
 		// *********************加载单位树*******************************
@@ -147,9 +134,12 @@ public class VoucherController extends BaseController {
 		mv.addObject("jqGridColModel", jqGridColModel);
 
 		// 生成子表结构
-		String jqGridColModelSub = tmplUtil.generateStructureNoEdit(tableCodeSub,
-				Jurisdiction.getCurrentDepartmentID());
-		mv.addObject("jqGridColModelSub", jqGridColModelSub);
+		/*
+		 * String jqGridColModelSub =
+		 * tmplUtil.generateStructureNoEdit(tableCodeSub,
+		 * Jurisdiction.getCurrentDepartmentID());
+		 * mv.addObject("jqGridColModelSub", jqGridColModelSub);
+		 */
 
 		// 底行显示的求和与平均值字段
 		SqlUserdata = tmplUtil.getSqlUserdata();
@@ -229,7 +219,41 @@ public class VoucherController extends BaseController {
 	}
 
 	/**
-	 * 列表
+	 * 获取明细显示结构
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/getDetailColModel")
+	public @ResponseBody CommonBase getDetailColModel() throws Exception {
+		logBefore(logger, Jurisdiction.getUsername() + "getDetailColModel");
+		CommonBase commonBase = new CommonBase();
+		commonBase.setCode(-1);
+
+		PageData pd = this.getPageData();
+		String DEPT_CODE = (String) pd.get("DEPT_CODE");
+		String which = pd.getString("TABLE_CODE");
+		String tableCodeSub = "";
+		if (which != null && which.equals("1")) {
+			tableCodeSub = "TB_STAFF_DETAIL";
+		} else if (which != null && which.equals("2")) {
+			tableCodeSub = "TB_SOCIAL_INC_DETAIL";
+		} else if (which != null && which.equals("3")) {
+			tableCodeSub = "TB_HOUSE_FUND_DETAIL";
+		} else {
+			tableCodeSub = "TB_STAFF_DETAIL";
+		}
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplConfigDictService, dictionariesService, departmentService);
+		String detailColModel = tmpl.generateStructureNoEdit(tableCodeSub, DEPT_CODE);
+
+		commonBase.setCode(0);
+		commonBase.setMessage(detailColModel);
+
+		return commonBase;
+	}
+
+	/**
+	 * 列表-获取明细信息
 	 * 
 	 * @param page
 	 * @throws Exception
@@ -247,7 +271,7 @@ public class VoucherController extends BaseController {
 	}
 
 	/**
-	 * 批量修改
+	 * 批量传输
 	 * 
 	 * @param
 	 * @throws Exception
@@ -335,6 +359,138 @@ public class VoucherController extends BaseController {
 			} else {
 				commonBase.setCode(-1);
 				commonBase.setMessage(message);
+			}
+		}
+		return commonBase;
+	}
+
+	/**
+	 * 批量获取凭证号
+	 * 
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/batchVoucher")
+	public @ResponseBody CommonBase batchVoucher() throws Exception {
+		logBefore(logger, Jurisdiction.getUsername() + "获取凭证号");
+		// String orgCode = Tools.readTxtFile(Const.ORG_CODE); // 读取总部组织机构编码
+		// if(!Jurisdiction.buttonJurisdiction(menuUrl, "del")){return null;}
+		// //校验权限
+		CommonBase commonBase = new CommonBase();
+		commonBase.setCode(-1);
+		PageData pd = this.getPageData();
+		String strDataRows = pd.getString("DATA_ROWS");
+		JSONArray array = JSONArray.fromObject(strDataRows);
+		@SuppressWarnings("unchecked")
+		List<PageData> listTransferData = (List<PageData>) JSONArray.toCollection(array, PageData.class);// 过时方法
+		if (null != listTransferData && listTransferData.size() > 0) {
+			String which = pd.getString("TABLE_CODE");
+			List<PageData> listVoucherNo = new ArrayList<PageData>();
+			// 执行从FIMS获取凭证号
+			Service service = new Service();
+			Call call = (Call) service.createCall();
+			pd.put("KEY_CODE", "JQueryPzInformation");
+			String strUrl = sysConfigManager.getSysConfigByKey(pd);
+			URL url = new URL(strUrl);
+			call.setTargetEndpointAddress(url);
+			call.setOperationName(new QName("http://JQueryPzInformation.j2ee", "commonQueryPzBh"));
+			call.setUseSOAPAction(true);
+			// 遍历批量获取凭证号
+			User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
+			String userId = user.getUSER_ID();
+			for (PageData item : listTransferData) {
+				String invoiceNumber = item.getString("BILL_CODE");// 单据编号
+				String fmisOrg = item.getString("DEPT_CODE");// FMIS组织机构编码
+				String tableName = "T" + getTableCode(which);// 在fmis建立的业务表名
+				String result = (String) call.invoke(new Object[] { tableName, invoiceNumber, fmisOrg });// 对应定义参数
+				if (result.length() > 0) {
+					String[] stringArr = result.split(";");
+					String pzbh = stringArr[0]; // 凭证编号
+					// String kjqj = stringArr[1];// 会计期间
+					// 执行获取凭证成功后对数据表进行凭证号更新
+					PageData pdCert = new PageData();
+					pdCert.put("BILL_CODE", item.getString("BILL_CODE"));
+					pdCert.put("CERT_CODE", pzbh);
+					pdCert.put("BILL_USER", userId);
+					pdCert.put("BILL_DATE", DateUtils.getCurrentTime());// YYYY-MM-DD
+																		// HH:MM:SS
+					listVoucherNo.add(pdCert);
+				}
+			}
+			if (null != listVoucherNo && listVoucherNo.size() > 0) {
+				voucherService.updateCertCode(listVoucherNo);
+			}
+		}
+		return commonBase;
+	}
+
+	/**
+	 * 批量获取冲销凭证号
+	 * 
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/batchWriteOffVoucher")
+	public @ResponseBody CommonBase batchWriteOffVoucher() throws Exception {
+		logBefore(logger, Jurisdiction.getUsername() + "获取冲销凭证号");
+		// String orgCode = Tools.readTxtFile(Const.ORG_CODE); // 读取总部组织机构编码
+		// if(!Jurisdiction.buttonJurisdiction(menuUrl, "del")){return null;}
+		// //校验权限
+		CommonBase commonBase = new CommonBase();
+		commonBase.setCode(-1);
+		PageData pd = this.getPageData();
+		String strDataRows = pd.getString("DATA_ROWS");
+		JSONArray array = JSONArray.fromObject(strDataRows);
+		@SuppressWarnings("unchecked")
+		List<PageData> listTransferData = (List<PageData>) JSONArray.toCollection(array, PageData.class);// 过时方法
+		if (null != listTransferData && listTransferData.size() > 0) {
+			/********************** 生成传输数据 ************************/
+			String which = pd.getString("TABLE_CODE");
+			List<PageData> listVoucherNo = new ArrayList<PageData>();
+			// 执行从FIMS获取冲销凭证号
+			Service service = new Service();
+			Call call = (Call) service.createCall();
+			pd.put("KEY_CODE", "JRevertVoucher");
+			String strUrl = sysConfigManager.getSysConfigByKey(pd);
+			URL url = new URL(strUrl);
+			call.setTargetEndpointAddress(url);
+			call.setOperationName(new QName("http://JRevertVoucher.j2ee", "AmisRevertVoucher"));
+			call.setUseSOAPAction(true);
+			// 遍历批量获取凭证号
+			User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
+			String userId = user.getUSER_ID();
+			for (PageData item : listTransferData) {
+				String fmisOrg = item.getString("DEPT_CODE");// FMIS组织机构编码
+				String fmisUrl = strUrl;// FMIS应用地址
+				String invoiceNumber = item.getString("BILL_CODE");// 单据编号
+				String invoiceState = item.getString("BILL_STATE");// 单据状态
+				String voucherDate = item.getString("CERT_BILL_DATE");// 凭证日期
+				String voucherNumber = item.getString("CERT_CODE");// 凭证编号
+				String tableName = "T" + getTableCode(which);// 在fmis建立的业务表名
+				String workDate = DateUtils.getCurrentTime(DateFormatUtils.DATE_NOFUll_FORMAT);// 当前工作日期格式20170602
+
+				String result = (String) call
+						.invoke(new Object[] { tableName, fmisOrg, voucherDate, voucherNumber, workDate });// 对应定义参数
+				if (result.length() > 0) {
+					String[] stringArr = result.split(";");
+					String flag = stringArr[0];
+					if (flag.equals("TRUE")) {
+						String reseverNumber = stringArr[1];// 冲销凭证编号
+						//String invoiceNumbers = "";// 冲销凭证编号
+
+						// 执行获取凭证成功后对数据表进行凭证号更新
+						PageData pdCert = new PageData();
+						pdCert.put("BILL_CODE", item.getString("BILL_CODE"));
+						pdCert.put("CERT_CODE", item.getString("CERT_CODE"));
+						pdCert.put("REVCERT_CODE", reseverNumber);
+						pdCert.put("BILL_USER", userId);
+						pdCert.put("BILL_DATE", DateUtils.getCurrentTime());// YYYY-MM-DD HH:MM:SS
+						listVoucherNo.add(pdCert);
+					}
+				}
+			}
+			if (null != listVoucherNo && listVoucherNo.size() > 0) {
+				voucherService.updateRevCertCode(listVoucherNo);
 			}
 		}
 		return commonBase;
@@ -433,7 +589,7 @@ public class VoucherController extends BaseController {
 	}
 
 	/**
-	 * 列表
+	 * 列表-汇总数据未上报单位
 	 * 
 	 * @param page
 	 * @throws Exception

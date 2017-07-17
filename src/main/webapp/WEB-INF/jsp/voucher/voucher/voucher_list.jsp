@@ -169,7 +169,7 @@
 	<script type="text/javascript" src="static/js/util/toolkit.js"></script>
 	<script src="static/ace/js/ace/ace.widget-box.js"></script>
 	<script type="text/javascript"> 
-	var jqGridColModelSub;
+	//var jqGridColModelSub;
 	var which='1';
 	var gridHeight;
 	var jqGridColModel;
@@ -181,10 +181,12 @@
 		//dropDownStyle();
 		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 	    jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
-	    jqGridColModelSub = eval("(${jqGridColModelSub})");
+	    //jqGridColModelSub = eval("(${jqGridColModelSub})");
 	    var certCode={label: '凭证号',name:'CERT_CODE', width:100};
 	    var revcertCode={label: '冲销凭证号',name:'REVCERT_CODE', width:100};
-	    jqGridColModel.unshift(certCode,revcertCode);
+	    var certBillDate={label: '凭证日期',name:'CERT_BILL_DATE', width:100,hidden:true};
+	    
+	    jqGridColModel.unshift(certCode,revcertCode,certBillDate);
 	    //jqGridColModel1=jqGridColModel.concat();
 	    //jqGridColModel1.unshift(certCode,revcertCode);
 		//resize to fit page size
@@ -427,12 +429,107 @@
 
 	//批量获取凭证号
 	function batchVoucher(e) {
-		
+		var listData =new Array();
+		var ids = $("#jqGrid").jqGrid('getGridParam','selarrrow');
+		//遍历访问这个集合  
+		var rowData;
+		$(ids).each(function (index, id){  
+            $("#jqGrid").saveRow(id, false, 'clientArray');
+             rowData = $("#jqGrid").getRowData(id);
+            listData.push(rowData);
+		});
+		top.jzts();
+		$.ajax({
+			type: "POST",
+			url: '<%=basePath%>voucher/batchVoucher.do?TABLE_CODE='+which,
+	    	//data: rowData,//可以单独传入一个对象，后台可以直接通过对应模型接受参数。但是传入Array（listData）就不好用了，所以传list方式需将List转为Json字符窜。
+			//data: '{"rows":listData}',
+			data:{DATA_ROWS:JSON.stringify(listData)},
+	    	dataType:'json',
+			cache: false,
+			success: function(response){
+				if(response.code==0){
+					$("#jqGrid").trigger("reloadGrid");  
+					$(top.hangge());//关闭加载状态
+					$("#subTitle").tips({
+						side:3,
+			            msg:'获取凭证号成功',
+			            bg:'#009933',
+			            time:3
+			        });
+				}else{
+					$(top.hangge());//关闭加载状态
+					$("#subTitle").tips({
+						side:3,
+			            msg:'获取凭证号失败,'+response.message,
+			            bg:'#cc0033',
+			            time:3
+			        });
+				}
+			},
+	    	error: function(e) {
+	    		$(top.hangge());//关闭加载状态
+				$("#subTitle").tips({
+					side:3,
+		            msg:'获取凭证号失败,'+response.responseJSON.message,
+		            bg:'#cc0033',
+		            time:3
+		        });
+	    	}
+		});
 	}
 	
 	//批量获取冲销凭证号
 	function batchWriteOffVoucher(e) {
-		
+		var listData =new Array();
+		var ids = $("#jqGrid").jqGrid('getGridParam','selarrrow');
+		//console.log(ids);
+		//遍历访问这个集合  
+		var rowData;
+		$(ids).each(function (index, id){  
+            $("#jqGrid").saveRow(id, false, 'clientArray');
+             rowData = $("#jqGrid").getRowData(id);
+            listData.push(rowData);
+		});
+		top.jzts();
+		$.ajax({
+			type: "POST",
+			url: '<%=basePath%>voucher/batchWriteOffVoucher.do?TABLE_CODE='+which,
+	    	//data: rowData,//可以单独传入一个对象，后台可以直接通过对应模型接受参数。但是传入Array（listData）就不好用了，所以传list方式需将List转为Json字符窜。
+			//data: '{"rows":listData}',
+			data:{DATA_ROWS:JSON.stringify(listData)},
+	    	dataType:'json',
+			cache: false,
+			success: function(response){
+				if(response.code==0){
+					$("#jqGrid").trigger("reloadGrid");  
+					$(top.hangge());//关闭加载状态
+					$("#subTitle").tips({
+						side:3,
+			            msg:'获取冲销凭证号成功',
+			            bg:'#009933',
+			            time:3
+			        });
+				}else{
+					$(top.hangge());//关闭加载状态
+					$("#subTitle").tips({
+						side:3,
+			            msg:'获取冲销凭证号失败,'+response.message,
+			            bg:'#cc0033',
+			            time:3
+			        });
+				}
+			},
+	    	error: function(e) {
+	    		$(top.hangge());//关闭加载状态
+				$("#subTitle").tips({
+					side:3,
+		            msg:'获取冲销凭证号失败,'+response.responseJSON.message,
+		            bg:'#cc0033',
+		            time:3
+		        });
+	    	}
+		});
 	}
 	
 	//批量传输
@@ -477,7 +574,13 @@
 				}
 			},
 	    	error: function(e) {
-				$(top.hangge());//关闭加载状态
+	    		$(top.hangge());//关闭加载状态
+				$("#subTitle").tips({
+					side:3,
+		            msg:'传输失败,'+response.responseJSON.message,
+		            bg:'#cc0033',
+		            time:3
+		        });
 	    	}
 		});
     }
@@ -487,80 +590,112 @@
     // the ID of the grid tow  and the primary key of the row
     function showChildGrid(parentRowID, parentRowKey) {
     	console.log(parentRowID+"  "+parentRowKey);
-        var childGridID = parentRowID + "_table";
-        var childGridPagerID = parentRowID + "_pager";
-     // send the parent row primary key to the server so that we know which grid to show
-     	var parentRowData=$("#jqGrid").jqGrid('getRowData',parentRowKey);
-        var childGridURL = '<%=basePath%>voucher/getDetailList.do?BILL_CODE='+parentRowData.BILL_CODE+'&TABLE_CODE='+which;
-        //childGridURL = childGridURL + "&parentRowID=" + encodeURIComponent(parentRowKey)
-
-        // add a table and pager HTML elements to the parent grid row - we will render the child grid here
-        $('#' + parentRowID).append('<table id=' + childGridID + '></table><div id=' + childGridPagerID + ' class=scroll></div>');
-        $("#" + childGridID).jqGrid({
-            url: childGridURL,
-            mtype: "GET",
-            datatype: "json",
-            page: 1,
-            colModel: jqGridColModelSub,
-            //width: '100%',
-            height: '100%',
-            shrinkToFit:true,
-            autowidth:true,
-            toppager : "#"+childGridPagerID,
-            //toolbar: [true,"top"],
-            //toppager:true ,
-            //pagerpos:"left",
-            //pager: "#" + childGridPagerID,
-            loadComplete : function() {
-				var table = this;
-				setTimeout(function(){
-					styleCheckbox(table);
-					updateActionIcons(table);
-					updatePagerIcons(table);
-					enableTooltips(table);
-				}, 0);
-			},
-			gridComplete:function(){
-			    //$("#" + childGridID).parents(".ui-jqgrid-bdiv").css("overflow-x","hidden");
-		    }
-        });
-        
-      	//navButtons
-		jQuery("#" + childGridID).jqGrid('navGrid',"#"+childGridPagerID,
-			{ 	//navbar options
-				edit: false,
-				add: false,
-				del: false,
-				search: true,
-				searchicon : 'ace-icon fa fa-search orange',
-				/* searchtext:"查询明细",
-				searchtitle:"查询明细", */
-				refresh: false,
-				refreshicon : 'ace-icon fa fa-refresh blue',
-				view: false,
-				cloneToTop :true
-			},
-			{
-				//edit record form
-			},
-			{
-				//new record form
-			},
-			{
-				//delete record form
-			},
-			{
-				//search form
-				recreateForm: true,
-				afterShowSearch: beforeSearchCallback,
-				afterRedraw: function(){
-					style_search_filters($(this));
-				},
-				multipleSearch: true,
-				//multipleGroup:true,
-				showQuery: false
-			}
-		);
+    	var parentRowData=$("#jqGrid").jqGrid('getRowData',parentRowKey);
+    	var DEPT_CODE = parentRowData.DEPT_CODE;
+    	var detailColModel = "[]";
+		$.ajax({
+			type: "GET",
+			url: '<%=basePath%>voucher/getDetailColModel.do?',
+	    	data: {DEPT_CODE:DEPT_CODE,TABLE_CODE:which},
+			dataType:'json',
+			cache: false,
+			success: function(response){
+				if(response.code==0){
+					detailColModel = response.message;
+	            	detailColModel = eval(detailColModel);
+			        var childGridID = parentRowID + "_table";
+			        var childGridPagerID = parentRowID + "_pager";
+			     	//send the parent row primary key to the server so that we know which grid to show
+			        var childGridURL = '<%=basePath%>voucher/getDetailList.do?BILL_CODE='+parentRowData.BILL_CODE+'&TABLE_CODE='+which;
+			        //childGridURL = childGridURL + "&parentRowID=" + encodeURIComponent(parentRowKey)
+			        // add a table and pager HTML elements to the parent grid row - we will render the child grid here
+			        $('#' + parentRowID).append('<table id=' + childGridID + '></table><div id=' + childGridPagerID + ' class=scroll></div>');
+			        $("#" + childGridID).jqGrid({
+			            url: childGridURL,
+			            mtype: "GET",
+			            datatype: "json",
+			            page: 1,
+			            colModel: detailColModel,
+			            //width: '100%',
+			            height: '100%',
+			            shrinkToFit:true,
+			            autowidth:true,
+			            toppager : "#"+childGridPagerID,
+			            pgbuttons: false,//上下按钮 
+						pginput:false,//输入框
+			            //toolbar: [true,"top"],
+			            //toppager:true ,
+			            //pagerpos:"left",
+			            //pager: "#" + childGridPagerID,
+			            loadComplete : function() {
+							var table = this;
+							setTimeout(function(){
+								styleCheckbox(table);
+								updateActionIcons(table);
+								updatePagerIcons(table);
+								enableTooltips(table);
+							}, 0);
+						},
+						gridComplete:function(){
+						    //$("#" + childGridID).parents(".ui-jqgrid-bdiv").css("overflow-x","hidden");
+							$(".ui-jqgrid-btable").removeAttr("style");
+						}
+			        });
+			        
+			      	//navButtons
+					jQuery("#" + childGridID).jqGrid('navGrid',"#"+childGridPagerID,
+						{ 	//navbar options
+							edit: false,
+							add: false,
+							del: false,
+							search: true,
+							searchicon : 'ace-icon fa fa-search orange',
+							/* searchtext:"查询明细",
+							searchtitle:"查询明细", */
+							refresh: false,
+							refreshicon : 'ace-icon fa fa-refresh blue',
+							view: false,
+							cloneToTop :true
+						},
+						{
+							//edit record form
+						},
+						{
+							//new record form
+						},
+						{
+							//delete record form
+						},
+						{
+							//search form
+							recreateForm: true,
+							afterShowSearch: beforeSearchCallback,
+							afterRedraw: function(){
+								style_search_filters($(this));
+							},
+							multipleSearch: true,
+							//multipleGroup:true,
+							showQuery: false
+						}
+					);
+				}else{
+					$("#subTitle").tips({
+						side:3,
+			            msg:'获取结构失败：'+response.message,
+			            bg:'#cc0033',
+			            time:3
+			        });
+				}
+			},error: function(response) {
+				$(top.hangge());//关闭加载状态
+				$("#subTitle").tips({
+					side:3,
+		            msg:'获取结构出错:'+response.responseJSON.message,
+		            bg:'#cc0033',
+		            time:3
+		        });
+	    	}
+		});
 	}
 	
 	//上传校验

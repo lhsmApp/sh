@@ -532,7 +532,9 @@
 			},
 			gridComplete:function(){
 
-			    $("#" + childGridID).parents(".ui-jqgrid-bdiv").css("overflow-x","hidden");}
+			    //$("#" + childGridID).parents(".ui-jqgrid-bdiv").css("overflow-x","hidden");
+				$(".ui-jqgrid-btable").removeAttr("style");
+			}
         });
 	}
 

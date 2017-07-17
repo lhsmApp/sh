@@ -401,7 +401,7 @@
 		</if>
 
 		<if test='pd.BILL_TYPE=="7" or pd.BILL_TYPE=="8" or pd.BILL_TYPE=="9"'>
-			select A.*,C.CERT_CODE,C.REVCERT_CODE
+			select A.*,C.CERT_CODE,C.REVCERT_CODE,C.BILL_USER CERT_BILL_USER,C.BILL_DATE CERT_BILL_DATE
 			from ${pd.TABLE_CODE} A
 			JOIN
 			tb_sys_sealed_info B
@@ -586,9 +586,9 @@
 			<if test="sidx != null">
 				order by ${sidx} ${sord}
 			</if>
-			<if test="currentResult != null and rowNum != null">
+			<!-- <if test="currentResult != null and rowNum != null">
 				limit #{currentResult}, #{rowNum}
-			</if>
+			</if> -->
 			) T
 		</if>
 
@@ -630,9 +630,9 @@
 			<if test="sidx != null">
 				order by ${sidx} ${sord}
 			</if>
-			<if test="currentResult != null and rowNum != null">
+			<!-- <if test="currentResult != null and rowNum != null">
 				limit #{currentResult}, #{rowNum}
-			</if>
+			</if> -->
 			) T
 		</if>
 
@@ -686,7 +686,7 @@
 		</if>
 
 		<if test='BILL_TYPE=="7" or BILL_TYPE=="8" or BILL_TYPE=="9"'>
-			select A.*,C.CERT_CODE,C.REVCERT_CODE
+			select A.*,C.CERT_CODE,C.REVCERT_CODE,C.BILL_USER CERT_BILL_USER,C.BILL_DATE CERT_BILL_DATE
 			from ${TABLE_CODE} A
 			JOIN
 			tb_sys_sealed_info B
@@ -719,11 +719,10 @@
 					#{item}
 				</foreach>
 			</if>
-			<if test="pd.filterWhereResult != null">
+			<if test="filterWhereResult != null">
 				${filterWhereResult}
 			</if>
 		</if>
-
 
 		<if test="sidx != null">
 			order by ${sidx} ${sord}
@@ -784,12 +783,11 @@
 		<foreach item="item" index="index" collection="list" open=" "
 			separator="; " close=" ">
 			<if test="item!=null">
-				update
-				${item.TABLE_CODE}
-				set
-				CERT_CODE = #{item.CERT_CODE}
-				where
-				BILL_CODE = #{item.BILL_CODE}
+				delete from
+				TB_GL_CERT
+				where BILL_CODE = #{item.BILL_CODE};
+		        insert into TB_GL_CERT(BILL_CODE,CERT_CODE,BILL_USER,BILL_DATE)
+		        values (#{item.BILL_CODE},#{item.CERT_CODE},#{item.BILL_USER},#{item.BILL_DATE})
 			</if>
 		</foreach>
 	</update>
@@ -799,13 +797,11 @@
 		<foreach item="item" index="index" collection="list" open=" "
 			separator="; " close=" ">
 			<if test="item!=null">
-				update
-				${item.TABLE_CODE}
-				set
-				REVCERT_CODE =
-				#{item.REVCERT_CODE}
-				where
-				BILL_CODE = #{item.BILL_CODE}
+				delete from
+				TB_GL_CERT
+				where BILL_CODE = #{item.BILL_CODE};
+		        insert into TB_GL_CERT(BILL_CODE,CERT_CODE,REVCERT_CODE,BILL_USER,BILL_DATE)
+		        values (#{item.BILL_CODE},#{item.CERT_CODE},#{item.REVCERT_CODE},#{item.BILL_USER},#{item.BILL_DATE})
 			</if>
 		</foreach>
 	</update>
