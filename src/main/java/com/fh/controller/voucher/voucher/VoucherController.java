@@ -38,6 +38,8 @@ import com.fh.service.fhoa.department.DepartmentManager;
 import com.fh.service.sysConfig.sysconfig.SysConfigManager;
 import com.fh.service.sysSealedInfo.syssealedinfo.SysSealedInfoManager;
 import com.fh.service.system.dictionaries.DictionariesManager;
+import com.fh.service.system.user.UserManager;
+import com.fh.service.system.user.impl.UserService;
 import com.fh.service.tmplConfigDict.tmplconfigdict.TmplConfigDictManager;
 import com.fh.service.tmplconfig.tmplconfig.impl.TmplConfigService;
 import com.fh.service.voucher.voucher.VoucherManager;
@@ -93,6 +95,9 @@ public class VoucherController extends BaseController {
 
 	@Resource(name = "sysconfigService")
 	private SysConfigManager sysConfigManager;
+	
+	@Resource(name = "userService")
+	private UserManager userService;
 
 	// 底行显示的求和与平均值字段
 	private StringBuilder SqlUserdata = new StringBuilder();
@@ -129,7 +134,7 @@ public class VoucherController extends BaseController {
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 		// 生成主表结构
 		TmplUtil tmplUtil = new TmplUtil(tmplconfigService, tmplConfigDictService, dictionariesService,
-				departmentService);
+				departmentService,userService);
 		String jqGridColModel = tmplUtil.generateStructureNoEdit(tableCode, Jurisdiction.getCurrentDepartmentID());
 		mv.addObject("jqGridColModel", jqGridColModel);
 
@@ -243,7 +248,7 @@ public class VoucherController extends BaseController {
 		} else {
 			tableCodeSub = "TB_STAFF_DETAIL";
 		}
-		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplConfigDictService, dictionariesService, departmentService);
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplConfigDictService, dictionariesService, departmentService,userService);
 		String detailColModel = tmpl.generateStructureNoEdit(tableCodeSub, DEPT_CODE);
 
 		commonBase.setCode(0);

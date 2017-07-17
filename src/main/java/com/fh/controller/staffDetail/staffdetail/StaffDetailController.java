@@ -50,6 +50,7 @@ import com.fh.service.staffDetail.staffdetail.StaffDetailManager;
 import com.fh.service.sysConfig.sysconfig.SysConfigManager;
 import com.fh.service.sysSealedInfo.syssealedinfo.impl.SysSealedInfoService;
 import com.fh.service.system.dictionaries.impl.DictionariesService;
+import com.fh.service.system.user.UserManager;
 import com.fh.service.tmplConfigDict.tmplconfigdict.impl.TmplConfigDictService;
 import com.fh.service.tmplconfig.tmplconfig.impl.TmplConfigService;
 
@@ -77,6 +78,8 @@ public class StaffDetailController extends BaseController {
 	private DictionariesService dictionariesService;
 	@Resource(name="departmentService")
 	private DepartmentService departmentService;
+	@Resource(name = "userService")
+	private UserManager userService;
 
 	//表名
 	String TableName = "TB_STAFF_DETAIL";
@@ -128,7 +131,7 @@ public class StaffDetailController extends BaseController {
 		List<String> userCodeList = staffdetailService.getHaveUserCodeDic(pd);
 		mv.addObject("userCodeList", userCodeList);
 		
-		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService);
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
 		String jqGridColModel = tmpl.generateStructure(TableName, DepartCode, 3);
 		
 		SqlUserdata = tmpl.getSqlUserdata();
