@@ -174,6 +174,16 @@
 	            $("#batchSave").removeClass('ui-state-disabled'); //Disable 按钮灰掉不可用
 	            $("#importItems").removeClass('ui-state-disabled'); //Disable 按钮灰掉不可用
 	            $("#report").removeClass('ui-state-disabled'); //Disable 按钮灰掉不可用
+	            
+	            $("#edit.ui-state-disabled .ui-icon").removeAttr("style"); //Disable 按钮灰掉不可用
+	            $("#add.ui-state-disabled .ui-icon").removeAttr("style"); //Disable 按钮灰掉不可用
+	            $("#del.ui-state-disabled .ui-icon").removeAttr("style"); //Disable 按钮灰掉不可用
+	            $("#batchDelete.ui-state-disabled .ui-icon").removeAttr("style"); //Disable 按钮灰掉不可用
+	            $("#batchEdit.ui-state-disabled .ui-icon").removeAttr("style"); //Disable 按钮灰掉不可用
+	            $("#batchCancelEdit.ui-state-disabled .ui-icon").removeAttr("style"); //Disable 按钮灰掉不可用
+	            $("#batchSave.ui-state-disabled .ui-icon").removeAttr("style"); //Disable 按钮灰掉不可用
+	            $("#importItems.ui-state-disabled .ui-icon").removeAttr("style"); //Disable 按钮灰掉不可用
+	            $("#report.ui-state-disabled .ui-icon").removeAttr("style"); //Disable 按钮灰掉不可用
 	        } else {
 	            $("#edit").addClass('ui-state-disabled'); //Enable 按钮可用
 	            $("#add").addClass('ui-state-disabled'); //Enable 按钮可用
@@ -184,6 +194,16 @@
 	            $("#batchSave").addClass('ui-state-disabled'); //Enable 按钮可用
 	            $("#importItems").addClass('ui-state-disabled'); //Enable 按钮可用
 	            $("#report").addClass('ui-state-disabled'); //Enable 按钮可用
+	            
+	            $("#edit.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important'); //Enable 按钮可用
+	            $("#add.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important'); //Enable 按钮可用
+	            $("#del.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important'); //Enable 按钮可用
+	            $("#batchDelete.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important'); //Enable 按钮可用
+	            $("#batchEdit.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important'); //Enable 按钮可用
+	            $("#batchCancelEdit.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important'); //Enable 按钮可用
+	            $("#batchSave.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important'); //Enable 按钮可用
+	            $("#importItems.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important'); //Enable 按钮可用
+	            $("#report.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important'); //Enable 按钮可用
 	        }
 	    };
 	    

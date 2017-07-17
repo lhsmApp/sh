@@ -375,6 +375,10 @@ public class StaffSummyController extends BaseController {
     			List<PageData> getSaveDate = staffdetailService.getSum(mapSave);
     			
     			List<PageData> listAdd = getListTo(getHaveDate, getSaveDate);
+
+                //根据DEPT_CODE从tb_gl_zrzx表里获取ZRZX_CODE，赋值给汇总保存数据
+                String strZRZC_CODE = "";
+
     			
     			for(PageData addTo : listAdd){
     				Object getBILL_CODE = addTo.get("BILL_CODE");
@@ -389,6 +393,7 @@ public class StaffSummyController extends BaseController {
             		User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
                     addTo.put("BILL_USER", user.getUSER_ID());
                     addTo.put("BILL_DATE", DateUtil.getTime());
+                    addTo.put("ZRZC_CODE", strZRZC_CODE);
                     
                     //更新明细单号的条件
                     StringBuilder updateFilter = new StringBuilder();
