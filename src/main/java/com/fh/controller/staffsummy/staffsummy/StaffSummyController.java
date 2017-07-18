@@ -380,7 +380,7 @@ public class StaffSummyController extends BaseController {
     			List<PageData> listAdd = getListTo(getHaveDate, getSaveDate);
 
                 //根据DEPT_CODE从tb_gl_zrzx表里获取ZRZX_CODE，赋值给汇总保存数据
-                String strZRZC_CODE = "";
+                String strZRZC_CODE = " ";
 
     			
     			for(PageData addTo : listAdd){
