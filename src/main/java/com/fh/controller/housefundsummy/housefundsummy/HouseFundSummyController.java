@@ -402,6 +402,7 @@ public class HouseFundSummyController extends BaseController {
             		User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
                     addTo.put("BILL_USER", user.getUSER_ID());
                     addTo.put("BILL_DATE", DateUtil.getTime());
+                    addTo.put("ZRZC_CODE", strZRZC_CODE);
                     
                     //更新明细单号的条件
                     StringBuilder updateFilter = new StringBuilder();
