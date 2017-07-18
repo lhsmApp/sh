@@ -5,7 +5,6 @@ import java.util.Map;
 
 import com.fh.entity.JqPage;
 import com.fh.entity.HouseFundDetailModel;
-import com.fh.entity.TableColumns;
 import com.fh.util.PageData;
 
 /** 

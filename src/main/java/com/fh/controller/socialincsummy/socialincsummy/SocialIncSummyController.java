@@ -29,6 +29,7 @@ import com.fh.entity.Page;
 import com.fh.entity.PageResult;
 import com.fh.entity.SocialIncSummyModel;
 import com.fh.entity.SysSealed;
+import com.fh.entity.ZrzxModel;
 import com.fh.entity.system.User;
 import com.fh.util.Const;
 import com.fh.util.DateUtil;
@@ -47,6 +48,7 @@ import com.fh.util.enums.DurState;
 import net.sf.json.JSONArray;
 
 import com.fh.service.fhoa.department.impl.DepartmentService;
+import com.fh.service.glzrzx.glzrzx.impl.GlZrzxService;
 import com.fh.service.socialIncDetail.socialincdetail.SocialIncDetailManager;
 import com.fh.service.socialincsummy.socialincsummy.SocialIncSummyManager;
 import com.fh.service.sysBillnum.sysbillnum.SysBillnumManager;
@@ -87,6 +89,8 @@ public class SocialIncSummyController extends BaseController {
 	private SysBillnumManager sysbillnumService;
 	@Resource(name = "userService")
 	private UserManager userService;
+	@Resource(name = "glzrzxService")
+	private GlZrzxService glzrzxService;
 
 	//表名
 	String TableNameBase = "tb_social_inc_summy";
@@ -377,6 +381,13 @@ public class SocialIncSummyController extends BaseController {
     			List<PageData> getSaveDate = socialincdetailService.getSum(mapSave);
     			
     			List<PageData> listAdd = getListTo(getHaveDate, getSaveDate);
+
+                //根据DEPT_CODE从tb_gl_zrzx表里获取ZRZX_CODE，赋值给汇总保存数据
+                String strZRZC_CODE = "";
+    			List<ZrzxModel> listZRZC_CODE = glzrzxService.findDeptFromZrzx(depart);
+                if(listZRZC_CODE!=null && listZRZC_CODE.size()>0){
+                	strZRZC_CODE = listZRZC_CODE.get(0).getZRZX_CODE();
+                }
     			
     			for(PageData addTo : listAdd){
     				Object getBILL_CODE = addTo.get("BILL_CODE");

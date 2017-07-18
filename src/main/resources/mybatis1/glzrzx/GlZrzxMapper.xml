@@ -15,7 +15,7 @@
 	
 	<!-- 根据DEPT_CODE获取 -->
 	<!-- 张晓柳 -->
-	<select id="findDeptFromZrzx" resultType="pd" parameterType="String">
+	<select id="findDeptFromZrzx" resultType="com.fh.entity.ZrzxModel" parameterType="String">
 	    select *
 	    from <include refid="tableName"></include>
 	    where DEPT_CODE = #{DEPT_CODE}
