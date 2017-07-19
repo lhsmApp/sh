@@ -317,7 +317,8 @@ public class StaffDetailController extends BaseController {
 	@RequestMapping(value="/goUploadExcel")
 	public ModelAndView goUploadExcel()throws Exception{
 		ModelAndView mv = this.getModelAndView();
-		mv.setViewName("staffDetail/staffdetail/uploadExcel");
+		mv.setViewName("common/uploadExcel");
+		mv.addObject("local", "staffdetail");
 		return mv;
 	}
 
@@ -465,7 +466,8 @@ public class StaffDetailController extends BaseController {
 			}
 		}
 		ModelAndView mv = this.getModelAndView();
-		mv.setViewName("staffDetail/staffdetail/uploadExcel");
+		mv.setViewName("common/uploadExcel");
+		mv.addObject("local", "staffdetail");
 		mv.addObject("commonBaseCode", commonBase.getCode());
 		mv.addObject("commonMessage", commonBase.getMessage());
 		return mv;
