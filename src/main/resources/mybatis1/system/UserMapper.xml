@@ -67,9 +67,45 @@
 		PHONE
 	</sql>
 	
+	<!-- 字段 -->
+	<sql id="FieldInsert">
+		USERNAME,
+		PASSWORD,
+		NAME,
+		RIGHTS,
+		ROLE_ID,
+		DEPARTMENT_ID,
+		LAST_LOGIN,
+		IP,
+		STATUS,
+		BZ,
+		SKIN,
+		EMAIL,
+		NUMBER,
+		PHONE
+	</sql>
+	
 	<!-- 字段值 -->
 	<sql id="FieldValue">
 		#{USER_ID},
+		#{USERNAME},
+		#{PASSWORD},
+		#{NAME},
+		#{RIGHTS},
+		#{ROLE_ID},
+		#{DEPARTMENT_ID},
+		#{LAST_LOGIN},
+		#{IP},
+		#{STATUS},
+		#{BZ},
+		#{SKIN},
+		#{EMAIL},
+		#{NUMBER},
+		#{PHONE}
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValueInsert">
 		#{USERNAME},
 		#{PASSWORD},
 		#{NAME},
@@ -313,9 +349,9 @@
 	<!-- 新增用户 -->
 	<insert id="saveU" parameterType="pd" >
 		insert into <include refid="tableName"></include> (
-			<include refid="Field"></include>
+			<include refid="FieldInsert"></include>
 		) values (
-			<include refid="FieldValue"></include>
+			<include refid="FieldValueInsert"></include>
 		)
 	</insert>
 	

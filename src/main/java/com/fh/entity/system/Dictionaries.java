@@ -16,9 +16,7 @@ public class Dictionaries {
 	private String PARENT_CODE;//父编码
 	private String NAME;			//名称
 	private String NAME_EN;			//英文名称
-	private String BIANMA;			//编码
 	private String ORDER_BY;		//排序	
-	private String PARENT_ID;		//上级ID
 	private String BZ;				//备注
 	private String TBSNAME;			//关联表
 	private String DICTIONARIES_ID;	//主键
@@ -52,24 +50,14 @@ public class Dictionaries {
 	public void setNAME_EN(String nAME_EN) {
 		NAME_EN = nAME_EN;
 	}
-	public String getBIANMA() {
-		return BIANMA;
-	}
-	public void setBIANMA(String bIANMA) {
-		BIANMA = bIANMA;
-	}
+	
 	public String getORDER_BY() {
 		return ORDER_BY;
 	}
 	public void setORDER_BY(String oRDER_BY) {
 		ORDER_BY = oRDER_BY;
 	}
-	public String getPARENT_ID() {
-		return PARENT_ID;
-	}
-	public void setPARENT_ID(String pARENT_ID) {
-		PARENT_ID = pARENT_ID;
-	}
+	
 	public String getBZ() {
 		return BZ;
 	}

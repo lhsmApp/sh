@@ -267,7 +267,7 @@
 		resultType="com.fh.entity.system.Dictionaries">
 		SELECT *
 		FROM sys_dictionaries
-		where DICT_CODE = #{DICT_CODE}
+		where PARENT_CODE = #{PARENT_CODE}
 		order by ORDER_BY
 	</select>
 </mapper>

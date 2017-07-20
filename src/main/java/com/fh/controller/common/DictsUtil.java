@@ -63,8 +63,8 @@ public class DictsUtil {
 			if (ret != null && !ret.toString().trim().equals("")) {
 				ret.append(";");
 			}
-			ret.append(dic.getBIANMA() + ":" + dic.getNAME());
-			dicAdd.put(dic.getBIANMA(), dic.getNAME());
+			ret.append(dic.getDICT_CODE() + ":" + dic.getNAME());
+			dicAdd.put(dic.getDICT_CODE(), dic.getNAME());
 		}
 		return ret.toString();
 	}
