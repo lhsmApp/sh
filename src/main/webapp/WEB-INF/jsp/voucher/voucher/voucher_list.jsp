@@ -233,7 +233,7 @@
 			//data:{VOUCHER_TYPE:voucherType,TABLE_CODE:'${pd.which}'},
 			if(target.attr('href')=='#voucherTransfer'){
 				voucherType=1;
-				$("[data-original-title='批量上传']").removeClass("hidden");
+				$("[data-original-title='上传']").removeClass("hidden");
 				$("[data-original-title='获取凭证号']").addClass("hidden");
 				$("[data-original-title='获取冲销凭证号']").addClass("hidden");
 				jQuery('#jqGrid').hideCol(['CERT_CODE','REVCERT_CODE']);
@@ -243,7 +243,7 @@
 				$("#jqGrid").trigger("reloadGrid");  
 			}else{
 				voucherType=2;
-				$("[data-original-title='批量上传']").addClass("hidden");
+				$("[data-original-title='上传']").addClass("hidden");
 				$("[data-original-title='获取凭证号']").removeClass("hidden");
 				$("[data-original-title='获取冲销凭证号']").removeClass("hidden");
 			
@@ -410,7 +410,7 @@
        $('#jqGrid').navButtonAdd('#jqGridPager',
        {
            buttonicon: "ace-icon fa fa-cloud-upload green",
-           title: "批量上传",
+           title: "上传",
            caption: "",
            position: "last",
            onClickButton: batchSave
@@ -438,6 +438,15 @@
              rowData = $("#jqGrid").getRowData(id);
             listData.push(rowData);
 		});
+		if(listData.length==0){
+			$("#subTitle").tips({
+				side:3,
+	            msg:'请选择单据后再进行【获取凭证号】',
+	            bg:'#009933',
+	            time:3
+	        });
+			return;
+		}
 		top.jzts();
 		$.ajax({
 			type: "POST",
@@ -491,6 +500,15 @@
              rowData = $("#jqGrid").getRowData(id);
             listData.push(rowData);
 		});
+		if(listData.length==0){
+			$("#subTitle").tips({
+				side:3,
+	            msg:'请选择单据后再进行【获取冲销凭证号】',
+	            bg:'#009933',
+	            time:3
+	        });
+			return;
+		}
 		top.jzts();
 		$.ajax({
 			type: "POST",
@@ -544,6 +562,15 @@
              rowData = $("#jqGrid").getRowData(id);
             listData.push(rowData);
 		});
+		if(listData.length==0){
+			$("#subTitle").tips({
+				side:3,
+	            msg:'请选择单据后再进行【上传】',
+	            bg:'#009933',
+	            time:3
+	        });
+			return;
+		}
 		top.jzts();
 		$.ajax({
 			type: "POST",

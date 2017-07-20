@@ -89,6 +89,7 @@
 				{ label: '单据编号', name: 'BILL_CODE', width: 75,editable: false},
 				{ label: '业务区间', name: 'BUSI_DATE', width: 90,editable: false},
 				{ label: '二级单位', name: 'DEPT_CODE', width: 100,editable: false,edittype: 'select',editoptions:{value:"${pd.strDict}"},formatter:'select',formatoptions:{value:"${pd.strDict}"},stype: 'select',searchoptions:{value:"${pd.strDict}"},},          
+				/* { label: '封存状态', name: 'STATE', width: 90,editable: false,align:'center',formatter: customFmatterState} */
 			],
 			//reloadAfterSubmit: true, 
 			//caption: "jqGrid with inline editing",
@@ -203,6 +204,15 @@
 		$(".widget-box").toggle("fast");
 		
 	}
+	
+	//格式化封存状态
+	function customFmatterState(cellvalue, options, rowObject) {
+		if (cellvalue == '0') {
+			return '<span class="label label-warning arrowed-in">解封</span>';
+		} else {
+			return '<span class="label label-success arrowed">未上报</span>';
+		}
+	};
  	</script>
 </body>
 </html>
