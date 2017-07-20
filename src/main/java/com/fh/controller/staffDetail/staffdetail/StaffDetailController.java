@@ -28,8 +28,6 @@ import com.fh.entity.PageResult;
 import com.fh.entity.StaffDetailModel;
 import com.fh.entity.SysSealed;
 import com.fh.entity.TmplConfigDetail;
-import com.fh.entity.system.Department;
-import com.fh.entity.system.Dictionaries;
 import com.fh.entity.system.User;
 import com.fh.exception.CustomException;
 import com.fh.util.ObjectExcelView;
@@ -132,7 +130,7 @@ public class StaffDetailController extends BaseController {
 		mv.addObject("userCodeList", userCodeList);
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
-		String jqGridColModel = tmpl.generateStructure(TableName, DepartCode, 3);
+		String jqGridColModel = tmpl.generateStructure(TableName, DepartCode, SystemDateTime, 3);
 		
 		SqlUserdata = tmpl.getSqlUserdata();
 		//默认值

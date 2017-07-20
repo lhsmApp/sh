@@ -180,7 +180,7 @@
 		from TB_TMPL_CONFIG_BASE
 	</select>
 
-	<!-- 根据当前单位编码及表名获取字段配置信息 -->
+	<!-- 根据当前单位编码、表名以及区间获取字段配置信息 -->
 	<!-- 张晓柳 -->
 	<select id="listNeed" parameterType="com.fh.entity.TmplConfigDetail"
 		resultType="com.fh.entity.TmplConfigDetail">
@@ -189,11 +189,9 @@
 		from
 		<include refid="tableName"></include>
 		where DEPT_CODE = #{DEPT_CODE}
-		and UPPER(TABLE_CODE) =
-		UPPER(#{TABLE_CODE})
-		and UPPER(TABLE_CODE) in (select UPPER(TABLE_CODE)
-		from
-		tb_tmpl_config_base where STATE = '1')
+		and RPT_DUR = #{RPT_DUR}
+		and UPPER(TABLE_CODE) = UPPER(#{TABLE_CODE})
+		and UPPER(TABLE_CODE) in (select UPPER(TABLE_CODE) from tb_tmpl_config_base where STATE = '1')
 		order by COL_HIDE desc,
 		DISP_ORDER
 		<!-- COL_HIDE必修倒序排列，关系添加或修改弹出框的显示 -->

@@ -156,12 +156,12 @@
 		    <include refid="Field"></include>
 		from 
 		<include refid="tableName"></include>
-		where BUSI_DATE = ${pd.SystemDateTime}
+		where BUSI_DATE = '${pd.SystemDateTime}'
 		and DEPT_CODE not in (select RPT_DEPT 
 		                      from tb_sys_sealed_info 
-		                      where RPT_DUR = ${pd.SystemDateTime} 
-		                      and STATE = ${pd.DurState} 
-		                      and BILL_TYPE = ${pd.TypeCode} 
+		                      where RPT_DUR = '${pd.SystemDateTime}' 
+		                      and STATE = '${pd.DurState}'
+		                      and BILL_TYPE = '${pd.TypeCode}'
 		                      )
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
@@ -178,7 +178,7 @@
 	</select>
 	<select id="countJqGridExtend" parameterType="jqPage" resultType="int">
 		select count(*) from <include refid="tableName"></include> 
-		where BUSI_DATE = ${pd.SystemDateTime}
+		where BUSI_DATE = '${pd.SystemDateTime}'
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
@@ -189,7 +189,7 @@
 	<select id="getFooterSummary" parameterType="jqPage" resultType="pd">
 		select ${pd.Userdata} 
 		from <include refid="tableName"></include> 
-		where BUSI_DATE = ${pd.SystemDateTime}
+		where BUSI_DATE = '${pd.SystemDateTime}'
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>

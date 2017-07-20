@@ -130,7 +130,7 @@ public class SocialIncDetailController extends BaseController {
 		mv.addObject("userCodeList", userCodeList);
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
-		String jqGridColModel = tmpl.generateStructure(TableName, DepartCode, 3);
+		String jqGridColModel = tmpl.generateStructure(TableName, DepartCode, SystemDateTime, 3);
 		
 		SqlUserdata = tmpl.getSqlUserdata();
 		//默认值

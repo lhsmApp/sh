@@ -98,7 +98,7 @@ public class HouseFundSummyController extends BaseController {
 	//枚举类型  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 	String TypeCode = BillType.GOLD_SUMMARY.getNameKey();
 	//显示结构的单位
-    String ShowDepartCode = "001001";
+    String ShowDepartCode = "01001";
 	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
 	private List<String> keyListBase = Arrays.asList("BILL_CODE", "DEPT_CODE", "BUSI_DATE", "USER_CATG", "USER_GROP");
     
@@ -132,7 +132,7 @@ public class HouseFundSummyController extends BaseController {
 		mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService));
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService, keyListBase);
-		String jqGridColModel = tmpl.generateStructureNoEdit(TableNameBase, ShowDepartCode);
+		String jqGridColModel = tmpl.generateStructureNoEdit(TableNameBase, ShowDepartCode, SystemDateTime);
 
 		//底行显示的求和与平均值字段
 		SqlUserdata = tmpl.getSqlUserdata();
@@ -200,7 +200,7 @@ public class HouseFundSummyController extends BaseController {
 		PageData pd = this.getPageData();
 		String DEPT_CODE = (String) pd.get("DATA_DEPT_CODE");
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
-		String detailColModel = tmpl.generateStructureNoEdit(TableNameDetail, DEPT_CODE);
+		String detailColModel = tmpl.generateStructureNoEdit(TableNameDetail, DEPT_CODE, SystemDateTime);
 		
 		commonBase.setCode(0);
 		commonBase.setMessage(detailColModel);
