@@ -313,7 +313,8 @@ public class HouseFundDetailController extends BaseController {
 	@RequestMapping(value="/goUploadExcel")
 	public ModelAndView goUploadExcel()throws Exception{
 		ModelAndView mv = this.getModelAndView();
-		mv.setViewName("houseFundDetail/housefunddetail/uploadExcel");
+		mv.setViewName("common/uploadExcel");
+		mv.addObject("local", "housefunddetail");
 		return mv;
 	}
 
@@ -461,7 +462,8 @@ public class HouseFundDetailController extends BaseController {
 			}
 		}
 		ModelAndView mv = this.getModelAndView();
-		mv.setViewName("houseFundDetail/housefunddetail/uploadExcel");
+		mv.setViewName("common/uploadExcel");
+		mv.addObject("local", "housefunddetail");
 		mv.addObject("commonBaseCode", commonBase.getCode());
 		mv.addObject("commonMessage", commonBase.getMessage());
 		return mv;

@@ -14,7 +14,7 @@
 <base href="<%=basePath%>">
 
 <!-- jsp文件头和头部 -->
-<%@ include file="../../system/index/top.jsp"%>
+<%@ include file="../system/index/top.jsp"%>
 
 </head>
 <body class="no-skin">
@@ -27,7 +27,7 @@
 				<div class="page-content">
 					<div class="row">
 						<div class="col-xs-12">
-							<form action="housefunddetail/readExcel.do" name="Form" id="Form" method="post" enctype="multipart/form-data">
+							<form name="Form" id="Form" method="post" enctype="multipart/form-data">
 								<div id="zhongxin">
 								<table style="width:95%;" >
 									<tr>
@@ -37,7 +37,7 @@
 										<td style="text-align: center;padding-top: 10px;">
 											<a class="btn btn-mini btn-primary" onclick="save();">导入</a>
 											<a class="btn btn-mini btn-danger" onclick="top.Dialog.close();">取消</a>
-											<a class="btn btn-mini btn-success" onclick="window.location.href='<%=basePath%>/housefunddetail/downExcel.do'">下载模版</a>
+											<a class="btn btn-mini btn-success" onclick="downModel('<%=basePath%>')">下载模版</a>
 										</td>
 									</tr>
 								</table>
@@ -58,7 +58,7 @@
 
 	<!-- basic scripts -->
 	<!-- 页面底部js¨ -->
-	<%@ include file="../../system/index/foot.jsp"%>
+	<%@ include file="../system/index/foot.jsp"%>
 	<!-- ace scripts -->
 	<script src="static/ace/js/ace/ace.js"></script>
 	<!-- 上传控件 -->
@@ -66,8 +66,12 @@
 	<!--提示框-->
 	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
 	<script type="text/javascript">
+	    var local = '${local}';
 		$(document).ready(function () {
 			$(top.hangge());
+			
+			document.getElementById("Form").action = local + "/readExcel.do";
+			
 		    var commonBaseCode = '${commonBaseCode}';
 		    var commonMessage = '${commonMessage}';
 		    if(commonBaseCode != null && $.trim(commonBaseCode) != ""){
@@ -104,6 +108,11 @@
 			});
 		});
 		
+		//下载模板
+		function downModel(basePath){
+			var url = basePath + local + '/downExcel.do';
+			window.location.href = url;
+		}
 		//保存
 		function save(){
 			if($("#excel").val() == "" || document.getElementById("excel").files[0] == '请选择xls格式的文件'){

@@ -315,7 +315,8 @@ public class SocialIncDetailController extends BaseController {
 	@RequestMapping(value="/goUploadExcel")
 	public ModelAndView goUploadExcel()throws Exception{
 		ModelAndView mv = this.getModelAndView();
-		mv.setViewName("socialIncDetail/socialincdetail/uploadExcel");
+		mv.setViewName("common/uploadExcel");
+		mv.addObject("local", "socialincdetail");
 		return mv;
 	}
 
@@ -463,7 +464,8 @@ public class SocialIncDetailController extends BaseController {
 			}
 		}
 		ModelAndView mv = this.getModelAndView();
-		mv.setViewName("socialIncDetail/socialincdetail/uploadExcel");
+		mv.setViewName("common/uploadExcel");
+		mv.addObject("local", "socialincdetail");
 		mv.addObject("commonBaseCode", commonBase.getCode());
 		mv.addObject("commonMessage", commonBase.getMessage());
 		return mv;
