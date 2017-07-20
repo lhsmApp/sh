@@ -131,7 +131,7 @@
 		left join 
 		oa_department d
 		on u.DEPARTMENT_ID=d.DEPARTMENT_CODE 
-		where u.STATUS=0 
+		where u.STATUS=1 
 		and u.USER_ID=#{USER_ID}
 	</select>
 	

@@ -380,19 +380,6 @@ public class UserController extends BaseController {
 			if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}  //校验权限 判断当前操作者有无用户管理查看权限
 			if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限判断当前操作者有无用户管理修改权限
 			if("admin".equals(pd.getString("USERNAME")) && !"admin".equals(Jurisdiction.getUsername())){return null;}	//非admin用户不能修改admin
-			
-			/*String departmentID=pd.getString("DEPARTMENT_ID");//对DEPARTMENT_ID还原本人DEPARTMENT_ID
-			PageData pdDepart=new PageData();
-			pdDepart.put("DEPARTMENT_ID", departmentID);
-			pd.put("DEPARTMENT_ID", departmentService.findById(pdDepart).getString("BIANMA")); */
-			
-		}else{	//如果当前登录用户修改用户资料提交的用户名是本人，则不能修改本人的角色ID
-			PageData temUser= userService.findByUsername(pd);
-			pd.put("ROLE_ID", temUser.getString("ROLE_ID")); //对角色ID还原本人角色ID
-			/*String departmentID=temUser.getString("DEPARTMENT_ID");//对DEPARTMENT_ID还原本人DEPARTMENT_ID
-			PageData pdDepart=new PageData();
-			pdDepart.put("DEPARTMENT_ID", departmentID);
-			pd.put("DEPARTMENT_ID", departmentService.findById(pdDepart).getString("BIANMA")); */
 		}
 		if(pd.getString("PASSWORD") != null && !"".equals(pd.getString("PASSWORD"))){
 			pd.put("PASSWORD", new SimpleHash("SHA-1", pd.getString("USERNAME"), pd.getString("PASSWORD")).toString());
