@@ -132,7 +132,7 @@ public class SocialIncSummyController extends BaseController {
 		mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService));
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService, userService,keyListBase);
-		String jqGridColModel = tmpl.generateStructureNoEdit(TableNameBase, ShowDepartCode, SystemDateTime);
+		String jqGridColModel = tmpl.generateStructureNoEdit(TableNameBase, ShowDepartCode);
 
 		//底行显示的求和与平均值字段
 		SqlUserdata = tmpl.getSqlUserdata();
@@ -200,7 +200,7 @@ public class SocialIncSummyController extends BaseController {
 		PageData pd = this.getPageData();
 		String DEPT_CODE = (String) pd.get("DATA_DEPT_CODE");
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
-		String detailColModel = tmpl.generateStructureNoEdit(TableNameDetail, DEPT_CODE, SystemDateTime);
+		String detailColModel = tmpl.generateStructureNoEdit(TableNameDetail, DEPT_CODE);
 		
 		commonBase.setCode(0);
 		commonBase.setMessage(detailColModel);

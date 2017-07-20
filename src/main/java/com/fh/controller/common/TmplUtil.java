@@ -94,7 +94,7 @@ public class TmplUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public String generateStructureNoEdit(String tableCode, String departCode, String SystemDateTime) throws Exception {
+	public String generateStructureNoEdit(String tableCode, String departCode) throws Exception {
 		// 默认值
 		m_defaultValueList = new HashMap<String, Object>();
 		// 底行显示的求和与平均值字段
@@ -109,7 +109,6 @@ public class TmplUtil {
 		TmplConfigDetail item = new TmplConfigDetail();
 		item.setDEPT_CODE(departCode);
 		item.setTABLE_CODE(tableCode);
-		item.setRPT_DUR(SystemDateTime);
 		m_columnsList = tmplconfigService.listNeed(item);
 		// 拼接真正设置的jqGrid的ColModel
 		StringBuilder jqGridColModel = new StringBuilder();
@@ -376,7 +375,7 @@ public class TmplUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public String generateStructure(String tableCode, String departCode, String SystemDateTime, int columnCount) throws Exception {
+	public String generateStructure(String tableCode, String departCode, int columnCount) throws Exception {
 		// 默认值
 		m_defaultValueList = new HashMap<String, Object>();
 		// 字典
@@ -395,7 +394,6 @@ public class TmplUtil {
 		TmplConfigDetail item = new TmplConfigDetail();
 		item.setDEPT_CODE(departCode);
 		item.setTABLE_CODE(tableCode);
-		item.setRPT_DUR(SystemDateTime);
 		m_columnsList = tmplconfigService.listNeed(item);
 		int row = 1;
 		int col = 1;

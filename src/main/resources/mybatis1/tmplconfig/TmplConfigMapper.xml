@@ -189,8 +189,8 @@
 		from
 		<include refid="tableName"></include>
 		where DEPT_CODE = #{DEPT_CODE}
-		and RPT_DUR = #{RPT_DUR}
 		and UPPER(TABLE_CODE) = UPPER(#{TABLE_CODE})
+		and RPT_DUR in (select KEY_VALUE from tb_sys_config where KEY_CODE = 'SystemDataTime')
 		and UPPER(TABLE_CODE) in (select UPPER(TABLE_CODE) from tb_tmpl_config_base where STATE = '1')
 		order by COL_HIDE desc,
 		DISP_ORDER
