@@ -135,15 +135,15 @@ public class DictionariesController extends BaseController {
 		if(null != keywords && !"".equals(keywords)){
 			pd.put("keywords", keywords.trim());
 		}
-		String DICTIONARIES_ID = null == pd.get("DICTIONARIES_ID")?"":pd.get("DICTIONARIES_ID").toString();
+		String DICT_CODE = null == pd.get("DICT_CODE")?"":pd.get("DICT_CODE").toString();
 		if(null != pd.get("id") && !"".equals(pd.get("id").toString())){
-			DICTIONARIES_ID = pd.get("id").toString();
+			DICT_CODE = pd.get("id").toString();
 		}
-		pd.put("DICTIONARIES_ID", DICTIONARIES_ID);					//上级ID
+		pd.put("DICT_CODE", DICT_CODE);					//上级ID
 		page.setPd(pd);
 		List<PageData>	varList = dictionariesService.list(page);	//列出Dictionaries列表
 		mv.addObject("pd", dictionariesService.findById(pd));		//传入上级所有信息
-		mv.addObject("DICTIONARIES_ID", DICTIONARIES_ID);			//上级ID
+		mv.addObject("DICT_CODE", DICT_CODE);			//上级ID
 		mv.setViewName("system/dictionaries/dictionaries_list");
 		mv.addObject("varList", varList);
 		mv.addObject("QX",Jurisdiction.getHC());					//按钮权限
@@ -156,16 +156,16 @@ public class DictionariesController extends BaseController {
 	 * @return
 	 */
 	@RequestMapping(value="/listAllDict")
-	public ModelAndView listAllDict(Model model,String DICTIONARIES_ID)throws Exception{
+	public ModelAndView listAllDict(Model model,String DICT_CODE)throws Exception{
 		ModelAndView mv = this.getModelAndView();
 		PageData pd = new PageData();
 		pd = this.getPageData();
 		try{
 			JSONArray arr = JSONArray.fromObject(dictionariesService.listAllDict("0"));
 			String json = arr.toString();
-			json = json.replaceAll("DICTIONARIES_ID", "id").replaceAll("PARENT_ID", "pId").replaceAll("NAME", "name").replaceAll("subDict", "nodes").replaceAll("hasDict", "checked").replaceAll("treeurl", "url");
+			json = json.replaceAll("DICT_CODE", "id").replaceAll("PARENT_CODE", "pId").replaceAll("NAME", "name").replaceAll("subDict", "nodes").replaceAll("hasDict", "checked").replaceAll("treeurl", "url");
 			model.addAttribute("zTreeNodes", json);
-			mv.addObject("DICTIONARIES_ID",DICTIONARIES_ID);
+			mv.addObject("DICT_CODE",DICT_CODE);
 			mv.addObject("pd", pd);	
 			mv.setViewName("system/dictionaries/dictionaries_ztree");
 		} catch(Exception e){
@@ -183,10 +183,10 @@ public class DictionariesController extends BaseController {
 		ModelAndView mv = this.getModelAndView();
 		PageData pd = new PageData();
 		pd = this.getPageData();
-		String DICTIONARIES_ID = null == pd.get("DICTIONARIES_ID")?"":pd.get("DICTIONARIES_ID").toString();
-		pd.put("DICTIONARIES_ID", DICTIONARIES_ID);					//上级ID
+		String DICT_CODE = null == pd.get("DICT_CODE")?"":pd.get("DICT_CODE").toString();
+		pd.put("DICT_CODE", DICT_CODE);					//上级ID
 		mv.addObject("pds",dictionariesService.findById(pd));		//传入上级所有信息
-		mv.addObject("DICTIONARIES_ID", DICTIONARIES_ID);			//传入ID，作为子级ID用
+		mv.addObject("DICT_CODE", DICT_CODE);			//传入ID，作为子级ID用
 		mv.setViewName("system/dictionaries/dictionaries_edit");
 		mv.addObject("msg", "save");
 		return mv;
@@ -201,13 +201,14 @@ public class DictionariesController extends BaseController {
 		ModelAndView mv = this.getModelAndView();
 		PageData pd = new PageData();
 		pd = this.getPageData();
-		String DICTIONARIES_ID = pd.getString("DICTIONARIES_ID");
 		pd = dictionariesService.findById(pd);	//根据ID读取
 		mv.addObject("pd", pd);					//放入视图容器
-		pd.put("DICTIONARIES_ID",pd.get("PARENT_ID").toString());			//用作上级信息
-		mv.addObject("pds",dictionariesService.findById(pd));				//传入上级所有信息
-		mv.addObject("DICTIONARIES_ID", pd.get("PARENT_ID").toString());	//传入上级ID，作为子ID用
-		pd.put("DICTIONARIES_ID",DICTIONARIES_ID);							//复原本ID
+		/*****获取上级所有信息******************/
+		PageData pdParent = new PageData();
+		pdParent.put("DICT_CODE",pd.get("PARENT_CODE").toString());			
+		mv.addObject("pds",dictionariesService.findByBianma(pdParent));	
+		/**********************************/
+		mv.addObject("DICT_CODE", pd.get("PARENT_CODE").toString());	//传入上级ID，作为子ID用
 		mv.setViewName("system/dictionaries/dictionaries_edit");
 		mv.addObject("msg", "edit");
 		return mv;
@@ -224,7 +225,7 @@ public class DictionariesController extends BaseController {
 		PageData pd = new PageData();
 		try{
 			pd = this.getPageData();
-			if(dictionariesService.findByBianma(pd) != null){
+			if(dictionariesService.hasSameDictCode(pd) != null){
 				errInfo = "error";
 			}
 		} catch(Exception e){

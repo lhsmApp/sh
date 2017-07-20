@@ -100,5 +100,11 @@ public interface DictionariesManager{
 	 * @throws Exception
 	 */
 	public int count(PageData pd)throws Exception;
+	
+	/**是否有相同编码 
+	 * @param pd
+	 * @throws Exception
+	 */
+	public PageData hasSameDictCode(PageData pd)throws Exception;
 }
 

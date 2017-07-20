@@ -40,9 +40,9 @@
 									</div>
 								</td>
 								<td>&nbsp;
-									<select name="DICTIONARIES_ID" id="DICTIONARIES_ID">
-										<option value="${DICTIONARIES_ID}" <c:if test="${DICTIONARIES_ID != ''}">selected</c:if>>本级</option>
-										<option value="" <c:if test="${DICTIONARIES_ID == ''}">selected</c:if>>全部</option>
+									<select name="DICT_CODE" id="DICT_CODE">
+										<option value="${DICT_CODE}" <c:if test="${DICT_CODE != ''}">selected</c:if>>本级</option>
+										<option value="" <c:if test="${DICT_CODE == ''}">selected</c:if>>全部</option>
 									</select>
 								</td>
 								<c:if test="${QX.cha == 1 }">
@@ -72,9 +72,9 @@
 									<c:forEach items="${varList}" var="var" varStatus="vs">
 										<tr>
 											<td class='center' style="width: 30px;">${vs.index+1}</td>
-											<td class='center'><a href="javascript:goSondict('${var.DICTIONARIES_ID }')"><i class="ace-icon fa fa-share bigger-100"></i>&nbsp;${var.NAME}</a></td>
-											<td class='center'><a href="javascript:goSondict('${var.DICTIONARIES_ID }')">${var.NAME_EN}</a></td>
-											<td class='center'>${var.BIANMA}</td>
+											<td class='center'><a href="javascript:goSondict('${var.DICT_CODE }')"><i class="ace-icon fa fa-share bigger-100"></i>&nbsp;${var.NAME}</a></td>
+											<td class='center'><a href="javascript:goSondict('${var.DICT_CODE }')">${var.NAME_EN}</a></td>
+											<td class='center'>${var.DICT_CODE}</td>
 											<td class='center'>${var.ORDER_BY}</td>
 											<td class="center">
 												<c:if test="${QX.edit != 1 && QX.del != 1 }">
@@ -144,10 +144,10 @@
 							<tr>
 								<td style="vertical-align:top;">
 									<c:if test="${QX.add == 1 }">
-									<a class="btn btn-sm btn-success" onclick="add('${DICTIONARIES_ID}');">新增</a>
+									<a class="btn btn-sm btn-success" onclick="add('${DICT_CODE}');">新增</a>
 									</c:if>
-									<c:if test="${null != pd.DICTIONARIES_ID && pd.DICTIONARIES_ID != ''}">
-									<a class="btn btn-sm btn-success" onclick="goSondict('${pd.PARENT_ID}');">返回</a>
+									<c:if test="${null != pd.DICT_CODE && pd.DICT_CODE != ''}">
+									<a class="btn btn-sm btn-success" onclick="goSondict('${pd.PARENT_CODE}');">返回</a>
 									</c:if>
 								</td>
 								<td style="vertical-align:top;"><div class="pagination" style="float: right;padding-top: 0px;margin-top: 0px;">${page.pageStr}</div></td>
@@ -193,23 +193,23 @@
 		}
 		
 		//去此ID下子列表
-		function goSondict(DICTIONARIES_ID){
+		function goSondict(DICT_CODE){
 			top.jzts();
-			window.location.href="<%=basePath%>dictionaries/list.do?DICTIONARIES_ID="+DICTIONARIES_ID;
+			window.location.href="<%=basePath%>dictionaries/list.do?DICT_CODE="+DICT_CODE;
 		};
 		
 		//新增
-		function add(DICTIONARIES_ID){
+		function add(DICT_CODE){
 			 top.jzts();
 			 var diag = new top.Dialog();
 			 diag.Drag=true;
 			 diag.Title ="新增";
-			 diag.URL = '<%=basePath%>dictionaries/goAdd.do?DICTIONARIES_ID='+DICTIONARIES_ID;
+			 diag.URL = '<%=basePath%>dictionaries/goAdd.do?DICT_CODE='+DICT_CODE;
 			 diag.Width = 500;
 			 diag.Height = 500;
 			 diag.CancelEvent = function(){ //关闭事件
 				 if('none' == diag.innerFrame.contentWindow.document.getElementById('zhongxin').style.display){
-					 parent.location.href="<%=basePath%>dictionaries/listAllDict.do?DICTIONARIES_ID=${DICTIONARIES_ID}&dnowPage=${page.currentPage}";
+					 parent.location.href="<%=basePath%>dictionaries/listAllDict.do?DICT_CODE=${DICT_CODE}&dnowPage=${page.currentPage}";
 				}
 				diag.close();
 			 };
@@ -225,7 +225,7 @@
 					$.get(url,function(data){
 						
 						if("success" == data.result){
-							parent.location.href="<%=basePath%>dictionaries/listAllDict.do?DICTIONARIES_ID=${DICTIONARIES_ID}&dnowPage=${page.currentPage}";
+							parent.location.href="<%=basePath%>dictionaries/listAllDict.do?DICT_CODE=${DICT_CODE}&dnowPage=${page.currentPage}";
 						}else if("false" == data.result){
 							top.hangge();
 							bootbox.dialog({
@@ -242,7 +242,7 @@
 						}else if("false2" == data.result){
 							top.hangge();
 							bootbox.dialog({
-								message: "<span class='bigger-110'>删除失败！排查表不存在或其表中没有BIANMA字段.</span>",
+								message: "<span class='bigger-110'>删除失败！排查表不存在或其表中没有DICT_CODE字段.</span>",
 								buttons: 			
 								{
 									"button" :
@@ -269,7 +269,7 @@
 			 diag.Height = 500;
 			 diag.CancelEvent = function(){ //关闭事件
 				 if(diag.innerFrame.contentWindow.document.getElementById('zhongxin').style.display == 'none'){
-					 parent.location.href="<%=basePath%>dictionaries/listAllDict.do?DICTIONARIES_ID=${DICTIONARIES_ID}&dnowPage=${page.currentPage}";
+					 parent.location.href="<%=basePath%>dictionaries/listAllDict.do?DICT_CODE=${DICT_CODE}&dnowPage=${page.currentPage}";
 				}
 				diag.close();
 			 };

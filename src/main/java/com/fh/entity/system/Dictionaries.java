@@ -12,6 +12,8 @@ import java.util.List;
  */
 public class Dictionaries {
 
+	private String DICT_CODE;//编码
+	private String PARENT_CODE;//父编码
 	private String NAME;			//名称
 	private String NAME_EN;			//英文名称
 	private String BIANMA;			//编码
@@ -26,6 +28,18 @@ public class Dictionaries {
 	private boolean hasDict = false;
 	private String treeurl;
 	
+	public String getDICT_CODE() {
+		return DICT_CODE;
+	}
+	public void setDICT_CODE(String dICT_CODE) {
+		DICT_CODE = dICT_CODE;
+	}
+	public String getPARENT_CODE() {
+		return PARENT_CODE;
+	}
+	public void setPARENT_CODE(String pARENT_CODE) {
+		PARENT_CODE = pARENT_CODE;
+	}
 	public String getNAME() {
 		return NAME;
 	}
