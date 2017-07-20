@@ -389,7 +389,6 @@
             var lastSelection;
 			function doubleClickRow(rowid,iRow,iCol,e){
 				if(getState()){
-                if (rowid && rowid !== lastSelection) {
                     var grid = $(gridBase_selector);
                     grid.restoreRow(lastSelection);
                     grid.editRow(rowid, {
@@ -446,7 +445,6 @@
                         }  
                     });
                     lastSelection = rowid;
-                }
 				}
 			} 
 
@@ -617,14 +615,9 @@
 	   	   diag.Width = 300;
 	   	   diag.Height = 150;
 	   	   diag.CancelEvent = function(){ //关闭事件
-			  if(diag.innerFrame.contentWindow.document.getElementById('zhongxin').style.display == 'none'){
-				 if('${page.currentPage}' == '0'){
-					 top.jzts();
-					 setTimeout("self.location.reload()",100);
-				 }else{
-					 nextPage(${page.currentPage});
-				 }
-			  }
+				  top.jzts();
+				  $(gridBase_selector).trigger("reloadGrid");  
+				  $(top.hangge());//关闭加载状态
 			  diag.close();
 		   };
 		   diag.show();
@@ -641,6 +634,16 @@
 		 * 上报
 		 */
 		function report(){
+	    	//获得选中的行ids的方法
+	    	var ids = $(gridBase_selector).getDataIDs();  
+	    	
+			if(!(ids!=null && ids.length>0)){
+				bootbox.dialog({
+					message: "<span class='bigger-110'>界面没有任何内容!</span>",
+					buttons: 			
+					{ "button":{ "label":"确定", "className":"btn-sm btn-success"}}
+				});
+			}else{
             var msg = '确定要上报吗?';
             bootbox.confirm(msg, function(result) {
 				if(result) {
@@ -682,6 +685,7 @@
 					});
 				}
             });
+			}
 		}
 	});
 	

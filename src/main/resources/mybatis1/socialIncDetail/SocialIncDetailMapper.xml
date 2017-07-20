@@ -26,8 +26,8 @@
 	<select id="getHaveUserCodeDic" parameterType="pd" resultType="String">
 		select USER_CODE
 		from <include refid="tableName"></include>
-		where BUSI_DATE = ${RPT_DUR}
-		and DEPT_CODE = ${RPT_DEPT}
+		where BUSI_DATE = '${RPT_DUR}'
+		and DEPT_CODE = '${RPT_DEPT}'
 	</select>
 	
 	<!-- 获取数据 验证数据重复 -->
@@ -60,13 +60,13 @@
 		    <include refid="Field"></include>
 		from 
 		<include refid="tableName"></include>
-		where BUSI_DATE = ${pd.SystemDateTime}
-		and DEPT_CODE = ${pd.DepartCode}
+		where BUSI_DATE = '${pd.SystemDateTime}'
+		and DEPT_CODE = '${pd.DepartCode}'
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
 		<if test="pd.UserCode!= null and pd.UserCode != ''"><!-- 关键词检索 -->
-		    and USER_CODE = ${pd.UserCode}
+		    and USER_CODE = '${pd.UserCode}'
 		</if>
 		<if test="sidx != null and sidx.trim() != ''" >
 			order by ${sidx} ${sord} 
@@ -77,25 +77,25 @@
 	</select>
 	<select id="countJqGridExtend" parameterType="jqPage" resultType="int">
 		select count(*) from <include refid="tableName"></include> 
-		where BUSI_DATE = ${pd.SystemDateTime}
-		and DEPT_CODE = ${pd.DepartCode}
+		where BUSI_DATE = '${pd.SystemDateTime}'
+		and DEPT_CODE = '${pd.DepartCode}'
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
 		<if test="pd.UserCode!= null and pd.UserCode != ''"><!-- 关键词检索 -->
-		    and USER_CODE = ${pd.UserCode}
+		    and USER_CODE = '${pd.UserCode}'
 		</if>
 	</select>
 	<select id="getFooterSummary" parameterType="jqPage" resultType="pd">
 		select ${pd.Userdata} 
 		from <include refid="tableName"></include> 
-		where BUSI_DATE = ${pd.SystemDateTime}
-		and DEPT_CODE = ${pd.DepartCode}
+		where BUSI_DATE = '${pd.SystemDateTime}'
+		and DEPT_CODE = '${pd.DepartCode}'
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
 		<if test="pd.UserCode!= null and pd.UserCode != ''"><!-- 关键词检索 -->
-		    and USER_CODE = ${pd.UserCode}
+		    and USER_CODE = '${pd.UserCode}'
 		</if>
 	</select>
 	
@@ -204,8 +204,8 @@
 		<include refid="Field"></include>
 		from 
 		<include refid="tableName"></include>
-		where BUSI_DATE = ${pd.SystemDateTime}
-		and DEPT_CODE = ${pd.DepartCode}
+		where BUSI_DATE = '${pd.SystemDateTime}'
+		and DEPT_CODE = '${pd.DepartCode}'
 		<!-- <if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''">
 			and ${pd.filterWhereResult}
 		</if> -->
@@ -293,8 +293,8 @@
 			sum(CUST_COL6) CUST_COL6
 		from 
 		<include refid="tableName"></include>
-		where BUSI_DATE = ${BUSI_DATE}
-	    and DEPT_CODE = ${DEPT_CODE} 
+		where BUSI_DATE = '${BUSI_DATE}'
+	    and DEPT_CODE = '${DEPT_CODE}'
 	    group by ${GroupbyFeild}
     </select>
 

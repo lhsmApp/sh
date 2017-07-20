@@ -8,6 +8,7 @@ public class TmplConfigDetail implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	private String RPT_DUR;
 	private String DEPT_CODE;
 	private String TABLE_CODE;	
 	private String COL_CODE;
@@ -17,6 +18,12 @@ public class TmplConfigDetail implements Serializable {
 	private String COL_HIDE;
 	private String COL_SUM;
 	private String COL_AVE;
+	public String getRPT_DUR() {
+		return RPT_DUR;
+	}
+	public void setRPT_DUR(String rPT_DUR) {
+		RPT_DUR = rPT_DUR;
+	}
 	public String getDEPT_CODE() {
 		return DEPT_CODE;
 	}
