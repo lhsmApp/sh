@@ -1,9 +1,8 @@
 package com.fh.controller.common;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +19,6 @@ import com.fh.util.Const;
 import com.fh.util.PageData;
 import com.fh.util.Tools;
 import com.fh.util.enums.BillState;
-import com.fh.util.enums.BillType;
 
 /**
  * 模板通用类
@@ -45,32 +43,37 @@ public class TmplUtil {
 	private List<String> keyList = Arrays.asList("BILL_CODE", "BUSI_DATE", "USER_CODE");
 	// 底行显示的求和与平均值字段
 	StringBuilder m_sqlUserdata = new StringBuilder();
-
 	public StringBuilder getSqlUserdata() {
 		return m_sqlUserdata;
 	}
 
-	// 表全部 默认值
-	private Map<String, Object> m_defaultValueList = new HashMap<String, Object>();
-	public Map<String, Object> getDefaultValueList() {
-		return m_defaultValueList;
-	}
-	// 表全部 类型
-	private Map<String, Object> m_typeList = new HashMap<String, Object>();
-	public Map<String, Object> getTypeList() {
-		return m_typeList;
-	}
+	//// 表全部 默认值
+	//private Map<String, Object> m_defaultValueList = new LinkedHashMap<String, Object>();
+	//public Map<String, Object> getDefaultValueList() {
+	//	return m_defaultValueList;
+	//}
+	//// 表全部 类型
+	//private Map<String, Object> m_typeList = new LinkedHashMap<String, Object>();
+	//public Map<String, Object> getTypeList() {
+	//	return m_typeList;
+	//}
 
 	// 字典
-	private Map<String, Object> m_dicList = new HashMap<String, Object>();
+	private Map<String, Object> m_dicList = new LinkedHashMap<String, Object>();
 	public Map<String, Object> getDicList() {
 		return m_dicList;
 	}
+	
+	//表结构  
+	private Map<String, TableColumns> map_HaveColumnsList = new LinkedHashMap<String, TableColumns>();
+	public Map<String, TableColumns> getHaveColumnsList() {
+		return map_HaveColumnsList;
+	}
 
 	// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-	private List<TmplConfigDetail> m_columnsList = new ArrayList<TmplConfigDetail>();
-	public List<TmplConfigDetail> getColumnsList() {
-		return m_columnsList;
+	private Map<String, TmplConfigDetail> map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
+	public Map<String, TmplConfigDetail> getSetColumnsList() {
+		return map_SetColumnsList;
 	}
 	
 
@@ -101,13 +104,15 @@ public class TmplUtil {
 	 */
 	public String generateStructureNoEdit(String tableCode, String departCode) throws Exception {
 		// 默认值
-		m_defaultValueList = new HashMap<String, Object>();
+		//m_defaultValueList = new LinkedHashMap<String, Object>();
 		// 表全部 类型
-		m_typeList = new HashMap<String, Object>();
+		//m_typeList = new LinkedHashMap<String, Object>();
 		// 底行显示的求和与平均值字段
 		m_sqlUserdata = new StringBuilder();
+		//表结构
+		map_HaveColumnsList = new LinkedHashMap<String, TableColumns>();
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-		m_columnsList = new ArrayList<TmplConfigDetail>();
+		map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
 		
 		// 用语句查询出数据库表的所有字段及其属性；拼接成jqgrid全部列
 		List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCode);
@@ -116,7 +121,7 @@ public class TmplUtil {
 		TmplConfigDetail item = new TmplConfigDetail();
 		item.setDEPT_CODE(departCode);
 		item.setTABLE_CODE(tableCode);
-		m_columnsList = tmplconfigService.listNeed(item);
+		List<TmplConfigDetail> m_columnsList = tmplconfigService.listNeed(item);
 		if(m_columnsList.size()==0){
 			String rootDeptCode=Tools.readTxtFile(Const.ROOT_DEPT_CODE);
 			item.setDEPT_CODE(rootDeptCode);
@@ -140,6 +145,7 @@ public class TmplUtil {
 		// 添加配置表设置列，字典（未设置就使用表默认，text或number）、隐藏、表头显示
 		if (m_columnsList != null && m_columnsList.size() > 0) {
 			for (int i = 0; i < m_columnsList.size(); i++) {
+				map_SetColumnsList.put(m_columnsList.get(i).getCOL_CODE(), m_columnsList.get(i));
 				if (listColModelAll.containsKey(m_columnsList.get(i).getCOL_CODE().toUpperCase())) {
 					Map<String, Object> itemColModel = listColModelAll.get(m_columnsList.get(i).getCOL_CODE());
 					jqGridColModel.append(", {");
@@ -213,13 +219,17 @@ public class TmplUtil {
 	 * @throws Exception
 	 */
 	public Map<String, Map<String, Object>> jqGridColModelAllNoEdit(List<TableColumns> columns) throws Exception {
-		Map<String, Map<String, Object>> list = new HashMap<String, Map<String, Object>>();
+		Map<String, Map<String, Object>> list = new LinkedHashMap<String, Map<String, Object>>();
 
 		for (TableColumns col : columns) {
-			m_defaultValueList.put(col.getColumn_name(), col.getColumn_default());
+			//m_defaultValueList.put(col.getColumn_name(), col.getColumn_default());
 			// 表全部 类型
-			m_typeList.put(col.getColumn_name(), col.getData_type());
-			Map<String, Object> MapAdd = new HashMap<String, Object>();
+			//m_typeList.put(col.getColumn_name(), col.getData_type());
+			//表结构
+			map_HaveColumnsList.put(col.getColumn_name(), col);
+			
+			
+			Map<String, Object> MapAdd = new LinkedHashMap<String, Object>();
 
 			StringBuilder model_name = new StringBuilder();
 			StringBuilder model_notedit = new StringBuilder();
@@ -254,14 +264,16 @@ public class TmplUtil {
 	 * @throws Exception
 	 */
 	public Map<String, Map<String, Object>> jqGridColModelAll(List<TableColumns> columns) throws Exception {
-		Map<String, Map<String, Object>> list = new HashMap<String, Map<String, Object>>();
+		Map<String, Map<String, Object>> list = new LinkedHashMap<String, Map<String, Object>>();
 
 		for (TableColumns col : columns) {
-			m_defaultValueList.put(col.getColumn_name(), col.getColumn_default());
+			//m_defaultValueList.put(col.getColumn_name(), col.getColumn_default());
 			// 表全部 类型
-			m_typeList.put(col.getColumn_name(), col.getData_type());
+			//m_typeList.put(col.getColumn_name(), col.getData_type());
+			//表结构
+			map_HaveColumnsList.put(col.getColumn_name(), col);
 
-			Map<String, Object> MapAdd = new HashMap<String, Object>();
+			Map<String, Object> MapAdd = new LinkedHashMap<String, Object>();
 
 			StringBuilder model_name = new StringBuilder();
 			StringBuilder model_edittype = new StringBuilder();
@@ -324,7 +336,7 @@ public class TmplUtil {
 	private String getDicValue(String dicName) throws Exception {
 		StringBuilder ret = new StringBuilder();
 		String strDicType = tmplConfigDictService.getDicType(dicName);
-		Map<String, String> dicAdd = new HashMap<String, String>();
+		Map<String, String> dicAdd = new LinkedHashMap<String, String>();
 		if (strDicType.equals("1")) {
 			List<Dictionaries> dicList = dictionariesService.getSysDictionaries(dicName);
 			for (Dictionaries dic : dicList) {
@@ -374,19 +386,19 @@ public class TmplUtil {
 		return ret.toString();
 	}
 
-	public static void setModelDefault(PageData pd, List<TmplConfigDetail> ColumnsList)
+	public static void setModelDefault(PageData pd, Map<String, TableColumns> haveColumnsList)
 			throws ClassNotFoundException {
 		String InsertField = "";
 		String InsertVale = "";
-		for (TmplConfigDetail col : ColumnsList) {
-			String value = (String) pd.get(col.getCOL_CODE().toUpperCase());
-			if(value != null && !value.trim().equals("")){
+	    for (TableColumns col : haveColumnsList.values()) {
+			Object value = pd.get(col.getColumn_name().toUpperCase());
+			if(value != null && value.toString() != null && !value.toString().trim().equals("")){
 				if(InsertField!=null && !InsertField.trim().equals("")){
 					InsertField += ",";
 					InsertVale += ",";
 				}
-				InsertField += col.getCOL_CODE();
-				InsertVale += "'" + value + "'";
+				InsertField += col.getColumn_name();
+				InsertVale += "'" + value.toString() + "'";
 			}
 		}
 		pd.put("InsertField", InsertField);
@@ -400,13 +412,15 @@ public class TmplUtil {
 	 */
 	public String generateStructure(String tableCode, String departCode, int columnCount) throws Exception {
 		// 默认值
-		m_defaultValueList = new HashMap<String, Object>();
+		//m_defaultValueList = new LinkedHashMap<String, Object>();
 		// 表全部 类型
-		m_typeList = new HashMap<String, Object>();
+		//m_typeList = new LinkedHashMap<String, Object>();
 		// 字典
-		m_dicList = new HashMap<String, Object>();
+		m_dicList = new LinkedHashMap<String, Object>();
+		//表结构
+		map_HaveColumnsList = new LinkedHashMap<String, TableColumns>();
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-		m_columnsList = new ArrayList<TmplConfigDetail>();
+		map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
 		// 底行显示的求和与平均值字段
 		m_sqlUserdata = new StringBuilder();
 		// 拼接真正设置的jqGrid的ColModel
@@ -419,7 +433,7 @@ public class TmplUtil {
 		TmplConfigDetail item = new TmplConfigDetail();
 		item.setDEPT_CODE(departCode);
 		item.setTABLE_CODE(tableCode);
-		m_columnsList = tmplconfigService.listNeed(item);
+		List<TmplConfigDetail> m_columnsList = tmplconfigService.listNeed(item);
 		if(m_columnsList.size()==0){
 			String rootDeptCode=Tools.readTxtFile(Const.ROOT_DEPT_CODE);
 			item.setDEPT_CODE(rootDeptCode);
@@ -450,6 +464,7 @@ public class TmplUtil {
 		// 添加配置表设置列，字典（未设置就使用表默认，text或number）、隐藏、表头显示
 		if (m_columnsList != null && m_columnsList.size() > 0) {
 			for (int i = 0; i < m_columnsList.size(); i++) {
+				map_SetColumnsList.put(m_columnsList.get(i).getCOL_CODE(), m_columnsList.get(i));
 				if (listColModelAll.containsKey(m_columnsList.get(i).getCOL_CODE().toUpperCase())) {
 					Map<String, Object> itemColModel = listColModelAll.get(m_columnsList.get(i).getCOL_CODE());
 					jqGridColModel.append(", {");

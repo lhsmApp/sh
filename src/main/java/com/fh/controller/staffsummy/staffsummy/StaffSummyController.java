@@ -28,9 +28,9 @@ import com.fh.entity.CommonBase;
 import com.fh.entity.JqPage;
 import com.fh.entity.Page;
 import com.fh.entity.PageResult;
-import com.fh.entity.StaffSummyModel;
 import com.fh.entity.SysSealed;
-import com.fh.entity.ZrzxModel;
+import com.fh.entity.TableColumns;
+import com.fh.entity.TmplConfigDetail;
 import com.fh.entity.system.User;
 import com.fh.util.Const;
 import com.fh.util.DateUtil;
@@ -101,7 +101,7 @@ public class StaffSummyController extends BaseController {
 	//显示结构的单位
     String ShowDepartCode = "01001";
 	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
-	private List<String> keyListBase = Arrays.asList("BILL_CODE", "DEPT_CODE", "BUSI_DATE", "USER_CATG", "USER_GROP");
+	private List<String> keyListBase = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "USER_CATG", "USER_GROP");
     
     //汇总字段
     List<String> SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "USER_CATG", "USER_GROP");
@@ -111,8 +111,10 @@ public class StaffSummyController extends BaseController {
 	String SystemDateTime = "";
 	//底行显示的求和与平均值字段
 	StringBuilder SqlUserdata = new StringBuilder();
-	//默认值
-	Map<String, Object> DefaultValueList = new HashMap<String, Object>();
+	//表结构  
+	Map<String, TableColumns> map_HaveColumnsList = new HashMap<String, TableColumns>();
+	// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
+	Map<String, TmplConfigDetail> map_SetColumnsList = new HashMap<String, TmplConfigDetail>();
 	
 	/**列表
 	 * @param page
@@ -137,8 +139,10 @@ public class StaffSummyController extends BaseController {
 
 		//底行显示的求和与平均值字段
 		SqlUserdata = tmpl.getSqlUserdata();
-		//默认值
-		DefaultValueList = tmpl.getDefaultValueList();
+		//表结构  
+		map_HaveColumnsList = tmpl.getHaveColumnsList();
+		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
+		map_SetColumnsList = tmpl.getSetColumnsList();
 		
 		mv.addObject("jqGridColModel", jqGridColModel);
 		return mv;
@@ -202,7 +206,7 @@ public class StaffSummyController extends BaseController {
 		String DEPT_CODE = (String) pd.get("DATA_DEPT_CODE");
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
 		String detailColModel = tmpl.generateStructureNoEdit(TableNameDetail, DEPT_CODE);
-		
+
 		commonBase.setCode(0);
 		commonBase.setMessage(detailColModel);
 		
@@ -274,34 +278,6 @@ public class StaffSummyController extends BaseController {
 			syssealedinfoService.insertBatch(listSysSealed);
 			commonBase.setCode(0);
 		}
-
-        /*List<StaffSummyModel> listData = (List<StaffSummyModel>) JSONArray.toCollection(array,StaffSummyModel.class);
-        List<SysSealed> listTransfer = new ArrayList<SysSealed>();
-        if(null != listData && listData.size() > 0){
-        	for(StaffSummyModel summy : listData){
-    			SysSealed item = new SysSealed();
-    			//item.setBILL_CODE(summy.getBILL_CODE());
-    			item.setBILL_CODE(" ");
-    			item.setRPT_DEPT(summy.getDEPT_CODE());
-    			item.setRPT_DUR(SystemDateTime);
-    			item.setRPT_USER(userId);
-    			item.setRPT_DATE(time);//YYYY-MM-DD HH:MM:SS
-    			item.setBILL_TYPE(TypeCode.toString());// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
-    			item.setSTATE(DurState.Sealed.getNameKey());// 枚举  1封存,0解封
-    			listTransfer.add(item);
-    			
-    			String checkState = CheckStateLast(item);
-    			if(checkState!=null && !checkState.trim().equals("")){
-    				commonBase.setCode(2);
-    				commonBase.setMessage(checkState);
-    				break;
-    			}
-        	}
-		}
-        if(commonBase.getCode() == -1){
-        	syssealedinfoService.insertBatch(listTransfer);
-    		commonBase.setCode(0);
-        } */
 		return commonBase;
 	}
 	
@@ -375,20 +351,40 @@ public class StaffSummyController extends BaseController {
     			mapHave.put("DEPT_CODE", depart);
     			List<PageData> getHaveDate = staffsummyService.getHave(mapHave);
     			//获取单位重新汇总信息
+    			List<TableColumns> tableSumColumns = tmplconfigService.getTableColumns(TableNameBase);
+    			List<TableColumns> tableDetailColumns = tmplconfigService.getTableColumns(TableNameDetail);
+    			//明细表字段
+    			List<String> DetailColumnsCodeList = new ArrayList<String>();
+    			if(tableDetailColumns!=null && tableDetailColumns.size()>0){
+    				for(TableColumns each : tableDetailColumns){
+    					DetailColumnsCodeList.add(each.getColumn_name());
+    				}
+    			}
     			Map<String, String> mapSave = new HashMap<String, String>();
     			mapSave.put("BUSI_DATE", SystemDateTime);
     			mapSave.put("DEPT_CODE", depart);
     			mapSave.put("GroupbyFeild", SumFieldToString);
+    			String SelectFeild = SumFieldToString;
+
+				if(tableSumColumns != null && tableSumColumns.size() > 0){
+					for(int i=0; i < tableSumColumns.size(); i++){
+						String getCOL_CODE = tableSumColumns.get(i).getColumn_name();
+						if(!SumField.contains(getCOL_CODE) && DetailColumnsCodeList.contains(getCOL_CODE)){
+						    SelectFeild += ", sum(" + getCOL_CODE +") " + getCOL_CODE;
+						}
+					}
+				}
+    			mapSave.put("SelectFeild", SelectFeild);
     			List<PageData> getSaveDate = staffdetailService.getSum(mapSave);
     			
     			List<PageData> listAdd = getListTo(getHaveDate, getSaveDate);
 
-                //根据DEPT_CODE从tb_gl_zrzx表里获取ZRZX_CODE，赋值给汇总保存数据
-                String strZRZC_CODE = "";
-    			List<ZrzxModel> listZRZC_CODE = glzrzxService.findDeptFromZrzx(depart);
-                if(listZRZC_CODE!=null && listZRZC_CODE.size()>0){
-                	strZRZC_CODE = listZRZC_CODE.get(0).getZRZX_CODE();
-                }
+                ////根据DEPT_CODE从tb_gl_zrzx表里获取ZRZX_CODE，赋值给汇总保存数据
+                //String strZRZC_CODE = "";
+    			//List<ZrzxModel> listZRZC_CODE = glzrzxService.findDeptFromZrzx(depart);
+                //if(listZRZC_CODE!=null && listZRZC_CODE.size()>0){
+                //	strZRZC_CODE = listZRZC_CODE.get(0).getZRZX_CODE();
+                //}
     			
     			for(PageData addTo : listAdd){
     				Object getBILL_CODE = addTo.get("BILL_CODE");
@@ -403,7 +399,8 @@ public class StaffSummyController extends BaseController {
             		User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
                     addTo.put("BILL_USER", user.getUSER_ID());
                     addTo.put("BILL_DATE", DateUtil.getTime());
-                    addTo.put("ZRZC_CODE", strZRZC_CODE);
+                    addTo.put("ZRZC_CODE", "");
+                    addTo.put("ESTB_DEPT", Jurisdiction.getCurrentDepartmentID());
                     
                     //更新明细单号的条件
                     StringBuilder updateFilter = new StringBuilder();
@@ -415,7 +412,7 @@ public class StaffSummyController extends BaseController {
                     }
 	    			addTo.put("updateFilter", updateFilter);
                     //添加未设置字段默认值
-	    			//TmplUtil.setModelDefault(addTo, StaffSummyModel.class, DefaultValueList);
+	    			TmplUtil.setModelDefault(addTo, map_HaveColumnsList);
     				listTo.add(addTo);
     			}
         	}

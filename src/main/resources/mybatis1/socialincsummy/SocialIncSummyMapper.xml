@@ -16,86 +16,16 @@
 	
 	<!-- 字段 -->
 	<sql id="FieldSelectKey">
-		BILL_CODE BILL_CODE__, DEPT_CODE DEPT_CODE__, BUSI_DATE BUSI_DATE__, USER_CATG USER_CATG__, USER_GROP USER_GROP__,
-	</sql>
-	<sql id="Field">
-		BILL_CODE,	
-		BUSI_DATE,	
-		ESTB_DEPT,	
-		USER_GROP,	
-		SOC_INC_BASE,	
-		PER_ENDW_INS,	
-		PER_MED_INS,	
-		PER_UNEMPL_INS,	
-		PER_TOTAL,	
-		DEPT_ENDW_INS,	
-		DEPT_MED_INS,	
-		DEPT_UNEMPL_INS,	
-		EMPT_INJ_INS,	
-		MATY_INS,	
-		DEPT_TOTAL,	
-		DEPT_CODE,	
-		USER_CATG,	
-		PMT_PLACE,	
-		CUST_COL1,	
-		CUST_COL2,	
-		CUST_COL3,	
-		CUST_COL4,	
-		CUST_COL5,	
-		CUST_COL6,	
-		CUST_COL7,	
-		CUST_COL8,	
-		CUST_COL9,	
-		CUST_COL10,	
-		ZRZC_CODE,	
-		BILL_STATE,	
-		BILL_USER,	
-		BILL_DATE
-	</sql>
-	
-	<!-- 字段值 -->
-	<sql id="FieldValue">
-		#{BILL_CODE},	
-		#{BUSI_DATE},	
-		#{ESTB_DEPT},	
-		#{USER_GROP},	
-		#{SOC_INC_BASE},	
-		#{PER_ENDW_INS},	
-		#{PER_MED_INS},	
-		#{PER_UNEMPL_INS},	
-		#{PER_TOTAL},	
-		#{DEPT_ENDW_INS},	
-		#{DEPT_MED_INS},	
-		#{DEPT_UNEMPL_INS},	
-		#{EMPT_INJ_INS},	
-		#{MATY_INS},	
-		#{DEPT_TOTAL},	
-		#{DEPT_CODE},	
-		#{USER_CATG},	
-		#{PMT_PLACE},	
-		#{CUST_COL1},	
-		#{CUST_COL2},	
-		#{CUST_COL3},	
-		#{CUST_COL4},	
-		#{CUST_COL5},	
-		#{CUST_COL6},	
-		#{CUST_COL7},	
-		#{CUST_COL8},	
-		#{CUST_COL9},	
-		#{CUST_COL10},	
-		#{ZRZC_CODE},	
-		#{BILL_STATE},	
-		#{BILL_USER},	
-		#{BILL_DATE}
+		BILL_CODE BILL_CODE__, DEPT_CODE DEPT_CODE__, BUSI_DATE BUSI_DATE__, 
+		USER_CATG USER_CATG__, USER_GROP USER_GROP__
 	</sql>
 	
 	<!-- 获取 -->
 	
 	<!-- 列表 -->
 	<select id="datalistJqPage" parameterType="jqPage" resultType="pd">
-		select 
+		select *,
 		    <include refid="FieldSelectKey"></include>
-		    <include refid="Field"></include>
 		from 
 		<include refid="tableName"></include>
 		where BUSI_DATE = '${pd.SystemDateTime}'
@@ -152,11 +82,7 @@
 	<insert id="save" parameterType="pd">
 		insert into 
 	<include refid="tableName"></include>
-		(
-	<include refid="Field"></include>
-		) values (
-	<include refid="FieldValue"></include>
-		)
+		(${InsertField}) values (${InsertVale})
 	</insert>
 	
 	

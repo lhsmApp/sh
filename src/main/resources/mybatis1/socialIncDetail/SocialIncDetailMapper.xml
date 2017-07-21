@@ -168,25 +168,7 @@
 	
 	<select id="getSum" parameterType="java.util.Map" resultType="pd">
         select 
-            ${GroupbyFeild},
-			sum(SOC_INC_BASE) SOC_INC_BASE,
-			sum(PER_ENDW_INS) PER_ENDW_INS,
-			sum(PER_MED_INS) PER_MED_INS,
-			sum(PER_UNEMPL_INS) PER_UNEMPL_INS,
-			sum(PER_TOTAL) PER_TOTAL,
-			sum(DEPT_ENDW_INS) DEPT_ENDW_INS,
-			sum(DEPT_MED_INS) DEPT_MED_INS,
-			sum(DEPT_UNEMPL_INS) DEPT_UNEMPL_INS,
-			sum(EMPT_INJ_INS) EMPT_INJ_INS,
-			sum(MATY_INS) MATY_INS,
-			sum(DEPT_TOTAL) DEPT_TOTAL,
-			
-			sum(CUST_COL1) CUST_COL1,
-			sum(CUST_COL2) CUST_COL2,
-			sum(CUST_COL3) CUST_COL3,
-			sum(CUST_COL4) CUST_COL4,
-			sum(CUST_COL5) CUST_COL5,
-			sum(CUST_COL6) CUST_COL6
+            ${SelectFeild}
 		from 
 		<include refid="tableName"></include>
 		where BUSI_DATE = '${BUSI_DATE}'

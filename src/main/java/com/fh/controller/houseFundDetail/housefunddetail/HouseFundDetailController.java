@@ -4,7 +4,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
@@ -24,6 +24,7 @@ import com.fh.entity.JqPage;
 import com.fh.entity.Page;
 import com.fh.entity.PageResult;
 import com.fh.entity.SysSealed;
+import com.fh.entity.TableColumns;
 import com.fh.entity.TmplConfigDetail;
 import com.fh.entity.system.User;
 import com.fh.exception.CustomException;
@@ -87,14 +88,16 @@ public class HouseFundDetailController extends BaseController {
 	String DepartCode = "";
 	//底行显示的求和与平均值字段
 	StringBuilder SqlUserdata = new StringBuilder();
-	//默认值
-	Map<String, Object> DefaultValueList = new HashMap<String, Object>();
-    // 表全部 类型
-    Map<String, Object> TypeList = new HashMap<String, Object>();
+	////默认值
+	//Map<String, Object> DefaultValueList = new LinkedHashMap<String, Object>();
+    //// 表全部 类型
+    //Map<String, Object> TypeList = new LinkedHashMap<String, Object>();
 	//字典
-	Map<String, Object> DicList = new HashMap<String, Object>();
-	//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-	List<TmplConfigDetail> ColumnsList = new ArrayList<TmplConfigDetail>();
+	Map<String, Object> DicList = new LinkedHashMap<String, Object>();
+	//表结构  
+	Map<String, TableColumns> map_HaveColumnsList = new LinkedHashMap<String, TableColumns>();
+	// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
+	Map<String, TmplConfigDetail> map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
 	
 	/**列表
 	 * @param page
@@ -133,13 +136,15 @@ public class HouseFundDetailController extends BaseController {
 		
 		SqlUserdata = tmpl.getSqlUserdata();
 		//默认值
-		DefaultValueList = tmpl.getDefaultValueList();
+		//DefaultValueList = tmpl.getDefaultValueList();
 		// 表全部 类型
-		TypeList = tmpl.getTypeList();
+		//TypeList = tmpl.getTypeList();
 		//字典
 		DicList = tmpl.getDicList();
-		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-		ColumnsList = tmpl.getColumnsList();
+		//表结构  
+		map_HaveColumnsList = tmpl.getHaveColumnsList();
+		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
+		map_SetColumnsList = tmpl.getSetColumnsList();
 		
 		mv.addObject("jqGridColModel", jqGridColModel);
 		return mv;
@@ -220,7 +225,7 @@ public class HouseFundDetailController extends BaseController {
 				pd.remove(DEPT_CODE);
 			}
 			pd.put(DEPT_CODE, DepartCode);
-			TmplUtil.setModelDefault(pd, ColumnsList);
+			TmplUtil.setModelDefault(pd, map_HaveColumnsList);
 			
 			List<PageData> listData = new ArrayList<PageData>();
 			listData.add(pd);
@@ -261,7 +266,7 @@ public class HouseFundDetailController extends BaseController {
 	        	item.put("BILL_CODE", " ");
 	        	item.put("BUSI_DATE", SystemDateTime);
 	        	item.put("DEPT_CODE", DepartCode);
-				TmplUtil.setModelDefault(item, ColumnsList);
+				TmplUtil.setModelDefault(item, map_HaveColumnsList);
 	        }
 			if(null != listData && listData.size() > 0){
 				List<PageData> repeatList = housefunddetailService.findByModel(listData);
@@ -353,12 +358,12 @@ public class HouseFundDetailController extends BaseController {
 					int sheetIndex = 0;
 					Map<String, String> titleAndAttribute = null;
 					// 定义对应的标题名与对应属性名
-					titleAndAttribute = new HashMap<String, String>();
+					titleAndAttribute = new LinkedHashMap<String, String>();
 					
 					//配置表设置列
-					if(ColumnsList != null && ColumnsList.size() > 0){
-						for(int i=0; i < ColumnsList.size(); i++){
-							titleAndAttribute.put(ColumnsList.get(i).getCOL_NAME(), ColumnsList.get(i).getCOL_CODE());
+					if(map_SetColumnsList != null && map_SetColumnsList.size() > 0){
+						for (TmplConfigDetail col : map_SetColumnsList.values()) {
+							titleAndAttribute.put(col.getCOL_NAME(), col.getCOL_CODE());
 						}
 					}
 
@@ -367,7 +372,7 @@ public class HouseFundDetailController extends BaseController {
 					// 解析excel，获取客户信息集合
 
 					uploadAndReadMap = testExcel.uploadAndRead(file, propertiesFileName, kyeName, sheetIndex,
-							titleAndAttribute, TypeList, ColumnsList, DicList);
+							titleAndAttribute, map_HaveColumnsList, map_SetColumnsList, DicList);
 				} catch (Exception e) {
 					e.printStackTrace();
 					logger.error("读取Excel文件错误", e);
@@ -427,6 +432,11 @@ public class HouseFundDetailController extends BaseController {
 							} else {
 								listUserCode.add(getUSER_CODE.trim());
 							}
+							String getESTB_DEPT = (String) uploadAndRead.get(i).get("ESTB_DEPT");
+							if(!(getESTB_DEPT!=null && !getESTB_DEPT.trim().equals(""))){
+								uploadAndRead.get(i).put("ESTB_DEPT", DepartCode);
+							}
+							TmplUtil.setModelDefault(uploadAndRead.get(i), map_HaveColumnsList);
 						}
 						if(sbRet.size()>0){
 							StringBuilder sbTitle = new StringBuilder();
@@ -488,29 +498,33 @@ public class HouseFundDetailController extends BaseController {
 	@SuppressWarnings("unchecked")
 	private ModelAndView export(List<PageData> varOList, String ExcelName){
 		ModelAndView mv = new ModelAndView();
-		Map<String,Object> dataMap = new HashMap<String,Object>();
+		Map<String,Object> dataMap = new LinkedHashMap<String,Object>();
 		dataMap.put("filename", ExcelName);
 		List<String> titles = new ArrayList<String>();
 		List<PageData> varList = new ArrayList<PageData>();
-		if(ColumnsList != null && ColumnsList.size() > 0){
-			for(int i=0; i < ColumnsList.size(); i++){
-				if(ColumnsList.get(i).getCOL_HIDE().equals("1")){
-					titles.add(ColumnsList.get(i).getCOL_NAME());
+		if(map_SetColumnsList != null && map_SetColumnsList.size() > 0){
+		    for (TmplConfigDetail col : map_SetColumnsList.values()) {
+				if(col.getCOL_HIDE().equals("1")){
+					titles.add(col.getCOL_NAME());
 				}
 			}
 			if(varOList!=null && varOList.size()>0){
 				for(int i=0;i<varOList.size();i++){
 					PageData vpd = new PageData();
-					for(int j=1; j <= ColumnsList.size(); j++){
-						String trans = ColumnsList.get(j-1).getDICT_TRANS();
-						Object getCellValue = varOList.get(i).get(ColumnsList.get(j-1).getCOL_CODE().toUpperCase());
+					int j = 1;
+					for (TmplConfigDetail col : map_SetColumnsList.values()) {
+						if(col.getCOL_HIDE().equals("1")){
+						String trans = col.getDICT_TRANS();
+						Object getCellValue = varOList.get(i).get(col.getCOL_CODE().toUpperCase());
 						if(trans != null && !trans.trim().equals("")){
 							String value = "";
-							Map<String, String> dicAdd = (Map<String, String>) DicList.getOrDefault(trans, new HashMap<String, String>());
+							Map<String, String> dicAdd = (Map<String, String>) DicList.getOrDefault(trans, new LinkedHashMap<String, String>());
 							value = dicAdd.getOrDefault(getCellValue, "");
 							vpd.put("var" + j, value);
 						} else {
 							vpd.put("var" + j, getCellValue.toString());
+						}
+						j++;
 						}
 					}
 					varList.add(vpd);

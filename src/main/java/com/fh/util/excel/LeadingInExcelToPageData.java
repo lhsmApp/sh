@@ -29,6 +29,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
+import com.fh.entity.TableColumns;
 import com.fh.entity.TmplConfigDetail;
 import com.fh.util.PageData;
 import com.fh.util.base.StochasticUtil;
@@ -86,8 +87,8 @@ public class LeadingInExcelToPageData<T> {
      */
     public Map<Integer, Object> uploadAndRead(MultipartFile multipart,String propertiesFileName, String kyeName,int sheetIndex,
             Map<String, String> titleAndAttribute,
-            Map<String, Object> TypeList,
-    		List<TmplConfigDetail> listColumns, Map<String, Object> DicList) throws Exception{
+            Map<String, TableColumns> map_HaveColumnsList,
+    		Map<String, TmplConfigDetail> map_SetColumnsList, Map<String, Object> DicList) throws Exception{
         
             String originalFilename=null;
             int i = 0;
@@ -102,7 +103,7 @@ public class LeadingInExcelToPageData<T> {
             
             String filePath = readPropertiesFilePathMethod( propertiesFileName, kyeName);
             File filePathname = this.upload(multipart, filePath, isExcel2003);
-            Map<Integer, Object> judgementVersion = judgementVersion(filePathname, sheetIndex, titleAndAttribute, TypeList, isExcel2003, listColumns, DicList);
+            Map<Integer, Object> judgementVersion = judgementVersion(filePathname, sheetIndex, titleAndAttribute, map_HaveColumnsList, isExcel2003, map_SetColumnsList, DicList);
         
         return judgementVersion;
     }
@@ -210,8 +211,9 @@ public class LeadingInExcelToPageData<T> {
      * @return
      * @throws Exception
      */
-    public Map<Integer, Object> judgementVersion(File filePathname,int sheetIndex,Map<String, String> titleAndAttribute,Map<String, Object> TypeList,boolean isExcel2003,
-    		List<TmplConfigDetail> listColumns, Map<String, Object> DicList) throws Exception{
+    public Map<Integer, Object> judgementVersion(File filePathname,int sheetIndex,Map<String, String> titleAndAttribute,
+    		Map<String, TableColumns> map_HaveColumnsList,boolean isExcel2003,
+    		Map<String, TmplConfigDetail> map_SetColumnsList, Map<String, Object> DicList) throws Exception{
         
         FileInputStream is=null;
         POIFSFileSystem fs=null;
@@ -241,7 +243,7 @@ public class LeadingInExcelToPageData<T> {
                 }
             }
         
-        return readExcelTitle(workbook,sheetIndex,titleAndAttribute,TypeList, listColumns, DicList);
+        return readExcelTitle(workbook,sheetIndex,titleAndAttribute,map_HaveColumnsList, map_SetColumnsList, DicList);
     }
 
     /**
@@ -253,8 +255,9 @@ public class LeadingInExcelToPageData<T> {
      * @return
      * @throws Exception
      */
-    private Map<Integer, Object> readExcelTitle(Workbook workbook,int sheetIndex,Map<String, String> titleAndAttribute,Map<String, Object> TypeList,
-    		List<TmplConfigDetail> listColumns, Map<String, Object> DicList) throws Exception{
+    private Map<Integer, Object> readExcelTitle(Workbook workbook,int sheetIndex,Map<String, String> titleAndAttribute,
+    		Map<String, TableColumns> map_HaveColumnsList,
+    		Map<String, TmplConfigDetail> map_SetColumnsList, Map<String, Object> DicList) throws Exception{
 
         //得到第一个shell  
         Sheet sheet = workbook.getSheetAt(sheetIndex);
@@ -284,7 +287,7 @@ public class LeadingInExcelToPageData<T> {
             }
         }
 
-        return readExcelValue(workbook,sheet,attribute,TypeList, listColumns, DicList);
+        return readExcelValue(workbook,sheet,attribute,map_HaveColumnsList, map_SetColumnsList, DicList);
         
     }
     
@@ -298,8 +301,9 @@ public class LeadingInExcelToPageData<T> {
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
-	private Map<Integer, Object> readExcelValue(Workbook workbook,Sheet sheet,Map<Integer, String> attribute,Map<String, Object> TypeList,
-    		List<TmplConfigDetail> listColumns, Map<String, Object> DicList) throws Exception{
+	private Map<Integer, Object> readExcelValue(Workbook workbook,Sheet sheet,Map<Integer, String> attribute,
+			Map<String, TableColumns> map_HaveColumnsList,
+			Map<String, TmplConfigDetail> map_SetColumnsList, Map<String, Object> DicList) throws Exception{
     	Map<Integer, Object> returnMap = new HashMap<Integer, Object>();
     	Map<String, Object> returnError = new HashMap<String, Object>();
         List<PageData> info=new ArrayList<PageData>();
@@ -333,28 +337,29 @@ public class LeadingInExcelToPageData<T> {
                 }
                 
                 String COL_CODE = attribute.get(Integer.valueOf(columnIndex));
-    			if(listColumns != null && listColumns.size() > 0){
-    				for(int j=0; j < listColumns.size(); j++){
-    					if(COL_CODE.equals(listColumns.get(j).getCOL_CODE())){
-        					String trans = listColumns.get(j).getDICT_TRANS();
-        					if(trans != null && !trans.trim().equals("")){
-        						Map<String, String> dicAdd = (Map<String, String>) DicList.getOrDefault(trans, new HashMap<String, String>());
-                                String getKey = "";
-        						for (Map.Entry<String, String> dic :dicAdd.entrySet())  {
-        							if(value.equals(dic.getValue().toString())){
-        								getKey = dic.getKey();
-                                    }
-        					    }  
-        						if(!(getKey != null && !getKey.trim().equals(""))){
-        							returnError.put(listColumns.get(j).getCOL_NAME(), value);
-        							break;
-        						}
-        						value = getKey;
-        					}
-    					}
-    				}
+    			if(map_SetColumnsList != null && map_SetColumnsList.size() > 0){
+    				TmplConfigDetail itemCol = map_SetColumnsList.get(COL_CODE);
+        			String trans = itemCol.getDICT_TRANS();
+        			if(trans != null && !trans.trim().equals("")){
+        				Map<String, String> dicAdd = (Map<String, String>) DicList.getOrDefault(trans, new HashMap<String, String>());
+                        String getKey = "";
+        				for (Map.Entry<String, String> dic :dicAdd.entrySet())  {
+        					if(value.equals(dic.getValue().toString())){
+        						getKey = dic.getKey();
+                            }
+        			    }  
+        				if(!(getKey != null && !getKey.trim().equals(""))){
+        					returnError.put(itemCol.getCOL_NAME(), value);
+        					break;
+        				}
+        				value = getKey;
+        			}
     			}
-                String fieldType = (String) TypeList.get(COL_CODE);
+    			TableColumns fieldTable = (TableColumns) map_HaveColumnsList.get(COL_CODE);
+    			String fieldType = "";
+    			if(fieldTable!=null && fieldTable.getData_type()!=null){
+    				fieldType = fieldTable.getData_type();
+    			}
 				
                 Object agge = value;
                 if (fieldType.toUpperCase().equals(Date.class.getName().toUpperCase())) {
