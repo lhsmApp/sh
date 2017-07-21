@@ -152,7 +152,7 @@ public class DictTransferController extends BaseController {
 				@Override
 				public String groupby(Object obj) {
 					PageData d = (PageData) obj;
-					return d.getString("PARENT_BIANMA"); // 分组依据为PARENT_ID
+					return d.getString("PARENT_CODE"); // 分组依据为PARENT_ID
 				}
 			});
 			// 获取上传XML数据

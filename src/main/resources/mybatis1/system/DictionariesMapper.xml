@@ -4,8 +4,9 @@
 
 	<resultMap type="Dictionaries" id="dictResultMap">
 		<id column="DICTIONARIES_ID" property="DICTIONARIES_ID" />
+		<id column="DICT_CODE" property="DICT_CODE" />
 		<result column="NAME" property="NAME" />
-		<result column="PARENT_ID" property="PARENT_ID" />
+		<result column="PARENT_CODE" property="PARENT_CODE" />
 	</resultMap>
 
 	<!--表名 -->
@@ -17,24 +18,45 @@
 	<sql id="Field">
 		NAME,
 		NAME_EN,
-		BIANMA,
+		DICT_CODE,
 		ORDER_BY,
-		PARENT_ID,
+		PARENT_CODE,
 		BZ,
 		TBSNAME,
 		DICTIONARIES_ID
+	</sql>
+	
+	<sql id="FieldInsert">
+		NAME,
+		NAME_EN,
+		DICT_CODE,
+		ORDER_BY,
+		PARENT_CODE,
+		BZ,
+		TBSNAME
 	</sql>
 
 	<!-- 字段值 -->
 	<sql id="FieldValue">
 		#{NAME},
 		#{NAME_EN},
-		#{BIANMA},
+		#{DICT_CODE},
 		#{ORDER_BY},
-		#{PARENT_ID},
+		#{PARENT_CODE},
 		#{BZ},
 		#{TBSNAME},
 		#{DICTIONARIES_ID}
+	</sql>
+	
+	<!-- 字段值 -->
+	<sql id="FieldValueInsert">
+		#{NAME},
+		#{NAME_EN},
+		#{DICT_CODE},
+		#{ORDER_BY},
+		#{PARENT_CODE},
+		#{BZ},
+		#{TBSNAME}
 	</sql>
 
 	<!-- 新增 -->
@@ -42,9 +64,9 @@
 		insert into
 		<include refid="tableName"></include>
 		(
-		<include refid="Field"></include>
+		<include refid="FieldInsert"></include>
 		) values (
-		<include refid="FieldValue"></include>
+		<include refid="FieldValueInsert"></include>
 		)
 	</insert>
 
@@ -64,11 +86,13 @@
 		NAME = #{NAME},
 		NAME_EN = #{NAME_EN},
 		ORDER_BY = #{ORDER_BY},
-		BZ = #{BZ},
+		BZ =
+		#{BZ},
 		TBSNAME = #{TBSNAME},
-		DICTIONARIES_ID = DICTIONARIES_ID
+		DICT_CODE = DICT_CODE
 		where
-		DICTIONARIES_ID = #{DICTIONARIES_ID}
+		DICTIONARIES_ID =
+		#{DICTIONARIES_ID}
 	</update>
 
 	<!-- 通过ID获取数据 -->
@@ -88,7 +112,20 @@
 		from
 		<include refid="tableName"></include>
 		where
-		BIANMA = #{BIANMA}
+		DICT_CODE = #{DICT_CODE}
+	</select>
+
+	<!-- 是否有相同编码 -->
+	<select id="hasSameDictCode" parameterType="pd" resultType="pd">
+		select
+		1
+		from
+		<include refid="tableName"></include>
+		where
+		DICT_CODE = #{DICT_CODE}
+		<if test="DICTIONARIES_ID != null and DICTIONARIES_ID != ''">
+			and DICTIONARIES_ID != #{DICTIONARIES_ID}
+		</if>
 	</select>
 
 	<!-- 列表 -->
@@ -99,49 +136,57 @@
 		<include refid="tableName"></include>
 		where
 		1=1
-		<if test="pd.DICTIONARIES_ID!= null and pd.DICTIONARIES_ID != ''"><!-- 检索 -->
-			and PARENT_ID = #{pd.DICTIONARIES_ID}
+		<if test="pd.DICT_CODE!= null and pd.DICT_CODE != ''"><!-- 检索 -->
+			and PARENT_CODE = #{pd.DICT_CODE}
 		</if>
 		<if test="pd.keywords != null and pd.keywords != ''"><!-- 关键词检索 -->
 			and
 			(
 			NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
 			or
-			NAME_EN LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+			NAME_EN LIKE
+			CONCAT(CONCAT('%', #{pd.keywords}),'%')
 			or
-			BIANMA LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+			DICT_CODE LIKE
+			CONCAT(CONCAT('%', #{pd.keywords}),'%')
 			)
 		</if>
-		order by ORDER_BY
+		order by PARENT_CODE,ORDER_BY
 	</select>
 
 	<!-- Jqgrid列表 -->
 	<select id="datalistJqPage" parameterType="jqPage" resultType="pd">
 		select
-		A.NAME,A.NAME_EN,A.BIANMA,A.ORDER_BY,A.PARENT_ID,A.BZ,A.TBSNAME,A.DICTIONARIES_ID,IFNULL(B.NAME,'所有字典') AS PARENT_NAME
+		A.NAME,A.NAME_EN,A.DICT_CODE,A.ORDER_BY,A.PARENT_CODE,A.BZ,A.TBSNAME,A.DICTIONARIES_ID,IFNULL(B.NAME,'所有字典')
+		AS PARENT_NAME
 		from
-		<include refid="tableName"></include> A
-		LEFT JOIN <include refid="tableName"></include> B
-		ON A.PARENT_ID=B.DICTIONARIES_ID
+		<include refid="tableName"></include>
+		A
+		LEFT JOIN
+		<include refid="tableName"></include>
+		B
+		ON A.PARENT_CODE=B.DICT_CODE
 		<where>
-			<if test="pd.DICTIONARIES_ID!= null and pd.DICTIONARIES_ID != ''"><!-- 检索 -->
-				and A.PARENT_ID = #{pd.DICTIONARIES_ID}
+			<if test="pd.DICT_CODE!= null and pd.DICT_CODE != ''"><!-- 检索 -->
+				and A.PARENT_CODE = #{pd.DICT_CODE}
 			</if>
 			<if test="pd.keywords != null and pd.keywords != ''"><!-- 关键词检索 -->
 				and
 				(
 				A.NAME LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
 				or
-				A.NAME_EN LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				A.NAME_EN
+				LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
 				or
-				A.BIANMA LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%')
+				A.DICT_CODE LIKE
+				CONCAT(CONCAT('%', #{pd.keywords}),'%')
 				)
 			</if>
 			<if test="pd.filterWhereResult != null">
 				${pd.filterWhereResult}
 			</if>
 		</where>
-		order by A.PARENT_ID
+		order by A.PARENT_CODE
 		<if test="sidx != null">
 			,${sidx} ${sord}
 		</if>
@@ -149,57 +194,65 @@
 			limit #{currentResult}, #{rowNum}
 		</if>
 	</select>
-	
+
 	<!-- 列表(全部) -->
 	<select id="listAll" parameterType="pd" resultType="pd">
 		select
-		A.NAME,A.NAME_EN,A.BIANMA,A.ORDER_BY,A.PARENT_ID,A.BZ,A.TBSNAME,
-		A.DICTIONARIES_ID,IFNULL(B.NAME,'所有字典') AS PARENT_NAME,B.BIANMA AS PARENT_BIANMA 
+		A.NAME,A.NAME_EN,A.DICT_CODE,A.ORDER_BY,A.PARENT_CODE,A.BZ,A.TBSNAME,
+		A.DICTIONARIES_ID,IFNULL(B.NAME,'所有字典') AS PARENT_NAME,B.DICT_CODE AS
+		PARENT_CODE
 		from
-		<include refid="tableName"></include> A
-		LEFT JOIN <include refid="tableName"></include> B
-		ON A.PARENT_ID=B.DICTIONARIES_ID
+		<include refid="tableName"></include>
+		A
+		LEFT JOIN
+		<include refid="tableName"></include>
+		B
+		ON A.PARENT_CODE=B.DICT_CODE
 		<where>
-		     A.PARENT_ID!='0' AND B.BIANMA!='ZRZX'
-			<if test="DICTIONARIES_ID!= null and DICTIONARIES_ID != ''"><!-- 检索 -->
-				and A.PARENT_ID = #{DICTIONARIES_ID}
+			A.PARENT_CODE!='0' AND B.DICT_CODE!='ZRZX' AND B.PARENT_CODE!='ZRZX'
+			<if test="DICT_CODE!= null and DICT_CODE != ''"><!-- 检索 -->
+				and A.PARENT_CODE = #{DICT_CODE}
 			</if>
 			<if test="keywords != null and keywords != ''"><!-- 关键词检索 -->
 				and
 				(
 				A.NAME LIKE CONCAT(CONCAT('%', #{keywords}),'%')
 				or
-				A.NAME_EN LIKE CONCAT(CONCAT('%', #{keywords}),'%')
+				A.NAME_EN LIKE
+				CONCAT(CONCAT('%', #{keywords}),'%')
 				or
-				A.BIANMA LIKE CONCAT(CONCAT('%', #{keywords}),'%')
+				A.DICT_CODE LIKE
+				CONCAT(CONCAT('%', #{keywords}),'%')
 				)
 			</if>
 			<if test="filterWhereResult != null">
 				${filterWhereResult}
 			</if>
 		</where>
-		order by A.PARENT_ID
+		order by A.PARENT_CODE
 		<if test="sidx != null">
 			,${sidx} ${sord}
 		</if>
 	</select>
-	
+
 	<!-- 记录数量 -->
 	<select id="count" parameterType="pd" resultType="int">
 		select count(*) from
 		<include refid="tableName"></include>
 		<where>
-			<if test="DICTIONARIES_ID!= null and DICTIONARIES_ID != ''"><!-- 检索 -->
-				and PARENT_ID = #{DICTIONARIES_ID}
+			<if test="DICT_CODE!= null and DICT_CODE != ''"><!-- 检索 -->
+				and PARENT_CODE = #{DICT_CODE}
 			</if>
 			<if test="keywords != null and keywords != ''"><!-- 关键词检索 -->
 				and
 				(
 				NAME LIKE CONCAT(CONCAT('%', #{keywords}),'%')
 				or
-				NAME_EN LIKE CONCAT(CONCAT('%', #{keywords}),'%')
+				NAME_EN LIKE
+				CONCAT(CONCAT('%', #{keywords}),'%')
 				or
-				BIANMA LIKE CONCAT(CONCAT('%', #{keywords}),'%')
+				DICT_CODE LIKE
+				CONCAT(CONCAT('%', #{keywords}),'%')
 				)
 			</if>
 			<if test="filterWhereResult != null">
@@ -216,7 +269,7 @@
 		from
 		<include refid="tableName"></include>
 		where
-		PARENT_ID = #{parentId} order by ORDER_BY
+		PARENT_CODE = #{parentCode} order by ORDER_BY
 	</select>
 
 	<!-- 排查表检查是否被占用 -->
@@ -226,17 +279,16 @@
 		from
 		${thisTable}
 		where
-		BIANMA = #{BIANMA}
+		DICT_CODE = #{DICT_CODE}
 	</select>
 
 	<!-- 获取SysDictionaries字典 -->
 	<!-- 张晓柳 -->
 	<select id="getSysDictionaries" parameterType="String"
 		resultType="com.fh.entity.system.Dictionaries">
-		SELECT r.*
-		FROM sys_dictionaries p, sys_dictionaries r
-		WHERE p.DICTIONARIES_ID = r.PARENT_ID
-		and UPPER(p.BIANMA) = UPPER(#{BIANMA})
+		SELECT *
+		FROM sys_dictionaries
+		where PARENT_CODE = #{PARENT_CODE}
 		order by ORDER_BY
 	</select>
 </mapper>

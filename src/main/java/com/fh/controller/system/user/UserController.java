@@ -170,7 +170,7 @@ public class UserController extends BaseController {
 		ModelAndView mv = this.getModelAndView();
 		PageData pd = new PageData();
 		pd = this.getPageData();
-		pd.put("USER_ID", this.get32UUID());	//ID 主键
+		//pd.put("USER_ID", this.get32UUID());	//ID 主键
 		pd.put("LAST_LOGIN", "");				//最后登录时间
 		pd.put("IP", "");						//IP
 		pd.put("STATUS", "1");					//状态
@@ -550,7 +550,7 @@ public class UserController extends BaseController {
 			 * var4 :备注
 			 */
 			for(int i=0;i<listPd.size();i++){		
-				pd.put("USER_ID", this.get32UUID());										//ID
+				//pd.put("USER_ID", this.get32UUID());										//ID
 				pd.put("NAME", listPd.get(i).getString("var1"));							//姓名
 				
 				String USERNAME = GetPinyin.getPingYin(listPd.get(i).getString("var1"));	//根据姓名汉字生成全拼

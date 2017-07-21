@@ -16,6 +16,7 @@ import com.fh.service.tmplConfigDict.tmplconfigdict.TmplConfigDictManager;
 import com.fh.util.PageData;
 import com.fh.util.StringUtil;
 
+import cn.jpush.http.StringUtils;
 import net.sf.json.JSONArray;
 
 /**
@@ -63,8 +64,8 @@ public class DictsUtil {
 			if (ret != null && !ret.toString().trim().equals("")) {
 				ret.append(";");
 			}
-			ret.append(dic.getBIANMA() + ":" + dic.getNAME());
-			dicAdd.put(dic.getBIANMA(), dic.getNAME());
+			ret.append(dic.getDICT_CODE() + ":" + dic.getNAME());
+			dicAdd.put(dic.getDICT_CODE(), dic.getNAME());
 		}
 		return ret.toString();
 	}
@@ -102,7 +103,7 @@ public class DictsUtil {
 			if (ret != null && !ret.toString().trim().equals("")) {
 				ret.append(";");
 			}
-			ret.append(dic.getString("USER_ID") + ":" + dic.getString("NAME"));
+			ret.append(StringUtil.toString(dic.get("USER_ID"), "") + ":" + dic.getString("NAME"));
 		}
 		return ret.toString();
 	}

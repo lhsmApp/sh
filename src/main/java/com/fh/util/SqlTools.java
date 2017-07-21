@@ -60,6 +60,7 @@ public class SqlTools {
             if (jsono.isJsonObject()) {  
                 String group = jsono.get("groupOp").getAsString();  
                 JsonElement rules = jsono.get("rules");  
+                if(rules==null) return "";
                 int i = 0;  
                 for (JsonElement o : rules.getAsJsonArray()) {  
                     String field = o.getAsJsonObject().get("field").getAsString();  

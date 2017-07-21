@@ -27,7 +27,7 @@
 					
 					<form action="dictionaries/${msg }.do" name="Form" id="Form" method="post">
 						<input type="hidden" name="DICTIONARIES_ID" id="DICTIONARIES_ID" value="${pd.DICTIONARIES_ID}"/>
-						<input type="hidden" name="PARENT_ID" id="PARENT_ID" value="${null == pd.PARENT_ID ? DICTIONARIES_ID:pd.PARENT_ID}"/>
+						<input type="hidden" name="PARENT_CODE" id="PARENT_CODE" value="${null == pd.PARENT_CODE ? DICT_CODE:pd.PARENT_CODE}"/>
 						<div id="zhongxin">
 						<table id="table_report" class="table table-striped table-bordered table-hover" style="margin-top:15px;">
 							<tr>
@@ -48,7 +48,7 @@
 							</tr>
 							<tr>
 								<td style="width:70px;text-align: right;padding-top: 13px;">编码:</td>
-								<td><input type="text" name="BIANMA" id="BIANMA" value="${pd.BIANMA}" maxlength="32" placeholder="这里输入编码 (不重复, 禁止修改)" title="编码" style="width:76%;" <c:if test="${null != pd.BIANMA}">readonly="readonly"</c:if> <c:if test="${null == pd.BIANMA}">onblur="hasBianma();"</c:if> /></td>
+								<td><input type="text" name="DICT_CODE" id="DICT_CODE" value="${pd.DICT_CODE}" maxlength="32" placeholder="这里输入编码 (不重复, 禁止修改)" title="编码" style="width:76%;" onblur="hasBianma('${pd.DICTIONARIES_ID }');"/></td>
 							</tr>
 							<tr>
 								<td style="width:70px;text-align: right;padding-top: 13px;">排序:</td>
@@ -122,14 +122,14 @@
 				$("#NAME_EN").focus();
 			return false;
 		}
-			if($("#BIANMA").val()==""){
-				$("#BIANMA").tips({
+			if($("#DICT_CODE").val()==""){
+				$("#DICT_CODE").tips({
 					side:3,
 		            msg:'请输入编码',
 		            bg:'#AE81FF',
 		            time:2
 		        });
-				$("#BIANMA").focus();
+				$("#DICT_CODE").focus();
 			return false;
 		}
 			if($("#ORDER_BY").val()==""){
@@ -150,25 +150,25 @@
 		}
 		
 		//判断编码是否存在
-		function hasBianma(){
-			var BIANMA = $.trim($("#BIANMA").val());
-			if("" == BIANMA)return;
+		function hasBianma(dictID){
+			var DICT_CODE = $.trim($("#DICT_CODE").val());
+			if("" == DICT_CODE)return;
 			$.ajax({
 				type: "POST",
 				url: '<%=basePath%>dictionaries/hasBianma.do',
-		    	data: {BIANMA:BIANMA,tm:new Date().getTime()},
+		    	data: {DICT_CODE:DICT_CODE,DICTIONARIES_ID:dictID,tm:new Date().getTime()},
 				dataType:'json',
 				cache: false,
 				success: function(data){
 					 if("success" == data.result){
 					 }else{
-						$("#BIANMA").tips({
+						$("#DICT_CODE").tips({
 							side:1,
-				            msg:'编码'+BIANMA+'已存在,重新输入',
+				            msg:'编码'+DICT_CODE+'已存在,重新输入',
 				            bg:'#AE81FF',
 				            time:5
 				        });
-						$('#BIANMA').val('');
+						$('#DICT_CODE').val('');
 					 }
 				}
 			});

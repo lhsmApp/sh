@@ -40,7 +40,9 @@ import com.fh.util.DateUtil;
 import com.fh.util.Jurisdiction;
 import com.fh.util.PageData;
 import com.fh.util.RightsHelper;
+import com.fh.util.StringUtil;
 import com.fh.util.Tools;
+import com.fh.util.base.ConvertUtils;
 /**
  * 总入口
  * @author fh QQ 3 1 3 5 9 6 7 9 0[青苔]
@@ -117,7 +119,7 @@ public class LoginController extends BaseController {
 						pd.put("LAST_LOGIN",DateUtil.getTime().toString());
 						userService.updateLastLogin(pd);
 						User user = new User();
-						user.setUSER_ID(pd.getString("USER_ID"));
+						user.setUSER_ID(StringUtil.toString(pd.get("USER_ID"),""));
 						user.setUSERNAME(pd.getString("USERNAME"));
 						user.setPASSWORD(pd.getString("PASSWORD"));
 						user.setNAME(pd.getString("NAME"));
@@ -181,7 +183,7 @@ public class LoginController extends BaseController {
 				}else{
 					user = userr;
 				}*/
-				user = userService.getUserAndRoleById(user.getUSER_ID());				//通过用户ID读取用户信息和角色信息
+				user = userService.getUserAndRoleById(StringUtil.toString(user.getUSER_ID(),"1"));				//通过用户ID读取用户信息和角色信息
 				session.setAttribute(Const.SESSION_USERROL, user);						//存入session
 				
 				

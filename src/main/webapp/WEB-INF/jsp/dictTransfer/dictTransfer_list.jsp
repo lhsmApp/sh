@@ -58,8 +58,7 @@
 													style="vertical-align: top; height: 32px; width: 150px;">
 														<option value="">请选择字典类型</option>
 														<c:forEach items="${dicTypeList}" var="dicType">
-															<option value="${dicType.DICTIONARIES_ID}"
-																<c:if test="${pd.DICTIONARIES_ID==dicType.DICTIONARIES_ID}">selected</c:if>>${dicType.NAME}</option>
+															<option value="${dicType.DICT_CODE}">${dicType.NAME}</option>
 														</c:forEach>
 												</select>
 											</span>
@@ -127,12 +126,11 @@
 			datatype: "json",
 			 colModel: [
 				{ label: 'ID',name:'DICTIONARIES_ID', key:true,width:60,hidden:true},
-				{ label: '编码',name:'BIANMA', width:60},
+				{ label: '编码',name:'DICT_CODE', width:60},
 				{ label: '名称', name: 'NAME', width: 90},
 				{ label: '英文', name: 'NAME_EN', width: 60},
 				{ label: '排序', name: 'ORDER_BY', width: 60},
-				{ label: '上级ID', name: 'PARENT_ID', width: 80,hidden:true},
-				{ label: '上级编码', name: 'PARENT_BIANMA', width: 80,hidden:true},
+				{ label: '上级编码', name: 'PARENT_CODE', width: 80,hidden:true},
 				{ label: '上级', name: 'PARENT_NAME', width: 80},
 				{ label: '备注', name: 'BZ', width: 80}
 			],
@@ -282,8 +280,8 @@
 			var dicType=$("#dicType").val();
 			$("#jqGrid").jqGrid('setGridParam',
 					{  // 重新加载数据
-						//url:'<%=basePath%>dictTransfer/getPageList.do?keywords='+ keywords+'&DICTIONARIES_ID='+dicType,
-						url:'<%=basePath%>dictTransfer/getPageList.do?DICTIONARIES_ID='+dicType,
+						//url:'<%=basePath%>dictTransfer/getPageList.do?keywords='+ keywords+'&DICT_CODE='+dicType,
+						url:'<%=basePath%>dictTransfer/getPageList.do?DICT_CODE='+dicType,
 						datatype : 'json',
 						page : 1
 					}).trigger("reloadGrid");

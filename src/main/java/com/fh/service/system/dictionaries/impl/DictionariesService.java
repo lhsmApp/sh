@@ -96,8 +96,8 @@ public class DictionariesService implements DictionariesManager{
 	public List<Dictionaries> listAllDict(String parentId) throws Exception {
 		List<Dictionaries> dictList = this.listSubDictByParentId(parentId);
 		for(Dictionaries dict : dictList){
-			dict.setTreeurl("dictionaries/list.do?DICTIONARIES_ID="+dict.getDICTIONARIES_ID());
-			dict.setSubDict(this.listAllDict(dict.getDICTIONARIES_ID()));
+			dict.setTreeurl("dictionaries/list.do?DICT_CODE="+dict.getDICT_CODE());
+			dict.setSubDict(this.listAllDict(dict.getDICT_CODE()));
 			dict.setTarget("treeFrame");
 		}
 		return dictList;
@@ -145,6 +145,14 @@ public class DictionariesService implements DictionariesManager{
 	 */
 	public int count(PageData pd)throws Exception{
 		return (int)dao.findForObject("DictionariesMapper.count", pd);
+	}
+	
+	/**是否有相同编码 
+	 * @param pd
+	 * @throws Exception
+	 */
+	public PageData hasSameDictCode(PageData pd)throws Exception{
+		return (PageData)dao.findForObject("DictionariesMapper.hasSameDictCode", pd);
 	}
 }
 

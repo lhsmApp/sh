@@ -16,7 +16,9 @@ import com.fh.service.system.dictionaries.DictionariesManager;
 import com.fh.service.system.user.UserManager;
 import com.fh.service.tmplConfigDict.tmplconfigdict.TmplConfigDictManager;
 import com.fh.service.tmplconfig.tmplconfig.TmplConfigManager;
+import com.fh.util.Const;
 import com.fh.util.PageData;
+import com.fh.util.Tools;
 import com.fh.util.enums.BillState;
 import com.fh.util.enums.BillType;
 
@@ -115,6 +117,12 @@ public class TmplUtil {
 		item.setDEPT_CODE(departCode);
 		item.setTABLE_CODE(tableCode);
 		m_columnsList = tmplconfigService.listNeed(item);
+		if(m_columnsList.size()==0){
+			String rootDeptCode=Tools.readTxtFile(Const.ROOT_DEPT_CODE);
+			item.setDEPT_CODE(rootDeptCode);
+			item.setTABLE_CODE(tableCode);
+			m_columnsList = tmplconfigService.listNeed(item);
+		}
 		// 拼接真正设置的jqGrid的ColModel
 		StringBuilder jqGridColModel = new StringBuilder();
 
@@ -323,8 +331,8 @@ public class TmplUtil {
 				if (ret != null && !ret.toString().trim().equals("")) {
 					ret.append(";");
 				}
-				ret.append(dic.getBIANMA() + ":" + dic.getNAME());
-				dicAdd.put(dic.getBIANMA(), dic.getNAME());
+				ret.append(dic.getDICT_CODE() + ":" + dic.getNAME());
+				dicAdd.put(dic.getDICT_CODE(), dic.getNAME());
 			}
 		} else if (strDicType.equals("2")) {
 			if (dicName.toUpperCase().equals(("oa_department").toUpperCase())) {
@@ -407,6 +415,12 @@ public class TmplUtil {
 		item.setDEPT_CODE(departCode);
 		item.setTABLE_CODE(tableCode);
 		m_columnsList = tmplconfigService.listNeed(item);
+		if(m_columnsList.size()==0){
+			String rootDeptCode=Tools.readTxtFile(Const.ROOT_DEPT_CODE);
+			item.setDEPT_CODE(rootDeptCode);
+			item.setTABLE_CODE(tableCode);
+			m_columnsList = tmplconfigService.listNeed(item);
+		}
 		int row = 1;
 		int col = 1;
 

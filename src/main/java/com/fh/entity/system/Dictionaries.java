@@ -12,11 +12,11 @@ import java.util.List;
  */
 public class Dictionaries {
 
+	private String DICT_CODE;//编码
+	private String PARENT_CODE;//父编码
 	private String NAME;			//名称
 	private String NAME_EN;			//英文名称
-	private String BIANMA;			//编码
 	private String ORDER_BY;		//排序	
-	private String PARENT_ID;		//上级ID
 	private String BZ;				//备注
 	private String TBSNAME;			//关联表
 	private String DICTIONARIES_ID;	//主键
@@ -26,6 +26,18 @@ public class Dictionaries {
 	private boolean hasDict = false;
 	private String treeurl;
 	
+	public String getDICT_CODE() {
+		return DICT_CODE;
+	}
+	public void setDICT_CODE(String dICT_CODE) {
+		DICT_CODE = dICT_CODE;
+	}
+	public String getPARENT_CODE() {
+		return PARENT_CODE;
+	}
+	public void setPARENT_CODE(String pARENT_CODE) {
+		PARENT_CODE = pARENT_CODE;
+	}
 	public String getNAME() {
 		return NAME;
 	}
@@ -38,24 +50,14 @@ public class Dictionaries {
 	public void setNAME_EN(String nAME_EN) {
 		NAME_EN = nAME_EN;
 	}
-	public String getBIANMA() {
-		return BIANMA;
-	}
-	public void setBIANMA(String bIANMA) {
-		BIANMA = bIANMA;
-	}
+	
 	public String getORDER_BY() {
 		return ORDER_BY;
 	}
 	public void setORDER_BY(String oRDER_BY) {
 		ORDER_BY = oRDER_BY;
 	}
-	public String getPARENT_ID() {
-		return PARENT_ID;
-	}
-	public void setPARENT_ID(String pARENT_ID) {
-		PARENT_ID = pARENT_ID;
-	}
+	
 	public String getBZ() {
 		return BZ;
 	}
