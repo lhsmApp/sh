@@ -48,7 +48,7 @@
 							</tr>
 							<tr>
 								<td style="width:70px;text-align: right;padding-top: 13px;">编码:</td>
-								<td><input type="text" name="DICT_CODE" id="DICT_CODE" value="${pd.DICT_CODE}" maxlength="32" placeholder="这里输入编码 (不重复, 禁止修改)" title="编码" style="width:76%;" onblur="hasBianma('${pd.DICTIONARIES_ID }');"</td>
+								<td><input type="text" name="DICT_CODE" id="DICT_CODE" value="${pd.DICT_CODE}" maxlength="32" placeholder="这里输入编码 (不重复, 禁止修改)" title="编码" style="width:76%;" onblur="hasBianma('${pd.DICTIONARIES_ID }');"/></td>
 							</tr>
 							<tr>
 								<td style="width:70px;text-align: right;padding-top: 13px;">排序:</td>
