@@ -57,7 +57,7 @@ public class DepartmentController extends BaseController {
 		ModelAndView mv = this.getModelAndView();
 		PageData pd = new PageData();
 		pd = this.getPageData();
-		pd.put("DEPARTMENT_ID", this.get32UUID());	//主键
+		//pd.put("DEPARTMENT_ID", this.get32UUID());	//主键
 		departmentService.save(pd);
 		mv.addObject("msg","success");
 		mv.setViewName("save_result");

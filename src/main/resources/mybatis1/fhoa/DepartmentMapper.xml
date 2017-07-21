@@ -28,6 +28,19 @@
 		DEPARTMENT_ID
 	</sql>
 	
+	<!-- 字段 -->
+	<sql id="FieldInsert">
+		NAME,	
+		NAME_EN,	
+		DEPARTMENT_CODE,	
+		PARENT_CODE,
+		HEADMAN,
+		TEL,
+		FUNCTIONS,
+		ADDRESS,
+		BZ
+	</sql>
+	
 	<!-- 字段值 -->
 	<sql id="FieldValue">
 		#{NAME},	
@@ -42,14 +55,27 @@
 		#{DEPARTMENT_ID}
 	</sql>
 	
+	<!-- 字段值 -->
+	<sql id="FieldValueInsert">
+		#{NAME},	
+		#{NAME_EN},	
+		#{DEPARTMENT_CODE},	
+		#{PARENT_CODE},
+		#{HEADMAN},
+		#{TEL},
+		#{FUNCTIONS},
+		#{ADDRESS},
+		#{BZ}
+	</sql>
+	
 	<!-- 新增-->
 	<insert id="save" parameterType="pd">
 		insert into 
 	<include refid="tableName"></include>
 		(
-	<include refid="Field"></include>
+	<include refid="FieldInsert"></include>
 		) values (
-	<include refid="FieldValue"></include>
+	<include refid="FieldValueInsert"></include>
 		)
 	</insert>
 	
