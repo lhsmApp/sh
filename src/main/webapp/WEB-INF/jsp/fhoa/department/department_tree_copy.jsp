@@ -107,12 +107,10 @@
 			var DEPARTMENT_CODE = "${DEPARTMENT_CODE}";
 			var DEPARTMENT_CODE_COPY = "${pd.DEPARTMENT_CODE}";
 			var TABLE_NO = "${pd.TABLE_NO}";
+			var RPT_DUR = "${pd.RPT_DUR}";
 			var url = "<%=basePath%>tmplconfig/copyAll.do?";
 			var postData;
-			postData = {"DEPARTMENT_CODE":DEPARTMENT_CODE,"TABLE_NO":TABLE_NO,"deptIds":JSON.stringify(listIds)};
-			console.log("listIds保存"+listIds);
-			console.log("ids值："+ids);
-			console.log("保存"+DEPARTMENT_CODE_COPY+TABLE_NO);
+			postData = {"RPT_DUR":RPT_DUR,"DEPARTMENT_CODE":DEPARTMENT_CODE,"TABLE_NO":TABLE_NO,"deptIds":JSON.stringify(listIds)};
 			$("#zhongxin").hide();
 			$("#zhongxin2").show();
 			 $.post(url,postData,function(data){

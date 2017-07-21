@@ -68,7 +68,7 @@
 							<!-- 开始循环 -->	
 							<c:choose>
 								<c:when test="${not empty varList}">
-									<c:if test="${QX.cha == 1 }">
+									<%-- <c:if test="${QX.cha == 1 }"> --%>
 									<c:forEach items="${varList}" var="var" varStatus="vs">
 										<tr>
 											<td class='center' style="width: 30px;">${vs.index+1}</td>
@@ -124,12 +124,12 @@
 										</tr>
 									
 									</c:forEach>
-									</c:if>
+									<%-- </c:if>
 									<c:if test="${QX.cha == 0 }">
 										<tr>
 											<td colspan="100" class="center">您无权查看</td>
 										</tr>
-									</c:if>
+									</c:if> --%>
 								</c:when>
 								<c:otherwise>
 									<tr class="main_info">
@@ -143,9 +143,9 @@
 						<table style="width:100%;">
 							<tr>
 								<td style="vertical-align:top;">
-									<c:if test="${QX.add == 1 }">
+									<%-- <c:if test="${QX.add == 1 }"> --%>
 									<a class="btn btn-sm btn-success" onclick="add('${DICT_CODE}');">新增</a>
-									</c:if>
+									<%-- </c:if> --%>
 									<c:if test="${null != pd.DICT_CODE && pd.DICT_CODE != ''}">
 									<a class="btn btn-sm btn-success" onclick="goSondict('${pd.PARENT_CODE}');">返回</a>
 									</c:if>

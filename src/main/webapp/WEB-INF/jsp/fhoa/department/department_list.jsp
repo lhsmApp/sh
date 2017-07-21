@@ -45,9 +45,9 @@
 										<option value="" <c:if test="${DEPARTMENT_CODE == ''}">selected</c:if>>全部</option>
 									</select>
 								</td>
-								<c:if test="${QX.cha == 1 }">
+								<%-- <c:if test="${QX.cha == 1 }"> --%>
 								<td style="vertical-align:top;padding-left:2px"><a class="btn btn-light btn-xs" onclick="gsearch();"  title="检索"><i id="nav-search-icon" class="ace-icon fa fa-search bigger-110 nav-search-icon blue"></i></a></td>
-								</c:if>
+								<%-- </c:if> --%>
 							</tr>
 						</table>
 						<!-- 检索  -->
@@ -69,7 +69,7 @@
 							<!-- 开始循环 -->	
 							<c:choose>
 								<c:when test="${not empty varList}">
-									<c:if test="${QX.cha == 1 }">
+									<%-- <c:if test="${QX.cha == 1 }"> --%>
 									<c:forEach items="${varList}" var="var" varStatus="vs">
 										<tr>
 											<td class='center' style="width: 30px;">${vs.index+1}</td>
@@ -79,20 +79,20 @@
 											<td class='center'>${var.HEADMAN}</td>
 											<td class='center'>${var.FUNCTIONS}</td>
 											<td class="center">
-												<c:if test="${QX.edit != 1 && QX.del != 1 }">
+												<%-- <c:if test="${QX.edit != 1 && QX.del != 1 }">
 												<span class="label label-large label-grey arrowed-in-right arrowed-in"><i class="ace-icon fa fa-lock" title="无权限"></i></span>
-												</c:if>
+												</c:if> --%>
 												<div class="hidden-sm hidden-xs btn-group">
-													<c:if test="${QX.edit == 1 }">
+													<%-- <c:if test="${QX.edit == 1 }"> --%>
 													<a class="btn btn-xs btn-success" title="编辑" onclick="edit('${var.DEPARTMENT_ID}');">
 														<i class="ace-icon fa fa-pencil-square-o bigger-120" title="编辑"></i>
 													</a>
-													</c:if>
-													<c:if test="${QX.del == 1 }">
+													<%-- </c:if> --%>
+													<%-- <c:if test="${QX.del == 1 }"> --%>
 													<a class="btn btn-xs btn-danger" onclick="del('${var.DEPARTMENT_ID}');">
 														<i class="ace-icon fa fa-trash-o bigger-120" title="删除"></i>
 													</a>
-													</c:if>
+													<%-- </c:if> --%>
 												</div>
 												<div class="hidden-md hidden-lg">
 													<div class="inline pos-rel">
@@ -101,7 +101,7 @@
 														</button>
 			
 														<ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
-															<c:if test="${QX.edit == 1 }">
+															<%-- <c:if test="${QX.edit == 1 }"> --%>
 															<li>
 																<a style="cursor:pointer;" onclick="edit('${var.DEPARTMENT_ID}');" class="tooltip-success" data-rel="tooltip" title="修改">
 																	<span class="green">
@@ -109,8 +109,8 @@
 																	</span>
 																</a>
 															</li>
-															</c:if>
-															<c:if test="${QX.del == 1 }">
+															<%-- </c:if>
+															<c:if test="${QX.del == 1 }"> --%>
 															<li>
 																<a style="cursor:pointer;" onclick="del('${var.DEPARTMENT_ID}');" class="tooltip-error" data-rel="tooltip" title="删除">
 																	<span class="red">
@@ -118,7 +118,7 @@
 																	</span>
 																</a>
 															</li>
-															</c:if>
+															<%-- </c:if> --%>
 														</ul>
 													</div>
 												</div>
@@ -126,12 +126,12 @@
 										</tr>
 									
 									</c:forEach>
-									</c:if>
+									<%-- </c:if>
 									<c:if test="${QX.cha == 0 }">
 										<tr>
 											<td colspan="100" class="center">您无权查看</td>
 										</tr>
-									</c:if>
+									</c:if> --%>
 								</c:when>
 								<c:otherwise>
 									<tr class="main_info">
@@ -145,12 +145,12 @@
 						<table style="width:100%;">
 							<tr>
 								<td style="vertical-align:top;">
-									<c:if test="${QX.add == 1 }">
+									<%-- <c:if test="${QX.add == 1 }"> --%>
 										<a class="btn btn-sm btn-success" onclick="add('${DEPARTMENT_CODE}');">新增</a>
-									</c:if>
-									<c:if test="${null != pd.DEPARTMENT_CODE && pd.DEPARTMENT_CODE != ''}">
+									<%-- </c:if>
+									<c:if test="${null != pd.DEPARTMENT_CODE && pd.DEPARTMENT_CODE != ''}"> --%>
 										<a class="btn btn-sm btn-success" onclick="goSondict('${pd.PARENT_CODE}');">返回</a>
-									</c:if>
+									<%-- </c:if> --%>
 								</td>
 								<td style="vertical-align:top;"><div class="pagination" style="float: right;padding-top: 0px;margin-top: 0px;">${page.pageStr}</div></td>
 							</tr>
