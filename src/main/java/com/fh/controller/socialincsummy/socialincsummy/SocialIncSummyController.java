@@ -414,7 +414,7 @@ public class SocialIncSummyController extends BaseController {
                     }
 	    			addTo.put("updateFilter", updateFilter);
                     //添加未设置字段默认值
-	    			TmplUtil.setModelDefault(addTo, SocialIncSummyModel.class, DefaultValueList);
+	    			//TmplUtil.setModelDefault(addTo, SocialIncSummyModel.class, DefaultValueList);
     				listTo.add(addTo);
     			}
         	}

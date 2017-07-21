@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.fh.entity.JqPage;
-import com.fh.entity.HouseFundDetailModel;
 import com.fh.util.PageData;
 
 /** 
@@ -15,32 +14,14 @@ import com.fh.util.PageData;
  */
 public interface HouseFundDetailManager{
 
-	/**获取数据
-	 * 张晓柳
-	 * @param pd
-	 * @throws Exception
-	 */
-	public List<HouseFundDetailModel> findByPd(PageData pd)throws Exception;
 	
 	/**获取数据
 	 * 张晓柳
 	 * @param pd
 	 * @throws Exception
 	 */
-	public List<HouseFundDetailModel> findByModel(List<HouseFundDetailModel> listData)throws Exception;
+	public List<PageData> findByModel(List<PageData> listData)throws Exception;
 
-	/**新增
-	 * @param pd
-	 * @throws Exception
-	 */
-	public void save(PageData pd)throws Exception;
-	
-	/**修改
-	 * @param pd
-	 * @throws Exception
-	 */
-	public void edit(PageData pd)throws Exception;
-	
 	/**导出列表
 	 * @param page
 	 * @throws Exception
@@ -74,26 +55,33 @@ public interface HouseFundDetailManager{
 	 * @param 
 	 * @throws Exception
 	 */
-	public void deleteAll(List<HouseFundDetailModel> listData)throws Exception;
+	public void deleteAll(List<PageData> listData)throws Exception;
 	
 	/**批量修改
 	 * @param pd
 	 * @throws Exception
 	 */
-	public void updateAll(List<HouseFundDetailModel> listData)throws Exception;
+	public void deleteUpdateAll(List<PageData> listData)throws Exception;
 	
 	/**导入
 	 * @param pd
 	 * @throws Exception
 	 */
-	public void batchImport(List<HouseFundDetailModel> listData)throws Exception;
+	public void batchImport(List<PageData> listData)throws Exception;
 
-	/**获取员工编码
+	/**获取员工编码 相当于字典
 	 * 张晓柳
 	 * @param 
 	 * @throws Exception
 	 */
 	public List<String> getHaveUserCodeDic(PageData pd)throws Exception;
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

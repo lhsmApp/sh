@@ -7,7 +7,6 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import com.fh.dao.DaoSupport;
 import com.fh.entity.JqPage;
-import com.fh.entity.HouseFundDetailModel;
 import com.fh.util.PageData;
 import com.fh.service.houseFundDetail.housefunddetail.HouseFundDetailManager;
 
@@ -22,6 +21,7 @@ public class HouseFundDetailService implements HouseFundDetailManager{
 
 	@Resource(name = "daoSupport")
 	private DaoSupport dao;
+
 	
 	/**获取数据
 	 * 张晓柳
@@ -29,34 +29,55 @@ public class HouseFundDetailService implements HouseFundDetailManager{
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	public List<HouseFundDetailModel> findByPd(PageData pd)throws Exception{
-		return (List<HouseFundDetailModel>)dao.findForList("HouseFundDetailMapper.findByPd", pd);
+	public List<PageData> findByModel(List<PageData> listData)throws Exception{
+		return (List<PageData>)dao.findForList("HouseFundDetailMapper.findByModel", listData);
 	}
 	
-	/**获取数据
-	 * 张晓柳
-	 * @param pd
+	/**列表
+	 * @param page
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	public List<HouseFundDetailModel> findByModel(List<HouseFundDetailModel> listData)throws Exception{
-		return (List<HouseFundDetailModel>)dao.findForList("HouseFundDetailMapper.findByModel", listData);
+	public List<PageData> JqPage(JqPage page)throws Exception{
+		return (List<PageData>)dao.findForList("HouseFundDetailMapper.datalistJqPage", page);
 	}
-	
-	/**新增
+	/**获取记录数量
 	 * @param pd
 	 * @throws Exception
 	 */
-	public void save(PageData pd)throws Exception{
-		dao.save("HouseFundDetailMapper.save", pd);
+	public int countJqGridExtend(JqPage page)throws Exception{
+		return (int)dao.findForObject("HouseFundDetailMapper.countJqGridExtend", page);
 	}
-	
-	/**修改
+	/**获取记录总合计
 	 * @param pd
 	 * @throws Exception
 	 */
-	public void edit(PageData pd)throws Exception{
-		dao.update("HouseFundDetailMapper.edit", pd);
+	public PageData getFooterSummary(JqPage page)throws Exception{
+		return (PageData)dao.findForObject("HouseFundDetailMapper.getFooterSummary", page);
+	}
+
+	/**批量删除
+	 * @param 
+	 * @throws Exception
+	 */
+	public void deleteAll(List<PageData> listData)throws Exception{
+		dao.delete("HouseFundDetailMapper.deleteAll", listData);
+	}
+	
+	/**批量修改
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void deleteUpdateAll(List<PageData> listData)throws Exception{
+		dao.batchDeleteUpdate("HouseFundDetailMapper.deleteAll", "HouseFundDetailMapper.save", listData);
+	}
+	
+	/**导入
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void batchImport(List<PageData> listData)throws Exception{
+		dao.batchImport("HouseFundDetailMapper.importDelete", "HouseFundDetailMapper.save", listData);
 	}
 	
 	/**导出列表
@@ -75,57 +96,8 @@ public class HouseFundDetailService implements HouseFundDetailManager{
 	public List<PageData> exportModel(String DepartCode)throws Exception{
 		return (List<PageData>)dao.findForList("HouseFundDetailMapper.exportModel", DepartCode);
 	}
-	
-	/**列表
-	 * @param page
-	 * @throws Exception
-	 */
-	@SuppressWarnings("unchecked")
-	public List<PageData> JqPage(JqPage page)throws Exception{
-		return (List<PageData>)dao.findForList("HouseFundDetailMapper.datalistJqPage", page);
-	}
-	
-	/**获取记录数量
-	 * @param pd
-	 * @throws Exception
-	 */
-	public int countJqGridExtend(JqPage page)throws Exception{
-		return (int)dao.findForObject("HouseFundDetailMapper.countJqGridExtend", page);
-	}
-	
-	/**获取记录总合计
-	 * @param pd
-	 * @throws Exception
-	 */
-	public PageData getFooterSummary(JqPage page)throws Exception{
-		return (PageData)dao.findForObject("HouseFundDetailMapper.getFooterSummary", page);
-	}
-	
-	/**批量删除
-	 * @param 
-	 * @throws Exception
-	 */
-	public void deleteAll(List<HouseFundDetailModel> listData)throws Exception{
-		dao.batchDelete("HouseFundDetailMapper.deleteAll", listData);
-	}
-	
-	/**批量修改
-	 * @param pd
-	 * @throws Exception
-	 */
-	public void updateAll(List<HouseFundDetailModel> listData)throws Exception{
-		dao.batchUpdate("HouseFundDetailMapper.updateAll", listData);
-	}
-	
-	/**导入
-	 * @param pd
-	 * @throws Exception
-	 */
-	public void batchImport(List<HouseFundDetailModel> listData)throws Exception{
-		dao.batchImport("HouseFundDetailMapper.importDelete", "HouseFundDetailMapper.importInsert", listData);
-	}
 
-	/**获取员工编码
+	/**获取员工编码 相当于字典
 	 * @param 
 	 * @throws Exception
 	 */
@@ -134,6 +106,12 @@ public class HouseFundDetailService implements HouseFundDetailManager{
 		return (List<String>)dao.findForList("HouseFundDetailMapper.getHaveUserCodeDic", pd);
 	}
 
+	
+	
+	
+	
+	
+	
 	
 	
 	

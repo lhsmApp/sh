@@ -6,8 +6,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,18 +29,20 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
+import com.fh.entity.TmplConfigDetail;
+import com.fh.util.PageData;
 import com.fh.util.base.StochasticUtil;
 
 
 /**
  * SpringMVC 读取Excle工具类
-* @ClassName: LeadingInExcel
+* @ClassName: LeadingInExcelToPageData
 * @Description: TODO(这里用一句话描述这个类的作用)
-* @author jiachao
+* @author 张晓柳
 * @date 2017年2月13日
 *
  */
-public class LeadingInExcel<T> {
+public class LeadingInExcelToPageData<T> {
     
     //log4j输出
     private Logger logger = Logger.getLogger(this.getClass());
@@ -52,7 +52,7 @@ public class LeadingInExcel<T> {
     /**
      * 无参构造
      */
-    public LeadingInExcel() {
+    public LeadingInExcelToPageData() {
         super();
     }
     
@@ -60,7 +60,7 @@ public class LeadingInExcel<T> {
      * 构造设置显示时间的格式
      * @param format 例："yyyy-MM-dd"
      */
-    public LeadingInExcel(String format) {
+    public LeadingInExcelToPageData(String format) {
         super();
         this.format = format;
     }
@@ -85,7 +85,9 @@ public class LeadingInExcel<T> {
      * @throws Exception
      */
     public Map<Integer, Object> uploadAndRead(MultipartFile multipart,String propertiesFileName, String kyeName,int sheetIndex,
-            Map<String, String> titleAndAttribute,Class<T> clazz) throws Exception{
+            Map<String, String> titleAndAttribute,
+            Map<String, Object> TypeList,
+    		List<TmplConfigDetail> listColumns, Map<String, Object> DicList) throws Exception{
         
             String originalFilename=null;
             int i = 0;
@@ -100,7 +102,7 @@ public class LeadingInExcel<T> {
             
             String filePath = readPropertiesFilePathMethod( propertiesFileName, kyeName);
             File filePathname = this.upload(multipart, filePath, isExcel2003);
-            Map<Integer, Object> judgementVersion = judgementVersion(filePathname, sheetIndex, titleAndAttribute, clazz, isExcel2003);
+            Map<Integer, Object> judgementVersion = judgementVersion(filePathname, sheetIndex, titleAndAttribute, TypeList, isExcel2003, listColumns, DicList);
         
         return judgementVersion;
     }
@@ -208,7 +210,8 @@ public class LeadingInExcel<T> {
      * @return
      * @throws Exception
      */
-    public Map<Integer, Object> judgementVersion(File filePathname,int sheetIndex,Map<String, String> titleAndAttribute,Class<T> clazz,boolean isExcel2003) throws Exception{
+    public Map<Integer, Object> judgementVersion(File filePathname,int sheetIndex,Map<String, String> titleAndAttribute,Map<String, Object> TypeList,boolean isExcel2003,
+    		List<TmplConfigDetail> listColumns, Map<String, Object> DicList) throws Exception{
         
         FileInputStream is=null;
         POIFSFileSystem fs=null;
@@ -238,7 +241,7 @@ public class LeadingInExcel<T> {
                 }
             }
         
-        return readExcelTitle(workbook,sheetIndex,titleAndAttribute,clazz);
+        return readExcelTitle(workbook,sheetIndex,titleAndAttribute,TypeList, listColumns, DicList);
     }
 
     /**
@@ -250,7 +253,8 @@ public class LeadingInExcel<T> {
      * @return
      * @throws Exception
      */
-    private Map<Integer, Object> readExcelTitle(Workbook workbook,int sheetIndex,Map<String, String> titleAndAttribute,Class<T> clazz) throws Exception{
+    private Map<Integer, Object> readExcelTitle(Workbook workbook,int sheetIndex,Map<String, String> titleAndAttribute,Map<String, Object> TypeList,
+    		List<TmplConfigDetail> listColumns, Map<String, Object> DicList) throws Exception{
 
         //得到第一个shell  
         Sheet sheet = workbook.getSheetAt(sheetIndex);
@@ -280,7 +284,7 @@ public class LeadingInExcel<T> {
             }
         }
 
-        return readExcelValue(workbook,sheet,attribute,clazz);
+        return readExcelValue(workbook,sheet,attribute,TypeList, listColumns, DicList);
         
     }
     
@@ -294,10 +298,11 @@ public class LeadingInExcel<T> {
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
-	private Map<Integer, Object> readExcelValue(Workbook workbook,Sheet sheet,Map<Integer, String> attribute,Class<T> clazz) throws Exception{
+	private Map<Integer, Object> readExcelValue(Workbook workbook,Sheet sheet,Map<Integer, String> attribute,Map<String, Object> TypeList,
+    		List<TmplConfigDetail> listColumns, Map<String, Object> DicList) throws Exception{
     	Map<Integer, Object> returnMap = new HashMap<Integer, Object>();
     	Map<String, Object> returnError = new HashMap<String, Object>();
-        List<T> info=new ArrayList<T>();
+        List<PageData> info=new ArrayList<PageData>();
         //获取标题行列数
         int titleCellNum = sheet.getRow(0).getLastCellNum();
         // 获取值
@@ -313,7 +318,7 @@ public class LeadingInExcel<T> {
             
             // 2.标记
             boolean judge = true;
-            T obj = clazz.newInstance();
+            PageData obj = new PageData();
             for (int columnIndex = 0; columnIndex < row.getLastCellNum(); columnIndex++) {//这里小于等于变成小于
                 Cell cell = row.getCell(columnIndex);
                 
@@ -327,35 +332,37 @@ public class LeadingInExcel<T> {
                 	continue;
                 }
                 
-                /*
-                 * 测试：查看自定义的title Map集合中定义的Excle标题和实体类中属性对应情况！
-                   System.out.println("c:"+columnIndex+"\t"+attribute.get(Integer.valueOf(columnIndex)));
-                 */
-                Field field = clazz.getDeclaredField(attribute.get(Integer
-                        .valueOf(columnIndex)));
-                Class<?> fieldType = field.getType();
-                Object agge = null;
-                if (fieldType.isAssignableFrom(Integer.class)) {
-                    agge = Integer.valueOf(value);
-                } else if (fieldType.isAssignableFrom(Double.class)) {
-                    agge = Double.valueOf(value);
-                } else if (fieldType.isAssignableFrom(Float.class)) {
-                    agge = Float.valueOf(value);
-                } else if (fieldType.isAssignableFrom(Long.class)) {
-                    agge = Long.valueOf(value);
-                } else if (fieldType.isAssignableFrom(Date.class)) {
+                String COL_CODE = attribute.get(Integer.valueOf(columnIndex));
+    			if(listColumns != null && listColumns.size() > 0){
+    				for(int j=0; j < listColumns.size(); j++){
+    					if(COL_CODE.equals(listColumns.get(j).getCOL_CODE())){
+        					String trans = listColumns.get(j).getDICT_TRANS();
+        					if(trans != null && !trans.trim().equals("")){
+        						Map<String, String> dicAdd = (Map<String, String>) DicList.getOrDefault(trans, new HashMap<String, String>());
+                                String getKey = "";
+        						for (Map.Entry<String, String> dic :dicAdd.entrySet())  {
+        							if(value.equals(dic.getValue().toString())){
+        								getKey = dic.getKey();
+                                    }
+        					    }  
+        						if(!(getKey != null && getKey.trim() != "")){
+        							returnError.put(listColumns.get(j).getCOL_NAME(), value);
+        							break;
+        						}
+        						value = getKey;
+        					}
+    					}
+    				}
+    			}
+                String fieldType = (String) TypeList.get(COL_CODE);
+				
+                Object agge = value;
+                if (fieldType.toUpperCase().equals(Date.class.getName().toUpperCase())) {
                     agge = new SimpleDateFormat(format).parse(value);
-                } else if (fieldType.isAssignableFrom(Boolean.class)) {
+                } else if (fieldType.toUpperCase().equals(Boolean.class.getName().toUpperCase())) {
                     agge = "Y".equals(value) || "1".equals(value);
-                } else if (fieldType.isAssignableFrom(String.class)) {
-                    agge = value;
                 }
-                // 个人感觉char跟byte就不用判断了 用这两个类型的很少如果是从数据库用IDE生成的话就不会出现了
-                Method method = clazz.getMethod("set"
-                        + toUpperFirstCase(attribute.get(Integer
-                                .valueOf(columnIndex))), fieldType);
-                method.invoke(obj, agge);
-
+                obj.put(COL_CODE, agge);
             }
             // 4. if
             if(judge)info.add(obj);
@@ -368,14 +375,6 @@ public class LeadingInExcel<T> {
             returnMap.put(2, info);
         }
         return returnMap;
-    }
-    
-    /**
-     *  @ 首字母大写
-     */
-    private String toUpperFirstCase(String str) {
-        return str.replaceFirst(str.substring(0, 1), str.substring(0, 1)
-                .toUpperCase());
     }
     
     /**

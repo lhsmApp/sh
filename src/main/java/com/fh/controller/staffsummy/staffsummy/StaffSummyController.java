@@ -415,7 +415,7 @@ public class StaffSummyController extends BaseController {
                     }
 	    			addTo.put("updateFilter", updateFilter);
                     //添加未设置字段默认值
-	    			TmplUtil.setModelDefault(addTo, StaffSummyModel.class, DefaultValueList);
+	    			//TmplUtil.setModelDefault(addTo, StaffSummyModel.class, DefaultValueList);
     				listTo.add(addTo);
     			}
         	}

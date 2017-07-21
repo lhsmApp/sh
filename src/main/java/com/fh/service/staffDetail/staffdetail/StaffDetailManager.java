@@ -3,13 +3,7 @@ package com.fh.service.staffDetail.staffdetail;
 import java.util.List;
 import java.util.Map;
 
-import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
-import com.fh.entity.StaffDetailModel;
-import com.fh.entity.TableColumns;
-import com.fh.entity.system.Department;
-import com.fh.entity.system.Dictionaries;
-import com.fh.entity.system.User;
 import com.fh.util.PageData;
 
 /** 
@@ -25,27 +19,8 @@ public interface StaffDetailManager{
 	 * @param pd
 	 * @throws Exception
 	 */
-	public List<StaffDetailModel> findByPd(PageData pd)throws Exception;
-	
-	/**获取数据
-	 * 张晓柳
-	 * @param pd
-	 * @throws Exception
-	 */
-	public List<StaffDetailModel> findByModel(List<StaffDetailModel> listData)throws Exception;
+	public List<PageData> findByModel(List<PageData> listData)throws Exception;
 
-	/**新增
-	 * @param pd
-	 * @throws Exception
-	 */
-	public void save(PageData pd)throws Exception;
-	
-	/**修改
-	 * @param pd
-	 * @throws Exception
-	 */
-	public void edit(PageData pd)throws Exception;
-	
 	/**导出列表
 	 * @param page
 	 * @throws Exception
@@ -79,21 +54,21 @@ public interface StaffDetailManager{
 	 * @param 
 	 * @throws Exception
 	 */
-	public void deleteAll(List<StaffDetailModel> listData)throws Exception;
+	public void deleteAll(List<PageData> listData)throws Exception;
 	
 	/**批量修改
 	 * @param pd
 	 * @throws Exception
 	 */
-	public void updateAll(List<StaffDetailModel> listData)throws Exception;
+	public void deleteUpdateAll(List<PageData> listData)throws Exception;
 	
 	/**导入
 	 * @param pd
 	 * @throws Exception
 	 */
-	public void batchImport(List<StaffDetailModel> listData)throws Exception;
+	public void batchImport(List<PageData> listData)throws Exception;
 
-	/**获取员工编码
+	/**获取员工编码 相当于字典
 	 * 张晓柳
 	 * @param 
 	 * @throws Exception

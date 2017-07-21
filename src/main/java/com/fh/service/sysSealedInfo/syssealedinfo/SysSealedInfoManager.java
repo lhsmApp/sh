@@ -2,10 +2,7 @@ package com.fh.service.sysSealedInfo.syssealedinfo;
 
 import java.util.List;
 
-import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
-import com.fh.entity.Page;
-import com.fh.entity.StaffDetailModel;
 import com.fh.entity.SysSealed;
 import com.fh.util.PageData;
 

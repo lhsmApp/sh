@@ -16,11 +16,7 @@
 	
 	<!-- 字段 -->
 	<sql id="FieldSelectKey"> BILL_CODE BILL_CODE__, BUSI_DATE BUSI_DATE__, USER_CODE USER_CODE__,</sql>
-    <sql id="Field"> BILL_CODE, BUSI_DATE, USER_CODE, USER_NAME, STAFF_IDENT, BANK_CARD, USER_GROP, USER_CATG, DEPT_CODE, ORG_UNIT, SAL_RANGE, POST_SALY, BONUS, CASH_BONUS, WORK_OT, BACK_SALY, RET_SALY, CHK_CASH, INTR_SGL_AWAD, SENY_ALLE, POST_ALLE, NS_ALLE, AREA_ALLE, EXPT_ALLE, TECH_ALLE, LIVE_EXPE, LIVE_ALLE, LEAVE_DM, HOUSE_ALLE, ITEM_ALLE, MEAL_EXPE, TRF_ALLE, TEL_EXPE, HLDY_ALLE, KID_ALLE, COOL_EXPE, EXT_SGL_AWAD, PRE_TAX_PLUS, GROSS_PAY, ENDW_INS, UNEMPL_INS, MED_INS, CASD_INS, HOUSE_FUND, SUP_PESN, TAX_BASE_ADJ, ACCRD_TAX, AFTER_TAX, ACT_SALY, GUESS_DIFF, CUST_COL1, CUST_COL2, CUST_COL3, CUST_COL4, CUST_COL5, CUST_COL6, CUST_COL7, CUST_COL8, CUST_COL9, CUST_COL10, ESTB_DEPT </sql>
     
-    <!-- 字段值 -->
-    <sql id="FieldValue"> #{BILL_CODE}, #{BUSI_DATE}, #{USER_CODE}, #{USER_NAME}, #{STAFF_IDENT}, #{BANK_CARD}, #{USER_GROP}, #{USER_CATG}, #{DEPT_CODE}, #{ORG_UNIT}, #{SAL_RANGE}, #{POST_SALY}, #{BONUS}, #{CASH_BONUS}, #{WORK_OT}, #{BACK_SALY}, #{RET_SALY}, #{CHK_CASH}, #{INTR_SGL_AWAD}, #{SENY_ALLE}, #{POST_ALLE}, #{NS_ALLE}, #{AREA_ALLE}, #{EXPT_ALLE}, #{TECH_ALLE}, #{LIVE_EXPE}, #{LIVE_ALLE}, #{LEAVE_DM}, #{HOUSE_ALLE}, #{ITEM_ALLE}, #{MEAL_EXPE}, #{TRF_ALLE}, #{TEL_EXPE}, #{HLDY_ALLE}, #{KID_ALLE}, #{COOL_EXPE}, #{EXT_SGL_AWAD}, #{PRE_TAX_PLUS}, #{GROSS_PAY}, #{ENDW_INS}, #{UNEMPL_INS}, #{MED_INS}, #{CASD_INS}, #{HOUSE_FUND}, #{SUP_PESN}, #{TAX_BASE_ADJ}, #{ACCRD_TAX}, #{AFTER_TAX}, #{ACT_SALY}, #{GUESS_DIFF}, #{CUST_COL1}, #{CUST_COL2}, #{CUST_COL3}, #{CUST_COL4}, #{CUST_COL5}, #{CUST_COL6}, #{CUST_COL7}, #{CUST_COL8}, #{CUST_COL9}, #{CUST_COL10}, #{ESTB_DEPT} </sql>
-	
 	<!-- 获取员工编码 相当于字典-->
 	<!-- 张晓柳 -->
 	<select id="getHaveUserCodeDic" parameterType="pd" resultType="String">
@@ -31,17 +27,8 @@
 	</select>
 	
 	<!-- 获取数据 验证数据重复 -->
-	<select id="findByPd" parameterType="pd" resultType="com.fh.entity.StaffDetailModel">
-		select 
-		    <include refid="Field"></include>
-		from 
-		    <include refid="tableName"></include>
-		where BUSI_DATE = #{BUSI_DATE}
-		and (USER_CODE = #{USER_CODE} and USER_CODE != #{USER_CODE__})
-	</select>
-	<select id="findByModel" parameterType="com.fh.entity.StaffDetailModel" resultType="com.fh.entity.StaffDetailModel">
-		select 
-		    <include refid="Field"></include>
+	<select id="findByModel" parameterType="pd" resultType="pd">
+		select * 
 		from 
 		    <include refid="tableName"></include>
         <where>
@@ -55,7 +42,7 @@
 	<select id="datalistJqPage" parameterType="jqPage" resultType="pd">
 		select 
 		    <include refid="FieldSelectKey"></include>
-		    <include refid="Field"></include>
+		    * 
 		from 
 		<include refid="tableName"></include>
 		where BUSI_DATE = '${pd.SystemDateTime}'
@@ -101,85 +88,11 @@
 	<insert id="save" parameterType="pd">
 		insert into 
 	    <include refid="tableName"></include>
-		(
-	    <include refid="Field"></include>
-		) values (
-	    <include refid="FieldValue"></include>
-		)
+		(${InsertField}) values (${InsertVale})
 	</insert>
 	
-	<!-- 修改 -->
-	<update id="edit" parameterType="pd">
-		update
-		<include refid="tableName"></include>
-		set 
-			BILL_CODE = #{BILL_CODE},
-			BUSI_DATE = #{BUSI_DATE},
-			USER_CODE = #{USER_CODE},
-			USER_NAME = #{USER_NAME},
-			STAFF_IDENT = #{STAFF_IDENT},
-			BANK_CARD = #{BANK_CARD},
-			USER_GROP = #{USER_GROP},
-			USER_CATG = #{USER_CATG},
-			DEPT_CODE = #{DEPT_CODE},
-			ORG_UNIT = #{ORG_UNIT},
-			SAL_RANGE = #{SAL_RANGE},
-			POST_SALY = #{POST_SALY},
-			BONUS = #{BONUS},
-			CASH_BONUS = #{CASH_BONUS},
-			WORK_OT = #{WORK_OT},
-			BACK_SALY = #{BACK_SALY},
-			RET_SALY = #{RET_SALY},
-			CHK_CASH = #{CHK_CASH},
-			INTR_SGL_AWAD = #{INTR_SGL_AWAD},
-			SENY_ALLE = #{SENY_ALLE},
-			POST_ALLE = #{POST_ALLE},
-			NS_ALLE = #{NS_ALLE},
-			AREA_ALLE = #{AREA_ALLE},
-			EXPT_ALLE = #{EXPT_ALLE},
-			TECH_ALLE = #{TECH_ALLE},
-			LIVE_EXPE = #{LIVE_EXPE},
-			LIVE_ALLE = #{LIVE_ALLE},
-			LEAVE_DM = #{LEAVE_DM},
-			HOUSE_ALLE = #{HOUSE_ALLE},
-			ITEM_ALLE = #{ITEM_ALLE},
-			MEAL_EXPE = #{MEAL_EXPE},
-			TRF_ALLE = #{TRF_ALLE},
-			TEL_EXPE = #{TEL_EXPE},
-			HLDY_ALLE = #{HLDY_ALLE},
-			KID_ALLE = #{KID_ALLE},
-			COOL_EXPE = #{COOL_EXPE},
-			EXT_SGL_AWAD = #{EXT_SGL_AWAD},
-			PRE_TAX_PLUS = #{PRE_TAX_PLUS},
-			GROSS_PAY = #{GROSS_PAY},
-			ENDW_INS = #{ENDW_INS},
-			UNEMPL_INS = #{UNEMPL_INS},
-			MED_INS = #{MED_INS},
-			CASD_INS = #{CASD_INS},
-			HOUSE_FUND = #{HOUSE_FUND},
-			SUP_PESN = #{SUP_PESN},
-			TAX_BASE_ADJ = #{TAX_BASE_ADJ},
-			ACCRD_TAX = #{ACCRD_TAX},
-			AFTER_TAX = #{AFTER_TAX},
-			ACT_SALY = #{ACT_SALY},
-			GUESS_DIFF = #{GUESS_DIFF},
-			CUST_COL1 = #{CUST_COL1},
-			CUST_COL2 = #{CUST_COL2},
-			CUST_COL3 = #{CUST_COL3},
-			CUST_COL4 = #{CUST_COL4},
-			CUST_COL5 = #{CUST_COL5},
-			CUST_COL6 = #{CUST_COL6},
-			CUST_COL7 = #{CUST_COL7},
-			CUST_COL8 = #{CUST_COL8},
-			CUST_COL9 = #{CUST_COL9},
-			CUST_COL10 = #{CUST_COL10},
-			ESTB_DEPT = #{ESTB_DEPT}
-		where BUSI_DATE = #{BUSI_DATE__} 
-		and USER_CODE = #{USER_CODE__}
-	</update>
-	
 	<!-- 批量删除 -->
-	<delete id="deleteAll" parameterType="com.fh.entity.StaffDetailModel">
+	<delete id="deleteAll" parameterType="pd">
 		delete from
 		<include refid="tableName"></include>
 		where
@@ -188,81 +101,17 @@
 		</foreach>
 	</delete>
 	
-	<!-- 批量保存 -->
-	<update id="updateAll" parameterType="com.fh.entity.StaffDetailModel">
-		        update
-		        <include refid="tableName"></include>
-		        set 
-			        BILL_CODE = #{BILL_CODE},
-			        BUSI_DATE = #{BUSI_DATE},
-			        USER_CODE = #{USER_CODE},
-			        USER_NAME = #{USER_NAME},
-			        STAFF_IDENT = #{STAFF_IDENT},
-			        BANK_CARD = #{BANK_CARD},
-			        USER_GROP = #{USER_GROP},
-			        USER_CATG = #{USER_CATG},
-			        DEPT_CODE = #{DEPT_CODE},
-			        ORG_UNIT = #{ORG_UNIT},
-			        SAL_RANGE = #{SAL_RANGE},
-			        POST_SALY = #{POST_SALY},
-			        BONUS = #{BONUS},
-			        CASH_BONUS = #{CASH_BONUS},
-			        WORK_OT = #{WORK_OT},
-			        BACK_SALY = #{BACK_SALY},
-			        RET_SALY = #{RET_SALY},
-			        CHK_CASH = #{CHK_CASH},
-			        INTR_SGL_AWAD = #{INTR_SGL_AWAD},
-			        SENY_ALLE = #{SENY_ALLE},
-			        POST_ALLE = #{POST_ALLE},
-			        NS_ALLE = #{NS_ALLE},
-			        AREA_ALLE = #{AREA_ALLE},
-			        EXPT_ALLE = #{EXPT_ALLE},
-			        TECH_ALLE = #{TECH_ALLE},
-			        LIVE_EXPE = #{LIVE_EXPE},
-			        LIVE_ALLE = #{LIVE_ALLE},
-			        LEAVE_DM = #{LEAVE_DM},
-			        HOUSE_ALLE = #{HOUSE_ALLE},
-			        ITEM_ALLE = #{ITEM_ALLE},
-			        MEAL_EXPE = #{MEAL_EXPE},
-			        TRF_ALLE = #{TRF_ALLE},
-			        TEL_EXPE = #{TEL_EXPE},
-			        HLDY_ALLE = #{HLDY_ALLE},
-			        KID_ALLE = #{KID_ALLE},
-			        COOL_EXPE = #{COOL_EXPE},
-			        EXT_SGL_AWAD = #{EXT_SGL_AWAD},
-			        PRE_TAX_PLUS = #{PRE_TAX_PLUS},
-			        GROSS_PAY = #{GROSS_PAY},
-			        ENDW_INS = #{ENDW_INS},
-			        UNEMPL_INS = #{UNEMPL_INS},
-		        	MED_INS = #{MED_INS},
-		        	CASD_INS = #{CASD_INS},
-			        HOUSE_FUND = #{HOUSE_FUND},
-			        SUP_PESN = #{SUP_PESN},
-		        	TAX_BASE_ADJ = #{TAX_BASE_ADJ},
-			        ACCRD_TAX = #{ACCRD_TAX},
-			        AFTER_TAX = #{AFTER_TAX},
-			        ACT_SALY = #{ACT_SALY},
-			        GUESS_DIFF = #{GUESS_DIFF},
-			        CUST_COL1 = #{CUST_COL1},
-			        CUST_COL2 = #{CUST_COL2},
-			        CUST_COL3 = #{CUST_COL3},
-			        CUST_COL4 = #{CUST_COL4},
-			        CUST_COL5 = #{CUST_COL5},
-		        	CUST_COL6 = #{CUST_COL6},
-		        	CUST_COL7 = #{CUST_COL7},
-			        CUST_COL8 = #{CUST_COL8},
-			        CUST_COL9 = #{CUST_COL9},
-			        CUST_COL10 = #{CUST_COL10},
-			        ESTB_DEPT = #{ESTB_DEPT}
-		        where BUSI_DATE = #{BUSI_DATE__} 
-		        and USER_CODE = #{USER_CODE__}
-	
-	</update>
+	<!-- 导入删除-->
+	<delete id="importDelete" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where BUSI_DATE = #{BUSI_DATE}
+	    and DEPT_CODE = #{DEPT_CODE} 
+	</delete>
 	
 	<!-- 导出列表 -->
 	<select id="exportList" parameterType="jqPage" resultType="pd">
-		select
-		<include refid="Field"></include>
+		select * 
 		from 
 		<include refid="tableName"></include>
 		where BUSI_DATE = '${pd.SystemDateTime}'
@@ -276,32 +125,13 @@
 	</select>
 	<!-- 导出模板 -->
 	<select id="exportModel" parameterType="String" resultType="pd">
-		select
-		<include refid="Field"></include>
+		select * 
 		from 
 		<include refid="tableName"></include>
 		where DEPT_CODE = #{DepartCode}
 		order by BUSI_DATE desc
 		limit 1
 	</select>
-	
-	<!-- 导入-->
-	<delete id="importDelete" parameterType="com.fh.entity.StaffDetailModel">
-		delete from
-		<include refid="tableName"></include>
-		where BUSI_DATE = #{BUSI_DATE}
-	    and DEPT_CODE = #{DEPT_CODE} 
-	</delete>
-	<insert id="importInsert" parameterType="com.fh.entity.StaffDetailModel">
-		insert into 
-	    <include refid="tableName"></include>
-		(
-	    <include refid="Field"></include>
-		) values (
-	    <include refid="FieldValue"></include>
-		)
-	</insert>
-	
 	
 	
 	

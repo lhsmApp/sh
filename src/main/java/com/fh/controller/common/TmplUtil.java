@@ -48,26 +48,29 @@ public class TmplUtil {
 		return m_sqlUserdata;
 	}
 
-	// 默认值
+	// 表全部 默认值
 	private Map<String, Object> m_defaultValueList = new HashMap<String, Object>();
-
 	public Map<String, Object> getDefaultValueList() {
 		return m_defaultValueList;
+	}
+	// 表全部 类型
+	private Map<String, Object> m_typeList = new HashMap<String, Object>();
+	public Map<String, Object> getTypeList() {
+		return m_typeList;
 	}
 
 	// 字典
 	private Map<String, Object> m_dicList = new HashMap<String, Object>();
-
 	public Map<String, Object> getDicList() {
 		return m_dicList;
 	}
 
 	// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 	private List<TmplConfigDetail> m_columnsList = new ArrayList<TmplConfigDetail>();
-
 	public List<TmplConfigDetail> getColumnsList() {
 		return m_columnsList;
 	}
+	
 
 	public TmplUtil(TmplConfigManager tmplconfigService, TmplConfigDictManager tmplConfigDictService,
 			DictionariesManager dictionariesService, DepartmentManager departmentService,UserManager userService) {
@@ -97,6 +100,8 @@ public class TmplUtil {
 	public String generateStructureNoEdit(String tableCode, String departCode) throws Exception {
 		// 默认值
 		m_defaultValueList = new HashMap<String, Object>();
+		// 表全部 类型
+		m_typeList = new HashMap<String, Object>();
 		// 底行显示的求和与平均值字段
 		m_sqlUserdata = new StringBuilder();
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
@@ -204,6 +209,8 @@ public class TmplUtil {
 
 		for (TableColumns col : columns) {
 			m_defaultValueList.put(col.getColumn_name(), col.getColumn_default());
+			// 表全部 类型
+			m_typeList.put(col.getColumn_name(), col.getColumn_type());
 			Map<String, Object> MapAdd = new HashMap<String, Object>();
 
 			StringBuilder model_name = new StringBuilder();
@@ -243,6 +250,8 @@ public class TmplUtil {
 
 		for (TableColumns col : columns) {
 			m_defaultValueList.put(col.getColumn_name(), col.getColumn_default());
+			// 表全部 类型
+			m_typeList.put(col.getColumn_name(), col.getColumn_type());
 
 			Map<String, Object> MapAdd = new HashMap<String, Object>();
 
@@ -357,9 +366,9 @@ public class TmplUtil {
 		return ret.toString();
 	}
 
-	public static void setModelDefault(PageData pd, Class<?> clazz, Map<String, Object> DefaultValueList)
+	public static void setModelDefault(PageData pd, List<TmplConfigDetail> ColumnsList)
 			throws ClassNotFoundException {
-		Field[] fields = clazz.getDeclaredFields();// 根据Class对象获得属性 私有的也可以获得
+		/*Field[] fields = clazz.getDeclaredFields();// 根据Class对象获得属性 私有的也可以获得
 		for (Field field : fields) {
 			String fieldName = field.getName().toUpperCase();
 			if (!(pd.containsKey(fieldName) && pd.get(fieldName) != null
@@ -368,6 +377,7 @@ public class TmplUtil {
 				pd.put(fieldName, defaultValue);
 			}
 		}
+		//InsertField InsertVale*/
 	}
 
 	/**
@@ -378,6 +388,8 @@ public class TmplUtil {
 	public String generateStructure(String tableCode, String departCode, int columnCount) throws Exception {
 		// 默认值
 		m_defaultValueList = new HashMap<String, Object>();
+		// 表全部 类型
+		m_typeList = new HashMap<String, Object>();
 		// 字典
 		m_dicList = new HashMap<String, Object>();
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息

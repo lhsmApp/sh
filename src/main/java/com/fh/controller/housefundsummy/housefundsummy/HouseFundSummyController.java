@@ -414,7 +414,7 @@ public class HouseFundSummyController extends BaseController {
                     }
 	    			addTo.put("updateFilter", updateFilter);
                     //添加未设置字段默认值
-	    			TmplUtil.setModelDefault(addTo, HouseFundSummyModel.class, DefaultValueList);
+	    			//TmplUtil.setModelDefault(addTo, HouseFundSummyModel.class, DefaultValueList);
     				listTo.add(addTo);
     			}
         	}

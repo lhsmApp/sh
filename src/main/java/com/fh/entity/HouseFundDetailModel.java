@@ -1,6 +1,6 @@
 package com.fh.entity;
 
-public class HouseFundDetailModel{
+/*public class HouseFundDetailModel{
 	
 	private String BILL_CODE__ = " "; 
 	
@@ -209,4 +209,4 @@ public class HouseFundDetailModel{
 	
 	
 	
-}
+}*/

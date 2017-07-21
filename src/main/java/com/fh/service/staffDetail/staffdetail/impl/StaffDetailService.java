@@ -6,13 +6,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import com.fh.dao.DaoSupport;
-import com.fh.entity.JqGridModel;
 import com.fh.entity.JqPage;
-import com.fh.entity.StaffDetailModel;
-import com.fh.entity.TableColumns;
-import com.fh.entity.system.Department;
-import com.fh.entity.system.Dictionaries;
-import com.fh.entity.system.User;
 import com.fh.util.PageData;
 import com.fh.service.staffDetail.staffdetail.StaffDetailManager;
 
@@ -34,34 +28,55 @@ public class StaffDetailService implements StaffDetailManager{
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	public List<StaffDetailModel> findByPd(PageData pd)throws Exception{
-		return (List<StaffDetailModel>)dao.findForList("StaffDetailMapper.findByPd", pd);
+	public List<PageData> findByModel(List<PageData> listData)throws Exception{
+		return (List<PageData>)dao.findForList("StaffDetailMapper.findByModel", listData);
 	}
 	
-	/**获取数据
-	 * 张晓柳
-	 * @param pd
+	/**列表
+	 * @param page
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	public List<StaffDetailModel> findByModel(List<StaffDetailModel> listData)throws Exception{
-		return (List<StaffDetailModel>)dao.findForList("StaffDetailMapper.findByModel", listData);
+	public List<PageData> JqPage(JqPage page)throws Exception{
+		return (List<PageData>)dao.findForList("StaffDetailMapper.datalistJqPage", page);
 	}
-	
-	/**新增
+	/**获取记录数量
 	 * @param pd
 	 * @throws Exception
 	 */
-	public void save(PageData pd)throws Exception{
-		dao.save("StaffDetailMapper.save", pd);
+	public int countJqGridExtend(JqPage page)throws Exception{
+		return (int)dao.findForObject("StaffDetailMapper.countJqGridExtend", page);
 	}
-	
-	/**修改
+	/**获取记录总合计
 	 * @param pd
 	 * @throws Exception
 	 */
-	public void edit(PageData pd)throws Exception{
-		dao.update("StaffDetailMapper.edit", pd);
+	public PageData getFooterSummary(JqPage page)throws Exception{
+		return (PageData)dao.findForObject("StaffDetailMapper.getFooterSummary", page);
+	}
+
+	/**批量删除
+	 * @param 
+	 * @throws Exception
+	 */
+	public void deleteAll(List<PageData> listData)throws Exception{
+		dao.delete("StaffDetailMapper.deleteAll", listData);
+	}
+	
+	/**批量修改
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void deleteUpdateAll(List<PageData> listData)throws Exception{
+		dao.batchDeleteUpdate("StaffDetailMapper.deleteAll", "StaffDetailMapper.save", listData);
+	}
+	
+	/**导入
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void batchImport(List<PageData> listData)throws Exception{
+		dao.batchImport("StaffDetailMapper.importDelete", "StaffDetailMapper.save", listData);
 	}
 	
 	/**导出列表
@@ -80,57 +95,8 @@ public class StaffDetailService implements StaffDetailManager{
 	public List<PageData> exportModel(String DepartCode)throws Exception{
 		return (List<PageData>)dao.findForList("StaffDetailMapper.exportModel", DepartCode);
 	}
-	
-	/**列表
-	 * @param page
-	 * @throws Exception
-	 */
-	@SuppressWarnings("unchecked")
-	public List<PageData> JqPage(JqPage page)throws Exception{
-		return (List<PageData>)dao.findForList("StaffDetailMapper.datalistJqPage", page);
-	}
-	
-	/**获取记录数量
-	 * @param pd
-	 * @throws Exception
-	 */
-	public int countJqGridExtend(JqPage page)throws Exception{
-		return (int)dao.findForObject("StaffDetailMapper.countJqGridExtend", page);
-	}
-	
-	/**获取记录总合计
-	 * @param pd
-	 * @throws Exception
-	 */
-	public PageData getFooterSummary(JqPage page)throws Exception{
-		return (PageData)dao.findForObject("StaffDetailMapper.getFooterSummary", page);
-	}
-	
-	/**批量删除
-	 * @param 
-	 * @throws Exception
-	 */
-	public void deleteAll(List<StaffDetailModel> listData)throws Exception{
-		dao.batchDelete("StaffDetailMapper.deleteAll", listData);
-	}
-	
-	/**批量修改
-	 * @param pd
-	 * @throws Exception
-	 */
-	public void updateAll(List<StaffDetailModel> listData)throws Exception{
-		dao.batchUpdate("StaffDetailMapper.updateAll", listData);
-	}
-	
-	/**导入
-	 * @param pd
-	 * @throws Exception
-	 */
-	public void batchImport(List<StaffDetailModel> listData)throws Exception{
-		dao.batchImport("StaffDetailMapper.importDelete", "StaffDetailMapper.importInsert", listData);
-	}
 
-	/**获取员工编码
+	/**获取员工编码 相当于字典
 	 * @param 
 	 * @throws Exception
 	 */

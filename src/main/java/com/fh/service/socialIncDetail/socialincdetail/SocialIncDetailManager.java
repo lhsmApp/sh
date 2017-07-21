@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.fh.entity.JqPage;
-import com.fh.entity.SocialIncDetailModel;
-import com.fh.entity.TableColumns;
 import com.fh.util.PageData;
 
 /** 
@@ -16,32 +14,14 @@ import com.fh.util.PageData;
  */
 public interface SocialIncDetailManager{
 
-	/**获取数据
-	 * 张晓柳
-	 * @param pd
-	 * @throws Exception
-	 */
-	public List<SocialIncDetailModel> findByPd(PageData pd)throws Exception;
 	
 	/**获取数据
 	 * 张晓柳
 	 * @param pd
 	 * @throws Exception
 	 */
-	public List<SocialIncDetailModel> findByModel(List<SocialIncDetailModel> listData)throws Exception;
+	public List<PageData> findByModel(List<PageData> listData)throws Exception;
 
-	/**新增
-	 * @param pd
-	 * @throws Exception
-	 */
-	public void save(PageData pd)throws Exception;
-	
-	/**修改
-	 * @param pd
-	 * @throws Exception
-	 */
-	public void edit(PageData pd)throws Exception;
-	
 	/**导出列表
 	 * @param page
 	 * @throws Exception
@@ -75,26 +55,42 @@ public interface SocialIncDetailManager{
 	 * @param 
 	 * @throws Exception
 	 */
-	public void deleteAll(List<SocialIncDetailModel> listData)throws Exception;
+	public void deleteAll(List<PageData> listData)throws Exception;
 	
 	/**批量修改
 	 * @param pd
 	 * @throws Exception
 	 */
-	public void updateAll(List<SocialIncDetailModel> listData)throws Exception;
+	public void deleteUpdateAll(List<PageData> listData)throws Exception;
 	
 	/**导入
 	 * @param pd
 	 * @throws Exception
 	 */
-	public void batchImport(List<SocialIncDetailModel> listData)throws Exception;
+	public void batchImport(List<PageData> listData)throws Exception;
 
-	/**获取员工编码
+	/**获取员工编码 相当于字典
 	 * 张晓柳
 	 * @param 
 	 * @throws Exception
 	 */
 	public List<String> getHaveUserCodeDic(PageData pd)throws Exception;
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

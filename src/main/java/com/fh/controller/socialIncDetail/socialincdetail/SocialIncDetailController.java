@@ -23,7 +23,6 @@ import com.fh.entity.CommonBase;
 import com.fh.entity.JqPage;
 import com.fh.entity.Page;
 import com.fh.entity.PageResult;
-import com.fh.entity.SocialIncDetailModel;
 import com.fh.entity.SysSealed;
 import com.fh.entity.TmplConfigDetail;
 import com.fh.entity.system.Department;
@@ -39,7 +38,7 @@ import com.fh.util.date.DateUtils;
 import com.fh.util.enums.BillType;
 import com.fh.util.enums.DurState;
 import com.fh.util.Jurisdiction;
-import com.fh.util.excel.LeadingInExcel;
+import com.fh.util.excel.LeadingInExcelToPageData;
 
 import net.sf.json.JSONArray;
 
@@ -92,6 +91,8 @@ public class SocialIncDetailController extends BaseController {
 	StringBuilder SqlUserdata = new StringBuilder();
 	//默认值
 	Map<String, Object> DefaultValueList = new HashMap<String, Object>();
+    // 表全部 类型
+    Map<String, Object> TypeList = new HashMap<String, Object>();
 	//字典
 	Map<String, Object> DicList = new HashMap<String, Object>();
 	//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
@@ -135,6 +136,8 @@ public class SocialIncDetailController extends BaseController {
 		SqlUserdata = tmpl.getSqlUserdata();
 		//默认值
 		DefaultValueList = tmpl.getDefaultValueList();
+		// 表全部 类型
+		TypeList = tmpl.getTypeList();
 		//字典
 		DicList = tmpl.getDicList();
 		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
@@ -204,7 +207,6 @@ public class SocialIncDetailController extends BaseController {
 			commonBase.setCode(2);
 			commonBase.setMessage(checkState);
 		} else {
-			TmplUtil.setModelDefault(pd, SocialIncDetailModel.class, DefaultValueList);
 			String BILL_CODE = "BILL_CODE";
 			String BUSI_DATE = "BUSI_DATE";
 			String DEPT_CODE = "DEPT_CODE";
@@ -220,20 +222,17 @@ public class SocialIncDetailController extends BaseController {
 				pd.remove(DEPT_CODE);
 			}
 			pd.put(DEPT_CODE, DepartCode);
+			TmplUtil.setModelDefault(pd, ColumnsList);
 			
-			List<SocialIncDetailModel> repeatList = socialincdetailService.findByPd(pd);
+			List<PageData> listData = new ArrayList<PageData>();
+			listData.add(pd);
+			List<PageData> repeatList = socialincdetailService.findByModel(listData);
 			if(repeatList!=null && repeatList.size()>0){
 				commonBase.setCode(2);
 				commonBase.setMessage("此区间内编码已存在！");
 			} else {
-				if(pd.getString("oper").equals("edit")){
-					socialincdetailService.edit(pd);
-					commonBase.setCode(0);
-				}
-				else if(pd.getString("oper").equals("add")){
-					socialincdetailService.save(pd);
-					commonBase.setCode(0);
-				}
+				socialincdetailService.deleteUpdateAll(listData);
+				commonBase.setCode(0);
 			}
 		}
 		return commonBase;
@@ -259,19 +258,20 @@ public class SocialIncDetailController extends BaseController {
 			Object DATA_ROWS = pd.get("DATA_ROWS");
 			String json = DATA_ROWS.toString();  
 	       JSONArray array = JSONArray.fromObject(json);  
-	       List<SocialIncDetailModel> listData = (List<SocialIncDetailModel>) JSONArray.toCollection(array,SocialIncDetailModel.class);
-	       for(SocialIncDetailModel item : listData){
-	       	item.setBILL_CODE(" ");
-	       	item.setBUSI_DATE(SystemDateTime);
-	       	item.setDEPT_CODE(DepartCode);
-	       }
+	       List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);
+	        for(PageData item : listData){
+	        	item.put("BILL_CODE", " ");
+	        	item.put("BUSI_DATE", SystemDateTime);
+	        	item.put("DEPT_CODE", DepartCode);
+				TmplUtil.setModelDefault(item, ColumnsList);
+	        }
 			if(null != listData && listData.size() > 0){
-				List<SocialIncDetailModel> repeatList = socialincdetailService.findByModel(listData);
+				List<PageData> repeatList = socialincdetailService.findByModel(listData);
 				if(repeatList!=null && repeatList.size()>0){
 					commonBase.setCode(2);
 					commonBase.setMessage("此区间内编码已存在！");
 				} else {
-					socialincdetailService.updateAll(listData);
+					socialincdetailService.deleteUpdateAll(listData);
 					commonBase.setCode(0);
 				}
 			}
@@ -299,7 +299,7 @@ public class SocialIncDetailController extends BaseController {
 			Object DATA_ROWS = pd.get("DATA_ROWS");
 			String json = DATA_ROWS.toString();  
 	        JSONArray array = JSONArray.fromObject(json);  
-	        List<SocialIncDetailModel> listData = (List<SocialIncDetailModel>) JSONArray.toCollection(array,SocialIncDetailModel.class);
+	        List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);
 	        if(null != listData && listData.size() > 0){
 				socialincdetailService.deleteAll(listData);
 				commonBase.setCode(0);
@@ -325,8 +325,8 @@ public class SocialIncDetailController extends BaseController {
 	 * @return
 	 * @throws Exception
 	 */
-	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/readExcel")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @RequestMapping(value = "/readExcel")
 	//public @ResponseBody CommonBase readExcel(@RequestParam(value="excel",required=false) MultipartFile file) throws Exception{
 	public ModelAndView readExcel(@RequestParam(value="excel",required=false) MultipartFile file) throws Exception{
 		CommonBase commonBase = new CommonBase();
@@ -345,7 +345,7 @@ public class SocialIncDetailController extends BaseController {
 				commonBase.setMessage("当前区间和当前单位不能为空！");
 			} else {
 				// 局部变量
-				LeadingInExcel<SocialIncDetailModel> testExcel = null;
+				LeadingInExcelToPageData<PageData> testExcel = null;
 				Map<Integer, Object> uploadAndReadMap = null;
 				try {
 					// 定义需要读取的数据
@@ -353,7 +353,6 @@ public class SocialIncDetailController extends BaseController {
 					String propertiesFileName = "config";
 					String kyeName = "file_path";
 					int sheetIndex = 0;
-					Class<SocialIncDetailModel> clazz = SocialIncDetailModel.class;
 					Map<String, String> titleAndAttribute = null;
 					// 定义对应的标题名与对应属性名
 					titleAndAttribute = new HashMap<String, String>();
@@ -366,11 +365,11 @@ public class SocialIncDetailController extends BaseController {
 					}
 
 					// 调用解析工具包
-					testExcel = new LeadingInExcel<SocialIncDetailModel>(formart);
+					testExcel = new LeadingInExcelToPageData<PageData>(formart);
 					// 解析excel，获取客户信息集合
 
 					uploadAndReadMap = testExcel.uploadAndRead(file, propertiesFileName, kyeName, sheetIndex,
-							titleAndAttribute, clazz, ColumnsList, DicList);
+							titleAndAttribute, TypeList, ColumnsList, DicList);
 				} catch (Exception e) {
 					e.printStackTrace();
 					logger.error("读取Excel文件错误", e);
@@ -387,7 +386,7 @@ public class SocialIncDetailController extends BaseController {
 					commonBase.setCode(2);
 					commonBase.setMessage(message);
 				} else {
-					List<SocialIncDetailModel> uploadAndRead = (List<SocialIncDetailModel>) uploadAndReadMap.get(2);
+					List<PageData> uploadAndRead = (List<PageData>) uploadAndReadMap.get(2);
 					if (uploadAndRead != null && !"[]".equals(uploadAndRead.toString()) && uploadAndRead.size() >= 1) {
 						judgement = true;
 					}
@@ -396,11 +395,11 @@ public class SocialIncDetailController extends BaseController {
 						List<String> listUserCode = new ArrayList<String>();
 						int listSize = uploadAndRead.size();
 						for(int i=0;i<listSize;i++){
-							String getBUSI_DATE = uploadAndRead.get(i).getBUSI_DATE();
-							String getDEPT_CODE = uploadAndRead.get(i).getDEPT_CODE();
-							String getUSER_CODE = uploadAndRead.get(i).getUSER_CODE();
+							String getBUSI_DATE = (String) uploadAndRead.get(i).get("BUSI_DATE");
+							String getDEPT_CODE = (String) uploadAndRead.get(i).get("DEPT_CODE");
+							String getUSER_CODE = (String) uploadAndRead.get(i).get("USER_CODE");
 							if(!(getBUSI_DATE!=null && !getBUSI_DATE.trim().equals(""))){
-								uploadAndRead.get(i).setBUSI_DATE(SystemDateTime);
+								uploadAndRead.get(i).put("BUSI_DATE", SystemDateTime);
 								getBUSI_DATE = SystemDateTime;
 							}
 							if(!SystemDateTime.equals(getBUSI_DATE)){
@@ -409,7 +408,7 @@ public class SocialIncDetailController extends BaseController {
 								}
 							}
 							if(!(getDEPT_CODE!=null && !getDEPT_CODE.trim().equals(""))){
-								uploadAndRead.get(i).setDEPT_CODE(DepartCode);
+								uploadAndRead.get(i).put("DEPT_CODE", DepartCode);
 								getDEPT_CODE = DepartCode;
 							}
 							if(!DepartCode.equals(getDEPT_CODE)){
@@ -443,19 +442,6 @@ public class SocialIncDetailController extends BaseController {
 							socialincdetailService.batchImport(uploadAndRead);
 							commonBase.setCode(0);
 						}
-						
-						/*// 把客户信息分为没100条数据为一组迭代添加客户信息（注：将customerList集合作为参数，在Mybatis的相应映射文件中使用foreach标签进行批量添加。）
-						int listSize = uploadAndRead.size();
-						int toIndex = 100;
-						for (int i = 0; i < listSize; i += 100) {
-							if (i + 100 > listSize) {
-								toIndex = listSize - i;
-							}
-							List<SocialIncDetailModel> subList = uploadAndRead.subList(i, i + toIndex);
-
-							//此处执行集合添加 
-							socialincdetailService.batchImport(subList);
-						}*/
 					} else {
 						commonBase.setCode(-1);
 						commonBase.setMessage("TranslateUtil");

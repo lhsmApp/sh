@@ -16,10 +16,6 @@
 	
 	<!-- 字段 -->
 	<sql id="FieldSelectKey"> BILL_CODE BILL_CODE__, BUSI_DATE BUSI_DATE__, USER_CODE USER_CODE__,</sql>
-	<sql id="Field"> BILL_CODE, BUSI_DATE, USER_CODE, USER_NAME, USER_GROP, SOC_INC_BASE, PER_BASIC_FUND, PER_SUPP_FUND, PER_TOTAL, DEPT_BASIC_FUND, DEPT_SUPP_FUND, DEPT_TOTAL, DEPT_CODE, USER_CATG, PMT_PLACE, CUST_COL1, CUST_COL2, CUST_COL3, CUST_COL4, CUST_COL5, CUST_COL6, CUST_COL7, CUST_COL8, CUST_COL9, CUST_COL10, ESTB_DEPT </sql>
-	
-	<!-- 字段值 -->
-	<sql id="FieldValue"> #{BILL_CODE}, #{BUSI_DATE}, #{USER_CODE}, #{USER_NAME}, #{USER_GROP}, #{SOC_INC_BASE}, #{PER_BASIC_FUND}, #{PER_SUPP_FUND}, #{PER_TOTAL}, #{DEPT_BASIC_FUND}, #{DEPT_SUPP_FUND}, #{DEPT_TOTAL}, #{DEPT_CODE}, #{USER_CATG}, #{PMT_PLACE}, #{CUST_COL1}, #{CUST_COL2}, #{CUST_COL3}, #{CUST_COL4}, #{CUST_COL5}, #{CUST_COL6}, #{CUST_COL7}, #{CUST_COL8}, #{CUST_COL9}, #{CUST_COL10}, #{ESTB_DEPT} </sql>
 	
 	<!-- 获取员工编码 相当于字典-->
 	<!-- 张晓柳 -->
@@ -31,19 +27,8 @@
 	</select>
 	
 	<!-- 获取数据 验证数据重复 -->
-	<select id="findByPd" parameterType="pd" resultType="com.fh.entity.HouseFundDetailModel">
-		select 
-		    <include refid="FieldSelectKey"></include>
-		    <include refid="Field"></include>
-		from 
-		    <include refid="tableName"></include>
-		where BUSI_DATE = #{BUSI_DATE}
-		and (USER_CODE = #{USER_CODE} and USER_CODE != #{USER_CODE__})
-	</select>
-	<select id="findByModel" parameterType="com.fh.entity.HouseFundDetailModel" resultType="com.fh.entity.HouseFundDetailModel">
-		select 
-		    <include refid="FieldSelectKey"></include>
-		    <include refid="Field"></include>
+	<select id="findByModel" parameterType="pd" resultType="pd">
+		select * 
 		from 
 		    <include refid="tableName"></include>
         <where>
@@ -57,7 +42,7 @@
 	<select id="datalistJqPage" parameterType="jqPage" resultType="pd">
 		select 
 		    <include refid="FieldSelectKey"></include>
-		    <include refid="Field"></include>
+		    * 
 		from 
 		<include refid="tableName"></include>
 		where BUSI_DATE = '${pd.SystemDateTime}'
@@ -103,50 +88,11 @@
 	<insert id="save" parameterType="pd">
 		insert into 
 	    <include refid="tableName"></include>
-		(
-	    <include refid="Field"></include>
-		) values (
-	    <include refid="FieldValue"></include>
-		)
+		(${InsertField}) values (${InsertVale})
 	</insert>
 	
-	<!-- 修改 -->
-	<update id="edit" parameterType="pd">
-		update
-		<include refid="tableName"></include>
-		set 
-			BILL_CODE = #{BILL_CODE},
-			BUSI_DATE = #{BUSI_DATE},
-			USER_CODE = #{USER_CODE},
-			USER_NAME = #{USER_NAME},
-			USER_GROP = #{USER_GROP},
-			SOC_INC_BASE = #{SOC_INC_BASE},
-			PER_BASIC_FUND = #{PER_BASIC_FUND},
-			PER_SUPP_FUND = #{PER_SUPP_FUND},
-			PER_TOTAL = #{PER_TOTAL},
-			DEPT_BASIC_FUND = #{DEPT_BASIC_FUND},
-			DEPT_SUPP_FUND = #{DEPT_SUPP_FUND},
-			DEPT_TOTAL = #{DEPT_TOTAL},
-			DEPT_CODE = #{DEPT_CODE},
-			USER_CATG = #{USER_CATG},
-			PMT_PLACE = #{PMT_PLACE},
-			CUST_COL1 = #{CUST_COL1},
-			CUST_COL2 = #{CUST_COL2},
-			CUST_COL3 = #{CUST_COL3},
-			CUST_COL4 = #{CUST_COL4},
-			CUST_COL5 = #{CUST_COL5},
-			CUST_COL6 = #{CUST_COL6},
-			CUST_COL7 = #{CUST_COL7},
-			CUST_COL8 = #{CUST_COL8},
-			CUST_COL9 = #{CUST_COL9},
-			CUST_COL10 = #{CUST_COL10},
-			ESTB_DEPT = #{ESTB_DEPT}
-		where BUSI_DATE = #{BUSI_DATE__} 
-		and USER_CODE = #{USER_CODE__}
-	</update>
-	
 	<!-- 批量删除 -->
-	<delete id="deleteAll" parameterType="com.fh.entity.HouseFundDetailModel">
+	<delete id="deleteAll" parameterType="pd">
 		delete from
 		<include refid="tableName"></include>
 		where
@@ -155,45 +101,17 @@
 		</foreach>
 	</delete>
 	
-	<!-- 批量保存 -->
-	<update id="updateAll" parameterType="com.fh.entity.HouseFundDetailModel">
-		update
-		    <include refid="tableName"></include>
-		set 
-			BILL_CODE = #{BILL_CODE},
-			BUSI_DATE = #{BUSI_DATE},
-			USER_CODE = #{USER_CODE},
-			USER_NAME = #{USER_NAME},
-			USER_GROP = #{USER_GROP},
-			SOC_INC_BASE = #{SOC_INC_BASE},
-			PER_BASIC_FUND = #{PER_BASIC_FUND},
-			PER_SUPP_FUND = #{PER_SUPP_FUND},
-			PER_TOTAL = #{PER_TOTAL},
-			DEPT_BASIC_FUND = #{DEPT_BASIC_FUND},
-			DEPT_SUPP_FUND = #{DEPT_SUPP_FUND},
-			DEPT_TOTAL = #{DEPT_TOTAL},
-			DEPT_CODE = #{DEPT_CODE},
-			USER_CATG = #{USER_CATG},
-			PMT_PLACE = #{PMT_PLACE},
-			CUST_COL1 = #{CUST_COL1},
-			CUST_COL2 = #{CUST_COL2},
-			CUST_COL3 = #{CUST_COL3},
-			CUST_COL4 = #{CUST_COL4},
-			CUST_COL5 = #{CUST_COL5},
-			CUST_COL6 = #{CUST_COL6},
-			CUST_COL7 = #{CUST_COL7},
-			CUST_COL8 = #{CUST_COL8},
-			CUST_COL9 = #{CUST_COL9},
-			CUST_COL10 = #{CUST_COL10},
-			ESTB_DEPT = #{ESTB_DEPT}
-		 where BUSI_DATE = #{BUSI_DATE__} 
-		 and USER_CODE = #{USER_CODE__}
-	</update>
+	<!-- 导入删除-->
+	<delete id="importDelete" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where BUSI_DATE = #{BUSI_DATE}
+	    and DEPT_CODE = #{DEPT_CODE} 
+	</delete>
 	
 	<!-- 导出列表 -->
 	<select id="exportList" parameterType="jqPage" resultType="pd">
-		select
-		<include refid="Field"></include>
+		select * 
 		from 
 		<include refid="tableName"></include>
 		where BUSI_DATE = '${pd.SystemDateTime}'
@@ -207,32 +125,13 @@
 	</select>
 	<!-- 导出模板 -->
 	<select id="exportModel" parameterType="String" resultType="pd">
-		select
-		<include refid="Field"></include>
+		select * 
 		from 
 		<include refid="tableName"></include>
 		where DEPT_CODE = #{DepartCode}
 		order by BUSI_DATE desc
 		limit 1
 	</select>
-	
-	<!-- 导入-->
-	<delete id="importDelete" parameterType="com.fh.entity.HouseFundDetailModel">
-		delete from
-		<include refid="tableName"></include>
-		where BUSI_DATE = #{BUSI_DATE}
-	    and DEPT_CODE = #{DEPT_CODE} 
-	</delete>
-	<insert id="importInsert" parameterType="com.fh.entity.HouseFundDetailModel">
-		insert into 
-	    <include refid="tableName"></include>
-		(
-	    <include refid="Field"></include>
-		) values (
-	    <include refid="FieldValue"></include>
-		)
-	</insert>
-	
 	
 	
 	

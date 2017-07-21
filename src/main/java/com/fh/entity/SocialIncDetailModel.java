@@ -1,6 +1,6 @@
 package com.fh.entity;
 
-public class SocialIncDetailModel{
+/*public class SocialIncDetailModel{
 	
 	private String BILL_CODE__ = " "; 
 	private String BUSI_DATE__ = " "; 
@@ -234,4 +234,4 @@ public class SocialIncDetailModel{
 		ESTB_DEPT = eSTB_DEPT;
 	}
     
-}
+}*/
