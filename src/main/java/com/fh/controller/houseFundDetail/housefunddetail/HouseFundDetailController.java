@@ -121,7 +121,7 @@ public class HouseFundDetailController extends BaseController {
 		pd.put("RPT_DUR", SystemDateTime);
 		pd.put("BILL_TYPE", TypeCode);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 		String State = syssealedinfoService.getState(pd);
-		if(!(State != null && State.trim() != "")){
+		if(!(State != null && !State.trim().equals(""))){
 			State = DurState.Release.getNameKey();
 		}
 		mv.addObject("State", State.equals(DurState.Release.getNameKey())? true:false);// 枚举  1封存,0解封
@@ -201,7 +201,7 @@ public class HouseFundDetailController extends BaseController {
 
 		PageData pd = this.getPageData();
 		String checkState = CheckState(pd);
-		if(checkState!=null && checkState.trim() != ""){
+		if(checkState!=null && !checkState.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(checkState);
 		} else {
@@ -249,7 +249,7 @@ public class HouseFundDetailController extends BaseController {
 
 		PageData pd = this.getPageData();
 		String checkState = CheckState(pd);
-		if(checkState!=null && checkState.trim() != ""){
+		if(checkState!=null && !checkState.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(checkState);
 		} else {
@@ -290,7 +290,7 @@ public class HouseFundDetailController extends BaseController {
 
 		PageData pd = this.getPageData();
 		String checkState = CheckState(pd);
-		if(checkState!=null && checkState.trim() != ""){
+		if(checkState!=null && !checkState.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(checkState);
 		} else {
@@ -333,7 +333,7 @@ public class HouseFundDetailController extends BaseController {
 
 		PageData pd = this.getPageData();
 		String checkState = CheckState(pd);
-		if(checkState!=null && checkState.trim() != ""){
+		if(checkState!=null && !checkState.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(checkState);
 		} else {
@@ -536,7 +536,7 @@ public class HouseFundDetailController extends BaseController {
 
 		PageData pd = this.getPageData();
 		String checkState = CheckState(pd);
-		if(checkState!=null && checkState.trim() != ""){
+		if(checkState!=null && !checkState.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(checkState);
 		} else {

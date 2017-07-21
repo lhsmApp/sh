@@ -218,7 +218,7 @@ public class TmplUtil {
 		for (TableColumns col : columns) {
 			m_defaultValueList.put(col.getColumn_name(), col.getColumn_default());
 			// 表全部 类型
-			m_typeList.put(col.getColumn_name(), col.getColumn_type());
+			m_typeList.put(col.getColumn_name(), col.getData_type());
 			Map<String, Object> MapAdd = new HashMap<String, Object>();
 
 			StringBuilder model_name = new StringBuilder();
@@ -259,7 +259,7 @@ public class TmplUtil {
 		for (TableColumns col : columns) {
 			m_defaultValueList.put(col.getColumn_name(), col.getColumn_default());
 			// 表全部 类型
-			m_typeList.put(col.getColumn_name(), col.getColumn_type());
+			m_typeList.put(col.getColumn_name(), col.getData_type());
 
 			Map<String, Object> MapAdd = new HashMap<String, Object>();
 
@@ -376,16 +376,21 @@ public class TmplUtil {
 
 	public static void setModelDefault(PageData pd, List<TmplConfigDetail> ColumnsList)
 			throws ClassNotFoundException {
-		/*Field[] fields = clazz.getDeclaredFields();// 根据Class对象获得属性 私有的也可以获得
-		for (Field field : fields) {
-			String fieldName = field.getName().toUpperCase();
-			if (!(pd.containsKey(fieldName) && pd.get(fieldName) != null
-					&& !pd.get(fieldName).toString().trim().equals(""))) {
-				Object defaultValue = DefaultValueList.get(fieldName);
-				pd.put(fieldName, defaultValue);
+		String InsertField = "";
+		String InsertVale = "";
+		for (TmplConfigDetail col : ColumnsList) {
+			String value = (String) pd.get(col.getCOL_CODE().toUpperCase());
+			if(value != null && !value.trim().equals("")){
+				if(InsertField!=null && !InsertField.trim().equals("")){
+					InsertField += ",";
+					InsertVale += ",";
+				}
+				InsertField += col.getCOL_CODE();
+				InsertVale += "'" + value + "'";
 			}
 		}
-		//InsertField InsertVale*/
+		pd.put("InsertField", InsertField);
+		pd.put("InsertVale", InsertVale);
 	}
 
 	/**

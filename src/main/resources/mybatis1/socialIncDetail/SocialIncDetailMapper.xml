@@ -14,7 +14,7 @@
 	</sql>
 	
 	<!-- 字段 -->
-	<sql id="FieldSelectKey"> BILL_CODE BILL_CODE__, BUSI_DATE BUSI_DATE__, USER_CODE USER_CODE__,</sql>
+	<sql id="FieldSelectKey"> BILL_CODE BILL_CODE__, BUSI_DATE BUSI_DATE__, USER_CODE USER_CODE__</sql>
 	
 	<!-- 获取员工编码 相当于字典-->
 	<!-- 张晓柳 -->
@@ -40,8 +40,8 @@
 	<!-- 列表 -->
 	<select id="datalistJqPage" parameterType="jqPage" resultType="pd">
 		select 
+		    * ,
 		    <include refid="FieldSelectKey"></include>
-		    * 
 		from 
 		<include refid="tableName"></include>
 		where BUSI_DATE = '${pd.SystemDateTime}'

@@ -345,7 +345,7 @@ public class LeadingInExcelToPageData<T> {
         								getKey = dic.getKey();
                                     }
         					    }  
-        						if(!(getKey != null && getKey.trim() != "")){
+        						if(!(getKey != null && !getKey.trim().equals(""))){
         							returnError.put(listColumns.get(j).getCOL_NAME(), value);
         							break;
         						}
