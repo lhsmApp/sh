@@ -149,6 +149,7 @@
 			$("#jqGrid").jqGrid( 'setGridWidth', $(".page-content").width());
 			//$("#jqGrid").jqGrid( 'setGridHeight', $(window).height() - 160);
 			resizeGridHeight($("#jqGrid"));
+			$(".ui-jqgrid-btable").removeAttr("style");
 	    })
 		
 		$("#jqGrid").jqGrid({
@@ -178,11 +179,11 @@
 					}
 				},
 				
-				{ label: '单据编码',name:'BILL_CODE', width:100,hidden : true,editable: true},
+				{ label: '单据编码',name:'BILL_CODE', width:90,hidden : true,editable: true},
 				{ label: '单据单位', name: 'RPT_DEPT', width: 90,hidden : true,editable: true,edittype: 'select',formatter:'select',formatoptions:{value:"${departmentStr}"},editoptions:{value:"${departmentStr}"},stype: 'select',searchoptions:{value:"${departmentStr}"}},
 				{ label: '单据期间', name: 'RPT_DUR', width: 60,hidden : true,editable: true,},
 				
-				{ label: '单据编码',name:'BILL_CODE', width:90},
+				/* { label: '单据编码',name:'BILL_CODE', width:90}, */
 				{ label: '单据单位', name: 'RPT_DEPT', width: 90,edittype: 'select',formatter:'select',formatoptions:{value:"${departmentStr}"},editoptions:{value:"${departmentStr}"},stype: 'select',searchoptions:{value:"${departmentStr}"}},
 				{ label: '单据期间', name: 'RPT_DUR', width: 60},
 				{ label: '上传人', name: 'RPT_USER', width: 60,edittype: 'select',formatter:'select',formatoptions:{value:"${userStr}"},editoptions:{value:"${userStr}"},stype: 'select',searchoptions:{value:"${userStr}"}},

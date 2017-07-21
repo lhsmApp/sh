@@ -129,11 +129,11 @@ public class SysSealedInfoController extends BaseController {
 		}
 		page.setPd(pd);
 		List<PageData> varList = syssealedinfoService.list(page);	//列出Betting列表
-		//int records = syssealedinfoService.count(pd);
+		int records = syssealedinfoService.count(pd);
 		PageResult<PageData> result = new PageResult<PageData>();
 		result.setRows(varList);
 		result.setRowNum(page.getRowNum());
-		//result.setRecords(records);
+		result.setRecords(records);
 		result.setPage(page.getPage());
 		return result;
 	}

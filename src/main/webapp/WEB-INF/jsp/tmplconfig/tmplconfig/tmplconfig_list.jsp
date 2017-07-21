@@ -90,6 +90,11 @@
 												<div class="selectTree" id="selectTree" multiMode="false"
 													allSelectable="false" noGroup="false"></div>
 											</span>
+											<span class="input-icon pull-left" style="margin-right: 5px;">
+												<input id="busiDate" class="input-mask-date" type="text"
+												placeholder="请输入业务区间"> <i
+												class="ace-icon fa fa-calendar blue"></i>
+											</span>
 											<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
 												<i class="ace-icon fa fa-search bigger-110"></i>
 											</button>
@@ -136,6 +141,8 @@
 	<script src="static/ace/js/date-time/bootstrap-datepicker.js"></script>
 	<!--提示框-->
 	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
+	<!-- 输入格式化 -->
+	<script src="static/ace/js/jquery.maskedinput.js"></script>
 	<!-- JqGrid统一样式统一操作 -->
 	<script type="text/javascript" src="static/js/common/jqgrid_style.js"></script>
 
@@ -144,6 +151,9 @@
 	$(document).ready(function () {
 		
 		$(top.hangge());//关闭加载状态
+		$('.input-mask-date').mask('999999');
+		$("#busiDate").val('${pd.busiDate}');
+		
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
 			$("#jqGrid").jqGrid( 'setGridWidth', $(".page-content").width());
@@ -152,14 +162,16 @@
 	    })
 		
 		$("#jqGrid").jqGrid({
-			url: '<%=basePath%>tmplconfig/list.do',
+			//url: '<%=basePath%>tmplconfig/getPageList.do',
 			datatype: "json",
 			 colModel: [
 				//隐藏where条件
+				{ label: '期间', name: 'RPT_DUR', width: 60,hidden : true,editable: true,},
 				{ label: '单位编码', name: 'DEPT_CODE', width: 60,hidden : true,editable: true,},
 				{ label: '表编码', name: 'TABLE_CODE', width: 60,hidden : true,editable: true,},
 				{ label: '列编码', name: 'COL_CODE', width: 60,hidden : true,editable: true,},
 				
+				{ label: '业务期间',name:'RPT_DUR', width:60}, 
 				{ label: '单位',name:'DNAME', width:100}, 
 				{ label: '表名', name: 'TABLE_NAME', width: 90},
 				{ label: '列编码', name: 'COL_CODE', width: 60},
@@ -418,8 +430,10 @@
 		var DEPARTMENT_CODE = $("#DEPARTMENT_CODE").val(); 
 		var TABLE_NAME = $("#TABLE_NO").find("option:selected").text();
 		var DNAME = $("#DNAME").val(); 
+		var busiDate = $("#busiDate").val(); 
 		$("#jqGrid").jqGrid('setGridParam',{  // 重新加载数据
-			url:'<%=basePath%>tmplconfig/getPageList.do?TABLE_NO='+TABLE_NO+'&DEPARTMENT_CODE='+DEPARTMENT_CODE+'&TABLE_NAME='+TABLE_NAME+'&DNAME='+DNAME,  
+			url:'<%=basePath%>tmplconfig/getPageList.do?TABLE_NO='+TABLE_NO+'&DEPARTMENT_CODE='+DEPARTMENT_CODE
+			+'&RPT_DUR='+busiDate+'&TABLE_NAME='+TABLE_NAME+'&DNAME='+DNAME,  
 			datatype:'json',
 		      page:1
 		}).trigger("reloadGrid");
@@ -440,11 +454,12 @@
 		}
        	var TABLE_NO = $("#TABLE_NO").val(); 
 		var DEPARTMENT_CODE = $("#DEPARTMENT_CODE").val(); 
+		var busiDate = $("#busiDate").val(); 
        	 top.jzts();
 		 var diag = new top.Dialog();
 		 diag.Drag = true;
 		 diag.Title = "复制";
-		 diag.URL = '<%=basePath%>department/listAllDepartmentCopy.do?TABLE_NO='+TABLE_NO+'&DEPARTMENT_CODE='+DEPARTMENT_CODE;
+		 diag.URL = '<%=basePath%>department/listAllDepartmentCopy.do?TABLE_NO='+TABLE_NO+'&DEPARTMENT_CODE='+DEPARTMENT_CODE+'&RPT_DUR='+busiDate;
 		 diag.Width = 320;
 		 diag.Height = 450;
 		 diag.CancelEvent = function(){ //关闭事件
