@@ -432,42 +432,46 @@ public class StaffSummyController extends BaseController {
 	
 	private List<PageData> getListTo(List<PageData> listHave, List<PageData> listSave){
 		List<String> listNotSetCode = new ArrayList<String>();
-		//根据汇总字段匹配单号
-		if(listHave!=null && listHave.size()>0){
-			for(PageData eachHave : listHave){
-				Object getBILL_CODE = eachHave.get("BILL_CODE");
-				if(getBILL_CODE!=null && !getBILL_CODE.toString().equals("")){
-					for(PageData eachSave : listSave){
-						Boolean bol = true;
-						for(String field : SumField){
-							String strHave = (String) eachHave.get(field);
-							if(strHave == null) strHave = "";
-							String strSave = (String) eachSave.get(field);
-							if(strSave == null) strSave = "";
-							if(!strHave.equals(strSave)){
-								bol = false;
+	    if(listSave!=null && listSave.size()>0){
+			for(PageData eachSave : listSave){
+			    //先清除汇总生成数据的单号
+				eachSave.remove("BILL_CODE");
+				//在根据汇总字段匹配设置单号
+			    if(listHave!=null && listHave.size()>0){
+					for(PageData eachHave : listHave){
+						Object getBILL_CODE = eachHave.get("BILL_CODE");
+						if(getBILL_CODE!=null && !getBILL_CODE.toString().equals("")){
+							Boolean bol = true;
+							for(String field : SumField){
+								String strHave = (String) eachHave.get(field);
+								if(strHave == null) strHave = "";
+								String strSave = (String) eachSave.get(field);
+								if(strSave == null) strSave = "";
+								if(!strHave.equals(strSave)){
+									bol = false;
+								}
+							}
+							if(bol){
+								eachSave.put("BILL_CODE", getBILL_CODE);
+							} else {
+							    listNotSetCode.add(getBILL_CODE.toString());
 							}
 						}
-						if(bol){
-						    eachSave.put("BILL_CODE", getBILL_CODE);
-						} else {
-							listNotSetCode.add(getBILL_CODE.toString());
-						}
 					}
+			    }
+			}
+			//未匹配的单号和没有单号的记录设置
+			for(PageData eachSave : listSave){
+				if(!(listNotSetCode!=null && listNotSetCode.size()>0)){
+					break;
+				}
+				Object getBILL_CODE = eachSave.get("BILL_CODE");
+				if(!(getBILL_CODE != null && !getBILL_CODE.toString().trim().equals(""))){
+					eachSave.put("BILL_CODE", listNotSetCode.get(0));
+					listNotSetCode.remove(0);
 				}
 			}
-		}
-		//未匹配的单号和没有单号的记录设置
-		for(PageData eachSave : listSave){
-			if(!(listNotSetCode!=null && listNotSetCode.size()>0)){
-				break;
-			}
-			Object getBILL_CODE = eachSave.get("BILL_CODE");
-			if(!(getBILL_CODE != null && !getBILL_CODE.toString().trim().equals(""))){
-				eachSave.put("BILL_CODE", listNotSetCode.get(0));
-				listNotSetCode.remove(0);
-			}
-		}
+	    }
 		return listSave;
 	}
 	
