@@ -364,8 +364,8 @@ public class TmplUtil {
 					if (ret != null && !ret.toString().trim().equals("")) {
 						ret.append(";");
 					}
-					ret.append(dic.getString("USER_ID") + ":" + dic.getString("NAME"));
-					dicAdd.put(dic.getString("USER_ID"), dic.getString("NAME"));
+					ret.append(dic.get("USER_ID").toString() + ":" + dic.getString("NAME"));
+					dicAdd.put(dic.get("USER_ID").toString(), dic.getString("NAME"));
 				}
 			}
 		}else if (strDicType.equals("3")) {//枚举
