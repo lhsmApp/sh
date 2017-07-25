@@ -14,7 +14,13 @@
 <base href="<%=basePath%>">
 <!-- jsp文件头和头部 -->
 <%@ include file="../system/index/top.jsp"%>
-
+<style>
+	.page-header{
+		padding-top: 9px;
+		padding-bottom: 9px;
+		margin: 0 0 8px;
+	}
+</style>
 </head>
 <body class="no-skin">
 	<div class="main-container" id="main-container">
