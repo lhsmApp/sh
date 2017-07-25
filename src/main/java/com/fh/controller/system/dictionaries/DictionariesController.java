@@ -25,6 +25,7 @@ import com.fh.controller.base.BaseController;
 import com.fh.entity.Page;
 import com.fh.util.AppUtil;
 import com.fh.util.PageData;
+import com.fh.util.StringUtil;
 import com.fh.util.Jurisdiction;
 import com.fh.service.system.dictionaries.DictionariesManager;
 
@@ -55,6 +56,9 @@ public class DictionariesController extends BaseController {
 		ModelAndView mv = this.getModelAndView();
 		PageData pd = new PageData();
 		pd = this.getPageData();
+		if(StringUtil.isEmpty(pd.getString("PARENT_CODE"))){
+			pd.put("PARENT_CODE", "0");
+		}
 		//pd.put("DICTIONARIES_ID", this.get32UUID());	//主键
 		dictionariesService.save(pd);
 		mv.addObject("msg","success");

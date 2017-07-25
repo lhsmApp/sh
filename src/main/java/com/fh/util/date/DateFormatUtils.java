@@ -45,6 +45,8 @@ public class DateFormatUtils {
 	/** yyyyMMddhhmmss */
 	public static final String TIME_NOFUll_FORMAT = "yyyyMMddHHmmss";
 	
+	/** yyyyMM */
+	public static final String DATE_MONTH_FORMAT = "yyyyMM";
 	/**
 	 * 
 	 * 格式转换<br>

@@ -115,5 +115,18 @@ public interface TmplConfigManager{
 	 * @throws Exception
 	 */
 	public void copyAll(PageData pd) throws Exception;
+	
+	/**
+	 * 根据区间批量生成配置信息
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void insertBatchNextRptDur(PageData pd) throws Exception;
+	
+	/**通过期间获取数据，判断是否已经生成过模板配置信息 
+	 * @param pd
+	 * @throws Exception
+	 */
+	public String findByRptDur(String nextRptDur)throws Exception;
 }
 
