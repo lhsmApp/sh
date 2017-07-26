@@ -46,6 +46,14 @@ public class SysConfigService implements SysConfigManager{
 		dao.update("SysConfigMapper.edit", pd);
 	}
 	
+	/**更新业务期间
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void updateBusidate(String busiDate)throws Exception{
+		dao.update("SysConfigMapper.updateBusidate", busiDate);
+	}
+	
 	/**列表
 	 * @param page
 	 * @throws Exception

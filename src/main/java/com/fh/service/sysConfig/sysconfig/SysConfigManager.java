@@ -32,6 +32,12 @@ public interface SysConfigManager{
 	 */
 	public void edit(PageData pd)throws Exception;
 	
+	/**更新业务期间
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void updateBusidate(String busiDate)throws Exception;
+	
 	/**列表
 	 * @param page
 	 * @throws Exception

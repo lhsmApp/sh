@@ -109,6 +109,15 @@
 		where
 		TABLE_CODE = #{TABLE_CODE}
 	</select>
+	
+	<!-- 通过期间获取数据，判断是否已经生成过模板配置信息 -->
+	<select id="findByRptDur" parameterType="String" resultType="String">
+		select 1
+		from
+		<include refid="tableName"></include>
+		where
+		RPT_DUR = #{RPT_DUR} LIMIT 1 
+	</select>
 
 	<!-- 列表 -->
 	<select id="datalistJqPage" parameterType="page" resultType="pd">
@@ -284,6 +293,19 @@
 				TABLE_CODE=#{TABLE_CODE}
 			</if>
 		</foreach>
+	</insert>
+	
+	<!-- 根据区间批量生成配置信息 -->
+	<insert id="insertBatchNextRptDur" parameterType="pd">
+		<!-- 插入保存 -->
+		insert into
+		<include refid="tableName"></include>
+		(
+		<include refid="Field"></include>
+		)
+		SELECT #{NEXT_RPT_DUR} as RPT_DUR,DEPT_CODE,
+		TABLE_CODE,COL_CODE,COL_NAME,DISP_ORDER,DICT_TRANS,COL_HIDE,COL_SUM,COL_AVE
+		FROM tb_tmpl_config_detail WHERE RPT_DUR=#{CUR_RPT_DUR}
 	</insert>
 
 	<!-- 获取数据库中表结构 -->

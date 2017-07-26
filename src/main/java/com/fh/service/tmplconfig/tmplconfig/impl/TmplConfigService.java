@@ -149,7 +149,21 @@ public class TmplConfigService implements TmplConfigManager{
 	 */
 	public void copyAll(PageData pd) throws Exception {
 		dao.update("TmplConfigMapper.copyAll", pd);
-		
+	}
+	
+	/**
+	 * 根据区间批量生成配置信息
+	 */
+	public void insertBatchNextRptDur(PageData pd) throws Exception {
+		dao.update("TmplConfigMapper.insertBatchNextRptDur", pd);
+	}
+	
+	/**通过期间获取数据，判断是否已经生成过模板配置信息 
+	 * @param pd
+	 * @throws Exception
+	 */
+	public String findByRptDur(String nextRptDur)throws Exception{
+		return (String)dao.findForObject("TmplConfigMapper.findByRptDur", nextRptDur);
 	}
 }
 
