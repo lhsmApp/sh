@@ -68,7 +68,7 @@ public class StaffDetailService implements StaffDetailManager{
 	 * @throws Exception
 	 */
 	public void deleteUpdateAll(List<PageData> listData)throws Exception{
-		dao.batchDeleteUpdate("StaffDetailMapper.deleteAll", "StaffDetailMapper.save", listData);
+		dao.batchDeleteAllUpdate("StaffDetailMapper.deleteAll", "StaffDetailMapper.save", listData);
 	}
 	
 	/**导入

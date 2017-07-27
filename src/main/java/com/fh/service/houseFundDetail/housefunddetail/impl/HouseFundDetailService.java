@@ -69,7 +69,7 @@ public class HouseFundDetailService implements HouseFundDetailManager{
 	 * @throws Exception
 	 */
 	public void deleteUpdateAll(List<PageData> listData)throws Exception{
-		dao.batchDeleteUpdate("HouseFundDetailMapper.deleteAll", "HouseFundDetailMapper.save", listData);
+		dao.batchDeleteAllUpdate("HouseFundDetailMapper.deleteAll", "HouseFundDetailMapper.save", listData);
 	}
 	
 	/**导入

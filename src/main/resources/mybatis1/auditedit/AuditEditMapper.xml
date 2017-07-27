@@ -13,12 +13,9 @@
 		from ${TableName}
 		where BUSI_DATE = '${RPT_DUR}'
 		and DEPT_CODE = '${RPT_DEPT}'
-		<!-- <if test="which == 1">
+		<if test="SallaryType!= null and SallaryType != ''">
+		    and USER_GROP = '${SallaryType}'
 		</if>
-		<if test="which == 2">
-		</if>
-		<if test="which == 3">
-		</if> -->
 	</select>
 	
 	<!-- 获取数据 验证数据重复 -->
@@ -26,7 +23,7 @@
 		select * 
 		from ${TableName}
         <where>
-		<foreach item="item" index="index" collection="list" open=" " separator=" or " close=" ">
+		<foreach item="item" index="index" collection="ListData" open=" " separator=" or " close=" ">
             (BUSI_DATE = #{item.BUSI_DATE} and USER_CODE = #{item.USER_CODE} and USER_CODE != #{item.USER_CODE__})
 		</foreach>
 		</where>
@@ -37,7 +34,7 @@
 		select 
 		    * ,
 		    <include refid="FieldSelectKey"></include>
-		from ${TableName}
+		from ${pd.TableName}
 		where BUSI_DATE = '${pd.SystemDateTime}'
 		and DEPT_CODE = '${pd.DepartCode}'
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
@@ -45,6 +42,9 @@
 		</if>
 		<if test="pd.UserCode!= null and pd.UserCode != ''"><!-- 关键词检索 -->
 		    and USER_CODE = '${pd.UserCode}'
+		</if>
+		<if test="pd.SallaryType!= null and pd.SallaryType != ''">
+		    and USER_GROP = '${pd.SallaryType}'
 		</if>
 		<if test="sidx != null and sidx.trim() != ''" >
 			order by ${sidx} ${sord} 
@@ -54,7 +54,8 @@
         </if>
 	</select>
 	<select id="countJqGridExtend" parameterType="jqPage" resultType="int">
-		select count(*) from ${TableName}
+		select count(*) 
+		from ${pd.TableName}
 		where BUSI_DATE = '${pd.SystemDateTime}'
 		and DEPT_CODE = '${pd.DepartCode}'
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
@@ -62,11 +63,14 @@
 		</if>
 		<if test="pd.UserCode!= null and pd.UserCode != ''"><!-- 关键词检索 -->
 		    and USER_CODE = '${pd.UserCode}'
+		</if>
+		<if test="pd.SallaryType!= null and pd.SallaryType != ''">
+		    and USER_GROP = '${pd.SallaryType}'
 		</if>
 	</select>
 	<select id="getFooterSummary" parameterType="jqPage" resultType="pd">
 		select ${pd.Userdata} 
-		from ${TableName}
+		from ${pd.TableName}
 		where BUSI_DATE = '${pd.SystemDateTime}'
 		and DEPT_CODE = '${pd.DepartCode}'
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
@@ -74,6 +78,9 @@
 		</if>
 		<if test="pd.UserCode!= null and pd.UserCode != ''"><!-- 关键词检索 -->
 		    and USER_CODE = '${pd.UserCode}'
+		</if>
+		<if test="pd.SallaryType!= null and pd.SallaryType != ''">
+		    and USER_GROP = '${pd.SallaryType}'
 		</if>
 	</select>
 	
@@ -83,11 +90,18 @@
 		(${InsertField}) values (${InsertVale})
 	</insert>
 	
+	<!-- 删除 -->
+	<delete id="delete" parameterType="pd">
+		delete from ${TableName}
+		where BUSI_DATE = #{BUSI_DATE__} 
+		and USER_CODE = #{USER_CODE__} 
+	</delete>
+	
 	<!-- 批量删除 -->
 	<delete id="deleteAll" parameterType="pd">
 		delete from ${TableName}
 		where
-		<foreach item="item" index="index" collection="list" open=" (" separator=" or " close=") ">
+		<foreach item="item" index="index" collection="ListData" open=" (" separator=" or " close=") ">
             BUSI_DATE = #{item.BUSI_DATE__} and USER_CODE = #{item.USER_CODE__} 
 		</foreach>
 	</delete>
@@ -97,14 +111,20 @@
 		delete from ${TableName}
 		where BUSI_DATE = #{BUSI_DATE}
 	    and DEPT_CODE = #{DEPT_CODE} 
+		<if test="SallaryType!= null and SallaryType != ''">
+		    and USER_GROP = #{SallaryType}
+		</if>
 	</delete>
 	
 	<!-- 导出列表 -->
 	<select id="exportList" parameterType="jqPage" resultType="pd">
 		select * 
-		from ${TableName}
+		from ${pd.TableName}
 		where BUSI_DATE = '${pd.SystemDateTime}'
 		and DEPT_CODE = '${pd.DepartCode}'
+		<if test="pd.SallaryType!= null and pd.SallaryType != ''">
+		    and USER_GROP = '${pd.SallaryType}'
+		</if>
 		<!-- <if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''">
 			and ${pd.filterWhereResult}
 		</if> -->
@@ -115,8 +135,11 @@
 	<!-- 导出模板 -->
 	<select id="exportModel" parameterType="jqPage" resultType="pd">
 		select * 
-		from ${TableName}
+		from ${pd.TableName}
 		where DEPT_CODE = '${pd.DepartCode}'
+		<if test="pd.SallaryType!= null and pd.SallaryType != ''">
+		    and USER_GROP = '${pd.SallaryType}'
+		</if>
 		order by BUSI_DATE desc
 		limit 1
 	</select>

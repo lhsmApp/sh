@@ -9,7 +9,11 @@ public enum BillType {
 	SECURITY_SUMMARY("6","社保汇总"),
 	SALLARY_LISTEN("7","工资接口"),
 	GOLD_LISTEN("8","公积金接口"),
-	SECURITY_LISTEN("9","社保接口");
+	SECURITY_LISTEN("9","社保接口"),
+
+	SALLARY_AUDIT("10","工资对账"),
+	GOLD_AUDIT("11","公积金对账"),
+	SECURITY_AUDIT("12","社保对账");
 	
 	private String nameKey;
 

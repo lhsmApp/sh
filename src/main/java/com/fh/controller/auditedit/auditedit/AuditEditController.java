@@ -78,18 +78,6 @@ public class AuditEditController extends BaseController {
 	@Resource(name = "userService")
 	private UserManager userService;
 	
-	//while
-	//getHaveUserCodeDic
-	//JqPage
-	//countJqGridExtend
-	//getFooterSummary
-	//exportModel
-	//exportExcel
-
-	//表名
-	//String TableName = "TB_STAFF_DETAIL";
-	//枚举类型  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
-	//String TypeCode = BillType.SALLARY_DETAIL.getNameKey();
 	//默认的which值
 	String DefaultWhile = "1";
 
@@ -117,6 +105,7 @@ public class AuditEditController extends BaseController {
 		String which = getWhileValue(pd.getString("TABLE_CODE"));
 		String typeCode = getTypeCode(which);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 		String tableName = getTableCode(which);
+		String sallaryType = getSallaryType(which);
 		
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("auditedit/auditedit/auditedit_list");
@@ -138,9 +127,14 @@ public class AuditEditController extends BaseController {
 		}
 		mv.addObject("State", State.equals(DurState.Release.getNameKey())? true:false);// 枚举  1封存,0解封
 		//while
-		//pd.put("which", which);
+		pd.put("which", which);
+		mv.addObject("pd", pd);
 		//表名
 		pd.put("TableName", tableName);
+		if(sallaryType!=null && !sallaryType.trim().equals("")){
+			//工资分的类型
+			pd.put("SallaryType", sallaryType);
+		}
 		List<String> userCodeList = auditeditService.getHaveUserCodeDic(pd);
 		mv.addObject("userCodeList", userCodeList);
 		
@@ -166,9 +160,12 @@ public class AuditEditController extends BaseController {
 	@RequestMapping(value="/getPageList")
 	public @ResponseBody PageResult<PageData> getPageList(JqPage page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"列表AuditEdit");
+		
 		PageData pd = this.getPageData();
 		String which = getWhileValue(pd.getString("TABLE_CODE"));
 		String tableName = getTableCode(which);
+		String sallaryType = getSallaryType(which);
+		
 		//
 		String UserCode = pd.getString("UserCode");	
 		if(null != UserCode && !"".equals(UserCode)){
@@ -183,10 +180,12 @@ public class AuditEditController extends BaseController {
 		pd.put("SystemDateTime", SystemDateTime);
 		//页面显示数据的二级单位
 		pd.put("DepartCode", DepartCode);
-		//while
-		//pd.put("which", which);
 		//表名
 		pd.put("TableName", tableName);
+		if(sallaryType!=null && !sallaryType.trim().equals("")){
+			//工资分的类型
+			pd.put("SallaryType", sallaryType);
+		}
 		page.setPd(pd);
 		List<PageData> varList = auditeditService.JqPage(page);	//列出Betting列表
 		int records = auditeditService.countJqGridExtend(page);
@@ -243,7 +242,11 @@ public class AuditEditController extends BaseController {
 			
 			List<PageData> listData = new ArrayList<PageData>();
 			listData.add(pd);
-			List<PageData> repeatList = auditeditService.findByModel(listData);
+			
+			PageData pdFindByModel = new PageData();
+			pdFindByModel.put("TableName", tableName);
+			pdFindByModel.put("ListData", listData);
+			List<PageData> repeatList = auditeditService.findByModel(pdFindByModel);
 			if(repeatList!=null && repeatList.size()>0){
 				commonBase.setCode(2);
 				commonBase.setMessage("此区间内编码已存在！");
@@ -262,7 +265,7 @@ public class AuditEditController extends BaseController {
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/updateAll")
 	public @ResponseBody CommonBase updateAll() throws Exception{
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限	
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限	
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
 
@@ -288,7 +291,10 @@ public class AuditEditController extends BaseController {
 				item.put("TableName", tableName);
 	        }
 			if(null != listData && listData.size() > 0){
-				List<PageData> repeatList = auditeditService.findByModel(listData);
+				PageData pdFindByModel = new PageData();
+				pdFindByModel.put("TableName", tableName);
+				pdFindByModel.put("ListData", listData);
+				List<PageData> repeatList = auditeditService.findByModel(pdFindByModel);
 				if(repeatList!=null && repeatList.size()>0){
 					commonBase.setCode(2);
 					commonBase.setMessage("此区间内编码已存在！");
@@ -308,7 +314,7 @@ public class AuditEditController extends BaseController {
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/deleteAll")
 	public @ResponseBody CommonBase deleteAll() throws Exception{
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "delete")){return null;} //校验权限	
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "delete")){return null;} //校验权限	
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
 		
@@ -331,7 +337,10 @@ public class AuditEditController extends BaseController {
 				item.put("TableName", tableName);
 	        }
 	        if(null != listData && listData.size() > 0){
-				auditeditService.deleteAll(listData);
+				PageData pdDeleteAll = new PageData();
+				pdDeleteAll.put("TableName", tableName);
+				pdDeleteAll.put("ListData", listData);
+				auditeditService.deleteAll(pdDeleteAll);
 				commonBase.setCode(0);
 			}
 		}
@@ -344,8 +353,12 @@ public class AuditEditController extends BaseController {
 	 */
 	@RequestMapping(value="/goUploadExcel")
 	public ModelAndView goUploadExcel()throws Exception{
+		PageData pd = this.getPageData();
+		String which = getWhileValue(pd.getString("TABLE_CODE"));
+		
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("common/uploadExcel");
+		mv.addObject("which", which);
 		mv.addObject("local", "auditedit");
 		return mv;
 	}
@@ -361,12 +374,13 @@ public class AuditEditController extends BaseController {
 	public ModelAndView readExcel(@RequestParam(value="excel",required=false) MultipartFile file) throws Exception{
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;}//校验权限
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;}//校验权限
 
 		PageData pd = this.getPageData();
 		String which = getWhileValue(pd.getString("TABLE_CODE"));
 		String typeCode = getTypeCode(which);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 		String tableName = getTableCode(which);
+		String sallaryType = getSallaryType(which);
 		
 		String checkState = CheckState(pd, typeCode);
 		if(checkState!=null && !checkState.trim().equals("")){
@@ -470,6 +484,20 @@ public class AuditEditController extends BaseController {
 							TmplUtil.setModelDefault(uploadAndRead.get(i), map_HaveColumnsList);
 							//表名
 							uploadAndRead.get(i).put("TableName", tableName);
+							//工资分的类型
+							if(sallaryType!=null && !sallaryType.equals("")){
+								String getUSER_GROP = (String) uploadAndRead.get(i).get("USER_GROP");
+								if(!(getUSER_GROP!=null && !getUSER_GROP.trim().equals(""))){
+									uploadAndRead.get(i).put("USER_GROP", sallaryType);
+									getUSER_GROP = sallaryType;
+								}
+								if(!sallaryType.equals(getUSER_GROP)){
+									if(!sbRet.contains("导入员工组和当前员工组必须一致！")){
+										sbRet.add("导入员工组和当前员工组必须一致！");
+									}
+								}
+								uploadAndRead.get(i).put("SallaryType", sallaryType);
+							}
 						}
 						if(sbRet.size()>0){
 							StringBuilder sbTitle = new StringBuilder();
@@ -493,6 +521,7 @@ public class AuditEditController extends BaseController {
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("common/uploadExcel");
 		mv.addObject("local", "auditedit");
+		mv.addObject("which", which);
 		mv.addObject("commonBaseCode", commonBase.getCode());
 		mv.addObject("commonMessage", commonBase.getMessage());
 		return mv;
@@ -508,11 +537,16 @@ public class AuditEditController extends BaseController {
 		PageData pd = this.getPageData();
 		String which = getWhileValue(pd.getString("TABLE_CODE"));
 		String tableName = getTableCode(which);
+		String sallaryType = getSallaryType(which);
 		
 		//页面显示数据的二级单位
 		pd.put("DepartCode", DepartCode);
 		//表名
 		pd.put("TableName", tableName);
+		if(sallaryType!=null && !sallaryType.trim().equals("")){
+			//工资分的类型
+			pd.put("SallaryType", sallaryType);
+		}
 		page.setPd(pd);
 		
 		List<PageData> varOList = auditeditService.exportModel(page);
@@ -526,10 +560,11 @@ public class AuditEditController extends BaseController {
 	@RequestMapping(value="/excel")
 	public ModelAndView exportExcel(JqPage page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"导出AuditEdit到excel");
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
 		PageData pd = this.getPageData();
 		String which = getWhileValue(pd.getString("TABLE_CODE"));
 		String tableName = getTableCode(which);
+		String sallaryType = getSallaryType(which);
 		
 		//页面显示数据的年月
 		pd.put("SystemDateTime", SystemDateTime);
@@ -537,6 +572,10 @@ public class AuditEditController extends BaseController {
 		pd.put("DepartCode", DepartCode);
 		//表名
 		pd.put("TableName", tableName);
+		if(sallaryType!=null && !sallaryType.trim().equals("")){
+			//工资分的类型
+			pd.put("SallaryType", sallaryType);
+		}
 		page.setPd(pd);
 		List<PageData> varOList = auditeditService.exportList(page);
 		return export(varOList, "");
@@ -648,27 +687,34 @@ public class AuditEditController extends BaseController {
 			tableCode = "tb_social_inc_audit";
 		} else if (which != null && which.equals("5")) {
 			tableCode = "tb_house_fund_audit";
-		} else {
-			tableCode = "tb_staff_audit";
 		}
 		return tableCode;
 	}
 	private String getTypeCode(String which) {
 		String typeCode = "";
 		if (which != null && which.equals("1")) {
-			typeCode = BillType.SALLARY_LISTEN.getNameKey();
+			typeCode = BillType.SALLARY_AUDIT.getNameKey();
 		} else if (which != null && which.equals("2")) {
-			typeCode = BillType.SALLARY_LISTEN.getNameKey();
+			typeCode = BillType.SALLARY_AUDIT.getNameKey();
 		} else if (which != null && which.equals("3")) {
-			typeCode = BillType.SALLARY_LISTEN.getNameKey();
+			typeCode = BillType.SALLARY_AUDIT.getNameKey();
 		} else if (which != null && which.equals("4")) {
-			typeCode = BillType.SECURITY_LISTEN.getNameKey();
+			typeCode = BillType.SECURITY_AUDIT.getNameKey();
 		} else if (which != null && which.equals("5")) {
-			typeCode = BillType.GOLD_LISTEN.getNameKey();
-		} else {
-			typeCode = BillType.SALLARY_LISTEN.getNameKey();
+			typeCode = BillType.GOLD_AUDIT.getNameKey();
 		}
 		return typeCode;
+	}
+	private String getSallaryType(String which) {
+		String sallaryType = "";
+		if (which != null && which.equals("1")) {
+			sallaryType = "50210001";
+		} else if (which != null && which.equals("2")) {
+			sallaryType = "50210003";
+		} else if (which != null && which.equals("3")) {
+			sallaryType = "50210004";
+		}
+		return sallaryType;
 	}
 	
 	private String CheckState(PageData pd, String typeCode) throws Exception{

@@ -27,8 +27,8 @@ public class AuditEditService implements AuditEditManager{
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	public List<PageData> findByModel(List<PageData> listData)throws Exception{
-		return (List<PageData>)dao.findForList("AuditEditMapper.findByModel", listData);
+	public List<PageData> findByModel(PageData pd)throws Exception{
+		return (List<PageData>)dao.findForList("AuditEditMapper.findByModel", pd);
 	}
 	
 	/**列表
@@ -58,8 +58,8 @@ public class AuditEditService implements AuditEditManager{
 	 * @param 
 	 * @throws Exception
 	 */
-	public void deleteAll(List<PageData> listData)throws Exception{
-		dao.delete("AuditEditMapper.deleteAll", listData);
+	public void deleteAll(PageData pd)throws Exception{
+		dao.delete("AuditEditMapper.deleteAll", pd);
 	}
 	
 	/**批量修改
@@ -67,7 +67,7 @@ public class AuditEditService implements AuditEditManager{
 	 * @throws Exception
 	 */
 	public void deleteUpdateAll(List<PageData> listData)throws Exception{
-		dao.batchDeleteUpdate("AuditEditMapper.deleteAll", "AuditEditMapper.save", listData);
+		dao.batchDeleteOneUpdate("AuditEditMapper.delete", "AuditEditMapper.save", listData);
 	}
 	
 	/**导入

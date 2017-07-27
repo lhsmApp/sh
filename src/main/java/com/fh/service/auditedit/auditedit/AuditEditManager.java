@@ -19,7 +19,7 @@ public interface AuditEditManager{
 	 * @param pd
 	 * @throws Exception
 	 */
-	public List<PageData> findByModel(List<PageData> listData)throws Exception;
+	public List<PageData> findByModel(PageData pd)throws Exception;
 
 	/**导出列表
 	 * @param page
@@ -54,7 +54,7 @@ public interface AuditEditManager{
 	 * @param 
 	 * @throws Exception
 	 */
-	public void deleteAll(List<PageData> listData)throws Exception;
+	public void deleteAll(PageData pd)throws Exception;
 	
 	/**批量修改
 	 * @param pd

@@ -252,7 +252,7 @@
 		});
 
 		$(gridBase_selector).jqGrid({
-			url: '<%=basePath%>auditedit/getPageList.do?TABLE_CODE='+which + '&UserCode='+UserCode,
+			url: '<%=basePath%>auditedit/getPageList.do?TABLE_CODE='+which,
 			datatype: "json",
 			colModel: jqGridColModel,
 			//caption: '当前期间：' + SystemDateTime + '， 当前单位：' + DepartName + '',

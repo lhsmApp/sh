@@ -69,7 +69,7 @@ public class SocialIncDetailService implements SocialIncDetailManager{
 	 * @throws Exception
 	 */
 	public void deleteUpdateAll(List<PageData> listData)throws Exception{
-		dao.batchDeleteUpdate("SocialIncDetailMapper.deleteAll", "SocialIncDetailMapper.save", listData);
+		dao.batchDeleteAllUpdate("SocialIncDetailMapper.deleteAll", "SocialIncDetailMapper.save", listData);
 	}
 	
 	/**导入

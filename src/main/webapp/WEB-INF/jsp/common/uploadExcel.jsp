@@ -67,10 +67,11 @@
 	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
 	<script type="text/javascript">
 	    var local = '${local}';
+	    var which = '${which}';
 		$(document).ready(function () {
 			$(top.hangge());
 			
-			document.getElementById("Form").action = local + "/readExcel.do";
+			document.getElementById("Form").action = local + "/readExcel.do?TABLE_CODE="+which;
 			
 		    var commonBaseCode = '${commonBaseCode}';
 		    var commonMessage = '${commonMessage}';
@@ -110,7 +111,7 @@
 		
 		//下载模板
 		function downModel(basePath){
-			var url = basePath + local + '/downExcel.do';
+			var url = basePath + local + '/downExcel.do?TABLE_CODE='+which;
 			window.location.href = url;
 		}
 		//保存
