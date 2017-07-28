@@ -14,7 +14,7 @@
 		where BUSI_DATE = '${RPT_DUR}'
 		and DEPT_CODE = '${RPT_DEPT}'
 		<if test="SallaryType!= null and SallaryType != ''">
-		    and USER_GROP = '${SallaryType}'
+		    and ${SallaryType}
 		</if>
 	</select>
 	
@@ -44,7 +44,7 @@
 		    and USER_CODE = '${pd.UserCode}'
 		</if>
 		<if test="pd.SallaryType!= null and pd.SallaryType != ''">
-		    and USER_GROP = '${pd.SallaryType}'
+		    and ${pd.SallaryType}
 		</if>
 		<if test="sidx != null and sidx.trim() != ''" >
 			order by ${sidx} ${sord} 
@@ -65,7 +65,7 @@
 		    and USER_CODE = '${pd.UserCode}'
 		</if>
 		<if test="pd.SallaryType!= null and pd.SallaryType != ''">
-		    and USER_GROP = '${pd.SallaryType}'
+		    and ${pd.SallaryType}
 		</if>
 	</select>
 	<select id="getFooterSummary" parameterType="jqPage" resultType="pd">
@@ -80,7 +80,7 @@
 		    and USER_CODE = '${pd.UserCode}'
 		</if>
 		<if test="pd.SallaryType!= null and pd.SallaryType != ''">
-		    and USER_GROP = '${pd.SallaryType}'
+		    and ${pd.SallaryType}
 		</if>
 	</select>
 	
@@ -123,11 +123,8 @@
 		where BUSI_DATE = '${pd.SystemDateTime}'
 		and DEPT_CODE = '${pd.DepartCode}'
 		<if test="pd.SallaryType!= null and pd.SallaryType != ''">
-		    and USER_GROP = '${pd.SallaryType}'
+		    and ${pd.SallaryType}
 		</if>
-		<!-- <if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''">
-			and ${pd.filterWhereResult}
-		</if> -->
 		<if test="sidx != null" >
 			order by ${sidx} ${sord} 
     	</if>
@@ -138,7 +135,7 @@
 		from ${pd.TableName}
 		where DEPT_CODE = '${pd.DepartCode}'
 		<if test="pd.SallaryType!= null and pd.SallaryType != ''">
-		    and USER_GROP = '${pd.SallaryType}'
+		    and ${pd.SallaryType}
 		</if>
 		order by BUSI_DATE desc
 		limit 1

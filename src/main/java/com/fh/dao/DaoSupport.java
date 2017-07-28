@@ -132,7 +132,9 @@ public class DaoSupport implements DAO {
 		SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH,false);
 		try{
 			if(objs!=null&&objs.size()>0){
-				sqlSession.delete(importDelete, objs.get(0));
+				for(int i=0,size=objs.size();i<size;i++){
+				    sqlSession.delete(importDelete, objs.get(i));
+				}
 				for(int i=0,size=objs.size();i<size;i++){
 					sqlSession.update(importInsert, objs.get(i));
 				}

@@ -36,6 +36,7 @@ import com.fh.util.date.DateFormatUtils;
 import com.fh.util.date.DateUtils;
 import com.fh.util.enums.BillType;
 import com.fh.util.enums.DurState;
+import com.fh.util.enums.SysConfigKeyCode;
 import com.fh.util.excel.LeadingInExcelToPageData;
 
 import net.sf.json.JSONArray;
@@ -380,7 +381,7 @@ public class AuditEditController extends BaseController {
 		String which = getWhileValue(pd.getString("TABLE_CODE"));
 		String typeCode = getTypeCode(which);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 		String tableName = getTableCode(which);
-		String sallaryType = getSallaryType(which);
+		//String sallaryType = getSallaryType(which);
 		
 		String checkState = CheckState(pd, typeCode);
 		if(checkState!=null && !checkState.trim().equals("")){
@@ -485,19 +486,19 @@ public class AuditEditController extends BaseController {
 							//表名
 							uploadAndRead.get(i).put("TableName", tableName);
 							//工资分的类型
-							if(sallaryType!=null && !sallaryType.equals("")){
-								String getUSER_GROP = (String) uploadAndRead.get(i).get("USER_GROP");
-								if(!(getUSER_GROP!=null && !getUSER_GROP.trim().equals(""))){
-									uploadAndRead.get(i).put("USER_GROP", sallaryType);
-									getUSER_GROP = sallaryType;
-								}
-								if(!sallaryType.equals(getUSER_GROP)){
-									if(!sbRet.contains("导入员工组和当前员工组必须一致！")){
-										sbRet.add("导入员工组和当前员工组必须一致！");
-									}
-								}
-								uploadAndRead.get(i).put("SallaryType", sallaryType);
-							}
+							//if(sallaryType!=null && !sallaryType.equals("")){
+							//	String getUSER_GROP = (String) uploadAndRead.get(i).get("USER_GROP");
+							//	if(!(getUSER_GROP!=null && !getUSER_GROP.trim().equals(""))){
+							//		uploadAndRead.get(i).put("USER_GROP", sallaryType);
+							//		getUSER_GROP = sallaryType;
+							//	}
+							//	if(!sallaryType.equals(getUSER_GROP)){
+							//		if(!sbRet.contains("导入员工组和当前员工组必须一致！")){
+							//			sbRet.add("导入员工组和当前员工组必须一致！");
+							//		}
+							//	}
+							//	uploadAndRead.get(i).put("SallaryType", sallaryType);
+							//}
 						}
 						if(sbRet.size()>0){
 							StringBuilder sbTitle = new StringBuilder();
@@ -705,14 +706,20 @@ public class AuditEditController extends BaseController {
 		}
 		return typeCode;
 	}
-	private String getSallaryType(String which) {
-		String sallaryType = "";
+	private String getSallaryType(String which) throws Exception {
+		String strKeyCode = "";
 		if (which != null && which.equals("1")) {
-			sallaryType = "50210001";
+			strKeyCode = SysConfigKeyCode.ChkMktGRPCOND;
 		} else if (which != null && which.equals("2")) {
-			sallaryType = "50210003";
+			strKeyCode = SysConfigKeyCode.ChkRunGRPCOND;
 		} else if (which != null && which.equals("3")) {
-			sallaryType = "50210004";
+			strKeyCode = SysConfigKeyCode.ChkEmployGRPCOND;
+		}
+		String sallaryType = "";
+		if(strKeyCode != null && !strKeyCode.trim().equals("")){
+			PageData pd = new PageData();
+			pd.put("KEY_CODE", strKeyCode);
+			sallaryType = sysConfigManager.getSysConfigByKey(pd);
 		}
 		return sallaryType;
 	}
