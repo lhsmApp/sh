@@ -1,13 +1,11 @@
 package com.fh.controller.financeaccounts.financeaccounts;
 
-import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.Resource;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -17,13 +15,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
+import com.fh.controller.common.TmplUtil;
+import com.fh.entity.CommonBase;
+import com.fh.entity.JqPage;
 import com.fh.entity.Page;
-import com.fh.util.AppUtil;
-import com.fh.util.ObjectExcelView;
+import com.fh.entity.PageResult;
+import com.fh.entity.TableColumns;
 import com.fh.util.PageData;
+import com.fh.util.SqlTools;
 import com.fh.util.Jurisdiction;
-import com.fh.util.Tools;
+import com.fh.util.enums.SysConfigKeyCode;
+
+import net.sf.json.JSONArray;
+
+import com.fh.service.fhoa.department.impl.DepartmentService;
 import com.fh.service.financeaccounts.financeaccounts.FinanceAccountsManager;
+import com.fh.service.sysConfig.sysconfig.SysConfigManager;
+import com.fh.service.sysSealedInfo.syssealedinfo.impl.SysSealedInfoService;
+import com.fh.service.system.dictionaries.impl.DictionariesService;
+import com.fh.service.system.user.UserManager;
+import com.fh.service.tmplConfigDict.tmplconfigdict.impl.TmplConfigDictService;
+import com.fh.service.tmplconfig.tmplconfig.impl.TmplConfigService;
 
 /** 
  * 说明：财务对账
@@ -37,56 +49,28 @@ public class FinanceAccountsController extends BaseController {
 	String menuUrl = "financeaccounts/list.do"; //菜单地址(权限用)
 	@Resource(name="financeaccountsService")
 	private FinanceAccountsManager financeaccountsService;
+	@Resource(name="tmplconfigService")
+	private TmplConfigService tmplconfigService;
+	@Resource(name="syssealedinfoService")
+	private SysSealedInfoService syssealedinfoService;
+	@Resource(name="sysconfigService")
+	private SysConfigManager sysConfigManager;
+	@Resource(name="tmplconfigdictService")
+	private TmplConfigDictService tmplconfigdictService;
+	@Resource(name="dictionariesService")
+	private DictionariesService dictionariesService;
+	@Resource(name="departmentService")
+	private DepartmentService departmentService;
+	@Resource(name = "userService")
+	private UserManager userService;
 	
-	/**保存
-	 * @param
-	 * @throws Exception
-	 */
-	@RequestMapping(value="/save")
-	public ModelAndView save() throws Exception{
-		logBefore(logger, Jurisdiction.getUsername()+"新增FinanceAccounts");
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;} //校验权限
-		ModelAndView mv = this.getModelAndView();
-		PageData pd = new PageData();
-		pd = this.getPageData();
-		pd.put("FinanceAccounts_ID", this.get32UUID());	//主键
-		financeaccountsService.save(pd);
-		mv.addObject("msg","success");
-		mv.setViewName("save_result");
-		return mv;
-	}
-	
-	/**删除
-	 * @param out
-	 * @throws Exception
-	 */
-	@RequestMapping(value="/delete")
-	public void delete(PrintWriter out) throws Exception{
-		logBefore(logger, Jurisdiction.getUsername()+"删除FinanceAccounts");
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "del")){return;} //校验权限
-		PageData pd = new PageData();
-		pd = this.getPageData();
-		financeaccountsService.delete(pd);
-		out.write("success");
-		out.close();
-	}
-	
-	/**修改
-	 * @param
-	 * @throws Exception
-	 */
-	@RequestMapping(value="/edit")
-	public ModelAndView edit() throws Exception{
-		logBefore(logger, Jurisdiction.getUsername()+"修改FinanceAccounts");
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限
-		ModelAndView mv = this.getModelAndView();
-		PageData pd = new PageData();
-		pd = this.getPageData();
-		financeaccountsService.edit(pd);
-		mv.addObject("msg","success");
-		mv.setViewName("save_result");
-		return mv;
-	}
+	//默认的which值
+	String DefaultWhile = "1";
+	//显示结构的单位
+    String ShowDepartCode = "01001";
+
+	//页面显示数据的年月
+	String SystemDateTime = "";
 	
 	/**列表
 	 * @param page
@@ -96,159 +80,304 @@ public class FinanceAccountsController extends BaseController {
 	public ModelAndView list(Page page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"列表FinanceAccounts");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
+
+		PageData pd = this.getPageData();
+		String which = getWhileValue(pd.getString("TABLE_CODE"));
+		String summyTableName = getSummyTableCode(which);
+		
 		ModelAndView mv = this.getModelAndView();
-		PageData pd = new PageData();
-		pd = this.getPageData();
-		String keywords = pd.getString("keywords");				//关键词检索条件
-		if(null != keywords && !"".equals(keywords)){
-			pd.put("keywords", keywords.trim());
-		}
-		page.setPd(pd);
-		List<PageData>	varList = financeaccountsService.list(page);	//列出FinanceAccounts列表
 		mv.setViewName("financeaccounts/financeaccounts/financeaccounts_list");
-		mv.addObject("varList", varList);
+		//while
+		pd.put("which", which);
 		mv.addObject("pd", pd);
-		mv.addObject("QX",Jurisdiction.getHC());	//按钮权限
+		//当前期间,取自tb_system_config的SystemDateTime字段
+		SystemDateTime = sysConfigManager.currentSection(pd);
+		
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
+		String jqGridColModel = tmpl.generateStructureNoEdit(summyTableName, ShowDepartCode);
+		mv.addObject("jqGridColModel", jqGridColModel);
+
 		return mv;
 	}
 	
-	/**去新增页面
-	 * @param
+	/**列表
+	 * @param page
 	 * @throws Exception
 	 */
-	@RequestMapping(value="/goAdd")
-	public ModelAndView goAdd()throws Exception{
-		ModelAndView mv = this.getModelAndView();
-		PageData pd = new PageData();
-		pd = this.getPageData();
-		mv.setViewName("financeaccounts/financeaccounts/financeaccounts_edit");
-		mv.addObject("msg", "save");
-		mv.addObject("pd", pd);
-		return mv;
-	}	
-	
-	 /**去修改页面
-	 * @param
-	 * @throws Exception
-	 */
-	@RequestMapping(value="/goEdit")
-	public ModelAndView goEdit()throws Exception{
-		ModelAndView mv = this.getModelAndView();
-		PageData pd = new PageData();
-		pd = this.getPageData();
-		pd = financeaccountsService.findById(pd);	//根据ID读取
-		mv.setViewName("financeaccounts/financeaccounts/financeaccounts_edit");
-		mv.addObject("msg", "edit");
-		mv.addObject("pd", pd);
-		return mv;
-	}	
-	
-	 /**批量删除
-	 * @param
-	 * @throws Exception
-	 */
-	@RequestMapping(value="/deleteAll")
-	@ResponseBody
-	public Object deleteAll() throws Exception{
-		logBefore(logger, Jurisdiction.getUsername()+"批量删除FinanceAccounts");
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "del")){return null;} //校验权限
-		PageData pd = new PageData();		
-		Map<String,Object> map = new HashMap<String,Object>();
-		pd = this.getPageData();
-		List<PageData> pdList = new ArrayList<PageData>();
-		String DATA_IDS = pd.getString("DATA_IDS");
-		if(null != DATA_IDS && !"".equals(DATA_IDS)){
-			String ArrayDATA_IDS[] = DATA_IDS.split(",");
-			financeaccountsService.deleteAll(ArrayDATA_IDS);
-			pd.put("msg", "ok");
-		}else{
-			pd.put("msg", "no");
+	@RequestMapping(value="/getPageList")
+	public @ResponseBody PageResult<PageData> getPageList(JqPage page) throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"列表FinanceAccounts");
+		
+		PageData pd = this.getPageData();
+		String which = getWhileValue(pd.getString("TABLE_CODE"));
+		String summyTableName = getSummyTableCode(which);
+		String auditeTableName = getAuditeTableCode(which);
+		String detailTableName = getDetailTableCode(which);
+		String sallaryType = getSallaryType(which);
+		String groupbyFeild = getGroupbyFeild(which);
+		List<String> listGroupbyFeild = new ArrayList<String>();
+		if(groupbyFeild != null && !groupbyFeild.trim().equals("")){
+			listGroupbyFeild = Arrays.asList(groupbyFeild.replace(" ", "").toUpperCase().split(","));
 		}
-		pdList.add(pd);
-		map.put("list", pdList);
-		return AppUtil.returnObject(pd, map);
-	}
-	
-	 /**导出到excel
-	 * @param
-	 * @throws Exception
-	 */
-	@RequestMapping(value="/excel")
-	public ModelAndView exportExcel() throws Exception{
-		logBefore(logger, Jurisdiction.getUsername()+"导出FinanceAccounts到excel");
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
-		ModelAndView mv = new ModelAndView();
-		PageData pd = new PageData();
-		pd = this.getPageData();
-		Map<String,Object> dataMap = new HashMap<String,Object>();
-		List<String> titles = new ArrayList<String>();
-		titles.add("备注1");	//1
-		titles.add("备注2");	//2
-		titles.add("备注3");	//3
-		titles.add("备注4");	//4
-		titles.add("备注5");	//5
-		titles.add("备注6");	//6
-		titles.add("备注7");	//7
-		titles.add("备注8");	//8
-		titles.add("备注9");	//9
-		titles.add("备注10");	//10
-		titles.add("备注11");	//11
-		titles.add("备注12");	//12
-		titles.add("备注13");	//13
-		titles.add("备注14");	//14
-		titles.add("备注15");	//15
-		titles.add("备注16");	//16
-		titles.add("备注17");	//17
-		titles.add("备注18");	//18
-		titles.add("备注19");	//19
-		titles.add("备注20");	//20
-		titles.add("备注21");	//21
-		titles.add("备注22");	//22
-		titles.add("备注23");	//23
-		titles.add("备注24");	//24
-		titles.add("备注25");	//25
-		titles.add("备注26");	//26
-		titles.add("备注27");	//27
-		titles.add("备注28");	//28
-		dataMap.put("titles", titles);
-		List<PageData> varOList = financeaccountsService.listAll(pd);
+		
+		//多条件过滤条件
+		String filters = pd.getString("filters");
+		if(null != filters && !"".equals(filters)){
+			pd.put("filterWhereResult", SqlTools.constructWhere(filters,null));
+		}
+		//页面显示数据的年月
+		pd.put("SystemDateTime", SystemDateTime);
+		if(sallaryType!=null && !sallaryType.trim().equals("")){
+			//工资分的类型
+			pd.put("SallaryType", sallaryType);
+		}
+		//汇总字段
+		pd.put("GroupbyFeild", groupbyFeild);
+		List<TableColumns> tableSumColumns = tmplconfigService.getTableColumns(summyTableName);
+		
+		
+
+		//获取明细汇总信息
+		String detailSelectFeild = groupbyFeild;
+		//明细表字段
+		List<TableColumns> tableDetailColumns = tmplconfigService.getTableColumns(detailTableName);
+		List<String> detailColumnsCodeList = new ArrayList<String>();
+		if(tableDetailColumns!=null && tableDetailColumns.size()>0){
+			for(TableColumns each : tableDetailColumns){
+				detailColumnsCodeList.add(each.getColumn_name());
+			}
+		}
+	    if(tableSumColumns != null && tableSumColumns.size() > 0){
+			for(int i=0; i < tableSumColumns.size(); i++){
+				String getCOL_CODE = tableSumColumns.get(i).getColumn_name();
+				if(!listGroupbyFeild.contains(getCOL_CODE) && detailColumnsCodeList.contains(getCOL_CODE)){
+					detailSelectFeild += ", sum(" + getCOL_CODE +") " + getCOL_CODE;
+				}
+			}
+		} 
+		pd.put("SelectFeild", detailSelectFeild);
+		//表名
+		pd.put("TableName", summyTableName);
+		page.setPd(pd);
+		List<PageData> summayList = financeaccountsService.JqPage(page);
+
+		//获取对账汇总信息
+		String auditeSelectFeild = groupbyFeild;
+		//明细表字段
+		List<TableColumns> tableAuditeColumns = tmplconfigService.getTableColumns(auditeTableName);
+		List<String> auditeColumnsCodeList = new ArrayList<String>();
+		if(tableAuditeColumns!=null && tableAuditeColumns.size()>0){
+			for(TableColumns each : tableAuditeColumns){
+				auditeColumnsCodeList.add(each.getColumn_name());
+			}
+		}
+	    if(tableSumColumns != null && tableSumColumns.size() > 0){
+			for(int i=0; i < tableSumColumns.size(); i++){
+				String getCOL_CODE = tableSumColumns.get(i).getColumn_name();
+				if(!listGroupbyFeild.contains(getCOL_CODE) && auditeColumnsCodeList.contains(getCOL_CODE)){
+					auditeSelectFeild += ", sum(" + getCOL_CODE +") " + getCOL_CODE;
+				}
+			}
+		} 
+		pd.put("SelectFeild", auditeSelectFeild);
+		//表名
+		pd.put("TableName", auditeTableName);
+		page.setPd(pd);
+		List<PageData> auditeList = financeaccountsService.JqPage(page);
+		
+		
+		
 		List<PageData> varList = new ArrayList<PageData>();
-		for(int i=0;i<varOList.size();i++){
-			PageData vpd = new PageData();
-			vpd.put("var1", varOList.get(i).getString("BILL_CODE"));	    //1
-			vpd.put("var2", varOList.get(i).getString("BUSI_DATE"));	    //2
-			vpd.put("var3", varOList.get(i).getString("ESTB_DEPT"));	    //3
-			vpd.put("var4", varOList.get(i).getString("USER_GROP"));	    //4
-			vpd.put("var5", varOList.get(i).getString("SOC_INC_BASE"));	    //5
-			vpd.put("var6", varOList.get(i).getString("PER_BASIC_FUND"));	    //6
-			vpd.put("var7", varOList.get(i).getString("PER_SUPP_FUND"));	    //7
-			vpd.put("var8", varOList.get(i).getString("PER_TOTAL"));	    //8
-			vpd.put("var9", varOList.get(i).getString("DEPT_BASIC_FUND"));	    //9
-			vpd.put("var10", varOList.get(i).getString("DEPT_SUPP_FUND"));	    //10
-			vpd.put("var11", varOList.get(i).getString("DEPT_TOTAL"));	    //11
-			vpd.put("var12", varOList.get(i).getString("DEPT_CODE"));	    //12
-			vpd.put("var13", varOList.get(i).getString("USER_CATG"));	    //13
-			vpd.put("var14", varOList.get(i).getString("PMT_PLACE"));	    //14
-			vpd.put("var15", varOList.get(i).getString("CUST_COL1"));	    //15
-			vpd.put("var16", varOList.get(i).getString("CUST_COL2"));	    //16
-			vpd.put("var17", varOList.get(i).getString("CUST_COL3"));	    //17
-			vpd.put("var18", varOList.get(i).getString("CUST_COL4"));	    //18
-			vpd.put("var19", varOList.get(i).getString("CUST_COL5"));	    //19
-			vpd.put("var20", varOList.get(i).getString("CUST_COL6"));	    //20
-			vpd.put("var21", varOList.get(i).getString("CUST_COL7"));	    //21
-			vpd.put("var22", varOList.get(i).getString("CUST_COL8"));	    //22
-			vpd.put("var23", varOList.get(i).getString("CUST_COL9"));	    //23
-			vpd.put("var24", varOList.get(i).getString("CUST_COL10"));	    //24
-			vpd.put("var25", varOList.get(i).getString("ZRZC_CODE"));	    //25
-			vpd.put("var26", varOList.get(i).getString("BILL_STATE"));	    //26
-			vpd.put("var27", varOList.get(i).getString("BILL_USER"));	    //27
-			vpd.put("var28", varOList.get(i).getString("BILL_DATE"));	    //28
-			varList.add(vpd);
+		int records = varList.size();
+		
+		PageResult<PageData> result = new PageResult<PageData>();
+		result.setRows(varList);
+		result.setRowNum(page.getRowNum());
+		result.setRecords(records);
+		result.setPage(page.getPage());
+		
+		return result;
+	}
+
+	/**明细显示结构
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/getDetailColModel")
+	public @ResponseBody CommonBase getDetailColModel() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"getDetailColModel");
+		CommonBase commonBase = new CommonBase();
+		commonBase.setCode(-1);
+		
+		PageData pd = this.getPageData();
+		String which = getWhileValue(pd.getString("TABLE_CODE"));
+		String TabType = getWhileValue(pd.getString("TabType"));
+		String tableNameDetail = getDetailTableCode(which, TabType, true);
+		String DEPT_CODE = (String) pd.get("DATA_DEPT_CODE");
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
+		String detailColModel = tmpl.generateStructureNoEdit(tableNameDetail, DEPT_CODE);
+		
+		commonBase.setCode(0);
+		commonBase.setMessage(detailColModel);
+		
+		return commonBase;
+	}
+
+	/**明细数据
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/getDetailList")
+	public @ResponseBody PageResult<PageData> getDetailList() throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"getDetailList");
+		PageData pd = this.getPageData();
+		
+		//List<PageData> varList = financeaccountsService.dataListDetail(pd);	//列出Betting列表
+		PageResult<PageData> result = new PageResult<PageData>();
+		//result.setRows(varList);
+		
+		/*Object DATA_ROWS = pd.get("DATA_ROWS");
+		String json = DATA_ROWS.toString();  
+        JSONArray array = JSONArray.fromObject(json);  
+        List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);
+        if(null != listData && listData.size() > 0){
+			housefunddetailService.deleteAll(listData);
+			commonBase.setCode(0);
+		}*/
+		
+		return result;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	private String getWhileValue(String value){
+        String which = DefaultWhile;
+		if(value != null && !value.trim().equals("")){
+			which = value;
 		}
-		dataMap.put("varList", varList);
-		ObjectExcelView erv = new ObjectExcelView();
-		mv = new ModelAndView(erv,dataMap);
-		return mv;
+		return which;
+	}
+	/**
+	 * 根据前端业务表索引获取表名称
+	 * 
+	 * @param which
+	 * @return
+	 */
+	private String getSummyTableCode(String which) {
+		String tableCode = "";
+		if (which != null && which.equals("1")) {
+			tableCode = "tb_staff_summy";
+		} else if (which != null && which.equals("2")) {
+			tableCode = "tb_staff_summy";
+		} else if (which != null && which.equals("3")) {
+			tableCode = "tb_staff_summy";
+		} else if (which != null && which.equals("4")) {
+			tableCode = "tb_social_inc_summy";
+		} else if (which != null && which.equals("5")) {
+			tableCode = "tb_house_fund_summy";
+		}
+		return tableCode;
+	}
+	private String getAuditeTableCode(String which) {
+		String tableCode = "";
+		if (which != null && which.equals("1")) {
+			tableCode = "tb_staff_audit";
+		} else if (which != null && which.equals("2")) {
+			tableCode = "tb_staff_audit";
+		} else if (which != null && which.equals("3")) {
+			tableCode = "tb_staff_audit";
+		} else if (which != null && which.equals("4")) {
+			tableCode = "tb_social_inc_audit";
+		} else if (which != null && which.equals("5")) {
+			tableCode = "tb_house_fund_audit";
+		}
+		return tableCode;
+	}
+	private String getDetailTableCode(String which) {
+		String tableCode = "";
+		if (which != null && which.equals("1")) {
+			tableCode = "tb_staff_detail";
+		} else if (which != null && which.equals("2")) {
+			tableCode = "tb_staff_detail";
+		} else if (which != null && which.equals("3")) {
+			tableCode = "tb_staff_detail";
+		} else if (which != null && which.equals("4")) {
+			tableCode = "tb_social_inc_detail";
+		} else if (which != null && which.equals("5")) {
+			tableCode = "tb_house_fund_detail";
+		}
+		return tableCode;
+	}
+	private String getDetailTableCode(String which, String tabType, Boolean bolFirst) {
+		String tableCode = "";
+		if ("1".equals(which) || "2".equals(which) || "3".equals(which)) {
+			if("1".equals(tabType)){
+				tableCode = bolFirst ? "tb_staff_detail" : "tb_staff_audit";
+			} else if("2".equals(tabType)){
+				tableCode = bolFirst ? "tb_staff_audit" : "tb_staff_detail";
+			}
+		} else if ("4".equals(which)) {
+			if("1".equals(tabType)){
+				tableCode = bolFirst ? "tb_social_inc_detail" : "tb_social_inc_audit";
+			} else if("2".equals(tabType)){
+				tableCode = bolFirst ? "tb_social_inc_audit" : "tb_social_inc_detail";
+			}
+		} else if ("5".equals(which)) {
+			if("1".equals(tabType)){
+				tableCode = bolFirst ? "tb_house_fund_detail" : "tb_house_fund_audit";
+			} else if("2".equals(tabType)){
+				tableCode = bolFirst ? "tb_house_fund_audit" : "tb_house_fund_detail";
+			}
+		}
+		return tableCode;
+	}
+	private String getSallaryType(String which) throws Exception {
+		String strKeyCode = "";
+		if (which != null && which.equals("1")) {
+			strKeyCode = SysConfigKeyCode.ChkMktGRPCOND;
+		} else if (which != null && which.equals("2")) {
+			strKeyCode = SysConfigKeyCode.ChkRunGRPCOND;
+		} else if (which != null && which.equals("3")) {
+			strKeyCode = SysConfigKeyCode.ChkEmployGRPCOND;
+		}
+		String sallaryType = "";
+		if(strKeyCode != null && !strKeyCode.trim().equals("")){
+			PageData pd = new PageData();
+			pd.put("KEY_CODE", strKeyCode);
+			sallaryType = sysConfigManager.getSysConfigByKey(pd);
+		}
+		return sallaryType;
+	}
+	private String getGroupbyFeild(String which) throws Exception {
+		String strKeyCode = "";
+		if (which != null && which.equals("1")) {
+			strKeyCode = SysConfigKeyCode.ChkStaffGRP;
+		} else if (which != null && which.equals("2")) {
+			strKeyCode = SysConfigKeyCode.ChkStaffGRP;
+		} else if (which != null && which.equals("3")) {
+			strKeyCode = SysConfigKeyCode.ChkStaffGRP;
+		} else if (which != null && which.equals("4")) {
+			strKeyCode = SysConfigKeyCode.ChkSocialGRP;
+		} else if (which != null && which.equals("5")) {
+			strKeyCode = SysConfigKeyCode.ChkHouseGRP;
+		}
+		String groupbyFeild = "";
+		if(strKeyCode != null && !strKeyCode.trim().equals("")){
+			PageData pd = new PageData();
+			pd.put("KEY_CODE", strKeyCode);
+			groupbyFeild = sysConfigManager.getSysConfigByKey(pd);
+		}
+		return groupbyFeild;
 	}
 	
 	@InitBinder

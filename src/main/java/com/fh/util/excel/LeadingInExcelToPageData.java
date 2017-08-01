@@ -330,7 +330,7 @@ public class LeadingInExcelToPageData<T> {
                 String value = getCellValue(cell);
                 
                 // 3.单元格中的值等于null或等于"" 就放弃整行数据
-                if(value == null || "".equals(value)){
+                if(!(value != null && !value.trim().equals(""))){
                     //judge = false;
                     //break;
                 	continue;

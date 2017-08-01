@@ -77,6 +77,28 @@
 							<div id="jqGridPagerBase"></div>
 						</div>
 					</div>
+					
+					<div class="row">
+						<div class="col-xs-12">
+							<div class="tabbable">
+								<ul class="nav nav-tabs padding-18">
+									<li class="active">
+									<a data-toggle="tab" href="#voucherTransfer"> <i
+											class="green ace-icon fa fa-cogs bigger-120"></i> 二级单位差异明细
+									</a></li>
+									<li>
+									<a data-toggle="tab" href="#voucherMgr"> <i
+											class="orange ace-icon fa fa-cog bigger-120"></i> 对账编辑差异明细
+									</a></li>
+								</ul>
+								<div class="tab-content no-border ">
+									<table id="jqGridDetail"></table>
+									<div id="jqGridPagerDetail"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
 				</div>
 			</div>
 		</div>
@@ -117,9 +139,12 @@
 <script type="text/javascript"> 
     var gridBase_selector = "#jqGridBase";  
     var pagerBase_selector = "#jqGridPagerBase";  
+    var gridDetail_selector = "#jqGridDetail";  
+    var pagerDetail_selector = "#jqGridPagerDetail";  
 
 	var which='1';
 	var jqGridColModel;
+	var TabType;
 	
 	$(document).ready(function () {
 		$(top.hangge());//关闭加载状态
@@ -151,29 +176,40 @@
 			var target = $(this).find('input[type=radio]');
 			which = parseInt(target.val());
 			if(which!='${pd.which}'){
-				window.location.href="<%=basePath%>auditedit/list.do?TABLE_CODE="+which;
+				window.location.href="<%=basePath%>financeaccounts/list.do?TABLE_CODE="+which;
 			}
+		});
+		
+		//tab页切换
+		$('.nav-tabs li').on('click', function(e){
+			if($(this).hasClass('active')) return;
+			var target = $(this).find('a');
+			
+			if(target.attr('href')=='#voucherTransfer'){
+				TabType=1;
+			}else{
+				TabType=2;
+			}
+			var id=$(gridBase_selector).getGridParam('selrow');
+			getDetail(id);
 		});
 
 		$(gridBase_selector).jqGrid({
-			url: '<%=basePath%>auditedit/getPageList.do?TABLE_CODE='+which,
+			url: '<%=basePath%>financeaccounts/getPageList.do?TABLE_CODE='+which,
 			datatype: "json",
 			colModel: jqGridColModel,
 			viewrecords: true, 
 			shrinkToFit: false,
-			rowNum: 10,
-			rowList: [10,20,30],
+			rowNum: 0,
+			scroll: 1,
+			//rowList: [10,20,30],
             sortable: true,
 			altRows: true, //斑马条纹
 			
 			pager: pagerBase_selector,
 			footerrow: true,
 			userDataOnFooter: true,
-			onSelectRow : function(id){   
-
-				alert("selectRow");
-
-				},  
+			onSelectRow : getDetail,  
 			
 			loadComplete : function() {
 				var table = this;
@@ -203,7 +239,6 @@
 		            refreshicon : 'ace-icon fa fa-refresh green',
 		            view: false,
 		            viewicon : 'ace-icon fa fa-search-plus grey',
-		            //delfunc : batchDelete(),
 	        }, { }, { }, { },
 	        {
 				//search form
@@ -217,11 +252,88 @@
 				showQuery: false
 	        }, {},{});
 		
+		function getDetail(id){
+			var rowData = $(gridBase_selector).getRowData(id);
+			var deptcode = rowData.DEPT_CODE;
+
+			var listData =new Array();
+            listData.push(rowData);
+
+            var detailColModel = "[]";
+			$.ajax({
+				type: "GET",
+				url: '<%=basePath%>housefundsummy/getDetailColModel.do?TABLE_CODE='+which+'&TabType='+TabType,
+		    	data: {DATA_DEPT_CODE:deptcode},
+				dataType:'json',
+				cache: false,
+				success: function(response){
+					if(response.code==0){
+						$(top.hangge());//关闭加载状态
+						detailColModel = response.message;
+
+			            detailColModel = eval(detailColModel);
+			            var childGridID = parentRowID + "_table";
+			            var childGridPagerID = parentRowID + "_pager";
+			            // send the parent row primary key to the server so that we know which grid to show
+			            var childGridURL = '<%=basePath%>housefundsummy/getDetailList.do?TABLE_CODE='+which+'&TabType='+TabType;
+			            //childGridURL = childGridURL + "&parentRowID=" + encodeURIComponent(parentRowKey)
+
+			            // add a table and pager HTML elements to the parent grid row - we will render the child grid here
+			            $('#' + parentRowID).append('<table id=' + childGridID + '></table><div id=' + childGridPagerID + ' class=scroll></div>');
+
+			            $("#" + childGridID).jqGrid({
+			                url: childGridURL,
+					    	data: {DATA_ROWS:JSON.stringify(listData)},
+			                mtype: "GET",
+			                datatype: "json",
+			                colModel: detailColModel,
+			                page: 1,
+			                width: '100%',
+			                //height: '100%',
+			                rowNum: 0,	
+			                pager: "#" + childGridPagerID,
+							pgbuttons: false, // 分页按钮是否显示 
+							pginput: false, // 是否允许输入分页页数 
+			                viewrecords: true,
+			                recordpos: "left", // 记录数显示位置 
+			                
+			    			loadComplete : function() {
+			    				var table = this;
+			    				setTimeout(function(){
+			    					styleCheckbox(table);
+			    					updateActionIcons(table);
+			    					updatePagerIcons(table);
+			    					enableTooltips(table);
+			    				}, 0);
+			    			},
+			            });
+					}else{
+						$(top.hangge());//关闭加载状态
+						$("#subTitle").tips({
+							side:3,
+				            msg:'获取结构失败：'+response.message,
+				            bg:'#cc0033',
+				            time:3
+				        });
+					}
+				},
+		    	error: function(response) {
+					$(top.hangge());//关闭加载状态
+					$("#subTitle").tips({
+						side:3,
+			            msg:'获取结构出错:'+response.responseJSON.message,
+			            bg:'#cc0033',
+			            time:3
+			        });
+		    	}
+			});
+		}
+		
 		/**
 		 * 导出
 		 */
 	    function exportItems(){
-	    	window.location.href='<%=basePath%>auditedit/excel.do?TABLE_CODE='+which;
+	    	window.location.href='<%=basePath%>financeaccounts/excel.do?TABLE_CODE='+which;
 	    }
 
 	});
