@@ -21,6 +21,7 @@ import com.fh.entity.JqPage;
 import com.fh.entity.Page;
 import com.fh.entity.PageResult;
 import com.fh.entity.TableColumns;
+import com.fh.entity.TmplConfigDetail;
 import com.fh.util.PageData;
 import com.fh.util.SqlTools;
 import com.fh.util.Jurisdiction;
@@ -115,10 +116,7 @@ public class FinanceAccountsController extends BaseController {
 		String detailTableName = getDetailTableCode(which);
 		String sallaryType = getSallaryType(which);
 		String groupbyFeild = getGroupbyFeild(which);
-		List<String> listGroupbyFeild = new ArrayList<String>();
-		if(groupbyFeild != null && !groupbyFeild.trim().equals("")){
-			listGroupbyFeild = Arrays.asList(groupbyFeild.replace(" ", "").toUpperCase().split(","));
-		}
+		List<String> listGroupbyFeild = getFeildStringToList(groupbyFeild);
 		
 		//多条件过滤条件
 		String filters = pd.getString("filters");
@@ -133,61 +131,29 @@ public class FinanceAccountsController extends BaseController {
 		}
 		//汇总字段
 		pd.put("GroupbyFeild", groupbyFeild);
+		
+		//界面对比的表结构
 		List<TableColumns> tableSumColumns = tmplconfigService.getTableColumns(summyTableName);
 		
-		
-
 		//获取明细汇总信息
-		String detailSelectFeild = groupbyFeild;
-		//明细表字段
 		List<TableColumns> tableDetailColumns = tmplconfigService.getTableColumns(detailTableName);
-		List<String> detailColumnsCodeList = new ArrayList<String>();
-		if(tableDetailColumns!=null && tableDetailColumns.size()>0){
-			for(TableColumns each : tableDetailColumns){
-				detailColumnsCodeList.add(each.getColumn_name());
-			}
-		}
-	    if(tableSumColumns != null && tableSumColumns.size() > 0){
-			for(int i=0; i < tableSumColumns.size(); i++){
-				String getCOL_CODE = tableSumColumns.get(i).getColumn_name();
-				if(!listGroupbyFeild.contains(getCOL_CODE) && detailColumnsCodeList.contains(getCOL_CODE)){
-					detailSelectFeild += ", sum(" + getCOL_CODE +") " + getCOL_CODE;
-				}
-			}
-		} 
+		String detailSelectFeild = TmplUtil.getSumFeildSelect(groupbyFeild, tableDetailColumns, listGroupbyFeild);
 		pd.put("SelectFeild", detailSelectFeild);
 		//表名
-		pd.put("TableName", summyTableName);
+		pd.put("TableName", detailTableName);
 		page.setPd(pd);
-		List<PageData> summayList = financeaccountsService.JqPage(page);
+		List<PageData> detailSummayList = financeaccountsService.JqPage(page);
 
 		//获取对账汇总信息
-		String auditeSelectFeild = groupbyFeild;
-		//明细表字段
 		List<TableColumns> tableAuditeColumns = tmplconfigService.getTableColumns(auditeTableName);
-		List<String> auditeColumnsCodeList = new ArrayList<String>();
-		if(tableAuditeColumns!=null && tableAuditeColumns.size()>0){
-			for(TableColumns each : tableAuditeColumns){
-				auditeColumnsCodeList.add(each.getColumn_name());
-			}
-		}
-	    if(tableSumColumns != null && tableSumColumns.size() > 0){
-			for(int i=0; i < tableSumColumns.size(); i++){
-				String getCOL_CODE = tableSumColumns.get(i).getColumn_name();
-				if(!listGroupbyFeild.contains(getCOL_CODE) && auditeColumnsCodeList.contains(getCOL_CODE)){
-					auditeSelectFeild += ", sum(" + getCOL_CODE +") " + getCOL_CODE;
-				}
-			}
-		} 
+		String auditeSelectFeild = TmplUtil.getSumFeildSelect(groupbyFeild, tableAuditeColumns, listGroupbyFeild);
 		pd.put("SelectFeild", auditeSelectFeild);
 		//表名
 		pd.put("TableName", auditeTableName);
 		page.setPd(pd);
-		List<PageData> auditeList = financeaccountsService.JqPage(page);
+		List<PageData> auditeSummayList = financeaccountsService.JqPage(page);
 		
-		
-		
-		List<PageData> varList = new ArrayList<PageData>();
+		List<PageData> varList = getShowList(detailSummayList, auditeSummayList, tableSumColumns);
 		int records = varList.size();
 		
 		PageResult<PageData> result = new PageResult<PageData>();
@@ -227,39 +193,87 @@ public class FinanceAccountsController extends BaseController {
 	 * @param
 	 * @throws Exception
 	 */
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/getDetailList")
 	public @ResponseBody PageResult<PageData> getDetailList() throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"getDetailList");
 		PageData pd = this.getPageData();
-		
-		//List<PageData> varList = financeaccountsService.dataListDetail(pd);	//列出Betting列表
-		PageResult<PageData> result = new PageResult<PageData>();
-		//result.setRows(varList);
-		
-		/*Object DATA_ROWS = pd.get("DATA_ROWS");
+		String which = getWhileValue(pd.getString("TABLE_CODE"));
+		String TabType = getWhileValue(pd.getString("TabType"));
+		Object DATA_ROWS = pd.get("DATA_ROWS");
 		String json = DATA_ROWS.toString();  
-        JSONArray array = JSONArray.fromObject(json);  
-        List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);
-        if(null != listData && listData.size() > 0){
-			housefunddetailService.deleteAll(listData);
-			commonBase.setCode(0);
-		}*/
+        JSONArray array = JSONArray.fromObject(json); 
+		List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);
 		
+		String whereSql = "";
+		whereSql += " where BUSI_DATE = '" + SystemDateTime + "' ";
+		//多条件过滤条件
+		String filters = pd.getString("filters");
+		if(null != filters && !"".equals(filters.trim())){
+			whereSql += SqlTools.constructWhere(filters,null);
+		}
+		//工资分的类型
+		String sallaryType = getSallaryType(which);
+		if(sallaryType!=null && !sallaryType.trim().equals("")){
+			whereSql += " and " + sallaryType;
+		}
+        //分组字段
+		String groupbyFeild = getGroupbyFeild(which);
+		List<String> listGroupbyFeild = getFeildStringToList(groupbyFeild);
+		if(listGroupbyFeild!=null){
+			for(String feild : listGroupbyFeild){
+				if(feild != null && !feild.trim().equals("")){
+					whereSql += " and " + feild + " = '" + listData.get(0).get(feild) + "' ";
+				}
+			}
+		}
+		pd.put("whereSql", whereSql);
+		
+		String falseTableName = getDetailTableCode(which, TabType, true);
+		pd.put("TableName", falseTableName);
+		List<PageData> listFirst = financeaccountsService.dataListDetail(pd);
+		
+		String secondTableName = getDetailTableCode(which, TabType, false);
+		pd.put("TableName", secondTableName);
+		List<PageData> listSecond = financeaccountsService.dataListDetail(pd);
+
+		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
+		//TmplConfigDetail item = new TmplConfigDetail();
+		//item.setDEPT_CODE(departCode);
+		//item.setTABLE_CODE(falseTableName);
+		//List<TmplConfigDetail> m_columnsList = tmplconfigService.listNeed(item);
+		//界面对比的表结构
+		List<TableColumns> tableSumColumns = tmplconfigService.getTableColumns(falseTableName);
+
+		List<PageData> varList = getShowList(listFirst, listSecond, tableSumColumns);
+		PageResult<PageData> result = new PageResult<PageData>();
+		result.setRows(varList);
 		return result;
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	private List<PageData> getShowList(List<PageData> listFirst, List<PageData> listSecond, List<TableColumns> m_columnsList){
+		List<PageData> varList = new ArrayList<PageData>();
+		if(listFirst!=null && listFirst.size() > 0){
+			if(!(listSecond!=null && listSecond.size()>0)){
+				varList = listFirst;
+			} else {
+				varList = listFirst;
+				for(PageData fir : listFirst){
+					for(PageData sec : listSecond){
+						
+						
+						
+						
+						
+						
+						
+					}
+				}
+			}
+		}
+		return varList;
+	}
+
 	private String getWhileValue(String value){
         String which = DefaultWhile;
 		if(value != null && !value.trim().equals("")){
@@ -377,7 +391,21 @@ public class FinanceAccountsController extends BaseController {
 			pd.put("KEY_CODE", strKeyCode);
 			groupbyFeild = sysConfigManager.getSysConfigByKey(pd);
 		}
+		List<String> list = getFeildStringToList(groupbyFeild);
+		if(!(list!=null&&list.contains("BUSI_DATE"))){
+			if(groupbyFeild!=null && !groupbyFeild.trim().equals("")){
+				groupbyFeild += ",";
+			}
+			groupbyFeild += "BUSI_DATE";
+		}
 		return groupbyFeild;
+	}
+	private List<String> getFeildStringToList(String strFeild){
+		List<String> list = new ArrayList<String>();
+		if(strFeild != null && !strFeild.trim().equals("")){
+			list = Arrays.asList(strFeild.replace(" ", "").toUpperCase().split(","));
+		}
+		return list;
 	}
 	
 	@InitBinder

@@ -20,13 +20,8 @@
 	<select id="datalistDetail" parameterType="pd" resultType="pd">
 		select * 
 		from ${TableName}
-		where BUSI_DATE = #{BUSI_DATE}
-		and DEPT_CODE = '#{DEPT_CODE}
-		<if test="filterWhereResult!= null and filterWhereResult != ''">
-			${filterWhereResult}
-		</if>
-		<if test="SallaryType!= null and SallaryType != ''">
-		    and ${SallaryType}
+		<if test="whereSql!= null and whereSql != ''">
+			${whereSql}
 		</if>
 	</select>
 </mapper>

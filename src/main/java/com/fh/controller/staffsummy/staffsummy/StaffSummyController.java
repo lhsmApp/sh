@@ -351,29 +351,15 @@ public class StaffSummyController extends BaseController {
     			mapHave.put("DEPT_CODE", depart);
     			List<PageData> getHaveDate = staffsummyService.getHave(mapHave);
     			//获取单位重新汇总信息
-    			List<TableColumns> tableSumColumns = tmplconfigService.getTableColumns(TableNameBase);
     			List<TableColumns> tableDetailColumns = tmplconfigService.getTableColumns(TableNameDetail);
-    			//明细表字段
-    			List<String> DetailColumnsCodeList = new ArrayList<String>();
-    			if(tableDetailColumns!=null && tableDetailColumns.size()>0){
-    				for(TableColumns each : tableDetailColumns){
-    					DetailColumnsCodeList.add(each.getColumn_name());
-    				}
-    			}
     			Map<String, String> mapSave = new HashMap<String, String>();
     			mapSave.put("BUSI_DATE", SystemDateTime);
     			mapSave.put("DEPT_CODE", depart);
     			mapSave.put("GroupbyFeild", SumFieldToString);
-    			String SelectFeild = SumFieldToString;
+    			
+    			//获取汇总的select的字段
+    			String SelectFeild = TmplUtil.getSumFeildSelect(SumFieldToString, tableDetailColumns, SumField);
 
-				if(tableSumColumns != null && tableSumColumns.size() > 0){
-					for(int i=0; i < tableSumColumns.size(); i++){
-						String getCOL_CODE = tableSumColumns.get(i).getColumn_name();
-						if(!SumField.contains(getCOL_CODE) && DetailColumnsCodeList.contains(getCOL_CODE)){
-						    SelectFeild += ", sum(" + getCOL_CODE +") " + getCOL_CODE;
-						}
-					}
-				}
     			mapSave.put("SelectFeild", SelectFeild);
     			List<PageData> getSaveDate = staffdetailService.getSum(mapSave);
     			

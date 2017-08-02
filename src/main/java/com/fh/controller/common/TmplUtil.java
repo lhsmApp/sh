@@ -236,9 +236,7 @@ public class TmplUtil {
 			model_notedit.append(" editable: false ");
 
 			int intLength = getColumnLength(col.getColumn_type(), col.getData_type());
-			if (col.getData_type() != null
-					&& (col.getData_type().trim().equals("DECIMAL") || col.getData_type().trim().equals("DOUBLE")
-							|| col.getData_type().trim().equals("INT") || col.getData_type().trim().equals("FLOAT"))) {
+			if (col.getData_type() != null && IsNumFeild(col.getData_type())) {
 				model_name.append(" width: '150', ");
 				model_name.append(" align: 'right', search: false, sorttype: 'number', formatter: 'number',summaryTpl: 'sum: {0}', summaryType: 'sum', ");
 			} else {
@@ -291,9 +289,7 @@ public class TmplUtil {
 				editable = true;
 			}
 			int intLength = getColumnLength(col.getColumn_type(), col.getData_type());
-			if (col.getData_type() != null
-					&& (col.getData_type().trim().equals("DECIMAL") || col.getData_type().trim().equals("DOUBLE")
-							|| col.getData_type().trim().equals("INT") || col.getData_type().trim().equals("FLOAT"))) {
+			if (col.getData_type() != null && IsNumFeild(col.getData_type())) {
 				model_name.append(" width: '150', ");
 				model_name.append(" align: 'right', search: false, sorttype: 'number', editrules: {number: true}, ");
 				model_edittype.append(" edittype:'text', formatter: 'number', editoptions:{maxlength:'" + intLength
@@ -405,6 +401,33 @@ public class TmplUtil {
 		pd.put("InsertVale", InsertVale);
 	}
 
+	public static Boolean IsNumFeild(String Data_type){
+		Boolean bol = false;
+		if(Data_type.trim().equals("DECIMAL") || Data_type.trim().equals("DOUBLE")
+		    || Data_type.trim().equals("INT") || Data_type.trim().equals("FLOAT")){
+				bol = true;
+		}
+		return bol;
+	}
+
+	public static String getSumFeildSelect(String SumFieldToString, List<TableColumns> tableDetailColumns, List<String> SumField){
+		String SelectFeild = SumFieldToString;
+		if(tableDetailColumns != null && tableDetailColumns.size() > 0){
+			for(TableColumns col : tableDetailColumns){
+				if(TmplUtil.IsNumFeild(col.getData_type())){
+					String getCOL_CODE = col.getColumn_name();
+					if(!SumField.contains(getCOL_CODE)){
+					    SelectFeild += ", sum(" + getCOL_CODE +") " + getCOL_CODE;
+					}
+				}
+			}
+		}
+		return SelectFeild;
+	}
+	
+	
+	
+	
 	/**
 	 * 
 	 * @return
