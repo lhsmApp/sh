@@ -82,6 +82,10 @@
 		<include refid="Field"></include>
 		from
 		<include refid="tableName"></include>
+		where KEY_CODE!='SystemDataTime'
+		<if test="sidx != null">
+			order by ${sidx} ${sord}
+		</if>
 	</select>
 
 	<!-- 批量删除 -->

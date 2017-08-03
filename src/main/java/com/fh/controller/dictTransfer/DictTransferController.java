@@ -146,6 +146,9 @@ public class DictTransferController extends BaseController {
 			tableColumns.add(tableColumn);
 
 			tableColumns.add(tableColumn1);
+			for(PageData pdItem:listTransferData){
+				pdItem.put("BIANMA", pdItem.getString("DICT_CODE"));
+			}
 
 			// 将获取的字典数据进行分组
 			Map<String, List<PageData>> mapTransferData = GroupUtils.group(listTransferData, new GroupBy<String>() {
