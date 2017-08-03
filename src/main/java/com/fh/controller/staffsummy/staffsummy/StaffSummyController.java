@@ -358,7 +358,7 @@ public class StaffSummyController extends BaseController {
     			mapSave.put("GroupbyFeild", SumFieldToString);
     			
     			//获取汇总的select的字段
-    			String SelectFeild = TmplUtil.getSumFeildSelect(SumFieldToString, tableDetailColumns, SumField);
+    			String SelectFeild = TmplUtil.getSumFeildSelect(SumField, tableDetailColumns);
 
     			mapSave.put("SelectFeild", SelectFeild);
     			List<PageData> getSaveDate = staffdetailService.getSum(mapSave);

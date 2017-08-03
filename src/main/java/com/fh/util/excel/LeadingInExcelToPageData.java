@@ -21,7 +21,9 @@ import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellValue;
 import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -307,11 +309,13 @@ public class LeadingInExcelToPageData<T> {
     	Map<Integer, Object> returnMap = new HashMap<Integer, Object>();
     	Map<String, Object> returnError = new HashMap<String, Object>();
         List<PageData> info=new ArrayList<PageData>();
+        FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator(); 
         //获取标题行列数
         int titleCellNum = sheet.getRow(0).getLastCellNum();
         // 获取值
         for (int rowIndex = 1; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
             Row row = sheet.getRow(rowIndex);
+            if(row == null) continue;  
 //            logger.debug("第--" + rowIndex);
             
             //    1.若当前行的列数不等于标题行列数就放弃整行数据(若想放弃此功能注释4个步骤即可)
@@ -325,9 +329,32 @@ public class LeadingInExcelToPageData<T> {
             PageData obj = new PageData();
             for (int columnIndex = 0; columnIndex < row.getLastCellNum(); columnIndex++) {//这里小于等于变成小于
                 Cell cell = row.getCell(columnIndex);
+                if(cell == null) continue;
                 
                 //处理单元格中值得类型
-                String value = getCellValue(cell);
+                CellValue cellValue = evaluator.evaluate(cell);   
+                if(cellValue == null) continue;  
+
+                String value = ""; //cellValue == null ? "" : cellValue.formatAsString()
+                switch (cellValue.getCellType()) {  
+                    case Cell.CELL_TYPE_BOOLEAN:  
+                    	Boolean bolValue = cellValue.getBooleanValue();  
+                    	value = bolValue.toString();
+                        break;  
+                    case Cell.CELL_TYPE_NUMERIC:  
+                    	Number numValue = cellValue.getNumberValue();  
+                    	value = numValue.toString();
+                        break;  
+                    case Cell.CELL_TYPE_STRING:  
+                    	value = cellValue.getStringValue();  
+                        break;  
+                    case Cell.CELL_TYPE_BLANK:  
+                        break;  
+                    case Cell.CELL_TYPE_ERROR:  
+                        break;  
+                    case Cell.CELL_TYPE_FORMULA:   
+                        break;  
+                }
                 
                 // 3.单元格中的值等于null或等于"" 就放弃整行数据
                 if(!(value != null && !value.trim().equals(""))){
@@ -339,21 +366,23 @@ public class LeadingInExcelToPageData<T> {
                 String COL_CODE = attribute.get(Integer.valueOf(columnIndex));
     			if(map_SetColumnsList != null && map_SetColumnsList.size() > 0){
     				TmplConfigDetail itemCol = map_SetColumnsList.get(COL_CODE);
-        			String trans = itemCol.getDICT_TRANS();
-        			if(trans != null && !trans.trim().equals("")){
-        				Map<String, String> dicAdd = (Map<String, String>) DicList.getOrDefault(trans, new HashMap<String, String>());
-                        String getKey = "";
-        				for (Map.Entry<String, String> dic :dicAdd.entrySet())  {
-        					if(value.equals(dic.getValue().toString())){
-        						getKey = dic.getKey();
-                            }
-        			    }  
-        				if(!(getKey != null && !getKey.trim().equals(""))){
-        					returnError.put(itemCol.getCOL_NAME(), value);
-        					break;
-        				}
-        				value = getKey;
-        			}
+    				if(itemCol != null){
+            			String trans = itemCol.getDICT_TRANS();
+            			if(trans != null && !trans.trim().equals("")){
+            				Map<String, String> dicAdd = (Map<String, String>) DicList.getOrDefault(trans, new HashMap<String, String>());
+                            String getKey = "";
+            				for (Map.Entry<String, String> dic :dicAdd.entrySet())  {
+            					if(value.equals(dic.getValue().toString())){
+            						getKey = dic.getKey();
+                                }
+            			    }  
+            				if(!(getKey != null && !getKey.trim().equals(""))){
+            					returnError.put(itemCol.getCOL_NAME(), value);
+            					break;
+            				}
+            				value = getKey;
+            			}
+    				}
     			}
     			TableColumns fieldTable = (TableColumns) map_HaveColumnsList.get(COL_CODE);
     			String fieldType = "";
@@ -368,6 +397,7 @@ public class LeadingInExcelToPageData<T> {
                     agge = "Y".equals(value) || "1".equals(value);
                 }
                 obj.put(COL_CODE, agge);
+                
             }
             // 4. if
             if(judge)info.add(obj);

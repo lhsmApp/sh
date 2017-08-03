@@ -144,7 +144,7 @@
 
 	var which='1';
 	var jqGridColModel;
-	var TabType;
+	var TabType = 1;
 	
 	$(document).ready(function () {
 		$(top.hangge());//关闭加载状态
@@ -155,6 +155,7 @@
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
 			$(gridBase_selector).jqGrid( 'setGridWidth', $(".page-content").width());
+			$(gridDetail_selector).jqGrid( 'setGridWidth', $(".page-content").width());
 			//resizeGridHeight($(gridBase_selector),null,true);
 	    });
 		
@@ -190,8 +191,7 @@
 			}else{
 				TabType=2;
 			}
-			var id=$(gridBase_selector).getGridParam('selrow');
-			getDetail(id);
+			getDetail();
 		});
 
 		$(gridBase_selector).jqGrid({
@@ -207,9 +207,11 @@
 			altRows: true, //斑马条纹
 			
 			pager: pagerBase_selector,
-			footerrow: true,
-			userDataOnFooter: true,
-			onSelectRow : getDetail,  
+			footerrow: false,
+			userDataOnFooter: false,
+			onSelectRow : function(ids) {
+				getDetail(ids)
+            },  
 			
 			loadComplete : function() {
 				var table = this;
@@ -252,9 +254,13 @@
 				showQuery: false
 	        }, {},{});
 		
-		function getDetail(id){
-			var rowData = $(gridBase_selector).getRowData(id);
-			var deptcode = rowData.DEPT_CODE;
+		function getDetail(){
+			$(gridDetail_selector).GridUnload();
+			
+			var id=$(gridBase_selector).getGridParam('selrow');
+            var rowData = $(gridBase_selector).getRowData(id);
+            
+			var deptcode = rowData.DEPT_CODE__;
 
 			var listData =new Array();
             listData.push(rowData);
@@ -262,7 +268,7 @@
             var detailColModel = "[]";
 			$.ajax({
 				type: "GET",
-				url: '<%=basePath%>housefundsummy/getDetailColModel.do?TABLE_CODE='+which+'&TabType='+TabType,
+				url: '<%=basePath%>financeaccounts/getDetailColModel.do?TABLE_CODE='+which+'&TabType='+TabType,
 		    	data: {DATA_DEPT_CODE:deptcode},
 				dataType:'json',
 				cache: false,
@@ -272,31 +278,25 @@
 						detailColModel = response.message;
 
 			            detailColModel = eval(detailColModel);
-			            var childGridID = parentRowID + "_table";
-			            var childGridPagerID = parentRowID + "_pager";
-			            // send the parent row primary key to the server so that we know which grid to show
-			            var childGridURL = '<%=basePath%>housefundsummy/getDetailList.do?TABLE_CODE='+which+'&TabType='+TabType;
-			            //childGridURL = childGridURL + "&parentRowID=" + encodeURIComponent(parentRowKey)
-
-			            // add a table and pager HTML elements to the parent grid row - we will render the child grid here
-			            $('#' + parentRowID).append('<table id=' + childGridID + '></table><div id=' + childGridPagerID + ' class=scroll></div>');
-
-			            $("#" + childGridID).jqGrid({
+			            var childGridURL = '<%=basePath%>financeaccounts/getDetailList.do?TABLE_CODE='+which+'&TabType='+TabType;
+			            
+			            $(gridDetail_selector).jqGrid({
 			                url: childGridURL,
-					    	data: {DATA_ROWS:JSON.stringify(listData)},
+			                postData: {DATA_ROWS:JSON.stringify(listData)},
 			                mtype: "GET",
 			                datatype: "json",
 			                colModel: detailColModel,
-			                page: 1,
-			                width: '100%',
-			                //height: '100%',
-			                rowNum: 0,	
-			                pager: "#" + childGridPagerID,
-							pgbuttons: false, // 分页按钮是否显示 
-							pginput: false, // 是否允许输入分页页数 
 			                viewrecords: true,
-			                recordpos: "left", // 记录数显示位置 
-			                
+			    			shrinkToFit: false,
+			                rowNum: 0,	
+			    			scroll: 1,
+			                //width: '100%',
+			                //height: '100%',
+							//pgbuttons: false, // 分页按钮是否显示 
+							//pginput: false, // 是否允许输入分页页数 
+			    			altRows: true, //斑马条纹
+
+			                pager: pagerDetail_selector,
 			    			loadComplete : function() {
 			    				var table = this;
 			    				setTimeout(function(){
@@ -307,6 +307,32 @@
 			    				}, 0);
 			    			},
 			            });
+			            
+			    		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
+
+			    		$(gridDetail_selector).navGrid(pagerDetail_selector, 
+			    				{
+			    			        edit: false,
+			    		            editicon : 'ace-icon fa fa-pencil blue',
+			    		            add: false,
+			    		            addicon : 'ace-icon fa fa-plus-circle purple',
+			    		            del: false,
+			    		            delicon : 'ace-icon fa fa-trash-o red',
+			    		            search: false,
+			    		            searchicon : 'ace-icon fa fa-search orange',
+			    		            refresh: false,
+			    		            refreshicon : 'ace-icon fa fa-refresh green',
+			    		            view: false,
+			    		            viewicon : 'ace-icon fa fa-search-plus grey',
+			    	        });
+						$(gridDetail_selector).navButtonAdd(pagerDetail_selector, {
+				             caption : "",
+				             buttonicon : "ace-icon fa fa-cloud-download",
+				             onClickButton : exportItems,
+				             position : "last",
+				             title : "导出",
+				             cursor : "pointer"
+				         });
 					}else{
 						$(top.hangge());//关闭加载状态
 						$("#subTitle").tips({
@@ -333,9 +359,30 @@
 		 * 导出
 		 */
 	    function exportItems(){
-	    	window.location.href='<%=basePath%>financeaccounts/excel.do?TABLE_CODE='+which;
+			var ids = $(gridDetail_selector).getDataIDs();
+			if(!(ids!=null && ids.length>0)){
+				bootbox.dialog({
+					message: "<span class='bigger-110'>没有任何内容!</span>",
+					buttons: 			
+					{ "button":{ "label":"确定", "className":"btn-sm btn-success"}}
+				});
+			} else {
+				var listData =new Array();
+				
+				//遍历访问这个集合  
+				$(ids).each(function (index, id){  
+		            var rowData = $(gridDetail_selector).getRowData(id);
+		            listData.push(rowData);
+				});
+				
+				var id=$(gridBase_selector).getGridParam('selrow');
+	            var rowData = $(gridBase_selector).getRowData(id);
+				var deptcode = rowData.DEPT_CODE__;
+				
+		    	window.location.href='<%=basePath%>financeaccounts/excel.do?TABLE_CODE='+which+'&TabType='+TabType+'&DEPT_CODE='+deptcode+'&DATA_ROWS='+JSON.stringify(listData);
+				
+			}
 	    }
-
 	});
 </script>
 </html>

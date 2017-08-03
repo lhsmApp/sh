@@ -14,10 +14,13 @@
 		<if test="pd.SallaryType!= null and pd.SallaryType != ''">
 		    and ${pd.SallaryType}
 		</if>
-	    group by ${GroupbyFeild}
+	    group by ${pd.GroupbyFeild}
+		<if test="sidx != null and sidx.trim() != ''" >
+			order by ${sidx} ${sord} 
+    	</if>
 	</select>
 	
-	<select id="datalistDetail" parameterType="pd" resultType="pd">
+	<select id="dataListDetail" parameterType="pd" resultType="pd">
 		select * 
 		from ${TableName}
 		<if test="whereSql!= null and whereSql != ''">

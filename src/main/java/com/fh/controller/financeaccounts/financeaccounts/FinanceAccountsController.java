@@ -1,11 +1,15 @@
 package com.fh.controller.financeaccounts.financeaccounts;
 
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+
 import javax.annotation.Resource;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -25,6 +29,7 @@ import com.fh.entity.TmplConfigDetail;
 import com.fh.util.PageData;
 import com.fh.util.SqlTools;
 import com.fh.util.Jurisdiction;
+import com.fh.util.ObjectExcelView;
 import com.fh.util.enums.SysConfigKeyCode;
 
 import net.sf.json.JSONArray;
@@ -85,6 +90,9 @@ public class FinanceAccountsController extends BaseController {
 		PageData pd = this.getPageData();
 		String which = getWhileValue(pd.getString("TABLE_CODE"));
 		String summyTableName = getSummyTableCode(which);
+        //分组字段
+		String groupbyFeild = getGroupbyFeild(which);
+		List<String> listGroupbyFeild = getFeildStringToList(groupbyFeild);
 		
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("financeaccounts/financeaccounts/financeaccounts_list");
@@ -94,8 +102,8 @@ public class FinanceAccountsController extends BaseController {
 		//当前期间,取自tb_system_config的SystemDateTime字段
 		SystemDateTime = sysConfigManager.currentSection(pd);
 		
-		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
-		String jqGridColModel = tmpl.generateStructureNoEdit(summyTableName, ShowDepartCode);
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService, listGroupbyFeild);
+		String jqGridColModel = tmpl.generateStructureAccount(summyTableName, ShowDepartCode);
 		mv.addObject("jqGridColModel", jqGridColModel);
 
 		return mv;
@@ -137,7 +145,7 @@ public class FinanceAccountsController extends BaseController {
 		
 		//获取明细汇总信息
 		List<TableColumns> tableDetailColumns = tmplconfigService.getTableColumns(detailTableName);
-		String detailSelectFeild = TmplUtil.getSumFeildSelect(groupbyFeild, tableDetailColumns, listGroupbyFeild);
+		String detailSelectFeild = TmplUtil.getSumFeildSelect(listGroupbyFeild, tableDetailColumns);
 		pd.put("SelectFeild", detailSelectFeild);
 		//表名
 		pd.put("TableName", detailTableName);
@@ -146,14 +154,14 @@ public class FinanceAccountsController extends BaseController {
 
 		//获取对账汇总信息
 		List<TableColumns> tableAuditeColumns = tmplconfigService.getTableColumns(auditeTableName);
-		String auditeSelectFeild = TmplUtil.getSumFeildSelect(groupbyFeild, tableAuditeColumns, listGroupbyFeild);
+		String auditeSelectFeild = TmplUtil.getSumFeildSelect(listGroupbyFeild, tableAuditeColumns);
 		pd.put("SelectFeild", auditeSelectFeild);
 		//表名
 		pd.put("TableName", auditeTableName);
 		page.setPd(pd);
 		List<PageData> auditeSummayList = financeaccountsService.JqPage(page);
 		
-		List<PageData> varList = getShowList(detailSummayList, auditeSummayList, tableSumColumns);
+		List<PageData> varList = getShowList(detailSummayList, auditeSummayList, tableSumColumns, listGroupbyFeild, TmplUtil.keyExtra);
 		int records = varList.size();
 		
 		PageResult<PageData> result = new PageResult<PageData>();
@@ -181,7 +189,7 @@ public class FinanceAccountsController extends BaseController {
 		String tableNameDetail = getDetailTableCode(which, TabType, true);
 		String DEPT_CODE = (String) pd.get("DATA_DEPT_CODE");
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
-		String detailColModel = tmpl.generateStructureNoEdit(tableNameDetail, DEPT_CODE);
+		String detailColModel = tmpl.generateStructureAccount(tableNameDetail, DEPT_CODE);
 		
 		commonBase.setCode(0);
 		commonBase.setMessage(detailColModel);
@@ -223,7 +231,7 @@ public class FinanceAccountsController extends BaseController {
 		if(listGroupbyFeild!=null){
 			for(String feild : listGroupbyFeild){
 				if(feild != null && !feild.trim().equals("")){
-					whereSql += " and " + feild + " = '" + listData.get(0).get(feild) + "' ";
+					whereSql += " and " + feild + " = '" + listData.get(0).get(feild + TmplUtil.keyExtra) + "' ";
 				}
 			}
 		}
@@ -245,28 +253,135 @@ public class FinanceAccountsController extends BaseController {
 		//界面对比的表结构
 		List<TableColumns> tableSumColumns = tmplconfigService.getTableColumns(falseTableName);
 
-		List<PageData> varList = getShowList(listFirst, listSecond, tableSumColumns);
+		List<String> listMatchFeild = Arrays.asList("USER_CODE");
+		List<PageData> varList = getShowList(listFirst, listSecond, tableSumColumns, listMatchFeild, "");
 		PageResult<PageData> result = new PageResult<PageData>();
 		result.setRows(varList);
 		return result;
 	}
+
+	/**明细数据
+	 * @param
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value="/excel")
+	public ModelAndView excel() throws Exception{
+		PageData pd = this.getPageData();
+		String which = getWhileValue(pd.getString("TABLE_CODE"));
+		String TabType = getWhileValue(pd.getString("TabType"));
+		String departCode = pd.getString("DEPT_CODE");
+		Object DATA_ROWS = pd.get("DATA_ROWS");
+		String json = DATA_ROWS.toString();  
+        JSONArray array = JSONArray.fromObject(json); 
+		List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);
+
+		String excelTableName = getDetailTableCode(which, TabType, true);
+		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
+		TmplConfigDetail item = new TmplConfigDetail();
+		item.setDEPT_CODE(departCode);
+		item.setTABLE_CODE(excelTableName);
+		List<TmplConfigDetail> m_columnsList = tmplconfigService.listNeed(item);
+		
+		ModelAndView mv = new ModelAndView();
+		Map<String,Object> dataMap = new LinkedHashMap<String,Object>();
+		dataMap.put("filename", "");
+		List<String> titles = new ArrayList<String>();
+		List<PageData> varList = new ArrayList<PageData>();
+		if(m_columnsList != null && m_columnsList.size() > 0){
+		    for (TmplConfigDetail col : m_columnsList) {
+				if(col.getCOL_HIDE().equals("1")){
+					titles.add(col.getCOL_NAME());
+				}
+			}
+			if(listData!=null && listData.size()>0){
+				for(int i=0;i<listData.size();i++){
+					PageData vpd = new PageData();
+					int j = 1;
+					for (TmplConfigDetail col : m_columnsList) {
+						if(col.getCOL_HIDE().equals("1")){
+						String trans = col.getDICT_TRANS();
+						Object getCellValue = listData.get(i).get(col.getCOL_CODE().toUpperCase());
+						if(trans != null && !trans.trim().equals("")){
+							//String value = "";
+							//Map<String, String> dicAdd = (Map<String, String>) DicList.getOrDefault(trans, new LinkedHashMap<String, String>());
+							//value = dicAdd.getOrDefault(getCellValue, "");
+							//vpd.put("var" + j, value);
+							vpd.put("var" + j, getCellValue.toString());
+						} else {
+							vpd.put("var" + j, getCellValue.toString());
+						}
+						j++;
+						}
+					}
+					varList.add(vpd);
+				}
+			}
+		}
+		dataMap.put("titles", titles);
+		dataMap.put("varList", varList);
+		ObjectExcelView erv = new ObjectExcelView();
+		mv = new ModelAndView(erv,dataMap); 
+		return mv;
+	}
 	
-	private List<PageData> getShowList(List<PageData> listFirst, List<PageData> listSecond, List<TableColumns> m_columnsList){
+	private List<PageData> getShowList(List<PageData> listFirst, List<PageData> listSecond, List<TableColumns> m_columnsList, List<String> listMatchFeild, String strKeyExtra){
 		List<PageData> varList = new ArrayList<PageData>();
 		if(listFirst!=null && listFirst.size() > 0){
 			if(!(listSecond!=null && listSecond.size()>0)){
-				varList = listFirst;
-			} else {
-				varList = listFirst;
 				for(PageData fir : listFirst){
+					for(TableColumns col : m_columnsList){
+						if(TmplUtil.IsNumFeild(col.getData_type())){
+							BigDecimal firValue = (BigDecimal) fir.get(col.getColumn_name());
+							fir.put(col.getColumn_name(), firValue + "");
+						}
+					}
+				}
+				varList = listFirst;
+				
+			} else {
+				for(PageData fir : listFirst){
+					//listSecond里没有匹配fir的记录
+					Boolean bolNotHave = true;
+					//两条记录有差异
+					Boolean bolHavedifference = false;
 					for(PageData sec : listSecond){
-						
-						
-						
-						
-						
-						
-						
+						//根据汇总字段查找匹配的记录
+						Boolean bolMatch = true;
+						for(String sumFeild : listMatchFeild){
+							String firValue = (String) fir.get(sumFeild + strKeyExtra);
+							String secValue = (String) sec.get(sumFeild + strKeyExtra);
+							if(!(firValue!=null && secValue!=null && firValue.equals(secValue))
+									|| (firValue==null && secValue==null)){
+								bolMatch = false;
+							}
+						}
+						if(bolMatch){
+							bolNotHave = false;
+							for(TableColumns col : m_columnsList){
+								if(TmplUtil.IsNumFeild(col.getData_type())){
+									BigDecimal firValue = (BigDecimal) fir.get(col.getColumn_name());
+									BigDecimal secValue = (BigDecimal) sec.get(col.getColumn_name());
+									if(!firValue.equals(secValue)){
+										fir.put(col.getColumn_name(), firValue + "(" + secValue +")");
+										bolHavedifference = true;
+									} else {
+										fir.put(col.getColumn_name(), firValue + "");
+									}
+								}
+							}
+						}
+					}
+					if(bolNotHave){
+						for(TableColumns col : m_columnsList){
+							if(TmplUtil.IsNumFeild(col.getData_type())){
+								BigDecimal firValue = (BigDecimal) fir.get(col.getColumn_name());
+								fir.put(col.getColumn_name(), firValue + "");
+							}
+						}
+					}
+					if(bolNotHave || bolHavedifference){
+						varList.add(fir);
 					}
 				}
 			}
@@ -287,6 +402,21 @@ public class FinanceAccountsController extends BaseController {
 	 * @param which
 	 * @return
 	 */
+	/* private String getShowAboveTableCode(String which) {
+		String tableCode = "";
+		if (which != null && which.equals("1")) {
+			tableCode = "tb_staff_summy";
+		} else if (which != null && which.equals("2")) {
+			tableCode = "tb_staff_summy";
+		} else if (which != null && which.equals("3")) {
+			tableCode = "tb_staff_summy";
+		} else if (which != null && which.equals("4")) {
+			tableCode = "tb_social_inc_summy";
+		} else if (which != null && which.equals("5")) {
+			tableCode = "tb_house_fund_summy";
+		}
+		return tableCode;
+	} */
 	private String getSummyTableCode(String which) {
 		String tableCode = "";
 		if (which != null && which.equals("1")) {
@@ -397,6 +527,12 @@ public class FinanceAccountsController extends BaseController {
 				groupbyFeild += ",";
 			}
 			groupbyFeild += "BUSI_DATE";
+		}
+		if(!(list!=null&&list.contains("DEPT_CODE"))){
+			if(groupbyFeild!=null && !groupbyFeild.trim().equals("")){
+				groupbyFeild += ",";
+			}
+			groupbyFeild += "DEPT_CODE";
 		}
 		return groupbyFeild;
 	}
