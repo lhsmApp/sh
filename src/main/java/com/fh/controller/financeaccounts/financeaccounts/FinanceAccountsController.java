@@ -182,6 +182,12 @@ public class FinanceAccountsController extends BaseController {
 		logBefore(logger, Jurisdiction.getUsername()+"getDetailColModel");
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
+		// 字典
+		excel_dicList = new LinkedHashMap<String, Object>();
+		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
+		excel_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
+		//导出数据
+		excelListData = new ArrayList<PageData>();
 		
 		PageData pd = this.getPageData();
 		String which = getWhileValue(pd.getString("TABLE_CODE"));
@@ -190,6 +196,11 @@ public class FinanceAccountsController extends BaseController {
 		String DEPT_CODE = (String) pd.get("DATA_DEPT_CODE");
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
 		String detailColModel = tmpl.generateStructureAccount(tableNameDetail, DEPT_CODE);
+
+		// 字典
+		excel_dicList = tmpl.getDicList();
+		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
+		excel_SetColumnsList = tmpl.getSetColumnsList();
 		
 		commonBase.setCode(0);
 		commonBase.setMessage(detailColModel);
@@ -205,6 +216,9 @@ public class FinanceAccountsController extends BaseController {
 	@RequestMapping(value="/getDetailList")
 	public @ResponseBody PageResult<PageData> getDetailList() throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"getDetailList");
+		//导出数据
+		excelListData = new ArrayList<PageData>();
+		
 		PageData pd = this.getPageData();
 		String which = getWhileValue(pd.getString("TABLE_CODE"));
 		String TabType = getWhileValue(pd.getString("TabType"));
@@ -255,63 +269,57 @@ public class FinanceAccountsController extends BaseController {
 
 		List<String> listMatchFeild = Arrays.asList("USER_CODE");
 		List<PageData> varList = getShowList(listFirst, listSecond, tableSumColumns, listMatchFeild, "");
+		//导出数据
+		excelListData = varList;
+		
 		PageResult<PageData> result = new PageResult<PageData>();
 		result.setRows(varList);
 		return result;
 	}
 
-	/**明细数据
+
+	// 字典
+	private Map<String, Object> excel_dicList = new LinkedHashMap<String, Object>();
+	// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
+	private Map<String, TmplConfigDetail> excel_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
+	//导出数据
+	List<PageData> excelListData = new ArrayList<PageData>();
+	
+	/**导出数据
 	 * @param
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/excel")
 	public ModelAndView excel() throws Exception{
-		PageData pd = this.getPageData();
-		String which = getWhileValue(pd.getString("TABLE_CODE"));
-		String TabType = getWhileValue(pd.getString("TabType"));
-		String departCode = pd.getString("DEPT_CODE");
-		Object DATA_ROWS = pd.get("DATA_ROWS");
-		String json = DATA_ROWS.toString();  
-        JSONArray array = JSONArray.fromObject(json); 
-		List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);
-
-		String excelTableName = getDetailTableCode(which, TabType, true);
-		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-		TmplConfigDetail item = new TmplConfigDetail();
-		item.setDEPT_CODE(departCode);
-		item.setTABLE_CODE(excelTableName);
-		List<TmplConfigDetail> m_columnsList = tmplconfigService.listNeed(item);
-		
 		ModelAndView mv = new ModelAndView();
 		Map<String,Object> dataMap = new LinkedHashMap<String,Object>();
 		dataMap.put("filename", "");
 		List<String> titles = new ArrayList<String>();
 		List<PageData> varList = new ArrayList<PageData>();
-		if(m_columnsList != null && m_columnsList.size() > 0){
-		    for (TmplConfigDetail col : m_columnsList) {
+		if(excel_SetColumnsList != null && excel_SetColumnsList.size() > 0){
+		    for (TmplConfigDetail col : excel_SetColumnsList.values()) {
 				if(col.getCOL_HIDE().equals("1")){
 					titles.add(col.getCOL_NAME());
 				}
 			}
-			if(listData!=null && listData.size()>0){
-				for(int i=0;i<listData.size();i++){
+			if(excelListData!=null && excelListData.size()>0){
+				for(int i=0;i<excelListData.size();i++){
 					PageData vpd = new PageData();
 					int j = 1;
-					for (TmplConfigDetail col : m_columnsList) {
+					for (TmplConfigDetail col : excel_SetColumnsList.values()) {
 						if(col.getCOL_HIDE().equals("1")){
-						String trans = col.getDICT_TRANS();
-						Object getCellValue = listData.get(i).get(col.getCOL_CODE().toUpperCase());
-						if(trans != null && !trans.trim().equals("")){
-							//String value = "";
-							//Map<String, String> dicAdd = (Map<String, String>) DicList.getOrDefault(trans, new LinkedHashMap<String, String>());
-							//value = dicAdd.getOrDefault(getCellValue, "");
-							//vpd.put("var" + j, value);
-							vpd.put("var" + j, getCellValue.toString());
-						} else {
-							vpd.put("var" + j, getCellValue.toString());
-						}
-						j++;
+						    String trans = col.getDICT_TRANS();
+						    Object getCellValue = excelListData.get(i).get(col.getCOL_CODE().toUpperCase());
+						    if(trans != null && !trans.trim().equals("")){
+							    String value = "";
+							    Map<String, String> dicAdd = (Map<String, String>) excel_dicList.getOrDefault(trans, new LinkedHashMap<String, String>());
+							    value = dicAdd.getOrDefault(getCellValue, "");
+							    vpd.put("var" + j, value);
+						    } else {
+							    vpd.put("var" + j, getCellValue.toString());
+						    }
+						    j++;
 						}
 					}
 					varList.add(vpd);
@@ -402,21 +410,6 @@ public class FinanceAccountsController extends BaseController {
 	 * @param which
 	 * @return
 	 */
-	/* private String getShowAboveTableCode(String which) {
-		String tableCode = "";
-		if (which != null && which.equals("1")) {
-			tableCode = "tb_staff_summy";
-		} else if (which != null && which.equals("2")) {
-			tableCode = "tb_staff_summy";
-		} else if (which != null && which.equals("3")) {
-			tableCode = "tb_staff_summy";
-		} else if (which != null && which.equals("4")) {
-			tableCode = "tb_social_inc_summy";
-		} else if (which != null && which.equals("5")) {
-			tableCode = "tb_house_fund_summy";
-		}
-		return tableCode;
-	} */
 	private String getSummyTableCode(String which) {
 		String tableCode = "";
 		if (which != null && which.equals("1")) {

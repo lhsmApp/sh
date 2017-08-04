@@ -31,7 +31,7 @@ import com.fh.util.enums.BillState;
  */
 public class TmplUtil {
 
-	private TmplConfigManager tmplconfigService;
+	private static TmplConfigManager tmplconfigService;
 	private TmplConfigDictManager tmplConfigDictService;
 	private DictionariesManager dictionariesService;
 	private DepartmentManager departmentService;
@@ -79,7 +79,7 @@ public class TmplUtil {
 
 	public TmplUtil(TmplConfigManager tmplconfigService, TmplConfigDictManager tmplConfigDictService,
 			DictionariesManager dictionariesService, DepartmentManager departmentService,UserManager userService) {
-		this.tmplconfigService = tmplconfigService;
+		TmplUtil.tmplconfigService = tmplconfigService;
 		this.tmplConfigDictService = tmplConfigDictService;
 		this.dictionariesService = dictionariesService;
 		this.departmentService = departmentService;
@@ -89,7 +89,7 @@ public class TmplUtil {
 	public TmplUtil(TmplConfigManager tmplconfigService, TmplConfigDictManager tmplConfigDictService,
 			DictionariesManager dictionariesService, DepartmentManager departmentService,UserManager userService,
 			List<String> keyList) {
-		this.tmplconfigService = tmplconfigService;
+		TmplUtil.tmplconfigService = tmplconfigService;
 		this.tmplConfigDictService = tmplConfigDictService;
 		this.dictionariesService = dictionariesService;
 		this.departmentService = departmentService;
@@ -118,16 +118,7 @@ public class TmplUtil {
 		List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCode);
 		Map<String, Map<String, Object>> listColModelAll = jqGridColModelAllNoEdit(tableColumns);
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-		TmplConfigDetail item = new TmplConfigDetail();
-		item.setDEPT_CODE(departCode);
-		item.setTABLE_CODE(tableCode);
-		List<TmplConfigDetail> m_columnsList = tmplconfigService.listNeed(item);
-		if(m_columnsList.size()==0){
-			String rootDeptCode=Tools.readTxtFile(Const.ROOT_DEPT_CODE);
-			item.setDEPT_CODE(rootDeptCode);
-			item.setTABLE_CODE(tableCode);
-			m_columnsList = tmplconfigService.listNeed(item);
-		}
+		List<TmplConfigDetail> m_columnsList = getShowColumnList(tableCode, departCode);
 		// 拼接真正设置的jqGrid的ColModel
 		StringBuilder jqGridColModel = new StringBuilder();
 
@@ -398,16 +389,7 @@ public class TmplUtil {
 		List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCode);
 		Map<String, Map<String, Object>> listColModelAll = jqGridColModelAll(tableColumns);
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-		TmplConfigDetail item = new TmplConfigDetail();
-		item.setDEPT_CODE(departCode);
-		item.setTABLE_CODE(tableCode);
-		List<TmplConfigDetail> m_columnsList = tmplconfigService.listNeed(item);
-		if(m_columnsList.size()==0){
-			String rootDeptCode=Tools.readTxtFile(Const.ROOT_DEPT_CODE);
-			item.setDEPT_CODE(rootDeptCode);
-			item.setTABLE_CODE(tableCode);
-			m_columnsList = tmplconfigService.listNeed(item);
-		}
+		List<TmplConfigDetail> m_columnsList = getShowColumnList(tableCode, departCode);
 		int row = 1;
 		int col = 1;
 
@@ -593,6 +575,8 @@ public class TmplUtil {
 	public String generateStructureAccount(String tableCode, String departCode) throws Exception {
 		// 底行显示的求和与平均值字段
 		m_sqlUserdata = new StringBuilder();
+		// 字典
+		m_dicList = new LinkedHashMap<String, Object>();
 		//表结构
 		map_HaveColumnsList = new LinkedHashMap<String, TableColumns>();
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
@@ -600,18 +584,9 @@ public class TmplUtil {
 		
 		// 用语句查询出数据库表的所有字段及其属性；拼接成jqgrid全部列
 		List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCode);
-		Map<String, Map<String, Object>> listColModelAll = jqGridColModelAllAccount(tableColumns);
+		Map<String, Map<String, Object>> listColModelAll = jqGridColModelAccount(tableColumns);
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-		TmplConfigDetail item = new TmplConfigDetail();
-		item.setDEPT_CODE(departCode);
-		item.setTABLE_CODE(tableCode);
-		List<TmplConfigDetail> m_columnsList = tmplconfigService.listNeed(item);
-		if(m_columnsList.size()==0){
-			String rootDeptCode=Tools.readTxtFile(Const.ROOT_DEPT_CODE);
-			item.setDEPT_CODE(rootDeptCode);
-			item.setTABLE_CODE(tableCode);
-			m_columnsList = tmplconfigService.listNeed(item);
-		}
+		List<TmplConfigDetail> m_columnsList = getShowColumnList(tableCode, departCode);
 		// 拼接真正设置的jqGrid的ColModel
 		StringBuilder jqGridColModel = new StringBuilder();
 
@@ -680,7 +655,7 @@ public class TmplUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public Map<String, Map<String, Object>> jqGridColModelAllAccount(List<TableColumns> columns) throws Exception {
+	public Map<String, Map<String, Object>> jqGridColModelAccount(List<TableColumns> columns) throws Exception {
 		Map<String, Map<String, Object>> list = new LinkedHashMap<String, Map<String, Object>>();
 
 		for (TableColumns col : columns) {
@@ -710,4 +685,19 @@ public class TmplUtil {
 		return list;
 	}
 	
+	
+	public static List<TmplConfigDetail> getShowColumnList(String tableCode, String departCode) throws Exception{
+		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
+		TmplConfigDetail item = new TmplConfigDetail();
+		item.setDEPT_CODE(departCode);
+		item.setTABLE_CODE(tableCode);
+		List<TmplConfigDetail> m_columnsList = tmplconfigService.listNeed(item);
+		if(m_columnsList.size()==0){
+			String rootDeptCode=Tools.readTxtFile(Const.ROOT_DEPT_CODE);
+			item.setDEPT_CODE(rootDeptCode);
+			item.setTABLE_CODE(tableCode);
+			m_columnsList = tmplconfigService.listNeed(item);
+		}
+		return m_columnsList;
+	}
 }

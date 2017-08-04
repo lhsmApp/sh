@@ -379,7 +379,7 @@
 	            var rowData = $(gridBase_selector).getRowData(id);
 				var deptcode = rowData.DEPT_CODE__;
 				
-		    	window.location.href='<%=basePath%>financeaccounts/excel.do?TABLE_CODE='+which+'&TabType='+TabType+'&DEPT_CODE='+deptcode+'&DATA_ROWS='+JSON.stringify(listData);
+		    	window.location.href='<%=basePath%>financeaccounts/excel.do?TABLE_CODE='+which+'&TabType='+TabType+'&DEPT_CODE='+deptcode+'&DATA_ROWS='+ window.encodeURIComponent(JSON.stringify(listData));
 				
 			}
 	    }
