@@ -24,7 +24,7 @@ public interface FinanceAccountsManager{
 	 * @param pd
 	 * @throws Exception
 	 */
-	public List<PageData> dataListDetail(PageData pd)throws Exception;
+	public List<PageData> dataListDetail(JqPage page)throws Exception;
 	
 }
 

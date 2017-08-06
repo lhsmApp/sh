@@ -56,7 +56,7 @@
 							<div class="btn-toolbar inline middle no-margin">
 								<div data-toggle="buttons" class="btn-group no-margin">
 									<label class="btn btn-sm btn-primary active"> <span
-										class="bigger-110">市场化</span> <input type="radio" value="1" />
+										class="bigger-110">合同化、市场化</span> <input type="radio" value="1" />
 									</label> 
 									<label class="btn btn-sm btn-primary"> <span
 										class="bigger-110">运行人员</span> <input type="radio" value="2" />

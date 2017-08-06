@@ -30,6 +30,8 @@ import com.fh.util.PageData;
 import com.fh.util.SqlTools;
 import com.fh.util.Jurisdiction;
 import com.fh.util.ObjectExcelView;
+import com.fh.util.enums.BillType;
+import com.fh.util.enums.DurState;
 import com.fh.util.enums.SysConfigKeyCode;
 
 import net.sf.json.JSONArray;
@@ -149,6 +151,9 @@ public class FinanceAccountsController extends BaseController {
 		pd.put("SelectFeild", detailSelectFeild);
 		//表名
 		pd.put("TableName", detailTableName);
+		//上报
+		String detailReport = " and (BUSI_DATE, DEPT_CODE) in (select RPT_DUR, RPT_DEPT from tb_sys_sealed_info where STATE = '" + DurState.Sealed.getNameKey() + "' and BILL_TYPE = '" + getDetailTypeCode(which) + "' ) ";
+		pd.put("CheckReport", detailReport);
 		page.setPd(pd);
 		List<PageData> detailSummayList = financeaccountsService.JqPage(page);
 
@@ -158,6 +163,9 @@ public class FinanceAccountsController extends BaseController {
 		pd.put("SelectFeild", auditeSelectFeild);
 		//表名
 		pd.put("TableName", auditeTableName);
+		//上报
+		String auditeReport = " and (BUSI_DATE, DEPT_CODE) in (select RPT_DUR, RPT_DEPT from tb_sys_sealed_info where STATE = '" + DurState.Sealed.getNameKey() + "' and BILL_TYPE = '" + getAuditeTypeCode(which) + "' ) ";
+		pd.put("CheckReport", auditeReport);
 		page.setPd(pd);
 		List<PageData> auditeSummayList = financeaccountsService.JqPage(page);
 		
@@ -194,7 +202,8 @@ public class FinanceAccountsController extends BaseController {
 		String TabType = getWhileValue(pd.getString("TabType"));
 		String tableNameDetail = getDetailTableCode(which, TabType, true);
 		String DEPT_CODE = (String) pd.get("DATA_DEPT_CODE");
-		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
+		List<String> resetList = Arrays.asList("USER_CODE");
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService,resetList);
 		String detailColModel = tmpl.generateStructureAccount(tableNameDetail, DEPT_CODE);
 
 		// 字典
@@ -214,7 +223,7 @@ public class FinanceAccountsController extends BaseController {
 	 */
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/getDetailList")
-	public @ResponseBody PageResult<PageData> getDetailList() throws Exception{
+	public @ResponseBody PageResult<PageData> getDetailList(JqPage page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"getDetailList");
 		//导出数据
 		excelListData = new ArrayList<PageData>();
@@ -253,11 +262,13 @@ public class FinanceAccountsController extends BaseController {
 		
 		String falseTableName = getDetailTableCode(which, TabType, true);
 		pd.put("TableName", falseTableName);
-		List<PageData> listFirst = financeaccountsService.dataListDetail(pd);
+		page.setPd(pd);
+		List<PageData> listFirst = financeaccountsService.dataListDetail(page);
 		
 		String secondTableName = getDetailTableCode(which, TabType, false);
 		pd.put("TableName", secondTableName);
-		List<PageData> listSecond = financeaccountsService.dataListDetail(pd);
+		page.setPd(pd);
+		List<PageData> listSecond = financeaccountsService.dataListDetail(page);
 
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 		//TmplConfigDetail item = new TmplConfigDetail();
@@ -424,6 +435,36 @@ public class FinanceAccountsController extends BaseController {
 			tableCode = "tb_house_fund_summy";
 		}
 		return tableCode;
+	}
+	private String getAuditeTypeCode(String which) {
+		String typeCode = "";
+		if (which != null && which.equals("1")) {
+			typeCode = BillType.SALLARY_AUDIT.getNameKey();
+		} else if (which != null && which.equals("2")) {
+			typeCode = BillType.SALLARY_AUDIT.getNameKey();
+		} else if (which != null && which.equals("3")) {
+			typeCode = BillType.SALLARY_AUDIT.getNameKey();
+		} else if (which != null && which.equals("4")) {
+			typeCode = BillType.SECURITY_AUDIT.getNameKey();
+		} else if (which != null && which.equals("5")) {
+			typeCode = BillType.GOLD_AUDIT.getNameKey();
+		}
+		return typeCode;
+	}
+	private String getDetailTypeCode(String which) {
+		String typeCode = "";
+		if (which != null && which.equals("1")) {
+			typeCode = BillType.SALLARY_DETAIL.getNameKey();
+		} else if (which != null && which.equals("2")) {
+			typeCode = BillType.SALLARY_DETAIL.getNameKey();
+		} else if (which != null && which.equals("3")) {
+			typeCode = BillType.SALLARY_DETAIL.getNameKey();
+		} else if (which != null && which.equals("4")) {
+			typeCode = BillType.SECURITY_DETAIL.getNameKey();
+		} else if (which != null && which.equals("5")) {
+			typeCode = BillType.GOLD_DETAIL.getNameKey();
+		}
+		return typeCode;
 	}
 	private String getAuditeTableCode(String which) {
 		String tableCode = "";

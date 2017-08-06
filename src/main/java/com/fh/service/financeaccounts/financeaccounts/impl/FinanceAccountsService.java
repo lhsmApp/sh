@@ -34,8 +34,8 @@ public class FinanceAccountsService implements FinanceAccountsManager{
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	public List<PageData> dataListDetail(PageData pd)throws Exception{
-		return (List<PageData>)dao.findForList("FinanceAccountsMapper.dataListDetail", pd);
+	public List<PageData> dataListDetail(JqPage page)throws Exception{
+		return (List<PageData>)dao.findForList("FinanceAccountsMapper.dataListDetail", page);
 	}
 }
 

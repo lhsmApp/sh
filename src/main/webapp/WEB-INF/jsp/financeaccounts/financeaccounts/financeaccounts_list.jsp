@@ -210,7 +210,7 @@
 			footerrow: false,
 			userDataOnFooter: false,
 			onSelectRow : function(ids) {
-				getDetail(ids)
+				getDetail();
             },  
 			
 			loadComplete : function() {
@@ -221,6 +221,11 @@
 					updatePagerIcons(table);
 					enableTooltips(table);
 				}, 0);
+				var ids = $(gridBase_selector).getDataIDs();
+				if(ids!=null && ids.length>0){
+					$(gridBase_selector).setSelection(ids[0]);
+					getDetail();
+				}
 			},
 		});
 	    
@@ -290,6 +295,8 @@
 			    			shrinkToFit: false,
 			                rowNum: 0,	
 			    			scroll: 1,
+			    			sortable: true,
+			    			sortname: 'USER_CODE__',
 			                //width: '100%',
 			                //height: '100%',
 							//pgbuttons: false, // 分页按钮是否显示 
@@ -327,6 +334,7 @@
 			    	        });
 						$(gridDetail_selector).navButtonAdd(pagerDetail_selector, {
 				             caption : "",
+				             id : "exportItems",
 				             buttonicon : "ace-icon fa fa-cloud-download",
 				             onClickButton : exportItems,
 				             position : "last",

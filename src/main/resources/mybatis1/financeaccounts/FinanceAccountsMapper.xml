@@ -8,6 +8,7 @@
 		select ${pd.SelectFeild}
 		from ${pd.TableName}
 		where BUSI_DATE = '${pd.SystemDateTime}'
+		${pd.CheckReport}
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''">
 			${pd.filterWhereResult}
 		</if>
@@ -20,11 +21,14 @@
     	</if>
 	</select>
 	
-	<select id="dataListDetail" parameterType="pd" resultType="pd">
-		select * 
-		from ${TableName}
-		<if test="whereSql!= null and whereSql != ''">
-			${whereSql}
+	<select id="dataListDetail" parameterType="jqPage" resultType="pd">
+		select *, USER_CODE USER_CODE__
+		from ${pd.TableName}
+		<if test="pd.whereSql!= null and pd.whereSql != ''">
+			${pd.whereSql}
 		</if>
+		<if test="sidx != null and sidx.trim() != ''" >
+			order by ${sidx} ${sord} 
+    	</if>
 	</select>
 </mapper>
