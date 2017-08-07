@@ -84,11 +84,11 @@
 								<ul class="nav nav-tabs padding-18">
 									<li class="active">
 									<a data-toggle="tab" href="#voucherTransfer"> <i
-											class="green ace-icon fa fa-cogs bigger-120"></i> 二级单位差异明细
+											class="green ace-icon fa fa-cogs bigger-120"></i> 导入差异
 									</a></li>
 									<li>
 									<a data-toggle="tab" href="#voucherMgr"> <i
-											class="orange ace-icon fa fa-cog bigger-120"></i> 对账编辑差异明细
+											class="orange ace-icon fa fa-cog bigger-120"></i> 对账差异
 									</a></li>
 								</ul>
 								<div class="tab-content no-border ">
