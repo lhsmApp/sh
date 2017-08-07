@@ -156,7 +156,8 @@
 		$(window).on('resize.jqGrid', function () {
 			$(gridBase_selector).jqGrid( 'setGridWidth', $(".page-content").width());
 			$(gridDetail_selector).jqGrid( 'setGridWidth', $(".page-content").width());
-			//resizeGridHeight($(gridBase_selector),null,true);
+			resizeGridHeight($(gridBase_selector),423);
+			resizeGridHeight($(gridDetail_selector),398);
 	    });
 		
 		//初始化当前选择凭证类型
