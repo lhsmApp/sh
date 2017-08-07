@@ -100,10 +100,10 @@ public class SocialIncSummyController extends BaseController {
 	//显示结构的单位
     String ShowDepartCode = "01001";
 	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
-	private List<String> keyListBase = Arrays.asList("BILL_CODE", "DEPT_CODE", "BUSI_DATE", "USER_CATG", "USER_GROP");
+	private List<String> keyListBase = Arrays.asList("BILL_CODE", "DEPT_CODE", "BUSI_DATE", "USER_CATG", "USER_GROP", "CUST_COL7");
     
     //汇总字段
-    List<String> SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "USER_CATG", "USER_GROP");
+    List<String> SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "USER_CATG", "USER_GROP", "CUST_COL7");
     String SumFieldToString = tranferSumFieldToString();
 	
 	//页面显示数据的年月
