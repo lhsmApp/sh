@@ -45,20 +45,13 @@
 						<!-- arrowed-in-right -->
 						<span
 							class="label label-xlg label-yellow arrowed-in arrowed-right"
-							id="subTitle" style="margin-left: 2px;">凭证传输</span> <span
+							id="subTitle" style="margin-left: 2px;">数据传输查询</span> <span
 							style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
 
 						<button id="btnQuery" class="btn btn-white btn-info btn-sm"
 							onclick="showQueryCondi($('#jqGrid'),gridHeight)">
 							<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
 						</button>
-						<button id="btnValidate" class="btn btn-white btn-info btn-sm"
-							onclick="transferValidate()">
-							<i class="ace-icon fa fa-flask  bigger-120 blue"></i> <span>上传校验</span>
-						</button>
-						<sub class="text-warning orange" style="font-size: 14px;"> <!-- fa-exclamation-triangle -->
-							&nbsp;<i class="ace-icon fa fa-star"></i> 校验还未进行上报的二级单位汇总数据
-						</sub>
 						<div class="pull-right">
 							<span class="green middle bolder">凭证数据类型: &nbsp;</span>
 
@@ -99,6 +92,28 @@
 												<div class="selectTree" id="selectTree" multiMode="true"
 													allSelectable="false" noGroup="false"></div>
 											</span>
+											<span style="margin-right: 5px;"> 
+												<select
+													class="chosen-select form-control" name="EMPLGRP"
+													id="EMPLGRP" data-placeholder="请选择员工组"
+													style="vertical-align: top; height: 32px; width: 150px;">
+														<option value="">请选择员工组</option>
+														<c:forEach items="${emplgrp}" var="empl">
+															<option value="${empl.DICT_CODE}">${empl.NAME}</option>
+														</c:forEach>
+												</select>
+											</span>
+											<span style="margin-right: 5px;"> 
+												<select
+													class="chosen-select form-control" name="FMISACC"
+													id="FMISACC" data-placeholder="请选择帐套"
+													style="vertical-align: top; height: 32px; width: 150px;">
+														<option value="">请选择帐套</option>
+														<c:forEach items="${fmisacc}" var="fmi">
+															<option value="${fmi.DICT_CODE}">${fmi.NAME}</option>
+														</c:forEach>
+												</select>
+											</span> 
 											<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
 												<i class="ace-icon fa fa-search bigger-110"></i>
 											</button>
@@ -110,22 +125,8 @@
 					</div>
 					<div class="row">
 						<div class="col-xs-12">
-							<div class="tabbable">
-								<ul class="nav nav-tabs padding-18">
-									<li class="active"><a data-toggle="tab"
-										href="#voucherTransfer"> <i
-											class="green ace-icon fa fa-user bigger-120"></i> 凭证数据传输
-									</a></li>
-
-									<li><a data-toggle="tab" href="#voucherMgr"> <i
-											class="orange ace-icon fa fa-rss bigger-120"></i> 凭证管理
-									</a></li>
-								</ul>
-								<div class="tab-content no-border ">
-									<table id="jqGrid"></table>
-									<div id="jqGridPager"></div>
-								</div>
-							</div>
+							<table id="jqGrid"></table>
+							<div id="jqGridPager"></div>
 						</div>
 					</div>
 				</div>
@@ -194,12 +195,12 @@
 			$("#jqGrid").jqGrid( 'setGridWidth', $(".page-content").width());
 			if(${HasUserData}){
 				//gridHeight=251;
-				gridHeight=236;
+				resizeGridHeight($("#jqGrid"),gridHeight,true);
 			}else{
 				//gridHeight=213;
-				gridHeight=198;
+				resizeGridHeight($("#jqGrid"),gridHeight,false);
 			}
-			resizeGridHeight($("#jqGrid"),gridHeight);
+			
 	    });
 		
 		//初始化当前选择凭证类型
@@ -221,67 +222,13 @@
 			var target = $(this).find('input[type=radio]');
 			which = parseInt(target.val());
 			if(which!='${pd.which}'){
-				window.location.href="<%=basePath%>voucher/list.do?TABLE_CODE="+which;
-			}
-		});
-		
-		//tab页切换
-		$('.nav-tabs li').on('click', function(e){
-			if($(this).hasClass('active')) return;
-			var target = $(this).find('a');
-			
-			//data:{VOUCHER_TYPE:voucherType,TABLE_CODE:'${pd.which}'},
-			if(target.attr('href')=='#voucherTransfer'){
-				voucherType=1;
-				$("[data-original-title='上传']").removeClass("hidden");
-				$("[data-original-title='获取凭证号']").addClass("hidden");
-				$("[data-original-title='获取冲销凭证号']").addClass("hidden");
-				jQuery('#jqGrid').hideCol(['CERT_CODE','REVCERT_CODE']);
-				var busiDate = $("#busiDate").val(); 
-				var deptCode = $("#departCode").val(); 
-				$("#jqGrid").jqGrid("setGridParam",{postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}',"BUSI_DATE":busiDate,"DEPT_CODE":deptCode}});
-				$("#jqGrid").trigger("reloadGrid");  
-			}else{
-				voucherType=2;
-				$("[data-original-title='上传']").addClass("hidden");
-				$("[data-original-title='获取凭证号']").removeClass("hidden");
-				$("[data-original-title='获取冲销凭证号']").removeClass("hidden");
-			
-				if($("[data-original-title='获取凭证号']").length==0){
-					//获取凭证号
-			       $('#jqGrid').navButtonAdd('#jqGridPager',
-			       {
-			    	   /* bigger-150 */
-			           buttonicon: "ace-icon fa fa-book purple",
-			           title: "获取凭证号",
-			           caption: "",
-			           position: "last",
-			           onClickButton: batchVoucher
-			       });
-				}
-				if($("[data-original-title='获取冲销凭证号']").length==0){
-					//获取冲销凭证号
-			       $('#jqGrid').navButtonAdd('#jqGridPager',
-			       {
-			    	   /* bigger-150 */
-			           buttonicon: "ace-icon fa fa-bookmark orange",
-			           title: "获取冲销凭证号",
-			           caption: "",
-			           position: "last",
-			           onClickButton: batchWriteOffVoucher
-			       });
-				}
-				jQuery('#jqGrid').showCol(['CERT_CODE','REVCERT_CODE']);
-				var busiDate = $("#busiDate").val(); 
-				var deptCode = $("#departCode").val(); 
-				$("#jqGrid").jqGrid("setGridParam",{postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}',"BUSI_DATE":busiDate,"DEPT_CODE":deptCode}});
-				$("#jqGrid").trigger("reloadGrid");  
+				window.location.href="<%=basePath%>voucher/voucherSearch.do?TABLE_CODE="+which;
 			}
 		});
 		
 		$("#jqGrid").jqGrid({
 			url: "<%=basePath%>voucher/getPageList.do",
-			postData:{"VOUCHER_TYPE":1,"TABLE_CODE":"${pd.which}","BUSI_DATE":$("#busiDate").val()},
+			postData:{"VOUCHER_TYPE":2,"TABLE_CODE":"${pd.which}","BUSI_DATE":$("#busiDate").val()},
 			datatype: "json",
 			colModel: jqGridColModel,
 			reloadAfterSubmit: true, 
@@ -365,7 +312,6 @@
 				});
 		    }
 		});
-		jQuery('#jqGrid').hideCol(['CERT_CODE','REVCERT_CODE']);
 		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
 	
 		//navButtons
@@ -405,212 +351,7 @@
 				showQuery: false
 			}
 		);
-
-       //批量传输
-       $('#jqGrid').navButtonAdd('#jqGridPager',
-       {
-           buttonicon: "ace-icon fa fa-cloud-upload green",
-           title: "上传",
-           caption: "",
-           position: "last",
-           onClickButton: batchSave
-       });
-       //获取凭证号
-       /* $('#jqGrid').navButtonAdd('#jqGridPager',
-       {
-           buttonicon: "ace-icon fa fa-book purple",
-           title: "获取凭证号",
-           caption: "",
-           position: "last",
-           onClickButton: batchVoucher
-       }); */
 	});
-	
-
-	//批量获取凭证号
-	function batchVoucher(e) {
-		var listData =new Array();
-		var ids = $("#jqGrid").jqGrid('getGridParam','selarrrow');
-		//遍历访问这个集合  
-		var rowData;
-		$(ids).each(function (index, id){  
-            $("#jqGrid").saveRow(id, false, 'clientArray');
-             rowData = $("#jqGrid").getRowData(id);
-            listData.push(rowData);
-		});
-		if(listData.length==0){
-			$("#subTitle").tips({
-				side:3,
-	            msg:'请选择单据后再进行【获取凭证号】',
-	            bg:'#009933',
-	            time:3
-	        });
-			return;
-		}
-		top.jzts();
-		$.ajax({
-			type: "POST",
-			url: '<%=basePath%>voucher/batchVoucher.do?TABLE_CODE='+which,
-	    	//data: rowData,//可以单独传入一个对象，后台可以直接通过对应模型接受参数。但是传入Array（listData）就不好用了，所以传list方式需将List转为Json字符窜。
-			//data: '{"rows":listData}',
-			data:{DATA_ROWS:JSON.stringify(listData)},
-	    	dataType:'json',
-			cache: false,
-			success: function(response){
-				if(response.code==0){
-					$("#jqGrid").trigger("reloadGrid");  
-					$(top.hangge());//关闭加载状态
-					$("#subTitle").tips({
-						side:3,
-			            msg:'获取凭证号成功',
-			            bg:'#009933',
-			            time:3
-			        });
-				}else{
-					$(top.hangge());//关闭加载状态
-					$("#subTitle").tips({
-						side:3,
-			            msg:'获取凭证号失败,'+response.message,
-			            bg:'#cc0033',
-			            time:3
-			        });
-				}
-			},
-	    	error: function(e) {
-	    		$(top.hangge());//关闭加载状态
-				$("#subTitle").tips({
-					side:3,
-		            msg:'获取凭证号失败,'+response.responseJSON.message,
-		            bg:'#cc0033',
-		            time:3
-		        });
-	    	}
-		});
-	}
-	
-	//批量获取冲销凭证号
-	function batchWriteOffVoucher(e) {
-		var listData =new Array();
-		var ids = $("#jqGrid").jqGrid('getGridParam','selarrrow');
-		//console.log(ids);
-		//遍历访问这个集合  
-		var rowData;
-		$(ids).each(function (index, id){  
-            $("#jqGrid").saveRow(id, false, 'clientArray');
-             rowData = $("#jqGrid").getRowData(id);
-            listData.push(rowData);
-		});
-		if(listData.length==0){
-			$("#subTitle").tips({
-				side:3,
-	            msg:'请选择单据后再进行【获取冲销凭证号】',
-	            bg:'#009933',
-	            time:3
-	        });
-			return;
-		}
-		top.jzts();
-		$.ajax({
-			type: "POST",
-			url: '<%=basePath%>voucher/batchWriteOffVoucher.do?TABLE_CODE='+which,
-	    	//data: rowData,//可以单独传入一个对象，后台可以直接通过对应模型接受参数。但是传入Array（listData）就不好用了，所以传list方式需将List转为Json字符窜。
-			//data: '{"rows":listData}',
-			data:{DATA_ROWS:JSON.stringify(listData)},
-	    	dataType:'json',
-			cache: false,
-			success: function(response){
-				if(response.code==0){
-					$("#jqGrid").trigger("reloadGrid");  
-					$(top.hangge());//关闭加载状态
-					$("#subTitle").tips({
-						side:3,
-			            msg:'获取冲销凭证号成功',
-			            bg:'#009933',
-			            time:3
-			        });
-				}else{
-					$(top.hangge());//关闭加载状态
-					$("#subTitle").tips({
-						side:3,
-			            msg:'获取冲销凭证号失败,'+response.message,
-			            bg:'#cc0033',
-			            time:3
-			        });
-				}
-			},
-	    	error: function(e) {
-	    		$(top.hangge());//关闭加载状态
-				$("#subTitle").tips({
-					side:3,
-		            msg:'获取冲销凭证号失败,'+response.responseJSON.message,
-		            bg:'#cc0033',
-		            time:3
-		        });
-	    	}
-		});
-	}
-	
-	//批量传输
-	function batchSave(e) {
-		var listData =new Array();
-		var ids = $("#jqGrid").jqGrid('getGridParam','selarrrow');
-		//console.log(ids);
-		//遍历访问这个集合  
-		var rowData;
-		$(ids).each(function (index, id){  
-            $("#jqGrid").saveRow(id, false, 'clientArray');
-             rowData = $("#jqGrid").getRowData(id);
-            listData.push(rowData);
-		});
-		if(listData.length==0){
-			$("#subTitle").tips({
-				side:3,
-	            msg:'请选择单据后再进行【上传】',
-	            bg:'#009933',
-	            time:3
-	        });
-			return;
-		}
-		top.jzts();
-		$.ajax({
-			type: "POST",
-			url: '<%=basePath%>voucher/voucherTransfer.do?TABLE_CODE='+which,
-	    	//data: rowData,//可以单独传入一个对象，后台可以直接通过对应模型接受参数。但是传入Array（listData）就不好用了，所以传list方式需将List转为Json字符窜。
-			//data: '{"rows":listData}',
-			data:{DATA_ROWS:JSON.stringify(listData)},
-	    	dataType:'json',
-			cache: false,
-			success: function(response){
-				if(response.code==0){
-					$("#jqGrid").trigger("reloadGrid");  
-					$(top.hangge());//关闭加载状态
-					$("#subTitle").tips({
-						side:3,
-			            msg:'传输成功',
-			            bg:'#009933',
-			            time:3
-			        });
-				}else{
-					$(top.hangge());//关闭加载状态
-					$("#subTitle").tips({
-						side:3,
-			            msg:'传输失败,'+response.message,
-			            bg:'#cc0033',
-			            time:3
-			        });
-				}
-			},
-	    	error: function(e) {
-	    		$(top.hangge());//关闭加载状态
-				$("#subTitle").tips({
-					side:3,
-		            msg:'传输失败,'+response.responseJSON.message,
-		            bg:'#cc0033',
-		            time:3
-		        });
-	    	}
-		});
-    }
 	
 	//显示明细信息
 	// the event handler on expanding parent row receives two parameters
@@ -725,32 +466,13 @@
 		});
 	}
 	
-	//上传校验
-	function transferValidate(){
-		 top.jzts();
-		 var diag = new top.Dialog();
-		 diag.Drag=true;
-		 diag.Title ="汇总数据未上报单位校验";
-		 diag.URL = "<%=basePath%>voucher/transferValidate.do?TABLE_CODE="+which;
-		 diag.Width = 800;
-		 diag.Height = 480;
-		 diag.Modal = true;				//有无遮罩窗口
-		 diag. ShowMaxButton = true;	//最大化按钮
-	     diag.ShowMinButton = true;		//最小化按钮 
-		 diag.CancelEvent = function(){ //关闭事件
-			/* if(diag.innerFrame.contentWindow.document.getElementById('zhongxin').style.display == 'none'){
-				 //执行刷新等
-			} */
-			diag.close();
-		 };
-		 diag.show();
-	}
-	
 	//检索
 	function tosearch() {
 		var busiDate = $("#busiDate").val(); 
 		var deptCode = $("#departCode").val(); 
-		$("#jqGrid").jqGrid("setGridParam",{postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}',"BUSI_DATE":busiDate,"DEPT_CODE":deptCode}})
+		var empl = $("#EMPLGRP").val(); 
+		var fmi = $("#FMISACC").val(); 
+		$("#jqGrid").jqGrid("setGridParam",{postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}',"BUSI_DATE":busiDate,"DEPT_CODE":deptCode,"USER_GROP":empl,"FMISACC":fmi}})
 		.trigger("reloadGrid");
 	}  
 	

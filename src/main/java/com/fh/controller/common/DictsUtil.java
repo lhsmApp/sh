@@ -6,8 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import com.fh.entity.system.Department;
 import com.fh.entity.system.Dictionaries;
 import com.fh.service.fhoa.department.DepartmentManager;
@@ -18,7 +16,6 @@ import com.fh.util.PageData;
 import com.fh.util.StringUtil;
 import com.fh.util.enums.BillState;
 
-import cn.jpush.http.StringUtils;
 import net.sf.json.JSONArray;
 
 /**
@@ -40,14 +37,8 @@ public class DictsUtil {
 	 * @throws Exception
 	 */
 	public static List<Dictionaries> getDictsByParentBianma(DictionariesManager dictionariesService,String parentBianma) throws Exception {
-		List<Dictionaries> areaList = null;
-		PageData pdDict = new PageData();
-		pdDict.put("BIANMA", parentBianma);
-		PageData pdDictResult = dictionariesService.findByBianma(pdDict);
-		if (pdDictResult != null && !StringUtil.isEmpty(StringUtil.toString(pdDictResult.get("DICTIONARIES_ID"), ""))) {
-			areaList = dictionariesService.listAllDict(StringUtil.toString(pdDictResult.get("DICTIONARIES_ID"), ""));
-		}
-		return areaList;
+		List<Dictionaries> listDict= dictionariesService.getSysDictionaries(parentBianma);
+		return listDict;
 	}
 
 	public static List<Dictionaries> getDictsByParentCode(DictionariesManager dictionariesService, String dicName) throws Exception {

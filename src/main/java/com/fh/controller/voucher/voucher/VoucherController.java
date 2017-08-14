@@ -155,6 +155,63 @@ public class VoucherController extends BaseController {
 		mv.addObject("HasUserData", hasUserData);
 		return mv;
 	}
+	
+	/**
+	 * 传输数据查询
+	 * 
+	 * @param page
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/voucherSearch")
+	public ModelAndView voucherSearch(Page page) throws Exception {
+		// if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
+		// //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
+		ModelAndView mv = this.getModelAndView();
+		mv.setViewName("voucher/voucher/voucher_search");
+		PageData pd = this.getPageData();
+		String which = pd.getString("TABLE_CODE");
+		String tableCode = getTableCode(which);
+		// 此处放当前页面初始化时用到的一些数据，例如搜索的下拉列表数据，所需的字典数据、权限数据等等。
+		// mv.addObject("pd", pd);
+		// *********************加载单位树*******************************
+		mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService));
+		// ***********************************************************
+
+		pd.put("which", which);
+		mv.addObject("pd", pd);
+
+		// 设置期间
+		pd.put("KEY_CODE", "SystemDataTime");
+		String busiDate = sysConfigManager.getSysConfigByKey(pd);
+		pd.put("busiDate", busiDate);
+
+		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
+		// 生成主表结构
+		TmplUtil tmplUtil = new TmplUtil(tmplconfigService, tmplConfigDictService, dictionariesService,
+				departmentService,userService);
+		String jqGridColModel = tmplUtil.generateStructureNoEdit(tableCode, Jurisdiction.getCurrentDepartmentID());
+		mv.addObject("jqGridColModel", jqGridColModel);
+
+		// 生成子表结构
+		/*
+		 * String jqGridColModelSub =
+		 * tmplUtil.generateStructureNoEdit(tableCodeSub,
+		 * Jurisdiction.getCurrentDepartmentID());
+		 * mv.addObject("jqGridColModelSub", jqGridColModelSub);
+		 */
+
+		// 底行显示的求和与平均值字段
+		SqlUserdata = tmplUtil.getSqlUserdata();
+		boolean hasUserData = false;
+		if (SqlUserdata != null && !SqlUserdata.toString().trim().equals("")) {
+			hasUserData = true;
+		}
+		mv.addObject("HasUserData", hasUserData);
+		
+		mv.addObject("emplgrp", DictsUtil.getDictsByParentBianma(dictionariesService, "EMPLGRP"));
+		mv.addObject("fmisacc", DictsUtil.getDictsByParentBianma(dictionariesService, "FMISACC"));
+		return mv;
+	}
 
 	/**
 	 * 列表

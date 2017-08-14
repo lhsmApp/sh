@@ -401,7 +401,8 @@
 		</if>
 
 		<if test='pd.BILL_TYPE=="7" or pd.BILL_TYPE=="8" or pd.BILL_TYPE=="9"'>
-			select A.*,C.CERT_CODE,C.REVCERT_CODE,C.BILL_USER CERT_BILL_USER,C.BILL_DATE CERT_BILL_DATE
+			select A.*,C.CERT_CODE,C.REVCERT_CODE,C.BILL_USER
+			CERT_BILL_USER,C.BILL_DATE CERT_BILL_DATE
 			from ${pd.TABLE_CODE} A
 			JOIN
 			tb_sys_sealed_info B
@@ -458,7 +459,8 @@
 			(SELECT bill_code,rpt_dept,rpt_dur,state FROM
 			tb_sys_sealed_info WHERE
 			bill_type=#{BILL_TYPE1} AND state='1') N
-			ON M.bill_code=N.bill_code AND M.rpt_dept=N.rpt_dept
+			ON
+			M.bill_code=N.bill_code AND M.rpt_dept=N.rpt_dept
 			AND
 			M.rpt_dur=N.rpt_dur
 			WHERE (M.bill_type=#{BILL_TYPE} AND
@@ -480,6 +482,12 @@
 				</if>
 				<if test="BUSI_DATE!= null and BUSI_DATE != ''">
 					and BUSI_DATE = #{BUSI_DATE}
+				</if>
+				<if test="USER_GROP!= null and USER_GROP != ''">
+					and USER_GROP = #{USER_GROP}
+				</if>
+				<if test="FMISACC!= null and FMISACC != ''">
+					and CUST_COL7 = #{FMISACC}
 				</if>
 				<if test="DEPT_CODES!= null and DEPT_CODES != ''"><!-- 根据单位检索 -->
 					and DEPT_CODE in
@@ -520,6 +528,12 @@
 			</if>
 			<if test="BUSI_DATE!= null and BUSI_DATE != ''">
 				and BUSI_DATE = #{BUSI_DATE}
+			</if>
+			<if test="USER_GROP!= null and USER_GROP != ''">
+				and USER_GROP = #{USER_GROP}
+			</if>
+			<if test="FMISACC!= null and FMISACC != ''">
+				and CUST_COL7 = #{FMISACC}
 			</if>
 			<if test="DEPT_CODES!= null and DEPT_CODES != ''"><!-- 根据单位检索 -->
 				and DEPT_CODE in
@@ -572,6 +586,12 @@
 				<if test="pd.BUSI_DATE!= null and pd.BUSI_DATE != ''">
 					and BUSI_DATE = #{pd.BUSI_DATE}
 				</if>
+				<if test="pd.USER_GROP!= null and pd.USER_GROP != ''">
+					and USER_GROP = #{pd.USER_GROP}
+				</if>
+				<if test="pd.FMISACC!= null and pd.FMISACC != ''">
+					and CUST_COL7 = #{pd.FMISACC}
+				</if>
 				<if test="pd.DEPT_CODES!= null and pd.DEPT_CODES != ''"><!-- 根据单位检索 -->
 					and DEPT_CODE in
 					<foreach item="item" index="index" collection="pd.DEPT_CODES"
@@ -586,9 +606,8 @@
 			<if test="sidx != null">
 				order by ${sidx} ${sord}
 			</if>
-			<!-- <if test="currentResult != null and rowNum != null">
-				limit #{currentResult}, #{rowNum}
-			</if> -->
+			<!-- <if test="currentResult != null and rowNum != null"> limit #{currentResult}, 
+				#{rowNum} </if> -->
 			) T
 		</if>
 
@@ -617,6 +636,12 @@
 			<if test="pd.BUSI_DATE!= null and pd.BUSI_DATE != ''">
 				and BUSI_DATE = #{pd.BUSI_DATE}
 			</if>
+			<if test="pd.USER_GROP!= null and pd.USER_GROP != ''">
+				and USER_GROP = #{pd.USER_GROP}
+			</if>
+			<if test="pd.FMISACC!= null and pd.FMISACC != ''">
+				and CUST_COL7 = #{pd.FMISACC}
+			</if>
 			<if test="pd.DEPT_CODES!= null and pd.DEPT_CODES != ''"><!-- 根据单位检索 -->
 				and DEPT_CODE in
 				<foreach item="item" index="index" collection="pd.DEPT_CODES"
@@ -630,9 +655,8 @@
 			<if test="sidx != null">
 				order by ${sidx} ${sord}
 			</if>
-			<!-- <if test="currentResult != null and rowNum != null">
-				limit #{currentResult}, #{rowNum}
-			</if> -->
+			<!-- <if test="currentResult != null and rowNum != null"> limit #{currentResult}, 
+				#{rowNum} </if> -->
 			) T
 		</if>
 
@@ -649,15 +673,17 @@
 			(SELECT bill_code,rpt_dept,rpt_dur,state FROM
 			tb_sys_sealed_info WHERE
 			bill_type=#{BILL_TYPE1} AND state='1') N
-			ON <!-- M.bill_code=N.bill_code AND --> M.rpt_dept=N.rpt_dept
+			ON <!-- 
+				M.bill_code=N.bill_code AND -->
+			M.rpt_dept=N.rpt_dept
 			AND
 			M.rpt_dur=N.rpt_dur
-			WHERE (M.bill_type=#{BILL_TYPE} AND
+			WHERE
+			(M.bill_type=#{BILL_TYPE} AND
 			M.state='1')
 			<!-- OR (M.BILL_TYPE='8' AND M.state='0') -->
 			AND N.bill_code IS NULL) B
-			ON <!-- A.BILL_CODE=B.BILL_CODE
-			AND -->
+			ON <!-- A.BILL_CODE=B.BILL_CODE AND -->
 			A.BUSI_DATE=B.RPT_DUR
 			AND
 			A.DEPT_CODE=B.RPT_DEPT
@@ -665,13 +691,20 @@
 				<if test="keywords!= null and keywords != ''"><!-- 关键词检索 -->
 					and
 					(
-					<!-- 根据需求自己加检索条件 字段1 LIKE CONCAT(CONCAT('%', # {keywords}),'%') or 
-						字段2 LIKE CONCAT(CONCAT('%', #{keywords}),'%') -->
+					<!-- 根据需求自己加检索条件 字段1 LIKE CONCAT(CONCAT('%', # {keywords}),'%') or 字段2 
+						LIKE CONCAT(CONCAT('%', #{keywords}),'%') -->
 					)
 				</if>
 				<if test="BUSI_DATE!= null and BUSI_DATE != ''">
 					and BUSI_DATE = #{BUSI_DATE}
 				</if>
+				<if test="USER_GROP!= null and USER_GROP != ''">
+					and USER_GROP = #{USER_GROP}
+				</if>
+				<if test="FMISACC!= null and FMISACC != ''">
+					and CUST_COL7 = #{FMISACC}
+				</if>
+
 				<if test="DEPT_CODES!= null and DEPT_CODES != ''"><!-- 根据单位检索 -->
 					and DEPT_CODE in
 					<foreach item="item" index="index" collection="DEPT_CODES"
@@ -686,13 +719,13 @@
 		</if>
 
 		<if test='BILL_TYPE=="7" or BILL_TYPE=="8" or BILL_TYPE=="9"'>
-			select A.*,C.CERT_CODE,C.REVCERT_CODE,C.BILL_USER CERT_BILL_USER,C.BILL_DATE CERT_BILL_DATE
+			select A.*,C.CERT_CODE,C.REVCERT_CODE,C.BILL_USER
+			CERT_BILL_USER,C.BILL_DATE CERT_BILL_DATE
 			from ${TABLE_CODE} A
 			JOIN
 			tb_sys_sealed_info B
 			ON
-			<!-- A.BILL_CODE=B.BILL_CODE
-			AND -->
+			<!-- A.BILL_CODE=B.BILL_CODE AND -->
 			A.BUSI_DATE=B.RPT_DUR
 			AND
 			A.DEPT_CODE=B.RPT_DEPT
@@ -711,6 +744,12 @@
 			</if>
 			<if test="BUSI_DATE!= null and BUSI_DATE != ''">
 				and BUSI_DATE = #{BUSI_DATE}
+			</if>
+			<if test="USER_GROP!= null and USER_GROP != ''">
+				and USER_GROP = #{USER_GROP}
+			</if>
+			<if test="FMISACC!= null and FMISACC != ''">
+				and CUST_COL7 = #{FMISACC}
 			</if>
 			<if test="DEPT_CODES!= null and DEPT_CODES != ''"><!-- 根据单位检索 -->
 				and DEPT_CODE in
@@ -748,14 +787,15 @@
 		SELECT A.*,B.BILL_TYPE,B.STATE
 		FROM ${TABLE_CODE} A
 		LEFT
-		JOIN (SELECT * FROM tb_sys_sealed_info WHERE bill_type=#{BILL_TYPE} AND state='1') B
+		JOIN (SELECT * FROM tb_sys_sealed_info WHERE bill_type=#{BILL_TYPE}
+		AND state='1') B
 		ON
-		<!-- A.BILL_CODE=B.BILL_CODE
-		AND -->
+		<!-- A.BILL_CODE=B.BILL_CODE AND -->
 		A.BUSI_DATE=B.RPT_DUR
 		AND
 		A.DEPT_CODE=B.RPT_DEPT
-		where B.RPT_DEPT IS NULL) T
+		where B.RPT_DEPT IS
+		NULL) T
 		<where>
 			<if test="filterWhereResult != null">
 				${filterWhereResult}
@@ -784,8 +824,9 @@
 				delete from
 				TB_GL_CERT
 				where BILL_CODE = #{item.BILL_CODE};
-		        insert into TB_GL_CERT(BILL_CODE,CERT_CODE,BILL_USER,BILL_DATE)
-		        values (#{item.BILL_CODE},#{item.CERT_CODE},#{item.BILL_USER},#{item.BILL_DATE})
+				insert into TB_GL_CERT(BILL_CODE,CERT_CODE,BILL_USER,BILL_DATE)
+				values
+				(#{item.BILL_CODE},#{item.CERT_CODE},#{item.BILL_USER},#{item.BILL_DATE})
 			</if>
 		</foreach>
 	</update>
@@ -798,8 +839,10 @@
 				delete from
 				TB_GL_CERT
 				where BILL_CODE = #{item.BILL_CODE};
-		        insert into TB_GL_CERT(BILL_CODE,CERT_CODE,REVCERT_CODE,BILL_USER,BILL_DATE)
-		        values (#{item.BILL_CODE},#{item.CERT_CODE},#{item.REVCERT_CODE},#{item.BILL_USER},#{item.BILL_DATE})
+				insert into
+				TB_GL_CERT(BILL_CODE,CERT_CODE,REVCERT_CODE,BILL_USER,BILL_DATE)
+				values
+				(#{item.BILL_CODE},#{item.CERT_CODE},#{item.REVCERT_CODE},#{item.BILL_USER},#{item.BILL_DATE})
 			</if>
 		</foreach>
 	</update>
