@@ -484,6 +484,8 @@
 		$("#selectTree").bind("change",function(){
 			if($(this).attr("relValue")){
 				$("#departCode").val($(this).attr("relValue"));
+		    }else{
+		    	$("#departCode").val("");
 		    }
 		});
 		//赋给data属性

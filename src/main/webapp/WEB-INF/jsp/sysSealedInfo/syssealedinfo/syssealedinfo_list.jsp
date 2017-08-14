@@ -422,8 +422,8 @@
 			$("#selectTree").bind("change",function(){
 				if($(this).attr("relValue")){
 					$("#RPT_DEPT").val($(this).attr("relValue"));
-					console.log($(this).attr("relValue"));
-					//$("#DNAME").val($(this).attr("relText"));
+			    }else{
+			    	$("#RPT_DEPT").val("");
 			    }
 			});
 			//赋给data属性
