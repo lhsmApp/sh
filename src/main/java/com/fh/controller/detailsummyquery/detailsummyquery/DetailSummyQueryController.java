@@ -91,7 +91,7 @@ public class DetailSummyQueryController extends BaseController {
 	 */
 	@RequestMapping(value="/list")
 	public ModelAndView list(Page page) throws Exception{
-		logBefore(logger, Jurisdiction.getUsername()+"列表DetailImportQuery");
+		logBefore(logger, Jurisdiction.getUsername()+"列表detailsummyquery");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
 
 		PageData pd = this.getPageData();
@@ -99,16 +99,23 @@ public class DetailSummyQueryController extends BaseController {
 		String summyTableName = getSummyTableCode(which);
 		
 		ModelAndView mv = this.getModelAndView();
-		mv.setViewName("detailimportquery/detailimportquery/detailimportquery_list");
+		mv.setViewName("detailsummyquery/detailsummyquery/detailsummyquery_list");
 		//当前期间,取自tb_system_config的SystemDateTime字段
 		String SystemDateTime = sysConfigManager.currentSection(pd);
 		mv.addObject("SystemDateTime", SystemDateTime);
 		//while
 		pd.put("which", which);
 		mv.addObject("pd", pd);
-		
+		//"BUSI_DATE", "DEPT_CODE", "USER_CATG", "USER_GROP", "CUST_COL7"
+		//DEPT_CODE
 		mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService));
-
+		//USER_CATG PARTUSERTYPE 企业特定员工分类字典
+		mv.addObject("PARTUSERTYPE", DictsUtil.getDictsByParentCode(dictionariesService, "PARTUSERTYPE"));
+		//USER_GROP EMPLGRP 员工组字典
+		mv.addObject("EMPLGRP", DictsUtil.getDictsByParentCode(dictionariesService, "EMPLGRP"));
+		//CUST_COL7 FMISACC 帐套字典
+		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));
+		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService, keyListBase);
 		String jqGridColModel = tmpl.generateStructureNoEdit(summyTableName, ShowDepartCode);
 		mv.addObject("jqGridColModel", jqGridColModel);
@@ -148,7 +155,10 @@ public class DetailSummyQueryController extends BaseController {
 			//工资分的类型
 			pd.put("SallaryType", sallaryType);
 		}
-		//QueryFeild
+		String QueryFeild = getQueryFeild(pd);
+		if(QueryFeild!=null && !QueryFeild.equals("")){
+			pd.put("QueryFeild", QueryFeild);
+		}
 		page.setPd(pd);
 		List<PageData> varList = detailsummyqueryryService.JqPage(page);	//列出Betting列表
 		int records = detailsummyqueryryService.countJqGridExtend(page);
@@ -167,6 +177,60 @@ public class DetailSummyQueryController extends BaseController {
 		result.setUserdata(userdata);
 		
 		return result;
+	}
+	
+	private String getQueryFeild(PageData pd){
+		//"BUSI_DATE", "DEPT_CODE", "USER_CATG", "USER_GROP", "CUST_COL7"
+		String BUSI_DATE = pd.getString("BUSI_DATE");
+		String DEPT_CODE = pd.getString("DEPT_CODE");
+		String USER_CATG = pd.getString("USER_CATG");
+		String USER_GROP = pd.getString("USER_GROP");
+		String CUST_COL7 = pd.getString("CUST_COL7");
+		String QueryFeild = "";
+		if(BUSI_DATE!=null && !BUSI_DATE.equals("")){
+			QueryFeild += " and BUSI_DATE like '%" + BUSI_DATE.trim() + "%' ";
+		}
+		if(DEPT_CODE!=null && !DEPT_CODE.equals("")){
+			String[] list = DEPT_CODE.replace(" ", "").split(",");
+			String strIn = "";
+			for(String str : list){
+				strIn += "'" + str +"'";
+			}
+			if(strIn!=null && !strIn.equals("")){
+				QueryFeild += " and DEPT_CODE in (" + strIn + ") ";
+			}
+		}
+		if(USER_CATG!=null && !USER_CATG.equals("")){
+			String[] list = USER_CATG.replace(" ", "").split(",");
+			String strIn = "";
+			for(String str : list){
+				strIn += "'" + str +"'";
+			}
+			if(strIn!=null && !strIn.equals("")){
+				QueryFeild += " and USER_CATG in (" + strIn + ") ";
+			}
+		}
+		if(USER_GROP!=null && !USER_GROP.equals("")){
+			String[] list = USER_GROP.replace(" ", "").split(",");
+			String strIn = "";
+			for(String str : list){
+				strIn += "'" + str +"'";
+			}
+			if(strIn!=null && !strIn.equals("")){
+				QueryFeild += " and USER_GROP in (" + strIn + ") ";
+			}
+		}
+		if(CUST_COL7!=null && !CUST_COL7.equals("")){
+			String[] list = CUST_COL7.replace(" ", "").split(",");
+			String strIn = "";
+			for(String str : list){
+				strIn += "'" + str +"'";
+			}
+			if(strIn!=null && !strIn.equals("")){
+				QueryFeild += " and CUST_COL7 in (" + strIn + ") ";
+			}
+		}
+		return QueryFeild;
 	}
 
 	/**明细显示结构
@@ -304,7 +368,10 @@ public class DetailSummyQueryController extends BaseController {
 			//工资分的类型
 			pd.put("SallaryType", sallaryType);
 		}
-		//QueryFeild
+		String QueryFeild = getQueryFeild(pd);
+		if(QueryFeild!=null && !QueryFeild.equals("")){
+			pd.put("QueryFeild", QueryFeild);
+		}
 		page.setPd(pd);
 		List<PageData> varOList = detailsummyqueryryService.datalistExport(page);
 		

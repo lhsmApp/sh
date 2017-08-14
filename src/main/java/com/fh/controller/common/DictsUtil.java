@@ -2,6 +2,7 @@ package com.fh.controller.common;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import com.fh.service.system.user.UserManager;
 import com.fh.service.tmplConfigDict.tmplconfigdict.TmplConfigDictManager;
 import com.fh.util.PageData;
 import com.fh.util.StringUtil;
+import com.fh.util.enums.BillState;
 
 import cn.jpush.http.StringUtils;
 import net.sf.json.JSONArray;
@@ -47,6 +49,12 @@ public class DictsUtil {
 		}
 		return areaList;
 	}
+
+	public static List<Dictionaries> getDictsByParentCode(DictionariesManager dictionariesService, String dicName) throws Exception {
+		List<Dictionaries> dicList = dictionariesService.getSysDictionaries(dicName);
+		return dicList;
+	}
+
 
 	/**
 	 * 根据字典名称获取字典信息，生成Jqgrid editOptions和SearchOptions所需的Select格式。

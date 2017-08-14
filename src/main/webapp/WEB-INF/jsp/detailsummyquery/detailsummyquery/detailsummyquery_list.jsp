@@ -97,9 +97,46 @@
 												class="ace-icon fa fa-calendar blue"></i>
 											</span>
 											<span class="pull-left" style="margin-right: 5px;">
-												<div class="selectTree" id="selectTree" multiMode="true"
+												<div class="selectTree" id="selectTreeDEPT_CODE" multiMode="true"
 												    allSelectable="false" noGroup="false"></div>
 											    <input type="text" id="DEPT_CODE" hidden></input>
+											</span>
+											
+											<span>
+												<select class="chosen-select form-control"
+													name="USER_CATG" id="USER_CATG"
+													data-placeholder="请选择特定员工分类"
+													style="vertical-align: top; height:32px;width: 150px;">
+													<option value="">全部</option>
+													<c:forEach items="${PARTUSERTYPE}" var="each">
+														<option value="${each.DICT_CODE}" 
+														    <c:if test="${pd.USER_CATG==each.DICT_CODE}">selected</c:if>>${each.NAME}</option>
+													</c:forEach>
+												</select>
+											</span>
+											<span>
+												<select class="chosen-select form-control"
+													name="USER_GROP" id="USER_GROP"
+													data-placeholder="请选择员工组"
+													style="vertical-align: top; height:32px;width: 150px;">
+													<option value="">全部</option>
+													<c:forEach items="${EMPLGRP}" var="each">
+														<option value="${each.DICT_CODE}" 
+														    <c:if test="${pd.USER_GROP==each.DICT_CODE}">selected</c:if>>${each.NAME}</option>
+													</c:forEach>
+												</select>
+											</span>
+											<span>
+												<select class="chosen-select form-control"
+													name="CUST_COL7" id="CUST_COL7"
+													data-placeholder="请选择帐套"
+													style="vertical-align: top; height:32px;width: 150px;">
+													<option value="">全部</option>
+													<c:forEach items="${FMISACC}" var="each">
+														<option value="${each.DICT_CODE}" 
+														    <c:if test="${pd.CUST_COL7==each.DICT_CODE}">selected</c:if>>${each.NAME}</option>
+													</c:forEach>
+												</select>
 											</span>
 											<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
 												<i class="ace-icon fa fa-search bigger-110"></i>
@@ -206,7 +243,12 @@
 		});
 		
 		$(gridBase_selector).jqGrid({
-			url: '<%=basePath%>detailsummyquery/getPageList.do?TABLE_CODE='+which,
+			url: '<%=basePath%>detailsummyquery/getPageList.do?TABLE_CODE='+which
+                    +'&BUSI_DATE='+$("#BUSI_DATE").val()
+                    +'&DEPT_CODE='+$("#DEPT_CODE").val()
+                    +'&USER_CATG='+$("#USER_CATG").val()
+                    +'&USER_GROP='+$("#USER_GROP").val()
+                    +'&CUST_COL7='+$("#CUST_COL7").val(),
 			datatype: "json",
 			colModel: jqGridColModel,
 			viewrecords: true, 
@@ -392,23 +434,30 @@
 		//下拉树
 		var defaultNodes = {"treeNodes":${zTreeNodes}};
 		//绑定change事件
-		$("#selectTree").bind("change",function(){
+		$("#selectTreeDEPT_CODE").bind("change",function(){
 			if($(this).attr("relValue")){
 				$("#DEPT_CODE").val($(this).attr("relValue"));
 		    }
 		});
 		//赋给data属性
-		$("#selectTree").data("data",defaultNodes);  
-		$("#selectTree").render();
-		$("#selectTree2_input").val("请选择");
+		$("#selectTreeDEPT_CODE").data("data",defaultNodes);  
+		$("#selectTreeDEPT_CODE").render();
 	}
 	
 	//检索
 	function tosearch() {
 		var BUSI_DATE = $("#BUSI_DATE").val(); 
 		var DEPT_CODE = $("#DEPT_CODE").val(); 
+		var USER_CATG = $("#USER_CATG").val(); 
+		var USER_GROP = $("#USER_GROP").val(); 
+		var CUST_COL7 = $("#CUST_COL7").val(); 
 		$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据  
-			url:'<%=basePath%>detailsummyquery/getPageList.do?TABLE_CODE='+which,  
+			url:'<%=basePath%>detailsummyquery/getPageList.do?TABLE_CODE='+which
+					+'&BUSI_DATE='+BUSI_DATE
+					+'&DEPT_CODE='+DEPT_CODE
+					+'&USER_CATG='+USER_CATG
+					+'&USER_GROP='+USER_GROP
+					+'&CUST_COL7='+CUST_COL7,  
 			datatype:'json',
 		      page:1
 		}).trigger("reloadGrid");

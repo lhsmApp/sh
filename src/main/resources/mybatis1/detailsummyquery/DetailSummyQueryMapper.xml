@@ -25,9 +25,9 @@
 		<if test="sidx != null and sidx.trim() != ''" >
 			order by ${sidx} ${sord} 
     	</if>
-		<if test="currentResult != null and rowNum != null" >           
+		<!-- <if test="currentResult != null and rowNum != null" >           
             limit #{currentResult}, #{rowNum} 
-        </if>
+        </if> -->
 	</select>
 	<select id="countJqGridExtend" parameterType="jqPage" resultType="int">
 		select count(*) 
@@ -63,8 +63,8 @@
 	<!-- 明细 -->
 	<select id="getDetailList" parameterType="pd" resultType="pd">
 		select * 
-		from ${pd.TableName}
-		where BILL_CODE = '${pd.BILL_CODE}'
+		from ${TableName}
+		where BILL_CODE = '${BILL_CODE}'
 		order by USER_CODE
 	</select>
 	
