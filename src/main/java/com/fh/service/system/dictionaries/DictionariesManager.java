@@ -62,6 +62,15 @@ public interface DictionariesManager{
 	public List<Dictionaries> listSubDictByParentId(String parentId) throws Exception;
 	
 	/**
+	 * 获取字典类型
+	 * @param parentId
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Dictionaries> getDictTypes() throws Exception;
+	
+	
+	/**
 	 * 获取所有数据并填充每条数据的子级列表(递归处理)
 	 * @param MENU_ID
 	 * @return

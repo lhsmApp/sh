@@ -25,7 +25,7 @@
 		TBSNAME,
 		DICTIONARIES_ID
 	</sql>
-	
+
 	<sql id="FieldInsert">
 		NAME,
 		NAME_EN,
@@ -47,7 +47,7 @@
 		#{TBSNAME},
 		#{DICTIONARIES_ID}
 	</sql>
-	
+
 	<!-- 字段值 -->
 	<sql id="FieldValueInsert">
 		#{NAME},
@@ -197,10 +197,10 @@
 
 	<!-- 列表(全部) -->
 	<select id="listAll" parameterType="pd" resultType="pd">
+		SELECT * FROM(
 		select
-		A.NAME,A.NAME_EN,A.DICT_CODE,A.ORDER_BY,A.PARENT_CODE,A.BZ,A.TBSNAME,
-		A.DICTIONARIES_ID,IFNULL(B.NAME,'所有字典') AS PARENT_NAME,B.DICT_CODE AS
-		PARENT_CODE
+		A.NAME,A.NAME_EN,A.DICT_CODE,A.ORDER_BY,A.PARENT_CODE,A.BZ,
+		A.DICTIONARIES_ID,IFNULL(B.NAME,'所有字典') AS PARENT_NAME
 		from
 		<include refid="tableName"></include>
 		A
@@ -209,19 +209,36 @@
 		B
 		ON A.PARENT_CODE=B.DICT_CODE
 		<where>
-			A.PARENT_CODE!='0' AND B.DICT_CODE!='ZRZX' AND B.PARENT_CODE!='ZRZX'
+			A.PARENT_CODE!='0' AND B.DICT_CODE!='ZRZX' AND
+			B.PARENT_CODE!='ZRZX'
+		</where>
+		UNION
+		SELECT NAME,NAME_EN,DEPARTMENT_CODE AS DICT_CODE,'' AS ORDER_BY,'ZZJG' AS
+		PARENT_CODE,BZ,DEPARTMENT_ID AS DICTIONARIES_ID,'组织机构'
+		AS PARENT_NAME FROM oa_department
+		UNION
+		SELECT NAME, '' AS NAME_EN,USER_ID AS DICT_CODE,'' AS ORDER_BY,'XTYH' AS
+		PARENT_CODE,BZ,USER_ID AS DICTIONARIES_ID,'系统用户' AS
+		PARENT_NAME FROM sys_user
+		
+		order by PARENT_CODE
+		<if test="sidx != null">
+			,${sidx} ${sord}
+		</if>
+		) TEMP
+		<where>
 			<if test="DICT_CODE!= null and DICT_CODE != ''"><!-- 检索 -->
-				and A.PARENT_CODE = #{DICT_CODE}
+				and PARENT_CODE = #{DICT_CODE}
 			</if>
 			<if test="keywords != null and keywords != ''"><!-- 关键词检索 -->
 				and
 				(
-				A.NAME LIKE CONCAT(CONCAT('%', #{keywords}),'%')
+				NAME LIKE CONCAT(CONCAT('%', #{keywords}),'%')
 				or
-				A.NAME_EN LIKE
+				NAME_EN LIKE
 				CONCAT(CONCAT('%', #{keywords}),'%')
 				or
-				A.DICT_CODE LIKE
+				DICT_CODE LIKE
 				CONCAT(CONCAT('%', #{keywords}),'%')
 				)
 			</if>
@@ -229,10 +246,6 @@
 				${filterWhereResult}
 			</if>
 		</where>
-		order by A.PARENT_CODE
-		<if test="sidx != null">
-			,${sidx} ${sord}
-		</if>
 	</select>
 
 	<!-- 记录数量 -->
@@ -259,6 +272,18 @@
 				${filterWhereResult}
 			</if>
 		</where>
+	</select>
+	
+	<!-- 通过ID获取其子级列表 -->
+	<select id="getDictTypes" 
+		resultMap="dictResultMap">
+		select
+		DICTIONARIES_ID,DICT_CODE,NAME,PARENT_CODE
+		from
+		<include refid="tableName"></include>
+		where
+		DICT_CODE != 'ZRZX' and
+		PARENT_CODE = '0' order by ORDER_BY
 	</select>
 
 	<!-- 通过ID获取其子级列表 -->
@@ -288,7 +313,8 @@
 		resultType="com.fh.entity.system.Dictionaries">
 		SELECT *
 		FROM sys_dictionaries
-		where PARENT_CODE = #{PARENT_CODE}
+		where PARENT_CODE =
+		#{PARENT_CODE}
 		order by ORDER_BY
 	</select>
 </mapper>
