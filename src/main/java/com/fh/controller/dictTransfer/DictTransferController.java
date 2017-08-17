@@ -21,6 +21,7 @@ import com.fh.entity.CommonBase;
 import com.fh.entity.Page;
 import com.fh.entity.PageResult;
 import com.fh.entity.TableColumns;
+import com.fh.entity.system.Dictionaries;
 import com.fh.exception.CustomException;
 import com.fh.service.sysConfig.sysconfig.SysConfigManager;
 import com.fh.service.system.dictionaries.DictionariesManager;
@@ -70,7 +71,16 @@ public class DictTransferController extends BaseController {
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("dictTransfer/dictTransfer_list");
 		// 此处放当前页面初始化时用到的一些数据，例如搜索的下拉列表数据，所需的字典数据、权限数据等等。
-		mv.addObject("dicTypeList", dictionariesService.listSubDictByParentId("0"));
+		List<Dictionaries> listDict=dictionariesService.getDictTypes();
+		Dictionaries dictDepartment=new Dictionaries();
+		dictDepartment.setDICT_CODE("oa_department");
+		dictDepartment.setNAME("组织机构字典");
+		listDict.add(dictDepartment);
+		Dictionaries dictSysUser=new Dictionaries();
+		dictSysUser.setDICT_CODE("sys_user");
+		dictSysUser.setNAME("系统用户字典");
+		listDict.add(dictSysUser);
+		mv.addObject("dicTypeList", listDict);
 		return mv;
 	}
 
