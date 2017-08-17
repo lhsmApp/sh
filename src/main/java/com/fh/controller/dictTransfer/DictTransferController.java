@@ -73,12 +73,12 @@ public class DictTransferController extends BaseController {
 		// 此处放当前页面初始化时用到的一些数据，例如搜索的下拉列表数据，所需的字典数据、权限数据等等。
 		List<Dictionaries> listDict=dictionariesService.getDictTypes();
 		Dictionaries dictDepartment=new Dictionaries();
-		dictDepartment.setDICT_CODE("ZZJG");
-		dictDepartment.setNAME("组织机构");
+		dictDepartment.setDICT_CODE("oa_department");
+		dictDepartment.setNAME("组织机构字典");
 		listDict.add(dictDepartment);
 		Dictionaries dictSysUser=new Dictionaries();
-		dictSysUser.setDICT_CODE("XTYH");
-		dictSysUser.setNAME("系统用户");
+		dictSysUser.setDICT_CODE("sys_user");
+		dictSysUser.setNAME("系统用户字典");
 		listDict.add(dictSysUser);
 		mv.addObject("dicTypeList", listDict);
 		return mv;
