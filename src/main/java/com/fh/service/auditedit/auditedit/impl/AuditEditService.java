@@ -95,14 +95,5 @@ public class AuditEditService implements AuditEditManager{
 		return (List<PageData>)dao.findForList("AuditEditMapper.exportModel", page);
 	}
 
-	/**获取员工编码 相当于字典
-	 * @param 
-	 * @throws Exception
-	 */
-	@SuppressWarnings("unchecked")
-	public List<String> getHaveUserCodeDic(PageData pd)throws Exception{
-		return (List<String>)dao.findForList("AuditEditMapper.getHaveUserCodeDic", pd);
-	}
-
 }
 

@@ -578,7 +578,7 @@
 			console.log($("#RPT_DEPT").val());
 			var RPT_DEPT = $("#RPT_DEPT").val();
 			$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据
-				url:'<%=basePath%>socialincsummy/getPageList.do?DepartCode='+RPT_DEPT,  
+				url:'<%=basePath%>socialincsummy/getPageList.do?DEPT_CODE='+RPT_DEPT,  
 				datatype:'json',
 			      page:1
 			}).trigger("reloadGrid");

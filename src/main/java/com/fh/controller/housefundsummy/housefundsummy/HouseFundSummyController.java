@@ -22,6 +22,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
 import com.fh.controller.common.BillCodeUtil;
 import com.fh.controller.common.DictsUtil;
+import com.fh.controller.common.QueryFeildString;
 import com.fh.controller.common.TmplUtil;
 import com.fh.entity.CommonBase;
 import com.fh.entity.JqPage;
@@ -114,7 +115,10 @@ public class HouseFundSummyController extends BaseController {
 	Map<String, TableColumns> map_HaveColumnsList = new HashMap<String, TableColumns>();
 	// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 	Map<String, TmplConfigDetail> map_SetColumnsList = new HashMap<String, TmplConfigDetail>();
-	
+
+	//界面查询字段
+    List<String> QueryFeildList = Arrays.asList("DEPT_CODE");
+
 	/**列表
 	 * @param page
 	 * @throws Exception
@@ -161,10 +165,10 @@ public class HouseFundSummyController extends BaseController {
 		if(null != filters && !"".equals(filters)){
 			pd.put("filterWhereResult", SqlTools.constructWhere(filters,null));
 		}
-		//
-		String DepartCode = pd.getString("DepartCode");	
-		if(null != DepartCode && !"".equals(DepartCode)){
-			pd.put("DepartCode", DepartCode.trim());
+
+		String QueryFeild = QueryFeildString.getQueryFeild(pd, QueryFeildList);;
+		if(QueryFeild!=null && !QueryFeild.equals("")){
+			pd.put("QueryFeild", QueryFeild);
 		}
 		//页面显示数据的年月
 		pd.put("SystemDateTime", SystemDateTime);

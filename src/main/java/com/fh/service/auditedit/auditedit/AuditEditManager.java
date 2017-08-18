@@ -68,13 +68,5 @@ public interface AuditEditManager{
 	 */
 	public void batchImport(List<PageData> listData)throws Exception;
 
-	/**获取员工编码 相当于字典
-	 * 张晓柳
-	 * @param 
-	 * @throws Exception
-	 */
-	public List<String> getHaveUserCodeDic(PageData pd)throws Exception;
-	
-	
 }
 

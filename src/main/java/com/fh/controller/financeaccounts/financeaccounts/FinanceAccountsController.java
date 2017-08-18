@@ -163,9 +163,6 @@ public class FinanceAccountsController extends BaseController {
 		pd.put("SelectFeild", auditeSelectFeild);
 		//表名
 		pd.put("TableName", auditeTableName);
-		//上报
-		String auditeReport = " and (BUSI_DATE, DEPT_CODE) in (select RPT_DUR, RPT_DEPT from tb_sys_sealed_info where STATE = '" + DurState.Sealed.getNameKey() + "' and BILL_TYPE = '" + getAuditeTypeCode(which) + "' ) ";
-		pd.put("CheckReport", auditeReport);
 		page.setPd(pd);
 		List<PageData> auditeSummayList = financeaccountsService.JqPage(page);
 		
@@ -435,21 +432,6 @@ public class FinanceAccountsController extends BaseController {
 			tableCode = "tb_house_fund_summy";
 		}
 		return tableCode;
-	}
-	private String getAuditeTypeCode(String which) {
-		String typeCode = "";
-		if (which != null && which.equals("1")) {
-			typeCode = BillType.SALLARY_AUDIT.getNameKey();
-		} else if (which != null && which.equals("2")) {
-			typeCode = BillType.SALLARY_AUDIT.getNameKey();
-		} else if (which != null && which.equals("3")) {
-			typeCode = BillType.SALLARY_AUDIT.getNameKey();
-		} else if (which != null && which.equals("4")) {
-			typeCode = BillType.SECURITY_AUDIT.getNameKey();
-		} else if (which != null && which.equals("5")) {
-			typeCode = BillType.GOLD_AUDIT.getNameKey();
-		}
-		return typeCode;
 	}
 	private String getDetailTypeCode(String which) {
 		String typeCode = "";

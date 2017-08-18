@@ -66,14 +66,26 @@
 									<div class="widget-main">
 										<form class="form-inline">
 											<span>
-												<select class="chosen-select form-control" 
-													name="UserCode" id="UserCode"
-													data-placeholder="请选择员工编号"
+												<select class="chosen-select form-control"
+													name="USER_GROP" id="USER_GROP"
+													data-placeholder="请选择员工组"
 													style="vertical-align: top; height:32px;width: 150px;">
-													<option value="">全部</option>
-													<c:forEach items="${userCodeList}" var="usercode">
-														<option value="${usercode}"
-															<c:if test="${pd.UserCode==usercode}">selected</c:if>>${usercode}</option>
+													<option value="">请选择员工组</option>
+													<c:forEach items="${EMPLGRP}" var="each">
+														<option value="${each.DICT_CODE}" 
+														    <c:if test="${pd.USER_GROP==each.DICT_CODE}">selected</c:if>>${each.NAME}</option>
+													</c:forEach>
+												</select>
+											</span>
+											<span>
+												<select class="chosen-select form-control"
+													name="CUST_COL7" id="CUST_COL7"
+													data-placeholder="请选择帐套"
+													style="vertical-align: top; height:32px;width: 150px;">
+													<option value="">请选择帐套</option>
+													<c:forEach items="${FMISACC}" var="each">
+														<option value="${each.DICT_CODE}" 
+														    <c:if test="${pd.CUST_COL7==each.DICT_CODE}">selected</c:if>>${each.NAME}</option>
 													</c:forEach>
 												</select>
 											</span>
@@ -215,7 +227,9 @@
 	    });
 		
 		$(gridBase_selector).jqGrid({
-			url: '<%=basePath%>staffdetail/getPageList.do',
+			url: '<%=basePath%>staffdetail/getPageList.do?'
+	            +'USER_GROP='+$("#USER_GROP").val()
+	            +'&CUST_COL7='+$("#CUST_COL7").val(),
 			datatype: "json",
 			colModel: jqGridColModel,
 			//caption: '当前期间：' + SystemDateTime + '， 当前单位：' + DepartName + '',
@@ -689,7 +703,9 @@
 	function tosearch() {
 		var UserCode = $("#UserCode").val();
 		$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据
-			url:'<%=basePath%>staffdetail/getPageList.do?UserCode='+UserCode,  
+			url:'<%=basePath%>staffdetail/getPageList.do?'
+	            +'USER_GROP='+$("#USER_GROP").val()
+	            +'&CUST_COL7='+$("#CUST_COL7").val(),  
 			datatype:'json',
 		      page:1
 		}).trigger("reloadGrid");

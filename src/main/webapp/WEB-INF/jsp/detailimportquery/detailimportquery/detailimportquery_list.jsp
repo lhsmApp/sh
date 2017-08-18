@@ -107,7 +107,7 @@
 													name="USER_CATG" id="USER_CATG"
 													data-placeholder="请选择特定员工分类"
 													style="vertical-align: top; height:32px;width: 150px;">
-													<option value="">全部</option>
+													<option value="">请选择特定员工分类</option>
 													<c:forEach items="${PARTUSERTYPE}" var="each">
 														<option value="${each.DICT_CODE}" 
 														    <c:if test="${pd.USER_CATG==each.DICT_CODE}">selected</c:if>>${each.NAME}</option>
@@ -119,7 +119,7 @@
 													name="USER_GROP" id="USER_GROP"
 													data-placeholder="请选择员工组"
 													style="vertical-align: top; height:32px;width: 150px;">
-													<option value="">全部</option>
+													<option value="">请选择员工组</option>
 													<c:forEach items="${EMPLGRP}" var="each">
 														<option value="${each.DICT_CODE}" 
 														    <c:if test="${pd.USER_GROP==each.DICT_CODE}">selected</c:if>>${each.NAME}</option>
@@ -131,7 +131,7 @@
 													name="CUST_COL7" id="CUST_COL7"
 													data-placeholder="请选择帐套"
 													style="vertical-align: top; height:32px;width: 150px;">
-													<option value="">全部</option>
+													<option value="">请选择帐套</option>
 													<c:forEach items="${FMISACC}" var="each">
 														<option value="${each.DICT_CODE}" 
 														    <c:if test="${pd.CUST_COL7==each.DICT_CODE}">selected</c:if>>${each.NAME}</option>

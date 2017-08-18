@@ -3,6 +3,7 @@ package com.fh.controller.detailimportquery.detailimportquery;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
 import com.fh.controller.common.DictsUtil;
+import com.fh.controller.common.QueryFeildString;
 import com.fh.controller.common.TmplUtil;
 import com.fh.entity.JqPage;
 import com.fh.entity.Page;
@@ -78,6 +80,8 @@ public class DetailImportQueryController extends BaseController {
 	Map<String, TableColumns> map_HaveColumnsList = new LinkedHashMap<String, TableColumns>();
 	// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 	Map<String, TmplConfigDetail> map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
+	//界面查询字段
+    List<String> QueryFeildList = Arrays.asList("BUSI_DATE", "DEPT_CODE", "USER_CATG", "USER_GROP", "CUST_COL7");
 
 	/**列表
 	 * @param page
@@ -149,7 +153,7 @@ public class DetailImportQueryController extends BaseController {
 			//工资分的类型
 			pd.put("SallaryType", sallaryType);
 		}
-		String QueryFeild = getQueryFeild(pd);
+		String QueryFeild = QueryFeildString.getQueryFeild(pd, QueryFeildList);
 		if(QueryFeild!=null && !QueryFeild.equals("")){
 			pd.put("QueryFeild", QueryFeild);
 		}
@@ -171,60 +175,6 @@ public class DetailImportQueryController extends BaseController {
 		result.setUserdata(userdata);
 		
 		return result;
-	}
-	
-	private String getQueryFeild(PageData pd){
-		//"BUSI_DATE", "DEPT_CODE", "USER_CATG", "USER_GROP", "CUST_COL7"
-		String BUSI_DATE = pd.getString("BUSI_DATE");
-		String DEPT_CODE = pd.getString("DEPT_CODE");
-		String USER_CATG = pd.getString("USER_CATG");
-		String USER_GROP = pd.getString("USER_GROP");
-		String CUST_COL7 = pd.getString("CUST_COL7");
-		String QueryFeild = "";
-		if(BUSI_DATE!=null && !BUSI_DATE.equals("")){
-			QueryFeild += " and BUSI_DATE like '%" + BUSI_DATE.trim() + "%' ";
-		}
-		if(DEPT_CODE!=null && !DEPT_CODE.equals("")){
-			String[] list = DEPT_CODE.replace(" ", "").split(",");
-			String strIn = "";
-			for(String str : list){
-				strIn += "'" + str +"'";
-			}
-			if(strIn!=null && !strIn.equals("")){
-				QueryFeild += " and DEPT_CODE in (" + strIn + ") ";
-			}
-		}
-		if(USER_CATG!=null && !USER_CATG.equals("")){
-			String[] list = USER_CATG.replace(" ", "").split(",");
-			String strIn = "";
-			for(String str : list){
-				strIn += "'" + str +"'";
-			}
-			if(strIn!=null && !strIn.equals("")){
-				QueryFeild += " and USER_CATG in (" + strIn + ") ";
-			}
-		}
-		if(USER_GROP!=null && !USER_GROP.equals("")){
-			String[] list = USER_GROP.replace(" ", "").split(",");
-			String strIn = "";
-			for(String str : list){
-				strIn += "'" + str +"'";
-			}
-			if(strIn!=null && !strIn.equals("")){
-				QueryFeild += " and USER_GROP in (" + strIn + ") ";
-			}
-		}
-		if(CUST_COL7!=null && !CUST_COL7.equals("")){
-			String[] list = CUST_COL7.replace(" ", "").split(",");
-			String strIn = "";
-			for(String str : list){
-				strIn += "'" + str +"'";
-			}
-			if(strIn!=null && !strIn.equals("")){
-				QueryFeild += " and CUST_COL7 in (" + strIn + ") ";
-			}
-		}
-		return QueryFeild;
 	}
 
 	private String getWhileValue(String value){
@@ -294,7 +244,7 @@ public class DetailImportQueryController extends BaseController {
 			//工资分的类型
 			pd.put("SallaryType", sallaryType);
 		}
-		String QueryFeild = getQueryFeild(pd);
+		String QueryFeild = QueryFeildString.getQueryFeild(pd, QueryFeildList);
 		if(QueryFeild!=null && !QueryFeild.equals("")){
 			pd.put("QueryFeild", QueryFeild);
 		}

@@ -3,6 +3,7 @@ package com.fh.controller.socialIncDetail.socialincdetail;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
+import com.fh.controller.common.DictsUtil;
+import com.fh.controller.common.QueryFeildString;
 import com.fh.controller.common.TmplUtil;
 import com.fh.entity.CommonBase;
 import com.fh.entity.JqPage;
@@ -130,8 +133,11 @@ public class SocialIncDetailController extends BaseController {
 			State = DurState.Release.getNameKey();
 		}
 		mv.addObject("State", State.equals(DurState.Release.getNameKey())? true:false);// 枚举  1封存,0解封
-		List<String> userCodeList = socialincdetailService.getHaveUserCodeDic(pd);
-		mv.addObject("userCodeList", userCodeList);
+
+		//USER_GROP EMPLGRP 员工组字典
+		mv.addObject("EMPLGRP", DictsUtil.getDictsByParentCode(dictionariesService, "EMPLGRP"));
+		//CUST_COL7 FMISACC 帐套字典
+		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
 		String jqGridColModel = tmpl.generateStructure(TableName, DepartCode, 3);
@@ -152,6 +158,9 @@ public class SocialIncDetailController extends BaseController {
 		return mv;
 	}
 	
+	//界面查询字段
+    List<String> QueryFeildList = Arrays.asList("USER_GROP", "CUST_COL7");
+
 	/**列表
 	 * @param page
 	 * @throws Exception
@@ -161,10 +170,10 @@ public class SocialIncDetailController extends BaseController {
 		logBefore(logger, Jurisdiction.getUsername()+"列表SocialIncDetail");
 		PageData pd = new PageData();
 		pd = this.getPageData();
-		//
-		String UserCode = pd.getString("UserCode");	
-		if(null != UserCode && !"".equals(UserCode)){
-			pd.put("UserCode", UserCode.trim());
+
+		String QueryFeild = QueryFeildString.getQueryFeild(pd, QueryFeildList);;
+		if(QueryFeild!=null && !QueryFeild.equals("")){
+			pd.put("QueryFeild", QueryFeild);
 		}
 		//多条件过滤条件
 		String filters = pd.getString("filters");

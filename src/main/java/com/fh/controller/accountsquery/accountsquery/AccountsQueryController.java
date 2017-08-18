@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
 import com.fh.controller.common.DictsUtil;
+import com.fh.controller.common.QueryFeildString;
 import com.fh.controller.common.TmplUtil;
 import com.fh.entity.CommonBase;
 import com.fh.entity.JqPage;
@@ -133,7 +134,10 @@ public class AccountsQueryController extends BaseController {
 			pd.put("filterWhereResult", SqlTools.constructWhere(filters,null));
 		}
 		//显示查询
-		pd.put("QueryFeild", getQueryFeild(pd));
+		String QueryFeild = QueryFeildString.getQueryFeild(pd, QueryFeildList);
+		if(QueryFeild!=null && !QueryFeild.equals("")){
+			pd.put("QueryFeild", QueryFeild);
+		}
 		if(sallaryType!=null && !sallaryType.trim().equals("")){
 			//工资分的类型
 			pd.put("SallaryType", sallaryType);
@@ -163,8 +167,8 @@ public class AccountsQueryController extends BaseController {
 		//表名
 		pd.put("TableName", auditeTableName);
 		//上报
-		String auditeReport = " and (BUSI_DATE, DEPT_CODE) in (select RPT_DUR, RPT_DEPT from tb_sys_sealed_info where STATE = '" + DurState.Sealed.getNameKey() + "' and BILL_TYPE = '" + getAuditeTypeCode(which) + "' ) ";
-		pd.put("CheckReport", auditeReport);
+		//String auditeReport = " and (BUSI_DATE, DEPT_CODE) in (select RPT_DUR, RPT_DEPT from tb_sys_sealed_info where STATE = '" + DurState.Sealed.getNameKey() + "' and BILL_TYPE = '" + getAuditeTypeCode(which) + "' ) ";
+		//pd.put("CheckReport", auditeReport);
 		page.setPd(pd);
 		List<PageData> auditeSummayList = accountsqueryService.JqPage(page);
 		
@@ -180,26 +184,8 @@ public class AccountsQueryController extends BaseController {
 		return result;
 	}
 	
-	private String getQueryFeild(PageData pd){
-		String BUSI_DATE = pd.getString("BUSI_DATE");
-		String DEPT_CODE = pd.getString("DEPT_CODE");
-		String QueryFeild = "";
-		if(BUSI_DATE!=null && !BUSI_DATE.equals("")){
-			QueryFeild += " and BUSI_DATE like '%" + BUSI_DATE.trim() + "%' ";
-		}
-		if(DEPT_CODE!=null && !DEPT_CODE.equals("")){
-			String[] list = DEPT_CODE.replace(" ", "").split(",");
-			String strIn = "";
-			for(String str : list){
-				strIn += "'" + str +"'";
-			}
-			if(strIn!=null && !strIn.equals("")){
-				QueryFeild += " and DEPT_CODE in (" + strIn + ") ";
-			}
-		}
-		return QueryFeild;
-	}
-
+	//界面查询字段
+    List<String> QueryFeildList = Arrays.asList("BUSI_DATE", "DEPT_CODE");
 
 	/**明细显示结构
 	 * @param
@@ -455,21 +441,7 @@ public class AccountsQueryController extends BaseController {
 		}
 		return tableCode;
 	}
-	private String getAuditeTypeCode(String which) {
-		String typeCode = "";
-		if (which != null && which.equals("1")) {
-			typeCode = BillType.SALLARY_AUDIT.getNameKey();
-		} else if (which != null && which.equals("2")) {
-			typeCode = BillType.SALLARY_AUDIT.getNameKey();
-		} else if (which != null && which.equals("3")) {
-			typeCode = BillType.SALLARY_AUDIT.getNameKey();
-		} else if (which != null && which.equals("4")) {
-			typeCode = BillType.SECURITY_AUDIT.getNameKey();
-		} else if (which != null && which.equals("5")) {
-			typeCode = BillType.GOLD_AUDIT.getNameKey();
-		}
-		return typeCode;
-	}
+	
 	private String getDetailTypeCode(String which) {
 		String typeCode = "";
 		if (which != null && which.equals("1")) {

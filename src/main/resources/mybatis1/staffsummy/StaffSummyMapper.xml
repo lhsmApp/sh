@@ -37,9 +37,9 @@
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
-		<if test="pd.DepartCode!= null and pd.DepartCode != ''"><!-- 关键词检索 -->
-		    and DEPT_CODE in (${pd.DepartCode})
-		</if>
+		    <if test="pd.QueryFeild!= null and pd.QueryFeild != ''">
+		        ${pd.QueryFeild}
+		    </if>
 		<if test="sidx != null and sidx.trim() != ''" >
 			order by ${sidx} ${sord} 
     	</if>
@@ -53,9 +53,9 @@
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
-		<if test="pd.DepartCode!= null and pd.DepartCode != ''"><!-- 关键词检索 -->
-		    and DEPT_CODE in (${pd.DepartCode})
-		</if>
+		    <if test="pd.QueryFeild!= null and pd.QueryFeild != ''">
+		        ${pd.QueryFeild}
+		    </if>
 	</select>
 	<select id="getFooterSummary" parameterType="jqPage" resultType="pd">
 		select ${pd.Userdata} 
@@ -64,9 +64,9 @@
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
-		<if test="pd.DepartCode!= null and pd.DepartCode != ''"><!-- 关键词检索 -->
-		    and DEPT_CODE in (${pd.DepartCode})
-		</if>
+		    <if test="pd.QueryFeild!= null and pd.QueryFeild != ''">
+		        ${pd.QueryFeild}
+		    </if>
 	</select>
 	
 	<!-- 删除数据 -->

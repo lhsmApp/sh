@@ -460,6 +460,22 @@
 				    }
 				});
 	
+	//检索
+	function tosearch() {
+		$(gridDetail_selector).GridUnload();
+		console.log("tosearch");
+		console.log(which);
+		console.log($("#BUSI_DATE").val());
+		console.log($("#DEPT_CODE").val());
+		$(gridBase_selector).setGridParam({  // 重新加载数据 
+			url:'<%=basePath%>accountsquery/getPageList.do?TABLE_CODE='+which
+			    +'&BUSI_DATE='+$("#BUSI_DATE").val()
+			    +'&DEPT_CODE='+$("#DEPT_CODE").val(),  
+			datatype:'json',
+		      page:1
+		}).trigger("reloadGrid");
+	}  
+	
 	//加载单位树
 	function initComplete(){
 		//下拉树
@@ -475,18 +491,5 @@
 		$("#selectTree").render();
 		$("#selectTree2_input").val("请选择");
 	}
-	
-	//检索
-	function tosearch() {
-		var BUSI_DATE = $("#BUSI_DATE").val(); 
-		var DEPT_CODE = $("#DEPT_CODE").val(); 
-		$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据 
-			url:'<%=basePath%>accountsquery/getPageList.do?TABLE_CODE='+which
-			    +'&BUSI_DATE='+BUSI_DATE
-			    +'&DEPT_CODE='+DEPT_CODE,  
-			datatype:'json',
-		      page:1
-		}).trigger("reloadGrid");
-	}  
 </script>
 </html>

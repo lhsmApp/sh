@@ -3,6 +3,7 @@ package com.fh.controller.auditedit.auditedit;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,24 +19,19 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
+import com.fh.controller.common.DictsUtil;
+import com.fh.controller.common.QueryFeildString;
 import com.fh.controller.common.TmplUtil;
 import com.fh.entity.CommonBase;
 import com.fh.entity.JqPage;
 import com.fh.entity.Page;
 import com.fh.entity.PageResult;
-import com.fh.entity.SysSealed;
 import com.fh.entity.TableColumns;
 import com.fh.entity.TmplConfigDetail;
-import com.fh.entity.system.User;
 import com.fh.exception.CustomException;
-import com.fh.util.Const;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
 import com.fh.util.SqlTools;
-import com.fh.util.date.DateFormatUtils;
-import com.fh.util.date.DateUtils;
-import com.fh.util.enums.BillType;
-import com.fh.util.enums.DurState;
 import com.fh.util.enums.SysConfigKeyCode;
 import com.fh.util.excel.LeadingInExcelToPageData;
 
@@ -84,8 +80,10 @@ public class AuditEditController extends BaseController {
 
 	//页面显示数据的年月
 	String SystemDateTime = "";
+	// 设置必定不用编辑的列
+	List<String> MustNotEditList = Arrays.asList("BILL_CODE", "BUSI_DATE");
 	//页面显示数据的二级单位
-	String DepartCode = "";
+	String DepartCode = "01001";
 	//底行显示的求和与平均值字段
 	StringBuilder SqlUserdata = new StringBuilder();
 	//字典
@@ -104,7 +102,6 @@ public class AuditEditController extends BaseController {
 		logBefore(logger, Jurisdiction.getUsername()+"列表AuditEdit");
 		PageData pd = this.getPageData();
 		String which = getWhileValue(pd.getString("TABLE_CODE"));
-		String typeCode = getTypeCode(which);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 		String tableName = getTableCode(which);
 		String sallaryType = getSallaryType(which);
 		
@@ -112,21 +109,6 @@ public class AuditEditController extends BaseController {
 		mv.setViewName("auditedit/auditedit/auditedit_list");
 		//当前期间,取自tb_system_config的SystemDateTime字段
 		SystemDateTime = sysConfigManager.currentSection(pd);
-		//mv.addObject("SystemDateTime", SystemDateTime);
-		//当前登录人所在二级单位
-		DepartCode = Jurisdiction.getCurrentDepartmentID();//
-		//User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
-		//String DepartName = user.getDEPARTMENT_NAME();
-		//mv.addObject("DepartName", DepartName);
-		//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
-		pd.put("RPT_DEPT", DepartCode);
-		pd.put("RPT_DUR", SystemDateTime);
-		pd.put("BILL_TYPE", typeCode);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
-		String State = syssealedinfoService.getState(pd);
-		if(!(State != null && !State.equals(""))){
-			State = DurState.Release.getNameKey();
-		}
-		mv.addObject("State", State.equals(DurState.Release.getNameKey())? true:false);// 枚举  1封存,0解封
 		//while
 		pd.put("which", which);
 		mv.addObject("pd", pd);
@@ -136,10 +118,17 @@ public class AuditEditController extends BaseController {
 			//工资分的类型
 			pd.put("SallaryType", sallaryType);
 		}
-		List<String> userCodeList = auditeditService.getHaveUserCodeDic(pd);
-		mv.addObject("userCodeList", userCodeList);
+		//DEPT_CODE
+		mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService));
+		//USER_GROP EMPLGRP 员工组字典
+		mv.addObject("EMPLGRP", DictsUtil.getDictsByParentCode(dictionariesService, "EMPLGRP"));
+		//CUST_COL7 FMISACC 帐套字典
+		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));
 		
+		//当前登录人所在二级单位
+		//String DepartCode = Jurisdiction.getCurrentDepartmentID();
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
+		tmpl.setMustNotEditList(MustNotEditList);
 		String jqGridColModel = tmpl.generateStructure(tableName, DepartCode, 3);
 		
 		SqlUserdata = tmpl.getSqlUserdata();
@@ -166,11 +155,10 @@ public class AuditEditController extends BaseController {
 		String which = getWhileValue(pd.getString("TABLE_CODE"));
 		String tableName = getTableCode(which);
 		String sallaryType = getSallaryType(which);
-		
-		//
-		String UserCode = pd.getString("UserCode");	
-		if(null != UserCode && !"".equals(UserCode)){
-			pd.put("UserCode", UserCode.trim());
+
+		String QueryFeild = QueryFeildString.getQueryFeild(pd, QueryFeildList);
+		if(QueryFeild!=null && !QueryFeild.equals("")){
+			pd.put("QueryFeild", QueryFeild);
 		}
 		//多条件过滤条件
 		String filters = pd.getString("filters");
@@ -179,8 +167,6 @@ public class AuditEditController extends BaseController {
 		}
 		//页面显示数据的年月
 		pd.put("SystemDateTime", SystemDateTime);
-		//页面显示数据的二级单位
-		pd.put("DepartCode", DepartCode);
 		//表名
 		pd.put("TableName", tableName);
 		if(sallaryType!=null && !sallaryType.trim().equals("")){
@@ -207,6 +193,9 @@ public class AuditEditController extends BaseController {
 		return result;
 	}
 	
+	//界面查询字段
+    List<String> QueryFeildList = Arrays.asList("DEPT_CODE", "USER_GROP", "CUST_COL7");
+
 	/**修改
 	 * @param
 	 * @throws Exception
@@ -219,24 +208,13 @@ public class AuditEditController extends BaseController {
 		
 		PageData pd = this.getPageData();
 		String which = getWhileValue(pd.getString("TABLE_CODE"));
-		String typeCode = getTypeCode(which);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 		String tableName = getTableCode(which);
 		
-		String checkState = CheckState(pd, typeCode);
-		if(checkState!=null && !checkState.trim().equals("")){
-			commonBase.setCode(2);
-			commonBase.setMessage(checkState);
-		} else {
 			String BUSI_DATE = "BUSI_DATE";
-			String DEPT_CODE = "DEPT_CODE";
 			if(pd.containsKey(BUSI_DATE)){
 				pd.remove(BUSI_DATE);
 			}
 			pd.put(BUSI_DATE, SystemDateTime);
-			if(pd.containsKey(DEPT_CODE)){
-				pd.remove(DEPT_CODE);
-			}
-			pd.put(DEPT_CODE, DepartCode);
 			TmplUtil.setModelDefault(pd, map_HaveColumnsList);
 			//表名
 			pd.put("TableName", tableName);
@@ -255,7 +233,6 @@ public class AuditEditController extends BaseController {
                 auditeditService.deleteUpdateAll(listData);
 				commonBase.setCode(0);
 			}
-		}
 		return commonBase;
 	}
 	
@@ -272,21 +249,14 @@ public class AuditEditController extends BaseController {
 
 		PageData pd = this.getPageData();
 		String which = getWhileValue(pd.getString("TABLE_CODE"));
-		String typeCode = getTypeCode(which);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 		String tableName = getTableCode(which);
 		
-		String checkState = CheckState(pd, typeCode);
-		if(checkState!=null && !checkState.trim().equals("")){
-			commonBase.setCode(2);
-			commonBase.setMessage(checkState);
-		} else {
 			Object DATA_ROWS = pd.get("DATA_ROWS");
 			String json = DATA_ROWS.toString();  
 	        JSONArray array = JSONArray.fromObject(json);  
 	        List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);
 	        for(PageData item : listData){
 	        	item.put("BUSI_DATE", SystemDateTime);
-	        	item.put("DEPT_CODE", DepartCode);
 				TmplUtil.setModelDefault(item, map_HaveColumnsList);
 				//表名
 				item.put("TableName", tableName);
@@ -304,7 +274,6 @@ public class AuditEditController extends BaseController {
 					commonBase.setCode(0);
 				}
 			}
-		}
 		return commonBase;
 	}
 	
@@ -321,14 +290,9 @@ public class AuditEditController extends BaseController {
 		
 		PageData pd = this.getPageData();
 		String which = getWhileValue(pd.getString("TABLE_CODE"));
-		String typeCode = getTypeCode(which);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 		String tableName = getTableCode(which);
 		
-		String checkState = CheckState(pd, typeCode);
-		if(checkState!=null && !checkState.trim().equals("")){
-			commonBase.setCode(2);
-			commonBase.setMessage(checkState);
-		} else {
+		
 			Object DATA_ROWS = pd.get("DATA_ROWS");
 			String json = DATA_ROWS.toString();  
 	        JSONArray array = JSONArray.fromObject(json);  
@@ -344,7 +308,6 @@ public class AuditEditController extends BaseController {
 				auditeditService.deleteAll(pdDeleteAll);
 				commonBase.setCode(0);
 			}
-		}
 		return commonBase;
 	}
 	
@@ -379,19 +342,12 @@ public class AuditEditController extends BaseController {
 
 		PageData pd = this.getPageData();
 		String which = getWhileValue(pd.getString("TABLE_CODE"));
-		String typeCode = getTypeCode(which);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 		String tableName = getTableCode(which);
 		//String sallaryType = getSallaryType(which);
 		
-		String checkState = CheckState(pd, typeCode);
-		if(checkState!=null && !checkState.trim().equals("")){
-			commonBase.setCode(2);
-			commonBase.setMessage(checkState);
-		} else {
-			if(!(SystemDateTime!=null && !SystemDateTime.trim().equals("")
-					&& DepartCode!=null && !DepartCode.trim().equals(""))){
+			if(!(SystemDateTime!=null && !SystemDateTime.trim().equals(""))){
 				commonBase.setCode(2);
-				commonBase.setMessage("当前区间和当前单位不能为空！");
+				commonBase.setMessage("当前区间不能为空！");
 			} else {
 				// 局部变量
 				LeadingInExcelToPageData<PageData> testExcel = null;
@@ -445,7 +401,6 @@ public class AuditEditController extends BaseController {
 						int listSize = uploadAndRead.size();
 						for(int i=0;i<listSize;i++){
 							String getBUSI_DATE = (String) uploadAndRead.get(i).get("BUSI_DATE");
-							String getDEPT_CODE = (String) uploadAndRead.get(i).get("DEPT_CODE");
 							String getUSER_CODE = (String) uploadAndRead.get(i).get("USER_CODE");
 							if(!(getBUSI_DATE!=null && !getBUSI_DATE.trim().equals(""))){
 								uploadAndRead.get(i).put("BUSI_DATE", SystemDateTime);
@@ -454,15 +409,6 @@ public class AuditEditController extends BaseController {
 							if(!SystemDateTime.equals(getBUSI_DATE)){
 								if(!sbRet.contains("导入区间和当前区间必须一致！")){
 									sbRet.add("导入区间和当前区间必须一致！");
-								}
-							}
-							if(!(getDEPT_CODE!=null && !getDEPT_CODE.trim().equals(""))){
-								uploadAndRead.get(i).put("DEPT_CODE", DepartCode);
-								getDEPT_CODE = DepartCode;
-							}
-							if(!DepartCode.equals(getDEPT_CODE)){
-								if(!sbRet.contains("导入单位和当前单位必须一致！")){
-									sbRet.add("导入单位和当前单位必须一致！");
 								}
 							}
 							if(!(getUSER_CODE!=null && !getUSER_CODE.trim().equals(""))){
@@ -480,7 +426,7 @@ public class AuditEditController extends BaseController {
 							}
 							String getESTB_DEPT = (String) uploadAndRead.get(i).get("ESTB_DEPT");
 							if(!(getESTB_DEPT!=null && !getESTB_DEPT.trim().equals(""))){
-								uploadAndRead.get(i).put("ESTB_DEPT", DepartCode);
+								uploadAndRead.get(i).put("ESTB_DEPT", Jurisdiction.getCurrentDepartmentID());
 							}
 							TmplUtil.setModelDefault(uploadAndRead.get(i), map_HaveColumnsList);
 							//表名
@@ -517,7 +463,6 @@ public class AuditEditController extends BaseController {
 						commonBase.setMessage("TranslateUtil");
 					}
 				}
-			}
 		}
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("common/uploadExcel");
@@ -540,8 +485,6 @@ public class AuditEditController extends BaseController {
 		String tableName = getTableCode(which);
 		String sallaryType = getSallaryType(which);
 		
-		//页面显示数据的二级单位
-		pd.put("DepartCode", DepartCode);
 		//表名
 		pd.put("TableName", tableName);
 		if(sallaryType!=null && !sallaryType.trim().equals("")){
@@ -569,8 +512,6 @@ public class AuditEditController extends BaseController {
 		
 		//页面显示数据的年月
 		pd.put("SystemDateTime", SystemDateTime);
-		//页面显示数据的二级单位
-		pd.put("DepartCode", DepartCode);
 		//表名
 		pd.put("TableName", tableName);
 		if(sallaryType!=null && !sallaryType.trim().equals("")){
@@ -625,43 +566,6 @@ public class AuditEditController extends BaseController {
 		return mv;
 	}
 	
-	 /**上报
-	 * @param
-	 * @throws Exception
-	 */
-	@RequestMapping(value="/report")
-	public @ResponseBody CommonBase report() throws Exception{
-		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "report")){return null;} //校验权限	
-		CommonBase commonBase = new CommonBase();
-		commonBase.setCode(-1);
-
-		PageData pd = this.getPageData();
-		String which = getWhileValue(pd.getString("TABLE_CODE"));
-		String typeCode = getTypeCode(which);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
-		
-		String checkState = CheckState(pd, typeCode);
-		if(checkState!=null && !checkState.trim().equals("")){
-			commonBase.setCode(2);
-			commonBase.setMessage(checkState);
-		} else {
-			User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
-			String userId = user.getUSER_ID();
-            String time = DateUtils.getCurrentTime(DateFormatUtils.DATE_FORMAT2);
-			
-			SysSealed item = new SysSealed();
-			item.setBILL_CODE(" ");
-			item.setRPT_DEPT(DepartCode);
-			item.setRPT_DUR(SystemDateTime);
-			item.setRPT_USER(userId);
-			item.setRPT_DATE(time);//YYYY-MM-DD HH:MM:SS
-			item.setBILL_TYPE(typeCode.toString());// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
-			item.setSTATE(DurState.Sealed.getNameKey());// 枚举  1封存,0解封
-			syssealedinfoService.report(item);
-			commonBase.setCode(0);
-		}
-		return commonBase;
-	}
-	
 	private String getWhileValue(String value){
         String which = DefaultWhile;
 		if(value != null && !value.trim().equals("")){
@@ -691,21 +595,6 @@ public class AuditEditController extends BaseController {
 		}
 		return tableCode;
 	}
-	private String getTypeCode(String which) {
-		String typeCode = "";
-		if (which != null && which.equals("1")) {
-			typeCode = BillType.SALLARY_AUDIT.getNameKey();
-		} else if (which != null && which.equals("2")) {
-			typeCode = BillType.SALLARY_AUDIT.getNameKey();
-		} else if (which != null && which.equals("3")) {
-			typeCode = BillType.SALLARY_AUDIT.getNameKey();
-		} else if (which != null && which.equals("4")) {
-			typeCode = BillType.SECURITY_AUDIT.getNameKey();
-		} else if (which != null && which.equals("5")) {
-			typeCode = BillType.GOLD_AUDIT.getNameKey();
-		}
-		return typeCode;
-	}
 	private String getSallaryType(String which) throws Exception {
 		String strKeyCode = "";
 		if (which != null && which.equals("1")) {
@@ -722,18 +611,6 @@ public class AuditEditController extends BaseController {
 			sallaryType = sysConfigManager.getSysConfigByKey(pd);
 		}
 		return sallaryType;
-	}
-	
-	private String CheckState(PageData pd, String typeCode) throws Exception{
-		String strRut = "当前期间已封存！";
-		pd.put("RPT_DEPT", DepartCode);
-		pd.put("RPT_DUR", SystemDateTime);
-		pd.put("BILL_TYPE", typeCode);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
-		String State = syssealedinfoService.getState(pd);
-		if(!DurState.Sealed.getNameKey().equals(State)){// 枚举  1封存,0解封
-			strRut = "";
-		}
-		return strRut;
 	}
 	
 	@InitBinder

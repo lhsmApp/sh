@@ -6,18 +6,6 @@
 	<!-- 字段 -->
 	<sql id="FieldSelectKey"> BUSI_DATE BUSI_DATE__, USER_CODE USER_CODE__</sql>
     
-	<!-- 获取员工编码 相当于字典-->
-	<!-- 张晓柳 -->
-	<select id="getHaveUserCodeDic" parameterType="pd" resultType="String">
-		select USER_CODE
-		from ${TableName}
-		where BUSI_DATE = '${RPT_DUR}'
-		and DEPT_CODE = '${RPT_DEPT}'
-		<if test="SallaryType!= null and SallaryType != ''">
-		    and ${SallaryType}
-		</if>
-	</select>
-	
 	<!-- 获取数据 验证数据重复 -->
 	<select id="findByModel" parameterType="pd" resultType="pd">
 		select * 
@@ -36,13 +24,12 @@
 		    <include refid="FieldSelectKey"></include>
 		from ${pd.TableName}
 		where BUSI_DATE = '${pd.SystemDateTime}'
-		and DEPT_CODE = '${pd.DepartCode}'
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
-		<if test="pd.UserCode!= null and pd.UserCode != ''"><!-- 关键词检索 -->
-		    and USER_CODE = '${pd.UserCode}'
-		</if>
+		    <if test="pd.QueryFeild!= null and pd.QueryFeild != ''">
+		        ${pd.QueryFeild}
+		    </if>
 		<if test="pd.SallaryType!= null and pd.SallaryType != ''">
 		    and ${pd.SallaryType}
 		</if>
@@ -57,13 +44,12 @@
 		select count(*) 
 		from ${pd.TableName}
 		where BUSI_DATE = '${pd.SystemDateTime}'
-		and DEPT_CODE = '${pd.DepartCode}'
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
-		<if test="pd.UserCode!= null and pd.UserCode != ''"><!-- 关键词检索 -->
-		    and USER_CODE = '${pd.UserCode}'
-		</if>
+		    <if test="pd.QueryFeild!= null and pd.QueryFeild != ''">
+		        ${pd.QueryFeild}
+		    </if>
 		<if test="pd.SallaryType!= null and pd.SallaryType != ''">
 		    and ${pd.SallaryType}
 		</if>
@@ -72,13 +58,12 @@
 		select ${pd.Userdata} 
 		from ${pd.TableName}
 		where BUSI_DATE = '${pd.SystemDateTime}'
-		and DEPT_CODE = '${pd.DepartCode}'
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
-		<if test="pd.UserCode!= null and pd.UserCode != ''"><!-- 关键词检索 -->
-		    and USER_CODE = '${pd.UserCode}'
-		</if>
+		    <if test="pd.QueryFeild!= null and pd.QueryFeild != ''">
+		        ${pd.QueryFeild}
+		    </if>
 		<if test="pd.SallaryType!= null and pd.SallaryType != ''">
 		    and ${pd.SallaryType}
 		</if>
@@ -121,7 +106,6 @@
 		select * 
 		from ${pd.TableName}
 		where BUSI_DATE = '${pd.SystemDateTime}'
-		and DEPT_CODE = '${pd.DepartCode}'
 		<if test="pd.SallaryType!= null and pd.SallaryType != ''">
 		    and ${pd.SallaryType}
 		</if>
@@ -133,10 +117,11 @@
 	<select id="exportModel" parameterType="jqPage" resultType="pd">
 		select * 
 		from ${pd.TableName}
-		where DEPT_CODE = '${pd.DepartCode}'
-		<if test="pd.SallaryType!= null and pd.SallaryType != ''">
-		    and ${pd.SallaryType}
-		</if>
+		<where>
+		    <if test="pd.SallaryType!= null and pd.SallaryType != ''">
+		        and ${pd.SallaryType}
+		    </if>
+		</where>
 		order by BUSI_DATE desc
 		limit 1
 	</select>

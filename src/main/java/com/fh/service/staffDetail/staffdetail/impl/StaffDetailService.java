@@ -96,15 +96,6 @@ public class StaffDetailService implements StaffDetailManager{
 		return (List<PageData>)dao.findForList("StaffDetailMapper.exportModel", DepartCode);
 	}
 
-	/**获取员工编码 相当于字典
-	 * @param 
-	 * @throws Exception
-	 */
-	@SuppressWarnings("unchecked")
-	public List<String> getHaveUserCodeDic(PageData pd)throws Exception{
-		return (List<String>)dao.findForList("StaffDetailMapper.getHaveUserCodeDic", pd);
-	}
-
 	
 	
 	

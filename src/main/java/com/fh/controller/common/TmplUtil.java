@@ -46,6 +46,11 @@ public class TmplUtil {
 	public StringBuilder getSqlUserdata() {
 		return m_sqlUserdata;
 	}
+	// 设置必定不用编辑的列
+	private List<String> MustNotEditList = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE");
+	public void setMustNotEditList(List<String> list){
+		MustNotEditList = list;
+	}
 
 	//// 表全部 默认值
 	//private Map<String, Object> m_defaultValueList = new LinkedHashMap<String, Object>();
@@ -525,9 +530,7 @@ public class TmplUtil {
 			Boolean editable = null;
 
 			// 设置必定不用编辑的列
-			if (col.getColumn_name().equals("BILL_CODE") 
-					|| col.getColumn_name().equals("BUSI_DATE")
-					|| col.getColumn_name().equals("DEPT_CODE")) {
+			if (MustNotEditList.contains(col.getColumn_name())) {
 				model_notedit.append(" editable: false ");
 				editable = false;
 			} else {
