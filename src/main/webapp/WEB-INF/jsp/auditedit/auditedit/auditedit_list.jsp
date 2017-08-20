@@ -4,7 +4,8 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%
 	String path = request.getContextPath();
-	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+	String basePath = request.getScheme() + "://" 
+	        + request.getServerName() + ":" + request.getServerPort()
 			+ path + "/";
 %>
 <!DOCTYPE html>
@@ -21,9 +22,20 @@
 	<!-- 最新版的Jqgrid Css，如果旧版本（Ace）某些方法不好用，尝试用此版本Css，替换旧版本Css -->
 	<!-- <link rel="stylesheet" type="text/css" media="screen" href="static/ace/css/ui.jqgrid-bootstrap.css" /> -->
 	
+<script type="text/javascript" src="static/js/jquery-1.7.2.js"></script>
+<!-- 树形下拉框start -->
+<script type="text/javascript" src="plugins/selectZtree/selectTree.js"></script>
+<script type="text/javascript" src="plugins/selectZtree/framework.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="plugins/selectZtree/import_fh.css" />
+<script type="text/javascript" src="plugins/selectZtree/ztree/ztree.js"></script>
+<link type="text/css" rel="stylesheet"
+	href="plugins/selectZtree/ztree/ztree.css"></link>
+<!-- 树形下拉框end -->
+
     <!-- 标准页面统一样式 -->
     <link rel="stylesheet" href="static/css/normal.css" />
-	
+
     <style>
 		.page-header{
 			padding-top: 9px;
@@ -46,7 +58,7 @@
 						<span style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
 								
 						<button id="btnQuery" class="btn btn-white btn-info btn-sm"
-								onclick="showQueryCondi($('#jqGridBase'),null,true)">
+								onclick="showQueryCondi($('#jqGrid'),null,true)">
 							<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
 						</button>
 						
@@ -82,6 +94,11 @@
 								<div class="widget-body">
 									<div class="widget-main">
 										<form class="form-inline">
+											<span class="pull-left" style="margin-right: 5px;">
+												<div class="selectTree" id="selectTree" multiMode="true"
+												    allSelectable="false" noGroup="false"></div>
+											    <input type="text" id="DEPT_CODE" hidden></input>
+											</span>
 											<span>
 												<select class="chosen-select form-control"
 													name="USER_GROP" id="USER_GROP"
@@ -154,10 +171,18 @@
 	<script src="static/ace/js/date-time/bootstrap-datepicker.js"></script>
 	<!--提示框-->
 	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
+	
+	<!-- 输入格式化 -->
+	<script src="static/ace/js/jquery.maskedinput.js"></script>
+	
 	<!-- JqGrid统一样式统一操作 -->
 	<script type="text/javascript" src="static/js/common/jqgrid_style.js"></script>
 	<!-- 上传控件 -->
 	<script src="static/ace/js/ace/elements.fileinput.js"></script>
+	
+	<script type="text/javascript" src="static/js/common/cusElement_style.js"></script>
+	<script type="text/javascript" src="static/js/util/toolkit.js"></script>
+	<script src="static/ace/js/ace/ace.widget-box.js"></script>
 	
 <script type="text/javascript"> 
     var gridBase_selector = "#jqGrid";  
@@ -203,7 +228,7 @@
 
 		$(gridBase_selector).jqGrid({
 			url: '<%=basePath%>auditedit/getPageList.do?TABLE_CODE='+which
-                //+'&DEPT_CODE='+$("#DEPT_CODE").val()
+                +'&DEPT_CODE='+$("#DEPT_CODE").val()
                 +'&USER_GROP='+$("#USER_GROP").val()
                 +'&CUST_COL7='+$("#CUST_COL7").val(),
 			datatype: "json",
@@ -373,7 +398,8 @@
                             console.log(rowid);  
                         },  
                         successfunc: function(response){
-							if(response.responseJSON.code==0){
+                            console.log(response);  
+							if(response.responseText=='{"code":0}'){
 								grid.trigger("reloadGrid");  
 								$(top.hangge());//关闭加载状态
 								$("#subTitle").tips({
@@ -390,12 +416,12 @@
 				            grid.jqGrid('editRow',lastSelection);
 							$(top.hangge());//关闭加载状态
 							if(response.statusText == "success"){
-								if(response.responseJSON.code != 0){
+								if(response.responseText != '{"code":0}'){
 							        grid.jqGrid('editRow',lastSelection);
 									$(top.hangge());//关闭加载状态
 									$("#subTitle").tips({
 										side:3,
-								        msg:'保存失败:'+response.responseJSON.message,
+								        msg:'保存失败:',//+response.responseJSON.message
 								        bg:'#cc0033',
 								        time:3
 								    });
@@ -403,7 +429,7 @@
 							} else {
 								$("#subTitle").tips({
 									side:3,
-						            msg:'保存出错:' + response.responseJSON.message,
+						            msg:'保存出错:',// + response.responseJSON.message
 						            bg:'#cc0033',
 						            time:3
 						        });
@@ -594,14 +620,36 @@
 	    function exportItems(){
 	    	window.location.href='<%=basePath%>auditedit/excel.do?TABLE_CODE='+which;
 	    }
-	});
+	}); 
+	
+	//加载单位树
+	function initComplete(){
+		//下拉树
+		var defaultNodes = {"treeNodes":${zTreeNodes}};
+		//绑定change事件
+		$("#selectTree").bind("change",function(){
+			console.log(1);
+			$("#DEPT_CODE").val("");
+			if($(this).attr("relValue")){
+				console.log(2);
+				$("#DEPT_CODE").val($(this).attr("relValue"));
+				console.log(3);
+		    }
+			console.log(4);
+		});
+		//赋给data属性
+		$("#selectTree").data("data",defaultNodes);  
+		$("#selectTree").render();
+		$("#selectTree2_input").val("请选择");
+	}
 	
 
 	//检索
 	function tosearch() {
+		console.log($("#DEPT_CODE").val());
 		$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据
 			url:'<%=basePath%>auditedit/getPageList.do?TABLE_CODE='+which
-                //+'&DEPT_CODE='+$("#DEPT_CODE").val()
+                +'&DEPT_CODE='+$("#DEPT_CODE").val()
                 +'&USER_GROP='+$("#USER_GROP").val()
                 +'&CUST_COL7='+$("#CUST_COL7").val(),  
 			datatype:'json',

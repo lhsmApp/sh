@@ -163,6 +163,8 @@ public class FinanceAccountsController extends BaseController {
 		pd.put("SelectFeild", auditeSelectFeild);
 		//表名
 		pd.put("TableName", auditeTableName);
+		//上报
+		pd.put("CheckReport", "");
 		page.setPd(pd);
 		List<PageData> auditeSummayList = financeaccountsService.JqPage(page);
 		

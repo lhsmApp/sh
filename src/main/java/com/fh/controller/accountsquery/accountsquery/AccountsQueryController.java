@@ -169,6 +169,7 @@ public class AccountsQueryController extends BaseController {
 		//上报
 		//String auditeReport = " and (BUSI_DATE, DEPT_CODE) in (select RPT_DUR, RPT_DEPT from tb_sys_sealed_info where STATE = '" + DurState.Sealed.getNameKey() + "' and BILL_TYPE = '" + getAuditeTypeCode(which) + "' ) ";
 		//pd.put("CheckReport", auditeReport);
+		pd.put("CheckReport", "");
 		page.setPd(pd);
 		List<PageData> auditeSummayList = accountsqueryService.JqPage(page);
 		

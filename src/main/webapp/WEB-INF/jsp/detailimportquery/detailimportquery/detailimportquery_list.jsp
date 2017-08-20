@@ -329,6 +329,7 @@
 		var defaultNodes = {"treeNodes":${zTreeNodes}};
 		//绑定change事件
 		$("#selectTree").bind("change",function(){
+			$("#DEPT_CODE").val("");
 			if($(this).attr("relValue")){
 				$("#DEPT_CODE").val($(this).attr("relValue"));
 		    }
