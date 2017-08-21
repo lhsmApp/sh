@@ -22,16 +22,16 @@
 	<!-- 最新版的Jqgrid Css，如果旧版本（Ace）某些方法不好用，尝试用此版本Css，替换旧版本Css -->
 	<!-- <link rel="stylesheet" type="text/css" media="screen" href="static/ace/css/ui.jqgrid-bootstrap.css" /> -->
 	
-<script type="text/javascript" src="static/js/jquery-1.7.2.js"></script>
-<!-- 树形下拉框start -->
-<script type="text/javascript" src="plugins/selectZtree/selectTree.js"></script>
-<script type="text/javascript" src="plugins/selectZtree/framework.js"></script>
-<link rel="stylesheet" type="text/css"
-	href="plugins/selectZtree/import_fh.css" />
-<script type="text/javascript" src="plugins/selectZtree/ztree/ztree.js"></script>
-<link type="text/css" rel="stylesheet"
-	href="plugins/selectZtree/ztree/ztree.css"></link>
-<!-- 树形下拉框end -->
+    <script type="text/javascript" src="static/js/jquery-1.7.2.js"></script>
+    <!-- 树形下拉框start -->
+    <script type="text/javascript" src="plugins/selectZtree/selectTree.js"></script>
+    <script type="text/javascript" src="plugins/selectZtree/framework.js"></script>
+    <link rel="stylesheet" type="text/css"
+	    href="plugins/selectZtree/import_fh.css" />
+    <script type="text/javascript" src="plugins/selectZtree/ztree/ztree.js"></script>
+    <link type="text/css" rel="stylesheet"
+    	href="plugins/selectZtree/ztree/ztree.css"></link>
+    <!-- 树形下拉框end -->
 
     <!-- 标准页面统一样式 -->
     <link rel="stylesheet" href="static/css/normal.css" />
@@ -287,7 +287,7 @@
 				closeAfterEdit: true,
 				recreateForm: true,
 				beforeShowForm :beforeEditOrAddCallback,
-	            afterSubmit: fn_addSubmit
+	            afterSubmit: fn_addSubmit_extend
 	        },
 	        {
 				//new record form
@@ -301,7 +301,7 @@
 			    onclickSubmit: function(params, posdata) {
 					console.log("onclickSubmit");
 	            } , 
-	            afterSubmit: fn_addSubmit
+	            afterSubmit: fn_addSubmit_extend
 	        },
 	        {
 				//delete record form
@@ -399,7 +399,9 @@
                         },  
                         successfunc: function(response){
                             console.log(response);  
-							if(response.responseText=='{"code":0}'){
+                            var responseJSON = JSON.parse(response.responseText);
+                            console.log(responseJSON);  
+							if(responseJSON.code == 0){
 								grid.trigger("reloadGrid");  
 								$(top.hangge());//关闭加载状态
 								$("#subTitle").tips({
@@ -413,15 +415,16 @@
 							}
                         },  
                         errorfunc: function(rowid, response){
+                            var responseJSON = JSON.parse(response.responseText);
 				            grid.jqGrid('editRow',lastSelection);
 							$(top.hangge());//关闭加载状态
 							if(response.statusText == "success"){
-								if(response.responseText != '{"code":0}'){
+								if(responseJSON.code != 0){
 							        grid.jqGrid('editRow',lastSelection);
 									$(top.hangge());//关闭加载状态
 									$("#subTitle").tips({
 										side:3,
-								        msg:'保存失败:',//+response.responseJSON.message
+								        msg:'保存失败:' + responseJSON.message,
 								        bg:'#cc0033',
 								        time:3
 								    });
@@ -429,7 +432,7 @@
 							} else {
 								$("#subTitle").tips({
 									side:3,
-						            msg:'保存出错:',// + response.responseJSON.message
+						            msg:'保存出错:' + responseJSON.message,
 						            bg:'#cc0033',
 						            time:3
 						        });
@@ -619,6 +622,36 @@
 		 */
 	    function exportItems(){
 	    	window.location.href='<%=basePath%>auditedit/excel.do?TABLE_CODE='+which;
+	    }
+
+	    /**
+	     * 增加成功
+	     * 
+	     * @param response
+	     * @param postdata
+	     * @returns
+	     */
+	    function fn_addSubmit_extend(response, postdata) {
+	        var responseJSON = JSON.parse(response.responseText);
+	    	if (responseJSON.code == 0) {
+	    		// console.log("Add Success");
+	    		$("#subTitle").tips({
+	    			side : 3,
+	    			msg : '保存成功',
+	    			bg : '#009933',
+	    			time : 3
+	    		});
+	    		return [ true ];
+	    	} else {
+	    		// console.log("Add Failed"+response.responseJSON.message);
+	    		$("#subTitle").tips({
+	    			side : 3,
+	    			msg : '保存失败,' + responseJSON.message,
+	    			bg : '#cc0033',
+	    			time : 3
+	    		});
+	    		return [ false, responseJSON.message ];
+	    	}
 	    }
 	}); 
 	
