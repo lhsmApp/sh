@@ -1,6 +1,5 @@
 package com.fh.controller.accountsquery.accountsquery;
 
-import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
+import com.fh.controller.common.AcconutsShowList;
 import com.fh.controller.common.DictsUtil;
 import com.fh.controller.common.QueryFeildString;
 import com.fh.controller.common.TmplUtil;
@@ -173,11 +173,12 @@ public class AccountsQueryController extends BaseController {
 		page.setPd(pd);
 		List<PageData> auditeSummayList = accountsqueryService.JqPage(page);
 		
-		List<PageData> varList = getShowList(detailSummayList, auditeSummayList, tableSumColumns, listGroupbyFeild, TmplUtil.keyExtra);
+		List<PageData> varList = AcconutsShowList.getShowListAll(detailSummayList, auditeSummayList, tableSumColumns, listGroupbyFeild, TmplUtil.keyExtra);
 		int records = varList.size();
+		List<PageData> showList = AcconutsShowList.getShowListPage(varList, page.getPage(), page.getRowNum());
 		
 		PageResult<PageData> result = new PageResult<PageData>();
-		result.setRows(varList);
+		result.setRows(showList);
 		result.setRowNum(page.getRowNum());
 		result.setRecords(records);
 		result.setPage(page.getPage());
@@ -285,7 +286,7 @@ public class AccountsQueryController extends BaseController {
 		List<TableColumns> tableSumColumns = tmplconfigService.getTableColumns(falseTableName);
 
 		List<String> listMatchFeild = Arrays.asList("USER_CODE");
-		List<PageData> varList = getShowList(listFirst, listSecond, tableSumColumns, listMatchFeild, "");
+		List<PageData> varList = AcconutsShowList.getShowListAll(listFirst, listSecond, tableSumColumns, listMatchFeild, "");
 		//导出数据
 		excelListData = varList;
 		
@@ -348,70 +349,6 @@ public class AccountsQueryController extends BaseController {
 		ObjectExcelView erv = new ObjectExcelView();
 		mv = new ModelAndView(erv,dataMap); 
 		return mv;
-	}
-	
-	private List<PageData> getShowList(List<PageData> listFirst, List<PageData> listSecond, List<TableColumns> m_columnsList, List<String> listMatchFeild, String strKeyExtra){
-		List<PageData> varList = new ArrayList<PageData>();
-		if(listFirst!=null && listFirst.size() > 0){
-			if(!(listSecond!=null && listSecond.size()>0)){
-				for(PageData fir : listFirst){
-					for(TableColumns col : m_columnsList){
-						if(TmplUtil.IsNumFeild(col.getData_type())){
-							BigDecimal firValue = (BigDecimal) fir.get(col.getColumn_name());
-							fir.put(col.getColumn_name(), firValue + "");
-						}
-					}
-				}
-				varList = listFirst;
-				
-			} else {
-				for(PageData fir : listFirst){
-					//listSecond里没有匹配fir的记录
-					Boolean bolNotHave = true;
-					//两条记录有差异
-					Boolean bolHavedifference = false;
-					for(PageData sec : listSecond){
-						//根据汇总字段查找匹配的记录
-						Boolean bolMatch = true;
-						for(String sumFeild : listMatchFeild){
-							String firValue = (String) fir.get(sumFeild + strKeyExtra);
-							String secValue = (String) sec.get(sumFeild + strKeyExtra);
-							if(!(firValue!=null && secValue!=null && firValue.equals(secValue))
-									|| (firValue==null && secValue==null)){
-								bolMatch = false;
-							}
-						}
-						if(bolMatch){
-							bolNotHave = false;
-							for(TableColumns col : m_columnsList){
-								if(TmplUtil.IsNumFeild(col.getData_type())){
-									BigDecimal firValue = (BigDecimal) fir.get(col.getColumn_name());
-									BigDecimal secValue = (BigDecimal) sec.get(col.getColumn_name());
-									if(!firValue.equals(secValue)){
-										fir.put(col.getColumn_name(), firValue + "(" + secValue +")");
-										bolHavedifference = true;
-									} else {
-										fir.put(col.getColumn_name(), firValue + "");
-									}
-								}
-							}
-						}
-					}
-					if(bolNotHave){
-						for(TableColumns col : m_columnsList){
-							if(TmplUtil.IsNumFeild(col.getData_type())){
-								BigDecimal firValue = (BigDecimal) fir.get(col.getColumn_name());
-								fir.put(col.getColumn_name(), firValue + "");
-							}
-						}
-					}
-					if(bolNotHave || bolHavedifference){
-						varList.add(fir);
-					}
-				}
-			}
-		}
-		return varList;
 	}
 
 	private String getWhileValue(String value){

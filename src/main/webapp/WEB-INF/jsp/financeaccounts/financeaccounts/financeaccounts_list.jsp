@@ -201,9 +201,9 @@
 			colModel: jqGridColModel,
 			viewrecords: true, 
 			shrinkToFit: false,
-			rowNum: 0,
-			scroll: 1,
-			//rowList: [10,20,30],
+			rowNum: 10,
+			//scroll: 1,
+			rowList: [10,20,30],
             sortable: true,
 			altRows: true, //斑马条纹
 			
@@ -241,7 +241,7 @@
 		            addicon : 'ace-icon fa fa-plus-circle purple',
 		            del: false,
 		            delicon : 'ace-icon fa fa-trash-o red',
-		            search: false,
+		            search: true,
 		            searchicon : 'ace-icon fa fa-search orange',
 		            refresh: true,
 		            refreshicon : 'ace-icon fa fa-refresh green',

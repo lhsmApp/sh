@@ -171,7 +171,7 @@ public class StaffDetailController extends BaseController {
 		PageData pd = new PageData();
 		pd = this.getPageData();
 
-		String QueryFeild = QueryFeildString.getQueryFeild(pd, QueryFeildList);;
+		String QueryFeild = QueryFeildString.getQueryFeild(pd, QueryFeildList);
 		if(QueryFeild!=null && !QueryFeild.equals("")){
 			pd.put("QueryFeild", QueryFeild);
 		}

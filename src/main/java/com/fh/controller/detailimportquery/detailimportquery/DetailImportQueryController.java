@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
 import com.fh.controller.common.DictsUtil;
+import com.fh.controller.common.FilterBillCode;
 import com.fh.controller.common.QueryFeildString;
 import com.fh.controller.common.TmplUtil;
 import com.fh.entity.JqPage;
@@ -28,6 +29,7 @@ import com.fh.entity.TmplConfigDetail;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
 import com.fh.util.SqlTools;
+import com.fh.util.enums.BillState;
 import com.fh.util.enums.SysConfigKeyCode;
 import com.fh.util.Jurisdiction;
 import com.fh.service.detailimportquery.detailimportquery.DetailImportQueryManager;
@@ -94,7 +96,7 @@ public class DetailImportQueryController extends BaseController {
 
 		PageData pd = this.getPageData();
 		String which = getWhileValue(pd.getString("TABLE_CODE"));
-		String tableName = getTableCode(which);
+		String tableName = getDetailTableCode(which);
 		
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("detailimportquery/detailimportquery/detailimportquery_list");
@@ -137,26 +139,7 @@ public class DetailImportQueryController extends BaseController {
 	public @ResponseBody PageResult<PageData> getPageList(JqPage page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"列表FinanceAccounts");
 		
-		PageData pd = this.getPageData();
-		String which = getWhileValue(pd.getString("TABLE_CODE"));
-		String tableName = getTableCode(which);
-		String sallaryType = getSallaryType(which);
-
-		//表名
-		pd.put("TableName", tableName);
-		//多条件过滤条件
-		String filters = pd.getString("filters");
-		if(null != filters && !"".equals(filters)){
-			pd.put("filterWhereResult", SqlTools.constructWhere(filters,null));
-		}
-		if(sallaryType!=null && !sallaryType.trim().equals("")){
-			//工资分的类型
-			pd.put("SallaryType", sallaryType);
-		}
-		String QueryFeild = QueryFeildString.getQueryFeild(pd, QueryFeildList);
-		if(QueryFeild!=null && !QueryFeild.equals("")){
-			pd.put("QueryFeild", QueryFeild);
-		}
+		PageData pd = setPutPd(this.getPageData());
 		page.setPd(pd);
 		List<PageData> varList = detailimportqueryService.JqPage(page);	//列出Betting列表
 		int records = detailimportqueryService.countJqGridExtend(page);
@@ -184,7 +167,7 @@ public class DetailImportQueryController extends BaseController {
 		}
 		return which;
 	}
-	private String getTableCode(String which) {
+	private String getDetailTableCode(String which) {
 		String tableCode = "";
 		if (which != null && which.equals("1")) {
 			tableCode = "tb_staff_detail";
@@ -196,8 +179,21 @@ public class DetailImportQueryController extends BaseController {
 			tableCode = "tb_social_inc_detail";
 		} else if (which != null && which.equals("5")) {
 			tableCode = "tb_house_fund_detail";
+		}
+		return tableCode;
+	}
+	private String getSummyTableCode(String which) {
+		String tableCode = "";
+		if (which != null && which.equals("1")) {
+			tableCode = "tb_staff_summy";
+		} else if (which != null && which.equals("2")) {
+			tableCode = "tb_staff_summy";
+		} else if (which != null && which.equals("3")) {
+			tableCode = "tb_staff_summy";
+		} else if (which != null && which.equals("4")) {
+			tableCode = "tb_social_inc_summy";
 		} else if (which != null && which.equals("5")) {
-			tableCode = "tb_staff_detail";
+			tableCode = "tb_house_fund_summy";
 		}
 		return tableCode;
 	}
@@ -219,22 +215,14 @@ public class DetailImportQueryController extends BaseController {
 		return sallaryType;
 	}
 	
-	 /**导出到excel
-	 * @param
-	 * @throws Exception
-	 */
-	@SuppressWarnings("unchecked")
-	@RequestMapping(value="/excel")
-	public ModelAndView exportExcel(JqPage page) throws Exception{
-		logBefore(logger, Jurisdiction.getUsername()+"导出HouseFundDetail到excel");
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
-		PageData pd = this.getPageData();
+	private PageData setPutPd(PageData pd) throws Exception{
 		String which = getWhileValue(pd.getString("TABLE_CODE"));
-		String tableName = getTableCode(which);
+		String tableNameDetail = getDetailTableCode(which);
+		String tableNameSummy = getSummyTableCode(which);
 		String sallaryType = getSallaryType(which);
 
 		//表名
-		pd.put("TableName", tableName);
+		pd.put("TableName", tableNameDetail);
 		//多条件过滤条件
 		String filters = pd.getString("filters");
 		if(null != filters && !"".equals(filters)){
@@ -245,9 +233,22 @@ public class DetailImportQueryController extends BaseController {
 			pd.put("SallaryType", sallaryType);
 		}
 		String QueryFeild = QueryFeildString.getQueryFeild(pd, QueryFeildList);
-		if(QueryFeild!=null && !QueryFeild.equals("")){
-			pd.put("QueryFeild", QueryFeild);
-		}
+		QueryFeild += FilterBillCode.getHelpfulBillCode(tableNameSummy);
+		pd.put("QueryFeild", QueryFeild);
+		
+		return pd;
+	}
+	
+	 /**导出到excel
+	 * @param
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value="/excel")
+	public ModelAndView exportExcel(JqPage page) throws Exception{
+		logBefore(logger, Jurisdiction.getUsername()+"导出HouseFundDetail到excel");
+		if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
+		PageData pd = setPutPd(this.getPageData());
 		page.setPd(pd);
 		List<PageData> varOList = detailimportqueryService.datalistExport(page);
 		

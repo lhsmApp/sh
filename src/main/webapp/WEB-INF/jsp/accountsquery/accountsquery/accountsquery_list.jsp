@@ -57,7 +57,7 @@
                         <span style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
 								
 						<button id="btnQuery" class="btn btn-white btn-info btn-sm"
-							onclick="showQueryCondi($('#jqGridBase'),null,true)">
+							onclick="showQueryCondi($('#jqGridBase'),$('#jqGridDetail'),null,true)">
 							<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
 						</button>
 						
@@ -191,6 +191,27 @@
 	var which='1';
 	var jqGridColModel;
 	var TabType = 1;
+
+	//显示隐藏查询 标准高度统一定为192（含底行），如果不含底行高度定为155.
+	function showQueryCondi(jqGridBase, jqGridDetail, gridHeight,withBottom) {
+		if (gridHeight=="undefined"||gridHeight == null || gridHeight == "" || gridHeight == 0) {
+			gridHeight = 279;
+		}
+		if ($(".widget-box").css("display") == "block") {
+			$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass(
+					'fa-chevron-down');
+			$("#btnQuery").find("span").text("显示查询");
+			$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight) * (2/5));
+			$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight) * (3/5));
+		} else {
+			$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass(
+					'fa-chevron-up');
+			$("#btnQuery").find("span").text("隐藏查询");
+			$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (2/5));
+			$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (3/5));
+		}
+		$(".widget-box").toggle("fast");
+	}
 	
 	$(document).ready(function () {
 		$(top.hangge());//关闭加载状态
@@ -206,8 +227,9 @@
 		$(window).on('resize.jqGrid', function () {
 			$(gridBase_selector).jqGrid( 'setGridWidth', $(".page-content").width());
 			$(gridDetail_selector).jqGrid( 'setGridWidth', $(".page-content").width());
-			resizeGridHeight($(gridBase_selector),423);
-			resizeGridHeight($(gridDetail_selector),398);
+			var gridHeight = 424 + 398;
+			resizeGridHeight($(gridBase_selector), gridHeight * (2.6/5));
+			resizeGridHeight($(gridDetail_selector), gridHeight * (2.4/5));
 	    });
 		
 		//初始化当前选择凭证类型
@@ -254,9 +276,9 @@
     			colModel: jqGridColModel,
     			viewrecords: true, 
     			shrinkToFit: false,
-    			rowNum: 0,
-    			scroll: 1,
-    			//rowList: [10,20,30],
+    			rowNum: 10,
+    			//scroll: 1,
+    			rowList: [10,20,30],
                 sortable: true,
     			altRows: true, //斑马条纹
     			

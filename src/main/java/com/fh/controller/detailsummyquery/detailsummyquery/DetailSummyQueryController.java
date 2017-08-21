@@ -252,8 +252,6 @@ public class DetailSummyQueryController extends BaseController {
 			tableCode = "tb_social_inc_summy";
 		} else if (which != null && which.equals("5")) {
 			tableCode = "tb_house_fund_summy";
-		} else if (which != null && which.equals("5")) {
-			tableCode = "tb_staff_summy";
 		}
 		return tableCode;
 	}
@@ -269,8 +267,6 @@ public class DetailSummyQueryController extends BaseController {
 			tableCode = "tb_social_inc_detail";
 		} else if (which != null && which.equals("5")) {
 			tableCode = "tb_house_fund_detail";
-		} else if (which != null && which.equals("5")) {
-			tableCode = "tb_staff_detail";
 		}
 		return tableCode;
 	}
