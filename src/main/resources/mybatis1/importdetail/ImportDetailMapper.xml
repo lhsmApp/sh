@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ImportDetailMapper">
+	
+<!-- 
+ * 说明： 导入明细
+ * 创建人：zhangxiaoliu
+ * 创建时间：2017-08-22
+ * @version
+ -->
+ 
+	<!-- 列表 -->
+	<select id="getCopyInsertList" parameterType="pd" resultType="pd">
+		select * 
+		from ${TableName}
+		where BUSI_DATE = '${SystemDateTime}'
+		and DEPT_CODE = '${DepartCode}'
+		<if test="QueryFeild!= null and QueryFeild != ''">
+		    ${QueryFeild}
+		</if>
+	</select>
+	
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into ${TableNameDetail}
+		(${InsertField}) values (${InsertVale})
+	</insert>
+	
+	<!-- 删除汇总上报记录 -->
+	<insert id="deleteReportRecord" parameterType="pd">
+		delete from tb_sys_sealed_info
+		where RPT_DUR = '${BUSI_DATE}'
+		and RPT_DEPT = '${DEPT_CODE}'
+		and BILL_TYPE = '${TypeCodeSummy}'
+	</insert>
+	
+</mapper>

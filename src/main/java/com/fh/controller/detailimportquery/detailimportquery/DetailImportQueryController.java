@@ -233,7 +233,7 @@ public class DetailImportQueryController extends BaseController {
 			pd.put("SallaryType", sallaryType);
 		}
 		String QueryFeild = QueryFeildString.getQueryFeild(pd, QueryFeildList);
-		QueryFeild += FilterBillCode.getHelpfulBillCode(tableNameSummy);
+		//QueryFeild += FilterBillCode.getHelpfulBillCode(tableNameSummy);
 		pd.put("QueryFeild", QueryFeild);
 		
 		return pd;

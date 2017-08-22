@@ -120,6 +120,32 @@ public class DaoSupport implements DAO {
 	}
 
 	/**
+	 * 插入复制数据
+	 * @param str
+	 * @param obj
+	 * @return
+	 * @throws Exception
+	 */
+	public void insertCopy(String strDelete, String strInsert, List<?> objs )throws Exception{
+		SqlSessionFactory sqlSessionFactory = sqlSessionTemplate.getSqlSessionFactory();
+		//批量执行器
+		SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH,false);
+		try{
+			if(objs!=null&&objs.size()>0){
+				for(int i=0,size=objs.size();i<size;i++){
+				    sqlSession.delete(strDelete, objs.get(i));
+					sqlSession.update(strInsert, objs.get(i));
+				}
+				sqlSession.flushStatements();
+				sqlSession.commit();
+				sqlSession.clearCache();
+			}
+		}finally{
+			sqlSession.close();
+		}
+	}
+
+	/**
 	 * 导入
 	 * @param str
 	 * @param obj

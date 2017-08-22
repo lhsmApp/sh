@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
 import com.fh.controller.common.DictsUtil;
+import com.fh.controller.common.FilterBillCode;
 import com.fh.controller.common.QueryFeildString;
 import com.fh.controller.common.TmplUtil;
 import com.fh.entity.CommonBase;
@@ -47,6 +48,7 @@ import com.fh.util.excel.LeadingInExcelToPageData;
 import net.sf.json.JSONArray;
 
 import com.fh.service.fhoa.department.impl.DepartmentService;
+import com.fh.service.importdetail.importdetail.impl.ImportDetailService;
 import com.fh.service.socialIncDetail.socialincdetail.SocialIncDetailManager;
 import com.fh.service.sysConfig.sysconfig.SysConfigManager;
 import com.fh.service.sysSealedInfo.syssealedinfo.impl.SysSealedInfoService;
@@ -81,11 +83,16 @@ public class SocialIncDetailController extends BaseController {
 	private DepartmentService departmentService;
 	@Resource(name = "userService")
 	private UserManager userService;
+	@Resource(name = "importdetailService")
+	private ImportDetailService importdetailService;
 	
 	//表名
-	String TableName = "tb_social_inc_detail";
+	String TableNameDetail = "tb_social_inc_detail";
+	String TableNameSummy = "tb_social_inc_summy";
 	//枚举类型  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
-	String TypeCode = BillType.SECURITY_DETAIL.getNameKey();
+	String TypeCodeDetail = BillType.SECURITY_DETAIL.getNameKey();
+	String TypeCodeSummy = BillType.SECURITY_SUMMARY.getNameKey();
+	String TypeCodeListen = BillType.SECURITY_LISTEN.getNameKey();
 	
 	//页面显示数据的年月
 	String SystemDateTime = "";
@@ -93,17 +100,16 @@ public class SocialIncDetailController extends BaseController {
 	String DepartCode = "";
 	//底行显示的求和与平均值字段
 	StringBuilder SqlUserdata = new StringBuilder();
-	////默认值
-	//Map<String, Object> DefaultValueList = new LinkedHashMap<String, Object>();
-    //// 表全部 类型
-    //Map<String, Object> TypeList = new LinkedHashMap<String, Object>();
 	//字典
 	Map<String, Object> DicList = new LinkedHashMap<String, Object>();
 	//表结构  
 	Map<String, TableColumns> map_HaveColumnsList = new LinkedHashMap<String, TableColumns>();
 	// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 	Map<String, TmplConfigDetail> map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
-	
+
+	//界面查询字段
+    List<String> QueryFeildList = Arrays.asList("USER_GROP", "CUST_COL7");
+    
 	/**列表
 	 * @param page
 	 * @throws Exception
@@ -127,7 +133,7 @@ public class SocialIncDetailController extends BaseController {
 		//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
 		pd.put("RPT_DEPT", DepartCode);
 		pd.put("RPT_DUR", SystemDateTime);
-		pd.put("BILL_TYPE", TypeCode);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+		pd.put("BILL_TYPE", TypeCodeDetail);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 		String State = syssealedinfoService.getState(pd);
 		if(!(State != null && !State.trim().equals(""))){
 			State = DurState.Release.getNameKey();
@@ -140,13 +146,9 @@ public class SocialIncDetailController extends BaseController {
 		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
-		String jqGridColModel = tmpl.generateStructure(TableName, DepartCode, 3);
+		String jqGridColModel = tmpl.generateStructure(TableNameDetail, DepartCode, 3);
 		
 		SqlUserdata = tmpl.getSqlUserdata();
-		//默认值
-		//DefaultValueList = tmpl.getDefaultValueList();
-		// 表全部 类型
-		//TypeList = tmpl.getTypeList();
 		//字典
 		DicList = tmpl.getDicList();
 		//表结构  
@@ -157,9 +159,6 @@ public class SocialIncDetailController extends BaseController {
 		mv.addObject("jqGridColModel", jqGridColModel);
 		return mv;
 	}
-	
-	//界面查询字段
-    List<String> QueryFeildList = Arrays.asList("USER_GROP", "CUST_COL7");
 
 	/**列表
 	 * @param page
@@ -168,10 +167,15 @@ public class SocialIncDetailController extends BaseController {
 	@RequestMapping(value="/getPageList")
 	public @ResponseBody PageResult<PageData> getPageList(JqPage page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"列表SocialIncDetail");
-		PageData pd = new PageData();
-		pd = this.getPageData();
+		PageData pd = this.getPageData();
+		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
+				DepartCode, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
+		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
+			strHelpful += " and 1 != 1 ";
+		}
 
-		String QueryFeild = QueryFeildString.getQueryFeild(pd, QueryFeildList);;
+		String QueryFeild = QueryFeildString.getQueryFeild(pd, QueryFeildList);
+		QueryFeild += strHelpful;
 		if(QueryFeild!=null && !QueryFeild.equals("")){
 			pd.put("QueryFeild", QueryFeild);
 		}
@@ -221,6 +225,19 @@ public class SocialIncDetailController extends BaseController {
 			commonBase.setCode(2);
 			commonBase.setMessage(checkState);
 		} else {
+			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
+					DepartCode, SystemDateTime,
+					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+					map_HaveColumnsList);
+			String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
+					DepartCode, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
+			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
+				commonBase.setCode(2);
+				commonBase.setMessage("获取可操作的数据的条件失败！");
+				return commonBase;
+			}
+			pd.put("CanOperate", strHelpful);
+			
 			String BILL_CODE = "BILL_CODE";
 			String BUSI_DATE = "BUSI_DATE";
 			String DEPT_CODE = "DEPT_CODE";
@@ -269,6 +286,18 @@ public class SocialIncDetailController extends BaseController {
 			commonBase.setCode(2);
 			commonBase.setMessage(checkState);
 		} else {
+			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
+					DepartCode, SystemDateTime,
+					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+					map_HaveColumnsList);
+			String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
+					DepartCode, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
+			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
+				commonBase.setCode(2);
+				commonBase.setMessage("获取可操作的数据的条件失败！");
+				return commonBase;
+			}
+			
 			Object DATA_ROWS = pd.get("DATA_ROWS");
 			String json = DATA_ROWS.toString();  
 	       JSONArray array = JSONArray.fromObject(json);  
@@ -277,6 +306,7 @@ public class SocialIncDetailController extends BaseController {
 	        	item.put("BILL_CODE", " ");
 	        	item.put("BUSI_DATE", SystemDateTime);
 	        	item.put("DEPT_CODE", DepartCode);
+	        	item.put("CanOperate", strHelpful);
 				TmplUtil.setModelDefault(item, map_HaveColumnsList);
 	        }
 			if(null != listData && listData.size() > 0){
@@ -310,11 +340,26 @@ public class SocialIncDetailController extends BaseController {
 			commonBase.setCode(2);
 			commonBase.setMessage(checkState);
 		} else {
+			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
+					DepartCode, SystemDateTime,
+					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+					map_HaveColumnsList);
+			String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
+					DepartCode, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
+			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
+				commonBase.setCode(2);
+				commonBase.setMessage("获取可操作的数据的条件失败！");
+				return commonBase;
+			}
+			
 			Object DATA_ROWS = pd.get("DATA_ROWS");
 			String json = DATA_ROWS.toString();  
 	        JSONArray array = JSONArray.fromObject(json);  
 	        List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);
 	        if(null != listData && listData.size() > 0){
+	        	for(PageData item : listData){
+	        	    item.put("CanOperate", strHelpful);
+	            }
 				socialincdetailService.deleteAll(listData);
 				commonBase.setCode(0);
 			}
@@ -339,13 +384,13 @@ public class SocialIncDetailController extends BaseController {
 	 * @return
 	 * @throws Exception
 	 */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({ "unchecked" })
     @RequestMapping(value = "/readExcel")
 	//public @ResponseBody CommonBase readExcel(@RequestParam(value="excel",required=false) MultipartFile file) throws Exception{
 	public ModelAndView readExcel(@RequestParam(value="excel",required=false) MultipartFile file) throws Exception{
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;}//校验权限
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;}//校验权限
 
 		PageData pd = this.getPageData();
 		String checkState = CheckState(pd);
@@ -358,112 +403,125 @@ public class SocialIncDetailController extends BaseController {
 				commonBase.setCode(2);
 				commonBase.setMessage("当前区间和当前单位不能为空！");
 			} else {
-				// 局部变量
-				LeadingInExcelToPageData<PageData> testExcel = null;
-				Map<Integer, Object> uploadAndReadMap = null;
-				try {
-					// 定义需要读取的数据
-					String formart = "yyyy-MM-dd";
-					String propertiesFileName = "config";
-					String kyeName = "file_path";
-					int sheetIndex = 0;
-					Map<String, String> titleAndAttribute = null;
-					// 定义对应的标题名与对应属性名
-					titleAndAttribute = new LinkedHashMap<String, String>();
-					
-					//配置表设置列
-					if(map_SetColumnsList != null && map_SetColumnsList.size() > 0){
-						for (TmplConfigDetail col : map_SetColumnsList.values()) {
-							titleAndAttribute.put(col.getCOL_NAME(), col.getCOL_CODE());
-						}
-					}
-
-					// 调用解析工具包
-					testExcel = new LeadingInExcelToPageData<PageData>(formart);
-					// 解析excel，获取客户信息集合
-
-					uploadAndReadMap = testExcel.uploadAndRead(file, propertiesFileName, kyeName, sheetIndex,
-							titleAndAttribute, map_HaveColumnsList, map_SetColumnsList, DicList);
-				} catch (Exception e) {
-					e.printStackTrace();
-					logger.error("读取Excel文件错误", e);
-					throw new CustomException("读取Excel文件错误",false);
-				}
-				boolean judgement = false;
-				if(uploadAndReadMap.get(1).equals(false)){
-					Map<String, Object> returnError =  (Map<String, Object>) uploadAndReadMap.get(2);
-					String message = "字典无此翻译： "; // \n
-					for (String k : returnError.keySet())  
-				    {
-						message += k + " : " + returnError.get(k);
-				    }
+				FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
+						DepartCode, SystemDateTime,
+						TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+						map_HaveColumnsList);
+				String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
+						DepartCode, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
+				if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 					commonBase.setCode(2);
-					commonBase.setMessage(message);
+					commonBase.setMessage("获取可操作的数据的条件失败！");
 				} else {
-					List<PageData> uploadAndRead = (List<PageData>) uploadAndReadMap.get(2);
-					if (uploadAndRead != null && !"[]".equals(uploadAndRead.toString()) && uploadAndRead.size() >= 1) {
-						judgement = true;
+					// 局部变量
+					LeadingInExcelToPageData<PageData> testExcel = null;
+					Map<Integer, Object> uploadAndReadMap = null;
+					try {
+						// 定义需要读取的数据
+						String formart = "yyyy-MM-dd";
+						String propertiesFileName = "config";
+						String kyeName = "file_path";
+						int sheetIndex = 0;
+						Map<String, String> titleAndAttribute = null;
+						// 定义对应的标题名与对应属性名
+						titleAndAttribute = new LinkedHashMap<String, String>();
+						
+						//配置表设置列
+						if(map_SetColumnsList != null && map_SetColumnsList.size() > 0){
+							for (TmplConfigDetail col : map_SetColumnsList.values()) {
+								titleAndAttribute.put(col.getCOL_NAME(), col.getCOL_CODE());
+							}
+						}
+
+						// 调用解析工具包
+						testExcel = new LeadingInExcelToPageData<PageData>(formart);
+						// 解析excel，获取客户信息集合
+
+						uploadAndReadMap = testExcel.uploadAndRead(file, propertiesFileName, kyeName, sheetIndex,
+								titleAndAttribute, map_HaveColumnsList, map_SetColumnsList, DicList);
+					} catch (Exception e) {
+						e.printStackTrace();
+						logger.error("读取Excel文件错误", e);
+						throw new CustomException("读取Excel文件错误",false);
 					}
-					if (judgement) {
-						List<String> sbRet = new ArrayList<String>();
-						List<String> listUserCode = new ArrayList<String>();
-						int listSize = uploadAndRead.size();
-						for(int i=0;i<listSize;i++){
-							String getBUSI_DATE = (String) uploadAndRead.get(i).get("BUSI_DATE");
-							String getDEPT_CODE = (String) uploadAndRead.get(i).get("DEPT_CODE");
-							String getUSER_CODE = (String) uploadAndRead.get(i).get("USER_CODE");
-							if(!(getBUSI_DATE!=null && !getBUSI_DATE.trim().equals(""))){
-								uploadAndRead.get(i).put("BUSI_DATE", SystemDateTime);
-								getBUSI_DATE = SystemDateTime;
-							}
-							if(!SystemDateTime.equals(getBUSI_DATE)){
-								if(!sbRet.contains("导入区间和当前区间必须一致！")){
-									sbRet.add("导入区间和当前区间必须一致！");
-								}
-							}
-							if(!(getDEPT_CODE!=null && !getDEPT_CODE.trim().equals(""))){
-								uploadAndRead.get(i).put("DEPT_CODE", DepartCode);
-								getDEPT_CODE = DepartCode;
-							}
-							if(!DepartCode.equals(getDEPT_CODE)){
-								if(!sbRet.contains("导入单位和当前单位必须一致！")){
-									sbRet.add("导入单位和当前单位必须一致！");
-								}
-							}
-							if(!(getUSER_CODE!=null && !getUSER_CODE.trim().equals(""))){
-								if(!sbRet.contains("人员编码不能为空！")){
-									sbRet.add("人员编码不能为空！");
-								}
-							}
-							if(listUserCode.contains(getUSER_CODE.trim())){
-								String strUserAdd = "编码" + getUSER_CODE + "重复！";
-								if(!sbRet.contains(strUserAdd)){
-									sbRet.add(strUserAdd);
-								}
-							} else {
-								listUserCode.add(getUSER_CODE.trim());
-							}
-							String getESTB_DEPT = (String) uploadAndRead.get(i).get("ESTB_DEPT");
-							if(!(getESTB_DEPT!=null && !getESTB_DEPT.trim().equals(""))){
-								uploadAndRead.get(i).put("ESTB_DEPT", DepartCode);
-							}
-							TmplUtil.setModelDefault(uploadAndRead.get(i), map_HaveColumnsList);
-						}
-						if(sbRet.size()>0){
-							StringBuilder sbTitle = new StringBuilder();
-							for(String str : sbRet){
-								sbTitle.append(str + "  "); // \n
-							}
-							commonBase.setCode(2);
-							commonBase.setMessage(sbTitle.toString());
-						} else {
-							//此处执行集合添加 
-							socialincdetailService.batchImport(uploadAndRead);
-							commonBase.setCode(0);
-						}
+					boolean judgement = false;
+					if(uploadAndReadMap.get(1).equals(false)){
+						Map<String, Object> returnError =  (Map<String, Object>) uploadAndReadMap.get(2);
+						String message = "字典无此翻译： "; // \n
+						for (String k : returnError.keySet())  
+					    {
+							message += k + " : " + returnError.get(k);
+					    }
+						commonBase.setCode(2);
+						commonBase.setMessage(message);
 					} else {
-						commonBase.setCode(-1);
-						commonBase.setMessage("TranslateUtil");
+						List<PageData> uploadAndRead = (List<PageData>) uploadAndReadMap.get(2);
+						if (uploadAndRead != null && !"[]".equals(uploadAndRead.toString()) && uploadAndRead.size() >= 1) {
+							judgement = true;
+						}
+						if (judgement) {
+							List<String> sbRet = new ArrayList<String>();
+							List<String> listUserCode = new ArrayList<String>();
+							int listSize = uploadAndRead.size();
+							for(int i=0;i<listSize;i++){
+								uploadAndRead.get(i).put("CanOperate", strHelpful);
+								uploadAndRead.get(i).put("BILL_CODE", " ");
+								String getBUSI_DATE = (String) uploadAndRead.get(i).get("BUSI_DATE");
+								String getDEPT_CODE = (String) uploadAndRead.get(i).get("DEPT_CODE");
+								String getUSER_CODE = (String) uploadAndRead.get(i).get("USER_CODE");
+								if(!(getBUSI_DATE!=null && !getBUSI_DATE.trim().equals(""))){
+									uploadAndRead.get(i).put("BUSI_DATE", SystemDateTime);
+									getBUSI_DATE = SystemDateTime;
+								}
+								if(!SystemDateTime.equals(getBUSI_DATE)){
+									if(!sbRet.contains("导入区间和当前区间必须一致！")){
+										sbRet.add("导入区间和当前区间必须一致！");
+									}
+								}
+								if(!(getDEPT_CODE!=null && !getDEPT_CODE.trim().equals(""))){
+									uploadAndRead.get(i).put("DEPT_CODE", DepartCode);
+									getDEPT_CODE = DepartCode;
+								}
+								if(!DepartCode.equals(getDEPT_CODE)){
+									if(!sbRet.contains("导入单位和当前单位必须一致！")){
+										sbRet.add("导入单位和当前单位必须一致！");
+									}
+								}
+								if(!(getUSER_CODE!=null && !getUSER_CODE.trim().equals(""))){
+									if(!sbRet.contains("人员编码不能为空！")){
+										sbRet.add("人员编码不能为空！");
+									}
+								}
+								if(listUserCode.contains(getUSER_CODE.trim())){
+									String strUserAdd = "编码" + getUSER_CODE + "重复！";
+									if(!sbRet.contains(strUserAdd)){
+										sbRet.add(strUserAdd);
+									}
+								} else {
+									listUserCode.add(getUSER_CODE.trim());
+								}
+								String getESTB_DEPT = (String) uploadAndRead.get(i).get("ESTB_DEPT");
+								if(!(getESTB_DEPT!=null && !getESTB_DEPT.trim().equals(""))){
+									uploadAndRead.get(i).put("ESTB_DEPT", DepartCode);
+								}
+								TmplUtil.setModelDefault(uploadAndRead.get(i), map_HaveColumnsList);
+							}
+							if(sbRet.size()>0){
+								StringBuilder sbTitle = new StringBuilder();
+								for(String str : sbRet){
+									sbTitle.append(str + "  "); // \n
+								}
+								commonBase.setCode(2);
+								commonBase.setMessage(sbTitle.toString());
+							} else {
+								//此处执行集合添加 
+								socialincdetailService.batchImport(uploadAndRead);
+								commonBase.setCode(0);
+							}
+						} else {
+							commonBase.setCode(-1);
+							commonBase.setMessage("TranslateUtil");
+						}
 					}
 				}
 			}
@@ -501,6 +559,17 @@ public class SocialIncDetailController extends BaseController {
 		pd.put("SystemDateTime", SystemDateTime);
 		//页面显示数据的二级单位
 		pd.put("DepartCode", DepartCode);
+
+		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
+				DepartCode, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
+		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
+			ObjectExcelView erv = new ObjectExcelView();
+			Map<String,Object> dataMap = new LinkedHashMap<String,Object>();
+			ModelAndView mv = new ModelAndView(erv,dataMap); 
+			return mv;
+		}
+		pd.put("CanOperate", strHelpful);
+		
 		page.setPd(pd);
 		List<PageData> varOList = socialincdetailService.exportList(page);
 		return export(varOList, "");
@@ -565,6 +634,11 @@ public class SocialIncDetailController extends BaseController {
 			commonBase.setCode(2);
 			commonBase.setMessage(checkState);
 		} else {
+			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
+					DepartCode, SystemDateTime,
+					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+					map_HaveColumnsList);
+			
 			User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
 			String userId = user.getUSER_ID();
             String time = DateUtils.getCurrentTime(DateFormatUtils.DATE_FORMAT2);
@@ -575,7 +649,7 @@ public class SocialIncDetailController extends BaseController {
 			item.setRPT_DUR(SystemDateTime);
 			item.setRPT_USER(userId);
 			item.setRPT_DATE(time);//YYYY-MM-DD HH:MM:SS
-			item.setBILL_TYPE(TypeCode.toString());// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+			item.setBILL_TYPE(TypeCodeDetail.toString());// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 			item.setSTATE(DurState.Sealed.getNameKey());// 枚举  1封存,0解封
 			syssealedinfoService.report(item);
 			commonBase.setCode(0);
@@ -587,7 +661,7 @@ public class SocialIncDetailController extends BaseController {
 		String strRut = "当前期间已封存！";
 		pd.put("RPT_DEPT", DepartCode);
 		pd.put("RPT_DUR", SystemDateTime);
-		pd.put("BILL_TYPE", TypeCode);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+		pd.put("BILL_TYPE", TypeCodeDetail);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 		String State = syssealedinfoService.getState(pd);
 		if(!DurState.Sealed.getNameKey().equals(State)){// 枚举  1封存,0解封
 			strRut = "";

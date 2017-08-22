@@ -17,18 +17,6 @@
 	<!-- 字段 -->
 	<sql id="FieldSelectKey"> BILL_CODE BILL_CODE__, BUSI_DATE BUSI_DATE__, USER_CODE USER_CODE__</sql>
 	
-	<!-- 获取数据 验证数据重复 -->
-	<select id="findByModel" parameterType="pd" resultType="pd">
-		select * 
-		from 
-		    <include refid="tableName"></include>
-        <where>
-		<foreach item="item" index="index" collection="list" open=" " separator=" or " close=" ">
-            (BUSI_DATE = #{item.BUSI_DATE} and USER_CODE = #{item.USER_CODE} and USER_CODE != #{item.USER_CODE__})
-		</foreach>
-		</where>
-	</select>
-	
 	<!-- 列表 -->
 	<select id="datalistJqPage" parameterType="jqPage" resultType="pd">
 		select 
@@ -75,6 +63,18 @@
 		    </if>
 	</select>
 	
+	<!-- 获取数据 验证数据重复 -->
+	<select id="findByModel" parameterType="pd" resultType="pd">
+		select * 
+		from 
+		    <include refid="tableName"></include>
+        <where>
+		<foreach item="item" index="index" collection="list" open=" " separator=" or " close=" ">
+            (BUSI_DATE = #{item.BUSI_DATE} and USER_CODE = #{item.USER_CODE} and USER_CODE != #{item.USER_CODE__} ${item.CanOperate})
+		</foreach>
+		</where>
+	</select>
+	
 	<!-- 新增 -->
 	<insert id="save" parameterType="pd">
 		insert into 
@@ -88,7 +88,7 @@
 		<include refid="tableName"></include>
 		where
 		<foreach item="item" index="index" collection="list" open=" (" separator=" or " close=") ">
-            BUSI_DATE = #{item.BUSI_DATE__} and USER_CODE = #{item.USER_CODE__} 
+            BUSI_DATE = #{item.BUSI_DATE__} and USER_CODE = #{item.USER_CODE__} ${item.CanOperate}
 		</foreach>
 	</delete>
 	
@@ -98,6 +98,7 @@
 		<include refid="tableName"></include>
 		where BUSI_DATE = #{BUSI_DATE}
 	    and DEPT_CODE = #{DEPT_CODE} 
+	    ${CanOperate}
 	</delete>
 	
 	<!-- 导出列表 -->
@@ -107,6 +108,7 @@
 		<include refid="tableName"></include>
 		where BUSI_DATE = '${pd.SystemDateTime}'
 		and DEPT_CODE = '${pd.DepartCode}'
+	    ${pd.CanOperate}
 		<!-- <if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''">
 			and ${pd.filterWhereResult}
 		</if> -->
