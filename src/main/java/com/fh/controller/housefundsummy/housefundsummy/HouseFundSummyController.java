@@ -22,6 +22,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
 import com.fh.controller.common.BillCodeUtil;
 import com.fh.controller.common.DictsUtil;
+import com.fh.controller.common.FilterBillCode;
 import com.fh.controller.common.QueryFeildString;
 import com.fh.controller.common.TmplUtil;
 import com.fh.entity.CommonBase;
@@ -52,6 +53,7 @@ import com.fh.service.fhoa.department.impl.DepartmentService;
 import com.fh.service.glzrzx.glzrzx.impl.GlZrzxService;
 import com.fh.service.houseFundDetail.housefunddetail.HouseFundDetailManager;
 import com.fh.service.housefundsummy.housefundsummy.HouseFundSummyManager;
+import com.fh.service.importdetail.importdetail.impl.ImportDetailService;
 import com.fh.service.sysBillnum.sysbillnum.SysBillnumManager;
 import com.fh.service.sysConfig.sysconfig.SysConfigManager;
 import com.fh.service.sysSealedInfo.syssealedinfo.impl.SysSealedInfoService;
@@ -92,12 +94,16 @@ public class HouseFundSummyController extends BaseController {
 	private UserManager userService;
 	@Resource(name = "glzrzxService")
 	private GlZrzxService glzrzxService;
+	@Resource(name = "importdetailService")
+	private ImportDetailService importdetailService;
 
 	//表名
 	String TableNameBase = "tb_house_fund_summy";
 	String TableNameDetail = "tb_house_fund_detail";
 	//枚举类型  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
-	String TypeCode = BillType.GOLD_SUMMARY.getNameKey();
+	String TypeCodeDetail = BillType.GOLD_DETAIL.getNameKey();
+	String TypeCodeSummy = BillType.GOLD_SUMMARY.getNameKey();
+	String TypeCodeListen = BillType.GOLD_LISTEN.getNameKey();
 	//显示结构的单位
     String ShowDepartCode = "01001";
 	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
@@ -166,14 +172,17 @@ public class HouseFundSummyController extends BaseController {
 			pd.put("filterWhereResult", SqlTools.constructWhere(filters,null));
 		}
 
-		String QueryFeild = QueryFeildString.getQueryFeild(pd, QueryFeildList);;
+		String QueryFeild = QueryFeildString.getQueryFeild(pd, QueryFeildList);
+		QueryFeild += " and BILL_STATE = '" + BillState.Normal.getNameKey() + "' ";
 		if(QueryFeild!=null && !QueryFeild.equals("")){
 			pd.put("QueryFeild", QueryFeild);
 		}
 		//页面显示数据的年月
 		pd.put("SystemDateTime", SystemDateTime);
 		//类型
-		pd.put("TypeCode", TypeCode);
+		pd.put("TypeCodeDetail", TypeCodeDetail);
+		pd.put("TypeCodeSummy", TypeCodeSummy);
+		pd.put("TypeCodeListen", TypeCodeListen);
 		pd.put("DurState", DurState.Sealed.getNameKey());
 		page.setPd(pd);
 		List<PageData> varList = housefundsummyService.JqPage(page);	//列出Betting列表
@@ -274,7 +283,7 @@ public class HouseFundSummyController extends BaseController {
 				item.setRPT_DUR(pgItem.getString("BUSI_DATE__"));
 				item.setRPT_USER(userId);
 				item.setRPT_DATE(time);// YYYY-MM-DD HH:MM:SS
-				item.setBILL_TYPE(TypeCode.toString());
+				item.setBILL_TYPE(TypeCodeSummy.toString());
 				item.setSTATE(DurState.Sealed.getNameKey());// 枚举  1封存,0解封
 				listSysSealed.add(item);
 			}
@@ -283,8 +292,9 @@ public class HouseFundSummyController extends BaseController {
 		}
 		return commonBase;
 	}
-	
-	 /**汇总
+
+	 /**汇总 接口有上报记录，生成新单号；没有就原有单号；
+	  * 先把接口有上报记录的汇总作废，删掉接口的上报记录，在先删后插
 	 * @param
 	 * @throws Exception
 	 */
@@ -293,7 +303,8 @@ public class HouseFundSummyController extends BaseController {
 		if(!Jurisdiction.buttonJurisdiction(menuUrl, "delete")){return null;} //校验权限	
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
-		List<PageData> listTo = new ArrayList<PageData>();
+		List<Map<String, Object>> listMap = new ArrayList<Map<String, Object>>();
+		List<SysSealed> delReportList = new ArrayList<SysSealed>();
 		PageData pdBillNum=new PageData();
 
 		/***************获取最大单号及更新最大单号********************/
@@ -329,7 +340,7 @@ public class HouseFundSummyController extends BaseController {
     			//item.setBILL_CODE(summy.getBILL_CODE());
     			itemLast.setRPT_DEPT(depart);
     			itemLast.setRPT_DUR(SystemDateTime);
-    			itemLast.setBILL_TYPE(TypeCode.toString());// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+    			itemLast.setBILL_TYPE(TypeCodeSummy.toString());// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
     			String checkStateLast = CheckStateLast(itemLast);
     			if(checkStateLast!=null && !checkStateLast.trim().equals("")){
     				commonBase.setCode(2);
@@ -341,18 +352,57 @@ public class HouseFundSummyController extends BaseController {
     			//itemBefore.setBILL_CODE(summy.getBILL_CODE());
     			itemBefore.setRPT_DEPT(depart);
     			itemBefore.setRPT_DUR(SystemDateTime);
-    			itemBefore.setBILL_TYPE(BillType.GOLD_DETAIL.getNameKey().toString());// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+    			itemBefore.setBILL_TYPE(TypeCodeDetail);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
     			String checkStateBefore = CheckStateBefore(itemBefore);
     			if(checkStateBefore!=null && !checkStateBefore.trim().equals("")){
     				commonBase.setCode(2);
     				commonBase.setMessage(checkStateBefore);
     				break;
     			}
+    			
+    			TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
+    			tmpl.generateStructureNoEdit(TableNameDetail, depart);
+    			Map<String, TableColumns> setColumnsList = tmpl.getHaveColumnsList();
+    			
+    			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
+    					depart, SystemDateTime,
+    					TypeCodeListen, TypeCodeSummy, TableNameBase, TableNameDetail, 
+    					setColumnsList);
+    			String strHelpfulDetail = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
+    					depart, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameBase);
+    			if(!(strHelpfulDetail != null && !strHelpfulDetail.trim().equals(""))){
+    				commonBase.setCode(2);
+    				commonBase.setMessage("获取可操作的数据的条件失败！");
+    				return commonBase;
+    			}
+    			SysSealed delReportEach = new SysSealed();
+    			delReportEach.setRPT_DEPT(depart);
+    			delReportEach.setRPT_DUR(SystemDateTime);
+    			delReportEach.setBILL_TYPE(TypeCodeListen);
+    			delReportList.add(delReportEach);
+    			
                 //获取单位已有的汇总信息
-    			Map<String, String> mapHave = new HashMap<String, String>();
-    			mapHave.put("BUSI_DATE", SystemDateTime);
-    			mapHave.put("DEPT_CODE", depart);
-    			List<PageData> getHaveDate = housefundsummyService.getHave(mapHave);
+    			Boolean bolDelSum = false;
+    			List<PageData> getHaveDate = new ArrayList<PageData>();
+    			PageData pdReportListen = new PageData();
+    			pdReportListen.put("RPT_DEPT", depart);
+    			pdReportListen.put("RPT_DUR", SystemDateTime);
+    			pdReportListen.put("BILL_TYPE", TypeCodeListen);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+    			String stateListen = syssealedinfoService.getState(pdReportListen);
+    			if(stateListen != null && !stateListen.equals("")){
+    				//接口已上报过（接口有记录），单号要全部生成
+    				getHaveDate = new ArrayList<PageData>();
+    				bolDelSum = false;
+    			} else {
+    				//接口未上报过（接口没记录），单号要获取原有的
+        			Map<String, String> mapHave = new HashMap<String, String>();
+        			mapHave.put("BUSI_DATE", SystemDateTime);
+        			mapHave.put("DEPT_CODE", depart);
+        			mapHave.put("BILL_STATE", BillState.Normal.getNameKey());
+        			getHaveDate = housefundsummyService.getHave(mapHave);
+        			bolDelSum = true;
+    			}
+    			
     			//获取单位重新汇总信息
     			List<TableColumns> tableDetailColumns = tmplconfigService.getTableColumns(TableNameDetail);
     			Map<String, String> mapSave = new HashMap<String, String>();
@@ -364,6 +414,7 @@ public class HouseFundSummyController extends BaseController {
     			String SelectFeild = TmplUtil.getSumFeildSelect(SumField, tableDetailColumns);
     			
     			mapSave.put("SelectFeild", SelectFeild);
+    			mapSave.put("CanOperate", strHelpfulDetail);
     			List<PageData> getSaveDate = housefunddetailService.getSum(mapSave);
     			
     			List<PageData> listAdd = getListTo(getHaveDate, getSaveDate);
@@ -399,11 +450,15 @@ public class HouseFundSummyController extends BaseController {
                     	}
                     	updateFilter.append(field + " = '" + addTo.getString(field) + "' ");
                     }
+                    updateFilter.append(FilterBillCode.getBillCodeNotInSumInvalid(TableNameBase));
 	    			addTo.put("updateFilter", updateFilter);
                     //添加未设置字段默认值
 	    			TmplUtil.setModelDefault(addTo, map_HaveColumnsList);
-    				listTo.add(addTo);
     			}
+        		Map<String, Object> mapAdd = new HashMap<String, Object>();
+    			mapAdd.put("DelSum", bolDelSum);
+    			mapAdd.put("AddList", listAdd);
+    			listMap.add(mapAdd);
         	}
 		}
 		//单号没变化，pdBillNum为null，不更新数据库单号
@@ -413,7 +468,7 @@ public class HouseFundSummyController extends BaseController {
 			pdBillNum.put("BILL_NUMBER", billNum);
 		}
         if(commonBase.getCode() == -1){
-			housefundsummyService.summaryModelList(listTo, pdBillNum);
+			housefundsummyService.summaryModelList(listMap, pdBillNum, delReportList);
 			commonBase.setCode(0);
         }
 		return commonBase;

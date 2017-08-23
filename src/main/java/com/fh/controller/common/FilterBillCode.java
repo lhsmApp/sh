@@ -27,6 +27,7 @@ public class FilterBillCode {
 			String DepartCode, String SystemDateTime, 
 			String TypeCodeListen, String TypeCodeSummy, String TableNameSummy, String TableNameDetail,
 			Map<String, TableColumns> map_HaveColumnsList) throws Exception{
+		//, Boolean report
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
 		

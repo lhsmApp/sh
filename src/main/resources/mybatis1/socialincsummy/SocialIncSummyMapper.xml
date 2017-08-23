@@ -33,7 +33,18 @@
 		                      from tb_sys_sealed_info 
 		                      where RPT_DUR = '${pd.SystemDateTime}'
 		                      and STATE = '${pd.DurState}'
-		                      and BILL_TYPE = '${pd.TypeCode}'
+		                      and BILL_TYPE = '${pd.TypeCodeSummy}'
+		                      )
+		and DEPT_CODE in (select RPT_DEPT 
+		                      from tb_sys_sealed_info 
+		                      where RPT_DUR = '${pd.SystemDateTime}' 
+		                      and STATE = '${pd.DurState}'
+		                      and BILL_TYPE = '${pd.TypeCodeDetail}'
+		                      )
+		and DEPT_CODE not in (select RPT_DEPT 
+		                      from tb_sys_sealed_info 
+		                      where RPT_DUR = '${pd.SystemDateTime}' 
+		                      and BILL_TYPE = '${pd.TypeCodeListen}'
 		                      )
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
@@ -51,6 +62,23 @@
 	<select id="countJqGridExtend" parameterType="jqPage" resultType="int">
 		select count(*) from <include refid="tableName"></include> 
 		where BUSI_DATE = '${pd.SystemDateTime}'
+		and DEPT_CODE not in (select RPT_DEPT 
+		                      from tb_sys_sealed_info 
+		                      where RPT_DUR = '${pd.SystemDateTime}'
+		                      and STATE = '${pd.DurState}'
+		                      and BILL_TYPE = '${pd.TypeCodeSummy}'
+		                      )
+		and DEPT_CODE in (select RPT_DEPT 
+		                      from tb_sys_sealed_info 
+		                      where RPT_DUR = '${pd.SystemDateTime}' 
+		                      and STATE = '${pd.DurState}'
+		                      and BILL_TYPE = '${pd.TypeCodeDetail}'
+		                      )
+		and DEPT_CODE not in (select RPT_DEPT 
+		                      from tb_sys_sealed_info 
+		                      where RPT_DUR = '${pd.SystemDateTime}' 
+		                      and BILL_TYPE = '${pd.TypeCodeListen}'
+		                      )
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
@@ -62,6 +90,23 @@
 		select ${pd.Userdata} 
 		from <include refid="tableName"></include> 
 		where BUSI_DATE = '${pd.SystemDateTime}'
+		and DEPT_CODE not in (select RPT_DEPT 
+		                      from tb_sys_sealed_info 
+		                      where RPT_DUR = '${pd.SystemDateTime}'
+		                      and STATE = '${pd.DurState}'
+		                      and BILL_TYPE = '${pd.TypeCodeSummy}'
+		                      )
+		and DEPT_CODE in (select RPT_DEPT 
+		                      from tb_sys_sealed_info 
+		                      where RPT_DUR = '${pd.SystemDateTime}' 
+		                      and STATE = '${pd.DurState}'
+		                      and BILL_TYPE = '${pd.TypeCodeDetail}'
+		                      )
+		and DEPT_CODE not in (select RPT_DEPT 
+		                      from tb_sys_sealed_info 
+		                      where RPT_DUR = '${pd.SystemDateTime}' 
+		                      and BILL_TYPE = '${pd.TypeCodeListen}'
+		                      )
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>

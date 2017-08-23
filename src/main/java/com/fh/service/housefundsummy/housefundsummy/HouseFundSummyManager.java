@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fh.entity.JqPage;
+import com.fh.entity.SysSealed;
 import com.fh.util.PageData;
 
 /** 
@@ -41,7 +42,7 @@ public interface HouseFundSummyManager{
 	 * @param pd
 	 * @throws Exception
 	 */
-	public void summaryModelList(List<PageData> listPd, PageData pdBillNum)throws Exception;
+	public void summaryModelList(List<Map<String, Object>> listMap, PageData pdBillNum, List<SysSealed> delReportList)throws Exception;
 	
 	
 }
