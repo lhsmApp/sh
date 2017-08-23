@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import com.fh.dao.DaoSupport;
 import com.fh.entity.JqPage;
+import com.fh.entity.SysSealed;
 import com.fh.util.PageData;
 import com.fh.service.staffsummy.staffsummy.StaffSummyManager;
 
@@ -58,8 +59,10 @@ public class StaffSummyService implements StaffSummyManager{
 	 * @param 
 	 * @throws Exception
 	 */
-	public void summaryModelList(List<PageData> listPd, PageData pdBillNum)throws Exception{
-		dao.batch_One_del_Ins("StaffSummyMapper.delete", "StaffSummyMapper.save", "StaffDetailMapper.editBillCode", listPd, "SysBillnumMapper.delete", "SysBillnumMapper.save", pdBillNum);
+	public void summaryModelList(List<Map<String, Object>> listMap, PageData pdBillNum, List<SysSealed> delReportList)throws Exception{
+		dao.batch_One_del_Ins("StaffSummyMapper.delete", "StaffSummyMapper.save", "StaffSummyMapper.updateBillState", "StaffDetailMapper.editBillCode", listMap, 
+				"SysBillnumMapper.delete", "SysBillnumMapper.save", pdBillNum,
+				"SysSealedInfoMapper.reportDelete", delReportList);
 	}
 	
 }

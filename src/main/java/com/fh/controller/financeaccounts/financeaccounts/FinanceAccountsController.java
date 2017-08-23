@@ -154,6 +154,7 @@ public class FinanceAccountsController extends BaseController {
 		pd.put("TableName", detailTableName);
 		//上报
 		String detailReport = " and (BUSI_DATE, DEPT_CODE) in (select RPT_DUR, RPT_DEPT from tb_sys_sealed_info where STATE = '" + DurState.Sealed.getNameKey() + "' and BILL_TYPE = '" + getDetailTypeCode(which) + "' ) ";
+		
 		pd.put("CheckReport", detailReport);
 		page.setPd(pd);
 		List<PageData> detailSummayList = financeaccountsService.JqPage(page);

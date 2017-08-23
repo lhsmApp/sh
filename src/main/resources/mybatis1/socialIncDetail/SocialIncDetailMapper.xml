@@ -166,6 +166,7 @@
 		<include refid="tableName"></include>
 		where BUSI_DATE = '${BUSI_DATE}'
 	    and DEPT_CODE = '${DEPT_CODE}'
+		${CanOperate}
 	    group by ${GroupbyFeild}
     </select>
 

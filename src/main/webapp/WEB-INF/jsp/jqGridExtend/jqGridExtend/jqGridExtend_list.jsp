@@ -235,6 +235,19 @@
 					updatePagerIcons(table);
 					enableTooltips(table);
 				}, 0);
+				var ids = $(gridBase_selector).getDataIDs();
+				if(!(ids!=null && ids.length>0)){
+					$(ids).each(function (index, id){ 
+						$(gridBase_selector).editrow(id, false); 
+					});
+				};
+				
+				
+				
+				
+				
+				
+				
 			},
 		}).navGrid(pagerBase_selector, 
 			{//navButtons

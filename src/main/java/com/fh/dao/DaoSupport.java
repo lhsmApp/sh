@@ -1,6 +1,7 @@
 package com.fh.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -253,22 +254,43 @@ public class DaoSupport implements DAO {
 	 * @return
 	 * @throws Exception
 	 */
-	public void batch_One_del_Ins(String del, String ins, String editBillCode, List<?> objs, String deleteBillNum, String insertBillNum, PageData pdBillNum)throws Exception{
+	public void batch_One_del_Ins(String delSum, String insSum, String updateBillState, String editBillCode, List<Map<String, Object>> listMap, 
+			String deleteBillNum, String insertBillNum, PageData pdBillNum, 
+			String deleteReportListen, List<?> listReportListen)throws Exception{
 		SqlSessionFactory sqlSessionFactory = sqlSessionTemplate.getSqlSessionFactory();
 		//批量执行器
 		SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH,false);
 		try{
-			if(objs!=null&&objs.size()>0){
+			if(listMap!=null&&listMap.size()>0){
+				//最大单号
 				if(pdBillNum != null){
 					sqlSession.update(deleteBillNum, pdBillNum);
 					sqlSession.update(insertBillNum, pdBillNum);
 				}
-				for(int i=0,size=objs.size();i<size;i++){
-				    sqlSession.delete(del, objs.get(i));
+				//删掉接口的所有上报记录
+				if(listReportListen!=null&&listReportListen.size()>0){
+					for(int i=0,size=listReportListen.size();i<size;i++){
+					    sqlSession.delete(deleteReportListen, listReportListen.get(i));
+					}
 				}
-				for(int i=0,size=objs.size();i<size;i++){
-					sqlSession.update(ins, objs.get(i));
-					sqlSession.update(editBillCode, objs.get(i));
+				for(Map<String, Object> map : listMap){
+					Boolean bolDelSum = (Boolean) map.get("DelSum");
+					List<?> objs = (List<?>) map.get("AddList");
+					//1、能删情况下(bolDelSum取决于是否有接口的上报记录)，删除能删的汇总记录
+					if(bolDelSum){
+						for(int i=0,size=objs.size();i<size;i++){
+						    sqlSession.delete(delSum, objs.get(i));
+						}
+					}
+					//2、把区间内本部门的汇总记录都作废（必须在修改明细单号前）
+					for(int i=0,size=objs.size();i<size;i++){
+					    sqlSession.update(updateBillState, objs.get(i));
+					}
+					//3、插入汇总记录，修改明细单号
+					for(int i=0,size=objs.size();i<size;i++){
+						sqlSession.update(insSum, objs.get(i));
+						sqlSession.update(editBillCode, objs.get(i));
+					}
 				}
 				sqlSession.flushStatements();
 				sqlSession.commit();
