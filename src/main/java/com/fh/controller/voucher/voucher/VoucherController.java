@@ -37,6 +37,7 @@ import com.fh.entity.system.User;
 import com.fh.service.fhoa.department.DepartmentManager;
 import com.fh.service.sysConfig.sysconfig.SysConfigManager;
 import com.fh.service.sysSealedInfo.syssealedinfo.SysSealedInfoManager;
+import com.fh.service.sysUnlockInfo.sysunlockinfo.SysUnlockInfoManager;
 import com.fh.service.system.dictionaries.DictionariesManager;
 import com.fh.service.system.user.UserManager;
 import com.fh.service.system.user.impl.UserService;
@@ -98,6 +99,9 @@ public class VoucherController extends BaseController {
 	
 	@Resource(name = "userService")
 	private UserManager userService;
+	
+	@Resource(name = "sysunlockinfoService")
+	private SysUnlockInfoManager sysUnlockInfoService;
 
 	// 底行显示的求和与平均值字段
 	private StringBuilder SqlUserdata = new StringBuilder();
@@ -279,6 +283,61 @@ public class VoucherController extends BaseController {
 		}
 		return result;
 	}
+	
+	/**
+	 * 列表
+	 * 
+	 * @param page
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/getSyncDelList")
+	public @ResponseBody PageResult<PageData> getSyncDelList(JqPage page) throws Exception {
+		logBefore(logger, Jurisdiction.getUsername() + "获取待传输列表Voucher");
+		PageData pd = new PageData();
+		pd = this.getPageData();
+		String which = pd.getString("TABLE_CODE");
+		String voucherType = pd.getString("VOUCHER_TYPE");
+		String tableCode = getTableCode(which);
+		pd.put("TABLE_CODE", tableCode);
+		String sealType = getSealType(which, voucherType);
+		pd.put("BILL_TYPE", sealType);// 封存类型
+
+		String strDeptCode = pd.getString("DEPT_CODE");// 单位检索条件
+		if (StringUtil.isNotEmpty(strDeptCode)) {
+			String[] strDeptCodes = strDeptCode.split(",");
+			pd.put("DEPT_CODES", strDeptCodes);
+		}
+
+		String keywords = pd.getString("keywords"); // 关键词检索条件
+		if (null != keywords && !"".equals(keywords)) {
+			pd.put("keywords", keywords.trim());
+		}
+		String filters = pd.getString("filters"); // 多条件过滤条件
+		if (null != filters && !"".equals(filters)) {
+			pd.put("filterWhereResult", SqlTools.constructWhere(filters, new CallBack() {
+				public String executeField(String f) {
+					if (f.equals("BILL_CODE"))
+						return "A.BILL_CODE";
+					else
+						return f;
+				}
+			}));
+		}
+
+		page.setPd(pd);
+		List<PageData> varList = voucherService.listSyncDelList(pd); // 列出Voucher列表
+		PageResult<PageData> result = new PageResult<PageData>();
+		result.setRows(varList);
+
+		/*PageData userdata = null;
+		if (SqlUserdata != null && !SqlUserdata.toString().trim().equals("")) {
+			// 底行显示的求和与平均值字段
+			pd.put("Userdata", SqlUserdata.toString());
+			userdata = voucherService.getFooterSummary(page);
+			result.setUserdata(userdata);
+		}*/
+		return result;
+	}
 
 	/**
 	 * 获取明细显示结构
@@ -425,6 +484,68 @@ public class VoucherController extends BaseController {
 		}
 		return commonBase;
 	}
+	
+	/**
+	 * 同步删除
+	 * 
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/syncDel")
+	public @ResponseBody CommonBase syncDel() throws Exception {
+		logBefore(logger, Jurisdiction.getUsername() + "同步删除");
+		String orgCode = Tools.readTxtFile(Const.ORG_CODE); // 读取总部组织机构编码
+		// if(!Jurisdiction.buttonJurisdiction(menuUrl, "del")){return null;}
+		// //校验权限
+		CommonBase commonBase = new CommonBase();
+		commonBase.setCode(-1);
+		PageData pd = this.getPageData();
+		String strDataRows = pd.getString("DATA_ROWS");
+		JSONArray array = JSONArray.fromObject(strDataRows);
+		@SuppressWarnings("unchecked")
+		List<PageData> listTransferData = (List<PageData>) JSONArray.toCollection(array, PageData.class);// 过时方法
+		if (null != listTransferData && listTransferData.size() > 0) {
+			/********************** 生成传输数据 ************************/
+			String which = pd.getString("TABLE_CODE");
+			String tableCode = getTableCode(which);
+			// String voucherType=pd.getString("VOUCHER_TYPE");
+
+			// 用语句查询出数据库表的所有字段及其属性；拼接成jqgrid全部列
+			List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCode);
+			GenerateTransferData generateTransferData = new GenerateTransferData();
+			Map<String, List<PageData>> mapTransferData = new HashMap<String, List<PageData>>();
+			mapTransferData.put(tableCode, listTransferData);
+			String transferData = generateTransferData.generateTransferData(tableColumns, mapTransferData, orgCode,
+					TransferOperType.DELETE);
+
+			// 执行上传FIMS
+			Service service = new Service();
+			Call call = (Call) service.createCall();
+			pd.put("KEY_CODE", "JSynFactTableData");
+			String strUrl = sysConfigManager.getSysConfigByKey(pd);
+			URL url = new URL(strUrl);
+			call.setTargetEndpointAddress(url);
+			call.setOperationName(new QName("http://JSynFactTableData.j2ee", "synFactData"));
+			call.setUseSOAPAction(true);
+			String message = (String) call.invoke(new Object[] { transferData });
+			System.out.println(message);
+			if (message.equals("TRUE")) {
+				//更改TB_SYS_UNLOCK_INFO删除状态
+				User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
+				String userId = user.getUSER_ID();
+				for(PageData pdItem:listTransferData ){
+					pdItem.put("DEL_USER", userId);
+					pdItem.put("DEL_DATE", DateUtils.getCurrentTime());//YYYY-MM-DD HH:MM:SS
+				}
+				sysUnlockInfoService.edit(listTransferData);
+				commonBase.setCode(0);
+			} else {
+				commonBase.setCode(-1);
+				commonBase.setMessage(message);
+			}
+		}
+		return commonBase;
+	}
 
 	/**
 	 * 批量获取凭证号
@@ -462,8 +583,9 @@ public class VoucherController extends BaseController {
 			String userId = user.getUSER_ID();
 			for (PageData item : listTransferData) {
 				String invoiceNumber = item.getString("BILL_CODE");// 单据编号
-				String fmisOrg = item.getString("DEPT_CODE");// FMIS组织机构编码
-				String tableName = "T" + getTableCode(which);// 在fmis建立的业务表名
+				//String fmisOrg = item.getString("DEPT_CODE");// FMIS组织机构编码
+				String fmisOrg = Tools.readTxtFile(Const.ORG_CODE); // 读取总部组织机构编码
+				String tableName = "T_" + getTableCode(which);// 在fmis建立的业务表名
 				String result = (String) call.invoke(new Object[] { tableName, invoiceNumber, fmisOrg });// 对应定义参数
 				if (result.length() > 0) {
 					String[] stringArr = result.split(";");

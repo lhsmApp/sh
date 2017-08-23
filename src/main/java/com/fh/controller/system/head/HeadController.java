@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fh.controller.base.BaseController;
-import com.fh.service.system.appuser.AppuserManager;
 import com.fh.service.system.fhsms.FhsmsManager;
 import com.fh.service.system.user.UserManager;
 import com.fh.service.system.userphoto.UserPhotoManager;
@@ -41,8 +40,6 @@ public class HeadController extends BaseController {
 	
 	@Resource(name="userService")
 	private UserManager userService;	
-	@Resource(name="appuserService")
-	private AppuserManager appuserService;
 	@Resource(name="fhsmsService")
 	private FhsmsManager fhsmsService;
 	@Resource(name="userphotoService")
@@ -175,8 +172,8 @@ public class HeadController extends BaseController {
 		if("yes".endsWith(isAll)){
 			try {
 				List<PageData> userList = new ArrayList<PageData>();
-				userList = "appuser".equals(fmsg) ? appuserService.listAllUser(pd):userService.listAllUser(pd);
-				zcount = userList.size();
+				//userList = "appuser".equals(fmsg) ? appuserService.listAllUser(pd):userService.listAllUser(pd);
+				//zcount = userList.size();
 				try {
 					for(int i=0;i<userList.size();i++){
 						if(Tools.checkMobileNumber(userList.get(i).getString("PHONE"))){			//手机号格式不对就跳过
@@ -268,8 +265,8 @@ public class HeadController extends BaseController {
 				if("yes".endsWith(isAll)){
 					try {
 						List<PageData> userList = new ArrayList<PageData>();
-						userList = "appuser".equals(fmsg) ? appuserService.listAllUser(pd):userService.listAllUser(pd);
-						zcount = userList.size();
+						//userList = "appuser".equals(fmsg) ? appuserService.listAllUser(pd):userService.listAllUser(pd);
+						//zcount = userList.size();
 						try {
 							for(int i=0;i<userList.size();i++){
 								if(Tools.checkEmail(userList.get(i).getString("EMAIL"))){		//邮箱格式不对就跳过

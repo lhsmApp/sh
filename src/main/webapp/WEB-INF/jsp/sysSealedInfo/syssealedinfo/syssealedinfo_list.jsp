@@ -21,6 +21,7 @@
 <!-- 最新版的Jqgrid Css，如果旧版本（Ace）某些方法不好用，尝试用此版本Css，替换旧版本Css -->
 <!-- <link rel="stylesheet" type="text/css" media="screen" href="static/ace/css/ui.jqgrid-bootstrap.css" /> -->
 <script type="text/javascript" src="static/js/jquery-1.7.2.js"></script>
+<!-- <script type="text/javascript" src="static/ace/js/jquery.js"></script> -->
 <!-- 树形下拉框start -->
 <script type="text/javascript" src="plugins/selectZtree/selectTree.js"></script>
 <script type="text/javascript" src="plugins/selectZtree/framework.js"></script>
@@ -159,11 +160,35 @@
 				{label: ' ',name:'myac',index:'', width:70, fixed:true, sortable:false, resize:false,
 					formatter:'actions', 
 					formatoptions:{ 
+					 onEdit:function(rowid){
+							 var curRow= $("tr[id="+rowid+"]");
+							 var curCol=curRow.find("td[aria-describedby='jqGrid_STATE']");
+							 if(curCol.attr('title')=='解封'){
+								 var cur=$("#jSaveButton_"+rowid);
+								 cur.find("span").css('display','none');
+							 }
+						},
                         onSuccess: function(response) {
-							if(response.responseJSON.code==0){
+                        	//console.log(response.responseText.code);
+                        	var code=JSON.parse(response.responseText);
+							if(code.code==0){
 								return [true];
 							}else{
-								return [false, response.responseJSON.message];
+								/* console.log(code.code);
+								console.log(code.message);
+								$("#subTitle").tips({
+									side : 3,
+									msg : '保存成功',
+									bg : '#009933',
+									time : 3
+								}); */
+								$("#subTitle").tips({
+									side : 3,
+									msg : '保存失败,' + code.message,
+									bg : '#cc0033',
+									time : 3
+								});
+								return [false, code.message];
 							}                
                         },
                         onError :function(rowid, res, stat, err) {
@@ -173,6 +198,7 @@
                         afterSave:function(rowid, res){
                         	$(".tooltip").remove();
                         	/* $("#jqGrid").trigger("reloadGrid"); */
+                        	
                         },
 						keys:true,
 					    delbutton: false,//disable delete button
@@ -182,6 +208,7 @@
 				{ label: '单据编码',name:'BILL_CODE', width:90,hidden : true,editable: true},
 				{ label: '单据单位', name: 'RPT_DEPT', width: 90,hidden : true,editable: true,edittype: 'select',formatter:'select',formatoptions:{value:"${departmentStr}"},editoptions:{value:"${departmentStr}"},stype: 'select',searchoptions:{value:"${departmentStr}"}},
 				{ label: '单据期间', name: 'RPT_DUR', width: 60,hidden : true,editable: true,},
+				{ label: '单据类型', name: 'BILL_TYPE', width: 60,hidden : true,editable: true,},
 				
 				/* { label: '单据编码',name:'BILL_CODE', width:90}, */
 				{ label: '单据单位', name: 'RPT_DEPT', width: 90,edittype: 'select',formatter:'select',formatoptions:{value:"${departmentStr}"},editoptions:{value:"${departmentStr}"},stype: 'select',searchoptions:{value:"${departmentStr}"}},
@@ -271,7 +298,7 @@
 			}
 		);
 	
-		// 批量编辑
+		/* // 批量编辑
         $('#jqGrid').navButtonAdd('#jqGridPager',
         {
             buttonicon: "ace-icon fa fa-pencil-square-o purple",
@@ -294,13 +321,12 @@
         //批量保存
         $('#jqGrid').navButtonAdd('#jqGridPager',
         {
-     	   /* bigger-150 */
             buttonicon: "ace-icon fa fa-save green",
             title: "批量保存",
             caption: "",
             position: "last",
             onClickButton: batchSave
-        });
+        }); */
  	});
 
 	//switch element when editing inline
@@ -311,8 +337,10 @@
 				.after('<span class="lbl" data-lbl="封存        解封"></span>'); 
 			 if (cellvalue=="解封") {	
 				$(cell).find('input[type=checkbox]').attr('checked','checked');
+				$(cell).find('input[type=checkbox]').attr('disabled','true');
 			 }else{
 			 	$(cell).find('input[type=checkbox]').removeAttr('checked');
+			 	$(cell).find('input[type=checkbox]').attr('disabled');
 			 }
 		}, 0);
 		if (cellvalue=="封存") {

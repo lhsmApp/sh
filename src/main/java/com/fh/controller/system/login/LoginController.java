@@ -7,7 +7,6 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -22,16 +21,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fh.controller.base.BaseController;
+import com.fh.entity.system.Menu;
+import com.fh.entity.system.Role;
+import com.fh.entity.system.User;
 import com.fh.service.fhoa.datajur.DatajurManager;
-import com.fh.service.system.appuser.AppuserManager;
 import com.fh.service.system.buttonrights.ButtonrightsManager;
 import com.fh.service.system.fhbutton.FhbuttonManager;
 import com.fh.service.system.fhlog.FHlogManager;
 import com.fh.service.system.loginimg.LogInImgManager;
 import com.fh.service.system.menu.MenuManager;
-import com.fh.entity.system.Menu;
-import com.fh.entity.system.Role;
-import com.fh.entity.system.User;
 import com.fh.service.system.role.RoleManager;
 import com.fh.service.system.user.UserManager;
 import com.fh.util.AppUtil;
@@ -42,7 +40,6 @@ import com.fh.util.PageData;
 import com.fh.util.RightsHelper;
 import com.fh.util.StringUtil;
 import com.fh.util.Tools;
-import com.fh.util.base.ConvertUtils;
 /**
  * 总入口
  * @author fh QQ 3 1 3 5 9 6 7 9 0[青苔]
@@ -65,8 +62,6 @@ public class LoginController extends BaseController {
 	private ButtonrightsManager buttonrightsService;
 	@Resource(name="fhbuttonService")
 	private FhbuttonManager fhbuttonService;
-	@Resource(name="appuserService")
-	private AppuserManager appuserService;
 	@Resource(name="datajurService")
 	private DatajurManager datajurService;
 	@Resource(name="fhlogService")
@@ -337,7 +332,7 @@ public class LoginController extends BaseController {
 		ModelAndView mv = this.getModelAndView();
 		PageData pd = new PageData();
 		pd.put("userCount", Integer.parseInt(userService.getUserCount("").get("userCount").toString())-1);				//系统用户数
-		pd.put("appUserCount", Integer.parseInt(appuserService.getAppUserCount("").get("appUserCount").toString()));	//会员数
+		//pd.put("appUserCount", Integer.parseInt(appuserService.getAppUserCount("").get("appUserCount").toString()));	//会员数
 		pd.put("SYSNAME", Tools.readTxtFile(Const.SYSNAME)); //读取系统名称
 		mv.addObject("pd",pd);
 		mv.setViewName("system/index/default");

@@ -91,10 +91,10 @@
 									<th class="center" style="width: 50px;">序号</th>
 									<th class='center'>角色</th>
 									<c:if test="${QX.edit == 1 }">
-									<th class="center">增</th>
+									<!-- <th class="center">增</th>
 									<th class="center">删</th>
 									<th class="center">改</th>
-									<th class="center">查</th>
+									<th class="center">查</th> -->
 									</c:if>
 									<th style="width:155px;"  class="center">操作</th>
 								</tr>
@@ -107,12 +107,12 @@
 										<tr>
 										<td class='center' style="width:30px;">${vs.index+1}</td>
 										<td id="ROLE_NAMETd${var.ROLE_ID }">${var.ROLE_NAME }</td>
-										<c:if test="${QX.edit == 1 }">
+										<%-- <c:if test="${QX.edit == 1 }">
 										<td style="width:30px;"><a onclick="roleButton('${var.ROLE_ID }','add_qx');" class="btn btn-warning btn-mini" title="分配新增权限"><i class="ace-icon fa fa-wrench bigger-110 icon-only"></i></a></td>
 										<td style="width:30px;"><a onclick="roleButton('${var.ROLE_ID }','del_qx');" class="btn btn-warning btn-mini" title="分配删除权限"><i class="ace-icon fa fa-wrench bigger-110 icon-only"></i></a></td>
 										<td style="width:30px;"><a onclick="roleButton('${var.ROLE_ID }','edit_qx');" class="btn btn-warning btn-mini" title="分配修改权限"><i class="ace-icon fa fa-wrench bigger-110 icon-only"></i></a></td>
 										<td style="width:30px;"><a onclick="roleButton('${var.ROLE_ID }','cha_qx');" class="btn btn-warning btn-mini" title="分配查看权限"><i class="ace-icon fa fa-wrench bigger-110 icon-only"></i></a></td>
-										</c:if>
+										</c:if> --%>
 										<td style="width:155px;">
 										<c:if test="${QX.edit != 1 && QX.del != 1 }">
 										<div style="width:100%;" class="center">

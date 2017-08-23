@@ -67,6 +67,15 @@ public class VoucherService implements VoucherManager{
 		return (List<PageData>)dao.findForList("VoucherMapper.listAll", pd);
 	}
 	
+	/**列表(同步删除)
+	 * @param pd
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PageData> listSyncDelList(PageData pd)throws Exception{
+		return (List<PageData>)dao.findForList("VoucherMapper.listSyncDelList", pd);
+	}
+	
 	/**通过id获取数据
 	 * @param pd
 	 * @throws Exception

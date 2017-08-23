@@ -120,6 +120,9 @@
 									<li><a data-toggle="tab" href="#voucherMgr"> <i
 											class="orange ace-icon fa fa-rss bigger-120"></i> 凭证管理
 									</a></li>
+									<li><a data-toggle="tab" href="#voucherSyncDel"> <i
+											class="red ace-icon fa fa-exchange bigger-120"></i> 同步删除
+									</a></li>
 								</ul>
 								<div class="tab-content no-border ">
 									<table id="jqGrid"></table>
@@ -236,17 +239,19 @@
 				$("[data-original-title='上传']").removeClass("hidden");
 				$("[data-original-title='获取凭证号']").addClass("hidden");
 				$("[data-original-title='获取冲销凭证号']").addClass("hidden");
+				$("[data-original-title='同步删除']").addClass("hidden");
 				jQuery('#jqGrid').hideCol(['CERT_CODE','REVCERT_CODE']);
 				var busiDate = $("#busiDate").val(); 
 				var deptCode = $("#departCode").val(); 
-				$("#jqGrid").jqGrid("setGridParam",{postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}',"BUSI_DATE":busiDate,"DEPT_CODE":deptCode}});
+				$("#jqGrid").jqGrid("setGridParam",{url:"<%=basePath%>voucher/getPageList.do",postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}',"BUSI_DATE":busiDate,"DEPT_CODE":deptCode}});
 				$("#jqGrid").trigger("reloadGrid");  
-			}else{
+			}else if(target.attr('href')=='#voucherMgr'){
 				voucherType=2;
 				$("[data-original-title='上传']").addClass("hidden");
 				$("[data-original-title='获取凭证号']").removeClass("hidden");
 				$("[data-original-title='获取冲销凭证号']").removeClass("hidden");
-			
+				$("[data-original-title='同步删除']").addClass("hidden");
+				
 				if($("[data-original-title='获取凭证号']").length==0){
 					//获取凭证号
 			       $('#jqGrid').navButtonAdd('#jqGridPager',
@@ -274,7 +279,31 @@
 				jQuery('#jqGrid').showCol(['CERT_CODE','REVCERT_CODE']);
 				var busiDate = $("#busiDate").val(); 
 				var deptCode = $("#departCode").val(); 
-				$("#jqGrid").jqGrid("setGridParam",{postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}',"BUSI_DATE":busiDate,"DEPT_CODE":deptCode}});
+				$("#jqGrid").jqGrid("setGridParam",{url:"<%=basePath%>voucher/getPageList.do",postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}',"BUSI_DATE":busiDate,"DEPT_CODE":deptCode}});
+				$("#jqGrid").trigger("reloadGrid");  
+			}else{
+				voucherType=2;
+				$("[data-original-title='上传']").addClass("hidden");
+				$("[data-original-title='获取凭证号']").addClass("hidden");
+				$("[data-original-title='获取冲销凭证号']").addClass("hidden");
+				$("[data-original-title='同步删除']").removeClass("hidden");
+				
+				if($("[data-original-title='同步删除']").length==0){
+					//同步删除
+			       $('#jqGrid').navButtonAdd('#jqGridPager',
+			       {
+			    	   /* bigger-150 */
+			           buttonicon: "ace-icon fa fa-exchange red",
+			           title: "同步删除",
+			           caption: "",
+			           position: "last",
+			           onClickButton: syncDel
+			       });
+				}
+				jQuery('#jqGrid').hideCol(['CERT_CODE','REVCERT_CODE']);
+				var busiDate = $("#busiDate").val(); 
+				var deptCode = $("#departCode").val(); 
+				$("#jqGrid").jqGrid("setGridParam",{url:"<%=basePath%>voucher/getSyncDelList.do",postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}',"BUSI_DATE":busiDate,"DEPT_CODE":deptCode}});
 				$("#jqGrid").trigger("reloadGrid");  
 			}
 		});
@@ -550,6 +579,68 @@
 		});
 	}
 	
+	//同步删除
+	function syncDel(e) {
+		var listData =new Array();
+		var ids = $("#jqGrid").jqGrid('getGridParam','selarrrow');
+		//console.log(ids);
+		//遍历访问这个集合  
+		var rowData;
+		$(ids).each(function (index, id){  
+            $("#jqGrid").saveRow(id, false, 'clientArray');
+             rowData = $("#jqGrid").getRowData(id);
+            listData.push(rowData);
+		});
+		if(listData.length==0){
+			$("#subTitle").tips({
+				side:3,
+	            msg:'请选择单据后再进行【同步删除】',
+	            bg:'#009933',
+	            time:3
+	        });
+			return;
+		}
+		top.jzts();
+		$.ajax({
+			type: "POST",
+			url: '<%=basePath%>voucher/syncDel.do?TABLE_CODE='+which,
+	    	//data: rowData,//可以单独传入一个对象，后台可以直接通过对应模型接受参数。但是传入Array（listData）就不好用了，所以传list方式需将List转为Json字符窜。
+			//data: '{"rows":listData}',
+			data:{DATA_ROWS:JSON.stringify(listData)},
+	    	dataType:'json',
+			cache: false,
+			success: function(response){
+				if(response.code==0){
+					$("#jqGrid").trigger("reloadGrid");  
+					$(top.hangge());//关闭加载状态
+					$("#subTitle").tips({
+						side:3,
+			            msg:'同步删除成功',
+			            bg:'#009933',
+			            time:3
+			        });
+				}else{
+					$(top.hangge());//关闭加载状态
+					$("#subTitle").tips({
+						side:3,
+			            msg:'同步删除失败,'+response.message,
+			            bg:'#cc0033',
+			            time:3
+			        });
+				}
+			},
+	    	error: function(e) {
+	    		$(top.hangge());//关闭加载状态
+				$("#subTitle").tips({
+					side:3,
+		            msg:'同步删除失败,'+response.responseJSON.message,
+		            bg:'#cc0033',
+		            time:3
+		        });
+	    	}
+		});
+	}
+	
 	//批量传输
 	function batchSave(e) {
 		var listData =new Array();
@@ -645,7 +736,7 @@
 			            colModel: detailColModel,
 			            //width: '100%',
 			            height: '100%',
-			            shrinkToFit:true,
+			            shrinkToFit:false,
 			            autowidth:true,
 			            toppager : "#"+childGridPagerID,
 			            pgbuttons: false,//上下按钮 
@@ -665,7 +756,7 @@
 						},
 						gridComplete:function(){
 						    //$("#" + childGridID).parents(".ui-jqgrid-bdiv").css("overflow-x","hidden");
-							$(".ui-jqgrid-btable").removeAttr("style");
+							//$(".ui-jqgrid-btable").removeAttr("style");
 						}
 			        });
 			        
