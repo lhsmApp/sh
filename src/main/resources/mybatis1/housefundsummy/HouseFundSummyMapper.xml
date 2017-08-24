@@ -121,6 +121,15 @@
 		<include refid="tableName"></include>
 		where BUSI_DATE = #{BUSI_DATE}
 	    and DEPT_CODE = #{DEPT_CODE} 
+	    and BILL_STATE = #{BILL_STATE}
+	</delete>
+	
+	<!-- 删除数据 -->
+	<delete id="updateBillState" parameterType="pd">
+		update <include refid="tableName"></include>
+		set BILL_STATE = '0'
+		where BUSI_DATE = #{BUSI_DATE}
+	    and DEPT_CODE = #{DEPT_CODE} 
 	</delete>
 	
 	<!-- 新增-->
@@ -138,6 +147,7 @@
 		<include refid="tableName"></include>
 		where BUSI_DATE = #{BUSI_DATE}
 	    and DEPT_CODE = #{DEPT_CODE} 
+	    and BILL_STATE = #{BILL_STATE} 
     </select>
 	
 </mapper>

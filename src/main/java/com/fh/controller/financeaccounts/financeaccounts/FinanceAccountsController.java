@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
 import com.fh.controller.common.AcconutsShowList;
+import com.fh.controller.common.FilterBillCode;
 import com.fh.controller.common.TmplUtil;
 import com.fh.entity.CommonBase;
 import com.fh.entity.JqPage;
@@ -80,6 +81,21 @@ public class FinanceAccountsController extends BaseController {
 
 	//页面显示数据的年月
 	String SystemDateTime = "";
+
+	String HouseFundSummy = "tb_house_fund_summy";
+	String SocialIncSummy = "tb_social_inc_summy";
+	String StaffSummy = "TB_STAFF_summy";
+
+	//枚举类型  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+	String TypeCodeGoldDetail = BillType.GOLD_DETAIL.getNameKey();
+	String TypeCodeGoldSummy = BillType.GOLD_SUMMARY.getNameKey();
+	String TypeCodeGoldListen = BillType.GOLD_LISTEN.getNameKey();
+	String TypeCodeSocialDetail = BillType.SECURITY_DETAIL.getNameKey();
+	String TypeCodeSocialSummy = BillType.SECURITY_SUMMARY.getNameKey();
+	String TypeCodeSocialListen = BillType.SECURITY_LISTEN.getNameKey();
+	String TypeCodeStaffDetail = BillType.SALLARY_DETAIL.getNameKey();
+	String TypeCodeStaffSummy = BillType.SALLARY_SUMMARY.getNameKey();
+	String TypeCodeStaffListen = BillType.SALLARY_LISTEN.getNameKey();
 	
 	/**列表
 	 * @param page
@@ -154,6 +170,13 @@ public class FinanceAccountsController extends BaseController {
 		pd.put("TableName", detailTableName);
 		//上报
 		String detailReport = " and (BUSI_DATE, DEPT_CODE) in (select RPT_DUR, RPT_DEPT from tb_sys_sealed_info where STATE = '" + DurState.Sealed.getNameKey() + "' and BILL_TYPE = '" + getDetailTypeCode(which) + "' ) ";
+		detailReport += FilterBillCode.getBillCodeNotInSumInvalid(HouseFundSummy);
+		detailReport += FilterBillCode.getBillCodeNotInSumInvalid(SocialIncSummy);
+		detailReport += FilterBillCode.getBillCodeNotInSumInvalid(StaffSummy);
+		
+		detailReport += FilterBillCode.getReportListenNotSummy(HouseFundSummy, TypeCodeGoldSummy, TypeCodeGoldListen);
+		detailReport += FilterBillCode.getReportListenNotSummy(SocialIncSummy, TypeCodeSocialSummy, TypeCodeSocialListen);
+		detailReport += FilterBillCode.getReportListenNotSummy(StaffSummy, TypeCodeStaffSummy, TypeCodeStaffListen);
 		
 		pd.put("CheckReport", detailReport);
 		page.setPd(pd);
@@ -239,6 +262,8 @@ public class FinanceAccountsController extends BaseController {
 		List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);
 		
 		String whereSql = "";
+		String whereSqlFirst = "";
+		String whereSqlSecond = "";
 		whereSql += " where BUSI_DATE = '" + SystemDateTime + "' ";
 		//多条件过滤条件
 		String filters = pd.getString("filters");
@@ -260,15 +285,20 @@ public class FinanceAccountsController extends BaseController {
 				}
 			}
 		}
-		pd.put("whereSql", whereSql);
+		whereSqlFirst = whereSql;
+		whereSqlFirst += getDetailHelpful(TabType, true);
+		whereSqlSecond = whereSql;
+		whereSqlSecond += getDetailHelpful(TabType, false);
 		
-		String falseTableName = getDetailTableCode(which, TabType, true);
-		pd.put("TableName", falseTableName);
+		String firstTableName = getDetailTableCode(which, TabType, true);
+		pd.put("TableName", firstTableName);
+		pd.put("whereSql", whereSqlFirst);
 		page.setPd(pd);
 		List<PageData> listFirst = financeaccountsService.dataListDetail(page);
 		
 		String secondTableName = getDetailTableCode(which, TabType, false);
 		pd.put("TableName", secondTableName);
+		pd.put("whereSql", whereSqlSecond);
 		page.setPd(pd);
 		List<PageData> listSecond = financeaccountsService.dataListDetail(page);
 
@@ -278,7 +308,7 @@ public class FinanceAccountsController extends BaseController {
 		//item.setTABLE_CODE(falseTableName);
 		//List<TmplConfigDetail> m_columnsList = tmplconfigService.listNeed(item);
 		//界面对比的表结构
-		List<TableColumns> tableSumColumns = tmplconfigService.getTableColumns(falseTableName);
+		List<TableColumns> tableSumColumns = tmplconfigService.getTableColumns(firstTableName);
 
 		List<String> listMatchFeild = Arrays.asList("USER_CODE");
 		List<PageData> varList = AcconutsShowList.getShowListAll(listFirst, listSecond, tableSumColumns, listMatchFeild, "");
@@ -362,11 +392,11 @@ public class FinanceAccountsController extends BaseController {
 	private String getSummyTableCode(String which) {
 		String tableCode = "";
 		if (which != null && which.equals("1")) {
-			tableCode = "tb_staff_summy";
+			tableCode = StaffSummy;
 		} else if (which != null && which.equals("2")) {
-			tableCode = "tb_staff_summy";
+			tableCode = StaffSummy;
 		} else if (which != null && which.equals("3")) {
-			tableCode = "tb_staff_summy";
+			tableCode = StaffSummy;
 		} else if (which != null && which.equals("4")) {
 			tableCode = "tb_social_inc_summy";
 		} else if (which != null && which.equals("5")) {
@@ -499,6 +529,31 @@ public class FinanceAccountsController extends BaseController {
 			list = Arrays.asList(strFeild.replace(" ", "").toUpperCase().split(","));
 		}
 		return list;
+	}
+	private String getDetailHelpful(String tabType, Boolean bolFirst) {
+		String detailReport = "";
+		if("1".equals(tabType)){
+			if(bolFirst){
+				detailReport += FilterBillCode.getBillCodeNotInSumInvalid(HouseFundSummy);
+				detailReport += FilterBillCode.getBillCodeNotInSumInvalid(SocialIncSummy);
+				detailReport += FilterBillCode.getBillCodeNotInSumInvalid(StaffSummy);
+				
+				detailReport += FilterBillCode.getReportListenNotSummy(HouseFundSummy, TypeCodeGoldSummy, TypeCodeGoldListen);
+				detailReport += FilterBillCode.getReportListenNotSummy(SocialIncSummy, TypeCodeSocialSummy, TypeCodeSocialListen);
+				detailReport += FilterBillCode.getReportListenNotSummy(StaffSummy, TypeCodeStaffSummy, TypeCodeStaffListen);
+			}
+		} else if("2".equals(tabType)){
+			if(!bolFirst){
+				detailReport += FilterBillCode.getBillCodeNotInSumInvalid(HouseFundSummy);
+				detailReport += FilterBillCode.getBillCodeNotInSumInvalid(SocialIncSummy);
+				detailReport += FilterBillCode.getBillCodeNotInSumInvalid(StaffSummy);
+				
+				detailReport += FilterBillCode.getReportListenNotSummy(HouseFundSummy, TypeCodeGoldSummy, TypeCodeGoldListen);
+				detailReport += FilterBillCode.getReportListenNotSummy(SocialIncSummy, TypeCodeSocialSummy, TypeCodeSocialListen);
+				detailReport += FilterBillCode.getReportListenNotSummy(StaffSummy, TypeCodeStaffSummy, TypeCodeStaffListen);
+			}
+		}
+		return detailReport;
 	}
 	
 	@InitBinder
