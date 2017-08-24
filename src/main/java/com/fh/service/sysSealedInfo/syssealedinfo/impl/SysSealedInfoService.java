@@ -128,5 +128,13 @@ public class SysSealedInfoService implements SysSealedInfoManager{
 	public void insertBatch(List<SysSealed> list)throws Exception{
 		dao.update("SysSealedInfoMapper.insertBatch", list);
 	}
+	
+	/**获取封存状态，用于验证解封某业务时是否可以进行解封
+	 * @param pd
+	 * @throws Exception
+	 */
+	public String valiState(PageData pd)throws Exception{
+		return (String)dao.findForObject("SysSealedInfoMapper.valiState", pd);
+	}
 }
 

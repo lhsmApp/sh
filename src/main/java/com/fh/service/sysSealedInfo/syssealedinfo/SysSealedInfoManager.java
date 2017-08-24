@@ -87,5 +87,11 @@ public interface SysSealedInfoManager{
 	 * @throws Exception
 	 */
 	public void insertBatch(List<SysSealed> list)throws Exception;
+	
+	/**获取封存状态，用于验证解封某业务时是否可以进行解封
+	 * @param pd
+	 * @throws Exception
+	 */
+	public String valiState(PageData pd)throws Exception;
 }
 

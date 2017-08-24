@@ -64,6 +64,8 @@
 		RPT_DEPT = #{RPT_DEPT}
 		and
 		RPT_DUR = #{RPT_DUR}
+		and
+		BILL_TYPE = #{BILL_TYPE}
 	</update>
 
 	<!-- 通过ID获取数据 -->
@@ -255,4 +257,13 @@
 		    </if>
 		</foreach>
 	</insert>
+	
+	<!-- 获取封存状态，用于验证解封某业务时是否可以进行解封 -->
+	<select id="valiState" parameterType="pd" resultType="string">
+		select STATE from
+		<include refid="tableName"></include>
+		<where>
+			BILL_TYPE=#{VALI_TYPE} and RPT_DEPT=#{RPT_DEPT} and RPT_DUR=#{RPT_DUR}
+		</where>
+	</select>
 </mapper>

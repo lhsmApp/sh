@@ -8,8 +8,6 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import net.sf.json.JSONArray;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,16 +19,17 @@ import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
 import com.fh.entity.system.Menu;
 import com.fh.entity.system.Role;
-import com.fh.service.system.appuser.AppuserManager;
 import com.fh.service.system.fhlog.FHlogManager;
+import com.fh.service.system.menu.MenuManager;
 import com.fh.service.system.role.RoleManager;
 import com.fh.service.system.user.UserManager;
-import com.fh.service.system.menu.MenuManager;
 import com.fh.util.AppUtil;
 import com.fh.util.Jurisdiction;
 import com.fh.util.PageData;
 import com.fh.util.RightsHelper;
 import com.fh.util.Tools;
+
+import net.sf.json.JSONArray;
 /**
  * 角色权限管理
 * @ClassName: RoleController
@@ -50,8 +49,6 @@ public class RoleController extends BaseController {
 	private RoleManager roleService;
 	@Resource(name="userService")
 	private UserManager userService;
-	@Resource(name="appuserService")
-	private AppuserManager appuserService;
 	@Resource(name="fhlogService")
 	private FHlogManager FHLOG;
 	
@@ -204,14 +201,14 @@ public class RoleController extends BaseController {
 				errInfo = "false";											//下级有数据时，删除失败
 			}else{
 				List<PageData> userlist = userService.listAllUserByRoldId(pd);			//此角色下的用户
-				List<PageData> appuserlist = appuserService.listAllAppuserByRorlid(pd);	//此角色下的会员
-				if(userlist.size() > 0 || appuserlist.size() > 0){						//此角色已被使用就不能删除
-					errInfo = "false2";
-				}else{
+				//List<PageData> appuserlist = appuserService.listAllAppuserByRorlid(pd);	//此角色下的会员
+				//if(userlist.size() > 0 || appuserlist.size() > 0){						//此角色已被使用就不能删除
+				//	errInfo = "false2";
+				//}else{
 				roleService.deleteRoleById(ROLE_ID);	//执行删除
 				FHLOG.save(Jurisdiction.getUsername(), "删除角色ID为:"+ROLE_ID);
 				errInfo = "success";
-				}
+				//}
 			}
 		} catch(Exception e){
 			logger.error(e.toString(), e);
