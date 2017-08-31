@@ -65,25 +65,25 @@
 							<div class="btn-toolbar inline middle no-margin">
 								<div data-toggle="buttons" class="btn-group no-margin">
 									<label class="btn btn-sm btn-primary active"> <span
-										class="bigger-110">合同化</span> <input type="radio" value="S016" />
+										class="bigger-110">合同化</span> <input type="radio" value="16" />
 									</label>
-									<label class="btn btn-sm btn-primary active"> <span
-										class="bigger-110">市场化</span> <input type="radio" value="S017" />
+									<label class="btn btn-sm btn-primary"> <span
+										class="bigger-110">市场化</span> <input type="radio" value="17" />
 									</label>
-									<label class="btn btn-sm btn-primary active"> <span
-										class="bigger-110">系统内劳务</span> <input type="radio" value="S018" />
+									<label class="btn btn-sm btn-primary"> <span
+										class="bigger-110">系统内劳务</span> <input type="radio" value="18" />
 									</label>
-									<label class="btn btn-sm btn-primary active"> <span
-										class="bigger-110">运行人员</span> <input type="radio" value="S019" />
+									<label class="btn btn-sm btn-primary"> <span
+										class="bigger-110">运行人员</span> <input type="radio" value="19" />
 									</label>
-									<label class="btn btn-sm btn-primary active"> <span
-										class="bigger-110">劳务派遣</span> <input type="radio" value="S020" />
+									<label class="btn btn-sm btn-primary"> <span
+										class="bigger-110">劳务派遣</span> <input type="radio" value="20" />
 									</label> 
 									<label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">社保</span> <input type="radio" value="SI004" />
+										class="bigger-110">社保</span> <input type="radio" value="24" />
 									</label> 
 									<label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">公积金</span> <input type="radio" value="HF004" />
+										class="bigger-110">公积金</span> <input type="radio" value="28" />
 									</label>
 								</div>
 							</div>
@@ -113,16 +113,15 @@
 												<div class="selectTree" id="selectTree" multiMode="true"
 													allSelectable="false" noGroup="false"></div>
 											</span>
-											<span class="pull-left" style="margin-right: 5px;">
-												<select class="chosen-select form-control"
-													name="CUST_COL7" id="CUST_COL7"
-													data-placeholder="请选择帐套"
-													style="vertical-align: top; height:32px;width: 150px;">
-													<option value="">请选择帐套</option>
-													<c:forEach items="${FMISACC}" var="each">
-														<option value="${each.DICT_CODE}" 
-														    <c:if test="${pd.CUST_COL7==each.DICT_CODE}">selected</c:if>>${each.NAME}</option>
-													</c:forEach>
+											<span style="margin-right: 5px;"> 
+												<select
+													class="chosen-select form-control" name="FMISACC"
+													id="FMISACC" data-placeholder="请选择帐套"
+													style="vertical-align: top; height: 32px; width: 150px;">
+														<option value="0">请选择帐套</option>
+														<c:forEach items="${fmisacc}" var="fmi">
+															<option value="${fmi.DICT_CODE}">${fmi.NAME}</option>
+														</c:forEach>
 												</select>
 											</span>
 											<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
@@ -199,7 +198,7 @@
 	<script src="static/ace/js/ace/ace.widget-box.js"></script>
 	<script type="text/javascript"> 
 	//var jqGridColModelSub;
-	var which='1';
+	var which='16';
 	var gridHeight;
 	var jqGridColModel;
 	var voucherType;
@@ -237,7 +236,6 @@
 				var target = $(this).find('input[type=radio]');
 				$(this).removeClass('active');
 				var whichCur = parseInt(target.val());
-				console.log(which);
 				if(whichCur=='${pd.which}'){
 					$(this).addClass('active');
 					which=whichCur;
@@ -269,7 +267,7 @@
 				jQuery('#jqGrid').hideCol(['CERT_CODE','REVCERT_CODE']);
 				var busiDate = $("#busiDate").val(); 
 				var deptCode = $("#departCode").val(); 
-				$("#jqGrid").jqGrid("setGridParam",{url:"<%=basePath%>voucher/getPageList.do",postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}',"BUSI_DATE":busiDate,"DEPT_CODE":deptCode}});
+				$("#jqGrid").jqGrid("setGridParam",{url:"<%=basePath%>voucher/getPageList.do",postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}',"BUSI_DATE":busiDate,"DEPT_CODE":deptCode,"FMISACC":$("#FMISACC").val()}});
 				$("#jqGrid").trigger("reloadGrid");  
 			}else if(target.attr('href')=='#voucherMgr'){
 				voucherType=2;
@@ -305,7 +303,7 @@
 				jQuery('#jqGrid').showCol(['CERT_CODE','REVCERT_CODE']);
 				var busiDate = $("#busiDate").val(); 
 				var deptCode = $("#departCode").val(); 
-				$("#jqGrid").jqGrid("setGridParam",{url:"<%=basePath%>voucher/getPageList.do",postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}',"BUSI_DATE":busiDate,"DEPT_CODE":deptCode}});
+				$("#jqGrid").jqGrid("setGridParam",{url:"<%=basePath%>voucher/getPageList.do",postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}',"BUSI_DATE":busiDate,"DEPT_CODE":deptCode,"FMISACC":$("#FMISACC").val()}});
 				$("#jqGrid").trigger("reloadGrid");  
 			}else{
 				voucherType=2;
@@ -329,14 +327,14 @@
 				jQuery('#jqGrid').hideCol(['CERT_CODE','REVCERT_CODE']);
 				var busiDate = $("#busiDate").val(); 
 				var deptCode = $("#departCode").val(); 
-				$("#jqGrid").jqGrid("setGridParam",{url:"<%=basePath%>voucher/getSyncDelList.do",postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}',"BUSI_DATE":busiDate,"DEPT_CODE":deptCode}});
+				$("#jqGrid").jqGrid("setGridParam",{url:"<%=basePath%>voucher/getSyncDelList.do",postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}',"BUSI_DATE":busiDate,"DEPT_CODE":deptCode,"FMISACC":$("#FMISACC").val()}});
 				$("#jqGrid").trigger("reloadGrid");  
 			}
 		});
 		
 		$("#jqGrid").jqGrid({
 			url: "<%=basePath%>voucher/getPageList.do",
-			postData:{"VOUCHER_TYPE":1,"TABLE_CODE":"${pd.which}","BUSI_DATE":$("#busiDate").val()},
+			postData:{"VOUCHER_TYPE":1,"TABLE_CODE":"${pd.which}","BUSI_DATE":$("#busiDate").val(),"FMISACC":$("#FMISACC").val()},
 			datatype: "json",
 			colModel: jqGridColModel,
 			reloadAfterSubmit: true, 
@@ -669,6 +667,15 @@
 	
 	//批量传输
 	function batchSave(e) {
+		if($("#FMISACC").val()=="0"){
+	        bootbox.dialog({
+				message: "<span class='bigger-110'>请您先选择帐套,查询数据后,选择要上传的数据再进行上传!</span>",
+				buttons: 			
+				{ "button":{ "label":"确定", "className":"btn-sm btn-success"}}
+			});
+	        return;
+        }
+		
 		var listData =new Array();
 		var ids = $("#jqGrid").jqGrid('getGridParam','selarrrow');
 		//console.log(ids);
@@ -688,45 +695,50 @@
 	        });
 			return;
 		}
-		top.jzts();
-		$.ajax({
-			type: "POST",
-			url: '<%=basePath%>voucher/voucherTransfer.do?TABLE_CODE='+which,
-	    	//data: rowData,//可以单独传入一个对象，后台可以直接通过对应模型接受参数。但是传入Array（listData）就不好用了，所以传list方式需将List转为Json字符窜。
-			//data: '{"rows":listData}',
-			data:{DATA_ROWS:JSON.stringify(listData)},
-	    	dataType:'json',
-			cache: false,
-			success: function(response){
-				if(response.code==0){
-					$("#jqGrid").trigger("reloadGrid");  
-					$(top.hangge());//关闭加载状态
+		var msg = '您当前选择的帐套为'+$("#FMISACC").text()+',确定要将选择的数据上传到FMIS融合系统吗?';
+        bootbox.confirm(msg, function(result) {
+		if(result) {
+			top.jzts();
+			$.ajax({
+				type: "POST",
+				url: '<%=basePath%>voucher/voucherTransfer.do?TABLE_CODE='+which,
+		    	//data: rowData,//可以单独传入一个对象，后台可以直接通过对应模型接受参数。但是传入Array（listData）就不好用了，所以传list方式需将List转为Json字符窜。
+				//data: '{"rows":listData}',
+				data:{DATA_ROWS:JSON.stringify(listData)},
+		    	dataType:'json',
+				cache: false,
+				success: function(response){
+					if(response.code==0){
+						$("#jqGrid").trigger("reloadGrid");  
+						$(top.hangge());//关闭加载状态
+						$("#subTitle").tips({
+							side:3,
+				            msg:'传输成功',
+				            bg:'#009933',
+				            time:3
+				        });
+					}else{
+						$(top.hangge());//关闭加载状态
+						$("#subTitle").tips({
+							side:3,
+				            msg:'传输失败,'+response.message,
+				            bg:'#cc0033',
+				            time:3
+				        });
+					}
+				},
+		    	error: function(e) {
+		    		$(top.hangge());//关闭加载状态
 					$("#subTitle").tips({
 						side:3,
-			            msg:'传输成功',
-			            bg:'#009933',
-			            time:3
-			        });
-				}else{
-					$(top.hangge());//关闭加载状态
-					$("#subTitle").tips({
-						side:3,
-			            msg:'传输失败,'+response.message,
+			            msg:'传输失败,'+response.responseJSON.message,
 			            bg:'#cc0033',
 			            time:3
 			        });
-				}
-			},
-	    	error: function(e) {
-	    		$(top.hangge());//关闭加载状态
-				$("#subTitle").tips({
-					side:3,
-		            msg:'传输失败,'+response.responseJSON.message,
-		            bg:'#cc0033',
-		            time:3
-		        });
-	    	}
-		});
+		    	}
+			});
+		}});
+		
     }
 	
 	//显示明细信息
@@ -865,9 +877,18 @@
 	
 	//检索
 	function tosearch() {
-		var busiDate = $("#busiDate").val(); 
+        if($("#FMISACC").val()=="0"){
+	        bootbox.dialog({
+				message: "<span class='bigger-110'>请您先选择帐套,然后再进行查询!</span>",
+				buttons: 			
+				{ "button":{ "label":"确定", "className":"btn-sm btn-success"}}
+			});
+	        return;
+        }
+        var busiDate = $("#busiDate").val(); 
 		var deptCode = $("#departCode").val(); 
-		$("#jqGrid").jqGrid("setGridParam",{postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}',"BUSI_DATE":busiDate,"DEPT_CODE":deptCode}})
+		var fmi = $("#FMISACC").val(); 
+		$("#jqGrid").jqGrid("setGridParam",{postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}',"BUSI_DATE":busiDate,"DEPT_CODE":deptCode,"FMISACC":fmi}})
 		.trigger("reloadGrid");
 	}  
 	

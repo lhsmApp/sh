@@ -123,32 +123,7 @@ public class TmplUtil {
 		pd.put("TABLE_NO", tableNo);
 		PageData pdResult=tmplconfigService.findTableCodeByTableNo(pd);
 		String tableCodeTmpl=pdResult.getString("TABLE_CODE");
-		String tableCodeOri="";//数据库真实业务数据表
-		if(tableCodeTmpl.startsWith("TB_STAFF_DETAIL")){
-			tableCodeOri="TB_STAFF_DETAIL";
-		}else if(tableCodeTmpl.startsWith("TB_STAFF_SUMMY")){
-			tableCodeOri="TB_STAFF_SUMMY";
-		}else if(tableCodeTmpl.startsWith("TB_STAFF_AUDIT")){
-			tableCodeOri="TB_STAFF_AUDIT";
-		}else if(tableCodeTmpl.startsWith("TB_STAFF_TRANSFER")){
-			tableCodeOri="TB_STAFF_SUMMY";
-		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_DETAIL")){
-			tableCodeOri="TB_SOCIAL_INC_DETAIL";
-		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_SUMMY")){
-			tableCodeOri="TB_SOCIAL_INC_SUMMY";
-		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_AUDIT")){
-			tableCodeOri="TB_SOCIAL_INC_AUDIT";
-		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_TRANSFER")){
-			tableCodeOri="TB_SOCIAL_INC_SUMMY";
-		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_DETAIL")){
-			tableCodeOri="TB_HOUSE_FUND_DETAIL";
-		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_SUMMY")){
-			tableCodeOri="TB_HOUSE_FUND_SUMMY";
-		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_AUDIT")){
-			tableCodeOri="TB_HOUSE_FUND_AUDIT";
-		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_TRANSFER")){
-			tableCodeOri="TB_HOUSE_FUND_SUMMY";
-		}
+		String tableCodeOri=DictsUtil.getActualTable(tableCodeTmpl);
 		// 用语句查询出数据库表的所有字段及其属性；拼接成jqgrid全部列
 		List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCodeOri);
 		Map<String, Map<String, Object>> listColModelAll = jqGridColModelAllNoEdit(tableColumns);
@@ -424,32 +399,7 @@ public class TmplUtil {
 		pd.put("TABLE_NO", tableNo);
 		PageData pdResult=tmplconfigService.findTableCodeByTableNo(pd);
 		String tableCodeTmpl=pdResult.getString("TABLE_CODE");
-		String tableCodeOri="";//数据库真实业务数据表
-		if(tableCodeTmpl.startsWith("TB_STAFF_DETAIL")){
-			tableCodeOri="TB_STAFF_DETAIL";
-		}else if(tableCodeTmpl.startsWith("TB_STAFF_SUMMY")){
-			tableCodeOri="TB_STAFF_SUMMY";
-		}else if(tableCodeTmpl.startsWith("TB_STAFF_AUDIT")){
-			tableCodeOri="TB_STAFF_AUDIT";
-		}else if(tableCodeTmpl.startsWith("TB_STAFF_TRANSFER")){
-			tableCodeOri="TB_STAFF_SUMMY";
-		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_DETAIL")){
-			tableCodeOri="TB_SOCIAL_INC_DETAIL";
-		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_SUMMY")){
-			tableCodeOri="TB_SOCIAL_INC_SUMMY";
-		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_AUDIT")){
-			tableCodeOri="TB_SOCIAL_INC_AUDIT";
-		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_TRANSFER")){
-			tableCodeOri="TB_SOCIAL_INC_SUMMY";
-		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_DETAIL")){
-			tableCodeOri="TB_HOUSE_FUND_DETAIL";
-		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_SUMMY")){
-			tableCodeOri="TB_HOUSE_FUND_SUMMY";
-		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_AUDIT")){
-			tableCodeOri="TB_HOUSE_FUND_AUDIT";
-		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_TRANSFER")){
-			tableCodeOri="TB_HOUSE_FUND_SUMMY";
-		}
+		String tableCodeOri=DictsUtil.getActualTable(tableCodeTmpl);//数据库真实业务数据表
 		// 用语句查询出数据库表的所有字段及其属性；拼接成jqgrid全部列
 		List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCodeOri);
 		Map<String, Map<String, Object>> listColModelAll = jqGridColModelAll(tableColumns);
@@ -649,32 +599,7 @@ public class TmplUtil {
 		pd.put("TABLE_NO", tableNo);
 		PageData pdResult=tmplconfigService.findTableCodeByTableNo(pd);
 		String tableCodeTmpl=pdResult.getString("TABLE_CODE");
-		String tableCodeOri="";//数据库真实业务数据表
-		if(tableCodeTmpl.startsWith("TB_STAFF_DETAIL")){
-			tableCodeOri="TB_STAFF_DETAIL";
-		}else if(tableCodeTmpl.startsWith("TB_STAFF_SUMMY")){
-			tableCodeOri="TB_STAFF_SUMMY";
-		}else if(tableCodeTmpl.startsWith("TB_STAFF_AUDIT")){
-			tableCodeOri="TB_STAFF_AUDIT";
-		}else if(tableCodeTmpl.startsWith("TB_STAFF_TRANSFER")){
-			tableCodeOri="TB_STAFF_SUMMY";
-		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_DETAIL")){
-			tableCodeOri="TB_SOCIAL_INC_DETAIL";
-		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_SUMMY")){
-			tableCodeOri="TB_SOCIAL_INC_SUMMY";
-		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_AUDIT")){
-			tableCodeOri="TB_SOCIAL_INC_AUDIT";
-		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_TRANSFER")){
-			tableCodeOri="TB_SOCIAL_INC_SUMMY";
-		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_DETAIL")){
-			tableCodeOri="TB_HOUSE_FUND_DETAIL";
-		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_SUMMY")){
-			tableCodeOri="TB_HOUSE_FUND_SUMMY";
-		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_AUDIT")){
-			tableCodeOri="TB_HOUSE_FUND_AUDIT";
-		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_TRANSFER")){
-			tableCodeOri="TB_HOUSE_FUND_SUMMY";
-		}
+		String tableCodeOri=DictsUtil.getActualTable(tableCodeTmpl);//数据库真实业务数据表
 		
 		// 用语句查询出数据库表的所有字段及其属性；拼接成jqgrid全部列
 		List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCodeOri);

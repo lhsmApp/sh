@@ -121,7 +121,7 @@ public class VoucherController extends BaseController {
 		PageData pd = this.getPageData();
 		String which = pd.getString("TABLE_CODE");
 		if(which==null)
-			which="S016";//取默认值-合同化工资传输表
+			which="16";//取默认值-合同化工资传输表
 		//String tableCode = getTableCode(which);
 		// 此处放当前页面初始化时用到的一些数据，例如搜索的下拉列表数据，所需的字典数据、权限数据等等。
 		// mv.addObject("pd", pd);
@@ -161,7 +161,7 @@ public class VoucherController extends BaseController {
 		mv.addObject("HasUserData", hasUserData);
 		
 		//CUST_COL7 FMISACC 帐套字典
-		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));
+		mv.addObject("fmisacc", DictsUtil.getDictsByParentBianma(dictionariesService, "FMISACC"));
 		return mv;
 	}
 	
@@ -180,7 +180,7 @@ public class VoucherController extends BaseController {
 		PageData pd = this.getPageData();
 		String which = pd.getString("TABLE_CODE");
 		if(which==null)
-			which="S016";//取默认值-合同化工资传输表
+			which="16";//取默认值-合同化工资传输表
 		//String tableCode = getTableCode(which);
 		// 此处放当前页面初始化时用到的一些数据，例如搜索的下拉列表数据，所需的字典数据、权限数据等等。
 		// mv.addObject("pd", pd);
@@ -250,7 +250,7 @@ public class VoucherController extends BaseController {
 			sealType1 = BillType.SECURITY_LISTEN.getNameKey();
 		}
 		pd.put("BILL_TYPE1", sealType1);// 封存类型
-		pd.put("EMPL_GROUP_TYPE",DictsUtil.getEmplGroupType(which));
+		pd.put("USER_GROP",DictsUtil.getEmplGroupType(which));
 		String strDeptCode = pd.getString("DEPT_CODE");// 单位检索条件
 		if (StringUtil.isNotEmpty(strDeptCode)) {
 			String[] strDeptCodes = strDeptCode.split(",");

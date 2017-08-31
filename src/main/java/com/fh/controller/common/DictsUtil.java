@@ -38,16 +38,17 @@ public class DictsUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<Dictionaries> getDictsByParentBianma(DictionariesManager dictionariesService,String parentBianma) throws Exception {
-		List<Dictionaries> listDict= dictionariesService.getSysDictionaries(parentBianma);
+	public static List<Dictionaries> getDictsByParentBianma(DictionariesManager dictionariesService,
+			String parentBianma) throws Exception {
+		List<Dictionaries> listDict = dictionariesService.getSysDictionaries(parentBianma);
 		return listDict;
 	}
 
-	public static List<Dictionaries> getDictsByParentCode(DictionariesManager dictionariesService, String dicName) throws Exception {
+	public static List<Dictionaries> getDictsByParentCode(DictionariesManager dictionariesService, String dicName)
+			throws Exception {
 		List<Dictionaries> dicList = dictionariesService.getSysDictionaries(dicName);
 		return dicList;
 	}
-
 
 	/**
 	 * 根据字典名称获取字典信息，生成Jqgrid editOptions和SearchOptions所需的Select格式。
@@ -57,7 +58,7 @@ public class DictsUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public static String getDicValue(DictionariesManager dictionariesService,String dicName) throws Exception {
+	public static String getDicValue(DictionariesManager dictionariesService, String dicName) throws Exception {
 		StringBuilder ret = new StringBuilder();
 		Map<String, String> dicAdd = new HashMap<String, String>();
 		List<Dictionaries> dicList = dictionariesService.getSysDictionaries(dicName);
@@ -73,6 +74,7 @@ public class DictsUtil {
 
 	/**
 	 * 获取组织结构信息，生成Jqgrid editOptions和SearchOptions所需的Select格式。
+	 * 
 	 * @param departmentService
 	 * @return
 	 * @throws Exception
@@ -89,9 +91,10 @@ public class DictsUtil {
 		}
 		return ret.toString();
 	}
-	
+
 	/**
 	 * 获取组织结构信息，生成Jqgrid editOptions和SearchOptions所需的Select格式。
+	 * 
 	 * @param departmentService
 	 * @return
 	 * @throws Exception
@@ -108,9 +111,10 @@ public class DictsUtil {
 		}
 		return ret.toString();
 	}
-	
+
 	/**
 	 * 获取自定类型信息，生成Jqgrid editOptions和SearchOptions所需的Select格式。
+	 * 
 	 * @param departmentService
 	 * @return
 	 * @throws Exception
@@ -127,66 +131,105 @@ public class DictsUtil {
 		}
 		return ret.toString();
 	}
-	
+
 	/**
 	 * 获取组织机构树数据源
+	 * 
 	 * @param departmentService
 	 * @return
 	 * @throws Exception
 	 */
-	public static String getDepartmentSelectTreeSource(DepartmentManager departmentService) throws Exception{
+	public static String getDepartmentSelectTreeSource(DepartmentManager departmentService) throws Exception {
 		List<PageData> zdepartmentPdList = new ArrayList<PageData>();
 		JSONArray arr = JSONArray.fromObject(departmentService.listAllDepartmentToSelect("0", zdepartmentPdList));
 		return (null == arr ? "" : arr.toString());
 	}
-	
+
 	/**
 	 * 获取组织机构树数据源
+	 * 
 	 * @param departmentService
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<PageData> getDepartmentSelectTreeSourceList(DepartmentManager departmentService) throws Exception{
+	public static List<PageData> getDepartmentSelectTreeSourceList(DepartmentManager departmentService)
+			throws Exception {
 		List<PageData> zdepartmentPdList = new ArrayList<PageData>();
 		return departmentService.listAllDepartmentToSelect("0", zdepartmentPdList);
 	}
-	
+
 	/**
 	 * 根据模板基本类型获取员工组编码
-	 * @param 
+	 * 
+	 * @param
 	 * @return
 	 * @throws Exception
 	 */
-	public static String getEmplGroupType(String tmplCode) throws Exception{
-		String emplGroupType="";
-		if(tmplCode.equals(TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey())
-			||tmplCode.equals(TmplType.TB_STAFF_SUMMY_CONTRACT.getNameKey())
-			||tmplCode.equals(TmplType.TB_STAFF_AUDIT_CONTRACT.getNameKey())
-			||tmplCode.equals(TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey())){
-			emplGroupType=EmplGroupType.HTH.getNameKey();
-		}else if(tmplCode.equals(TmplType.TB_STAFF_DETAIL_MARKET.getNameKey())
-				||tmplCode.equals(TmplType.TB_STAFF_SUMMY_MARKET.getNameKey())
-				||tmplCode.equals(TmplType.TB_STAFF_AUDIT_MARKET.getNameKey())
-				||tmplCode.equals(TmplType.TB_STAFF_TRANSFER_MARKET.getNameKey())){
-				emplGroupType=EmplGroupType.SCH.getNameKey();
-		}else if(tmplCode.equals(TmplType.TB_STAFF_DETAIL_LABOR.getNameKey())
-				||tmplCode.equals(TmplType.TB_STAFF_SUMMY_LABOR.getNameKey())
-				||tmplCode.equals(TmplType.TB_STAFF_AUDIT_LABOR.getNameKey())
-				||tmplCode.equals(TmplType.TB_STAFF_TRANSFER_LABOR.getNameKey())){
-				emplGroupType=EmplGroupType.LWPQ.getNameKey();
-		}
-		else if(tmplCode.equals(TmplType.TB_STAFF_DETAIL_SYS_LABOR.getNameKey())
-				||tmplCode.equals(TmplType.TB_STAFF_SUMMY_SYS_LABOR.getNameKey())
-				||tmplCode.equals(TmplType.TB_STAFF_AUDIT_SYS_LABOR.getNameKey())
-				||tmplCode.equals(TmplType.TB_STAFF_TRANSFER_SYS_LABOR.getNameKey())){
-				emplGroupType=EmplGroupType.XTNLW.getNameKey();
-		}
-		else if(tmplCode.equals(TmplType.TB_STAFF_DETAIL_OPER_LABOR.getNameKey())
-				||tmplCode.equals(TmplType.TB_STAFF_SUMMY_OPER_LABOR.getNameKey())
-				||tmplCode.equals(TmplType.TB_STAFF_AUDIT_OPER_LABOR.getNameKey())
-				||tmplCode.equals(TmplType.TB_STAFF_TRANSFER_OPER_LABOR.getNameKey())){
-				emplGroupType=EmplGroupType.YXRY.getNameKey();
+	public static String getEmplGroupType(String tmplCode) throws Exception {
+		String emplGroupType = "";
+		if (tmplCode.equals(TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey())
+				|| tmplCode.equals(TmplType.TB_STAFF_SUMMY_CONTRACT.getNameKey())
+				|| tmplCode.equals(TmplType.TB_STAFF_AUDIT_CONTRACT.getNameKey())
+				|| tmplCode.equals(TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey())) {
+			emplGroupType = EmplGroupType.HTH.getNameKey();
+		} else if (tmplCode.equals(TmplType.TB_STAFF_DETAIL_MARKET.getNameKey())
+				|| tmplCode.equals(TmplType.TB_STAFF_SUMMY_MARKET.getNameKey())
+				|| tmplCode.equals(TmplType.TB_STAFF_AUDIT_MARKET.getNameKey())
+				|| tmplCode.equals(TmplType.TB_STAFF_TRANSFER_MARKET.getNameKey())) {
+			emplGroupType = EmplGroupType.SCH.getNameKey();
+		} else if (tmplCode.equals(TmplType.TB_STAFF_DETAIL_LABOR.getNameKey())
+				|| tmplCode.equals(TmplType.TB_STAFF_SUMMY_LABOR.getNameKey())
+				|| tmplCode.equals(TmplType.TB_STAFF_AUDIT_LABOR.getNameKey())
+				|| tmplCode.equals(TmplType.TB_STAFF_TRANSFER_LABOR.getNameKey())) {
+			emplGroupType = EmplGroupType.LWPQ.getNameKey();
+		} else if (tmplCode.equals(TmplType.TB_STAFF_DETAIL_SYS_LABOR.getNameKey())
+				|| tmplCode.equals(TmplType.TB_STAFF_SUMMY_SYS_LABOR.getNameKey())
+				|| tmplCode.equals(TmplType.TB_STAFF_AUDIT_SYS_LABOR.getNameKey())
+				|| tmplCode.equals(TmplType.TB_STAFF_TRANSFER_SYS_LABOR.getNameKey())) {
+			emplGroupType = EmplGroupType.XTNLW.getNameKey();
+		} else if (tmplCode.equals(TmplType.TB_STAFF_DETAIL_OPER_LABOR.getNameKey())
+				|| tmplCode.equals(TmplType.TB_STAFF_SUMMY_OPER_LABOR.getNameKey())
+				|| tmplCode.equals(TmplType.TB_STAFF_AUDIT_OPER_LABOR.getNameKey())
+				|| tmplCode.equals(TmplType.TB_STAFF_TRANSFER_OPER_LABOR.getNameKey())) {
+			emplGroupType = EmplGroupType.YXRY.getNameKey();
 		}
 		return emplGroupType;
+	}
+
+	/**
+	 * 根据模板基本表名称获取对应的实际数据库表名称
+	 * 
+	 * @param
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getActualTable(String tableCodeTmpl) throws Exception {
+		String tableCodeOri = "";// 数据库真实业务数据表
+		if (tableCodeTmpl.startsWith("TB_STAFF_DETAIL")) {
+			tableCodeOri = "TB_STAFF_DETAIL";
+		} else if (tableCodeTmpl.startsWith("TB_STAFF_SUMMY")) {
+			tableCodeOri = "TB_STAFF_SUMMY";
+		} else if (tableCodeTmpl.startsWith("TB_STAFF_AUDIT")) {
+			tableCodeOri = "TB_STAFF_AUDIT";
+		} else if (tableCodeTmpl.startsWith("TB_STAFF_TRANSFER")) {
+			tableCodeOri = "TB_STAFF_SUMMY";
+		} else if (tableCodeTmpl.equals("TB_SOCIAL_INC_DETAIL")) {
+			tableCodeOri = "TB_SOCIAL_INC_DETAIL";
+		} else if (tableCodeTmpl.equals("TB_SOCIAL_INC_SUMMY")) {
+			tableCodeOri = "TB_SOCIAL_INC_SUMMY";
+		} else if (tableCodeTmpl.equals("TB_SOCIAL_INC_AUDIT")) {
+			tableCodeOri = "TB_SOCIAL_INC_AUDIT";
+		} else if (tableCodeTmpl.equals("TB_SOCIAL_INC_TRANSFER")) {
+			tableCodeOri = "TB_SOCIAL_INC_SUMMY";
+		} else if (tableCodeTmpl.equals("TB_HOUSE_FUND_DETAIL")) {
+			tableCodeOri = "TB_HOUSE_FUND_DETAIL";
+		} else if (tableCodeTmpl.equals("TB_HOUSE_FUND_SUMMY")) {
+			tableCodeOri = "TB_HOUSE_FUND_SUMMY";
+		} else if (tableCodeTmpl.equals("TB_HOUSE_FUND_AUDIT")) {
+			tableCodeOri = "TB_HOUSE_FUND_AUDIT";
+		} else if (tableCodeTmpl.equals("TB_HOUSE_FUND_TRANSFER")) {
+			tableCodeOri = "TB_HOUSE_FUND_SUMMY";
+		}
+		return tableCodeOri;
 	}
 }

@@ -199,6 +199,7 @@
 	<select id="listBase" parameterType="page" resultType="pd">
 		select *
 		from TB_TMPL_CONFIG_BASE
+		order by TABLE_NO
 	</select>
 
 	<!-- 根据当前单位编码、表名以及区间获取字段配置信息 -->
