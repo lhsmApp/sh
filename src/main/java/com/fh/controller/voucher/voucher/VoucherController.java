@@ -121,7 +121,7 @@ public class VoucherController extends BaseController {
 		PageData pd = this.getPageData();
 		String which = pd.getString("TABLE_CODE");
 		if(which==null)
-			which="S006";//取默认值-合同化工资传输表
+			which="S016";//取默认值-合同化工资传输表
 		//String tableCode = getTableCode(which);
 		// 此处放当前页面初始化时用到的一些数据，例如搜索的下拉列表数据，所需的字典数据、权限数据等等。
 		// mv.addObject("pd", pd);
@@ -179,6 +179,8 @@ public class VoucherController extends BaseController {
 		mv.setViewName("voucher/voucher/voucher_search");
 		PageData pd = this.getPageData();
 		String which = pd.getString("TABLE_CODE");
+		if(which==null)
+			which="S016";//取默认值-合同化工资传输表
 		//String tableCode = getTableCode(which);
 		// 此处放当前页面初始化时用到的一些数据，例如搜索的下拉列表数据，所需的字典数据、权限数据等等。
 		// mv.addObject("pd", pd);
