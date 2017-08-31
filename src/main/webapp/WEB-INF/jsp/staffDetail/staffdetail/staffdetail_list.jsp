@@ -95,17 +95,10 @@
 													</c:forEach>
 												</select>
 											</span>
-											<span>
-												<select class="chosen-select form-control"
-													name="USER_GROP" id="USER_GROP"
-													data-placeholder="请选择员工组"
-													style="vertical-align: top; height:32px;width: 150px;">
-													<option value="">请选择员工组</option>
-													<c:forEach items="${EMPLGRP}" var="each">
-														<option value="${each.DICT_CODE}" 
-														    <c:if test="${pd.USER_GROP==each.DICT_CODE}">selected</c:if>>${each.NAME}</option>
-													</c:forEach>
-												</select>
+											<span class="pull-left" style="margin-right: 5px;">
+												<div class="selectTree" id="selectTree" multiMode="true"
+												    allSelectable="false" noGroup="false"></div>
+											    <input type="text" id="DEPT_CODE" hidden></input>
 											</span>
 											<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
 												<i class="ace-icon fa fa-search bigger-110"></i>
@@ -164,6 +157,9 @@
 	<script type="text/javascript"> 
     var gridBase_selector = "#jqGridBase";  
     var pagerBase_selector = "#jqGridBasePager";  
+
+	var which='S001';
+	//var jqGridColModel;
     
 	$(document).ready(function () {
 		$(top.hangge());//关闭加载状态
@@ -240,9 +236,31 @@
 			resizeGridHeight($(gridBase_selector),null,true);
 	    });
 		
+		//初始化当前选择凭证类型
+		if('${pd.which}'!=""){
+			$('[data-toggle="buttons"] .btn').each(function(index, data){
+				var target = $(this).find('input[type=radio]');
+				$(this).removeClass('active');
+				var whichCur = parseInt(target.val());
+				console.log(which);
+				if(whichCur=='${pd.which}'){
+					$(this).addClass('active');
+					which=whichCur;
+				}
+			});
+		} 
+		//凭证类型变化
+		$('[data-toggle="buttons"] .btn').on('click', function(e){
+			var target = $(this).find('input[type=radio]');
+			which = parseInt(target.val());
+			if(which!='${pd.which}'){
+				window.location.href="<%=basePath%>staffdetail/list.do?WhileBillOff="+which;
+			}
+		});
+		
 		$(gridBase_selector).jqGrid({
-			url: '<%=basePath%>staffdetail/getPageList.do?'
-	            +'USER_GROP='+$("#USER_GROP").val()
+			url: '<%=basePath%>staffdetail/getPageList.do?WhileBillOff='+which
+	            +'&DEPT_CODE='+$("#DEPT_CODE").val()
 	            +'&CUST_COL7='+$("#CUST_COL7").val(),
 			datatype: "json",
 			colModel: jqGridColModel,
@@ -256,7 +274,7 @@
             multiboxonly: true,
             sortable: true,
 			altRows: true, //斑马条纹
-			editurl: '<%=basePath%>staffdetail/edit.do?',
+			editurl: '<%=basePath%>staffdetail/edit.do?WhileBillOff='+which,
 			
 			pager: pagerBase_selector,
 			footerrow: true,
@@ -504,7 +522,7 @@
 						{ "button":{ "label":"确定", "className":"btn-sm btn-success"}}
 					});
 				}else{
-	                var msg = '确定要删除选中的数据吗??';
+	                var msg = '确定要删除选中的数据吗?';
 	                bootbox.confirm(msg, function(result) {
 	    				if(result) {
 	    					var listData =new Array();
@@ -518,7 +536,7 @@
 	    					top.jzts();
 	    					$.ajax({
 	    						type: "POST",
-	    						url: '<%=basePath%>staffdetail/deleteAll.do?',
+	    						url: '<%=basePath%>staffdetail/deleteAll.do?WhileBillOff='+which,
 	    				    	data: {DATA_ROWS:JSON.stringify(listData)},
 	    						dataType:'json',
 	    						cache: false,
@@ -586,7 +604,7 @@
     					top.jzts();
     					$.ajax({
     						type: "POST",
-    						url: '<%=basePath%>staffdetail/updateAll.do?',
+    						url: '<%=basePath%>staffdetail/updateAll.do?WhileBillOff='+which,
     				    	data: {DATA_ROWS:JSON.stringify(listData)},
     						dataType:'json',
     						cache: false,
@@ -635,7 +653,7 @@
 	   	   var diag = new top.Dialog();
 	   	   diag.Drag=true;
 	   	   diag.Title ="EXCEL 导入到数据库";
-	   	   diag.URL = '<%=basePath%>staffdetail/goUploadExcel.do';
+	   	   diag.URL = '<%=basePath%>staffdetail/goUploadExcel.do?WhileBillOff='+which;
 	   	   diag.Width = 300;
 	   	   diag.Height = 150;
 	   	   diag.CancelEvent = function(){ //关闭事件
@@ -651,7 +669,7 @@
 		 * 导出
 		 */
 	    function exportItems(){
-	    	window.location.href='<%=basePath%>staffdetail/excel.do?';
+	    	window.location.href='<%=basePath%>staffdetail/excel.do?WhileBillOff='+which;
 	    }
 
 		/**
@@ -674,7 +692,7 @@
 					top.jzts();
 					$.ajax({
 						type: "POST",
-						url: '<%=basePath%>staffdetail/report.do?',
+						url: '<%=basePath%>staffdetail/report.do?WhileBillOff='+which,
 						cache: false,
 						success: function(response){
 							if(response.code==0){
@@ -717,13 +735,30 @@
 	function tosearch() {
 		var UserCode = $("#UserCode").val();
 		$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据
-			url:'<%=basePath%>staffdetail/getPageList.do?'
-	            +'USER_GROP='+$("#USER_GROP").val()
+			url:'<%=basePath%>staffdetail/getPageList.do?WhileBillOff='+which
+	            +'&DEPT_CODE='+$("#DEPT_CODE").val()
 	            +'&CUST_COL7='+$("#CUST_COL7").val(),  
 			datatype:'json',
 		      page:1
 		}).trigger("reloadGrid");
-	}  
+	}   
+	
+	//加载单位树
+	function initComplete(){
+		//下拉树
+		var defaultNodes = {"treeNodes":${zTreeNodes}};
+		//绑定change事件
+		$("#selectTree").bind("change",function(){
+			$("#DEPT_CODE").val("");
+			if($(this).attr("relValue")){
+				$("#DEPT_CODE").val($(this).attr("relValue"));
+		    }
+		});
+		//赋给data属性
+		$("#selectTree").data("data",defaultNodes);  
+		$("#selectTree").render();
+		$("#selectTree2_input").val("请选择");
+	}
 
  	</script>
 </html>

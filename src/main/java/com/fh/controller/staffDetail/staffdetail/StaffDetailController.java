@@ -98,6 +98,10 @@ public class StaffDetailController extends BaseController {
 	String SystemDateTime = "";
 	//页面显示数据的二级单位
 	String DepartCode = "";
+
+	//默认的which值
+	String DefaultWhile = "S001";
+	
 	//底行显示的求和与平均值字段
 	StringBuilder SqlUserdata = new StringBuilder();
 	//字典
@@ -108,7 +112,7 @@ public class StaffDetailController extends BaseController {
 	Map<String, TmplConfigDetail> map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
 
 	//界面查询字段
-    List<String> QueryFeildList = Arrays.asList("USER_GROP", "CUST_COL7");
+    List<String> QueryFeildList = Arrays.asList("DEPT_CODE", "CUST_COL7");
 
 	/**列表
 	 * @param page
@@ -119,18 +123,24 @@ public class StaffDetailController extends BaseController {
 		logBefore(logger, Jurisdiction.getUsername()+"列表StaffDetail");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
 		PageData pd = this.getPageData();
+		//员工组
+		String WhileBillOff = getWhileValue(pd.getString("WhileBillOff"));
+		//当前期间,取自tb_system_config的SystemDateTime字段
+		SystemDateTime = sysConfigManager.currentSection(pd);
+		//当前登录人所在二级单位
+		DepartCode = Jurisdiction.getCurrentDepartmentID();//
+		//User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
+		//String DepartName = user.getDEPARTMENT_NAME();
 		
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("staffDetail/staffdetail/staffdetail_list");
-		//当前期间,取自tb_system_config的SystemDateTime字段
-		SystemDateTime = sysConfigManager.currentSection(pd);
-		mv.addObject("SystemDateTime", SystemDateTime);
-		//当前登录人所在二级单位
-		DepartCode = Jurisdiction.getCurrentDepartmentID();//
-		User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
-		String DepartName = user.getDEPARTMENT_NAME();
-		mv.addObject("DepartName", DepartName);
+		//while
+		pd.put("which", WhileBillOff);
+		mv.addObject("pd", pd);
+		//mv.addObject("SystemDateTime", SystemDateTime);
+		//mv.addObject("DepartName", DepartName);
 		//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
+		pd.put("BILL_OFF", WhileBillOff);
 		pd.put("RPT_DEPT", DepartCode);
 		pd.put("RPT_DUR", SystemDateTime);
 		pd.put("BILL_TYPE", TypeCodeDetail);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
@@ -140,13 +150,13 @@ public class StaffDetailController extends BaseController {
 		}
 		mv.addObject("State", State.equals(DurState.Release.getNameKey())? true:false);// 枚举  1封存,0解封
 
-		//USER_GROP EMPLGRP 员工组字典
-		mv.addObject("EMPLGRP", DictsUtil.getDictsByParentCode(dictionariesService, "EMPLGRP"));
 		//CUST_COL7 FMISACC 帐套字典
 		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));
+		//DEPT_CODE 
+		mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService));
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
-		String jqGridColModel = tmpl.generateStructure(TableNameDetail, DepartCode, 3);
+		String jqGridColModel = tmpl.generateStructure(WhileBillOff, DepartCode, 3);
 		
 		SqlUserdata = tmpl.getSqlUserdata();
 		//字典
@@ -168,6 +178,10 @@ public class StaffDetailController extends BaseController {
 	public @ResponseBody PageResult<PageData> getPageList(JqPage page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"列表StaffDetail");
 		PageData pd = this.getPageData();
+		//员工组
+		String WhileBillOff = getWhileValue(pd.getString("WhileBillOff"));
+		
+		//根据凭证上报情况判断当前显示信息
 		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
 				DepartCode, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
 		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
@@ -666,6 +680,14 @@ public class StaffDetailController extends BaseController {
 			strRut = "";
 		}
 		return strRut;
+	}
+
+	private String getWhileValue(String value){
+        String which = DefaultWhile;
+		if(value != null && !value.trim().equals("")){
+			which = value;
+		}
+		return which;
 	}
 	
 	@InitBinder

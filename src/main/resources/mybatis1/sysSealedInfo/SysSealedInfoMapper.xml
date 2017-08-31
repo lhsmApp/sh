@@ -171,8 +171,8 @@
 		where RPT_DEPT = '${RPT_DEPT}'
 		and RPT_DUR = '${RPT_DUR}'
 		and BILL_TYPE = '${BILL_TYPE}'
-		<if test="BILL_CODE != null and BILL_CODE != ''">
-		    and BILL_CODE = '${BILL_CODE}'
+		<if test="BILL_OFF != null and BILL_OFF != ''">
+		    and BILL_OFF = '${BILL_OFF}'
 		</if>
 	</select>
 	<select id="getStateFromModel" parameterType="com.fh.entity.SysSealed" resultType="String">
