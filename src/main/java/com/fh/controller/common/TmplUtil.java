@@ -107,7 +107,7 @@ public class TmplUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public String generateStructureNoEdit(String tableCode, String departCode) throws Exception {
+	public String generateStructureNoEdit(String tableNo, String departCode) throws Exception {
 		// 默认值
 		//m_defaultValueList = new LinkedHashMap<String, Object>();
 		// 表全部 类型
@@ -119,11 +119,41 @@ public class TmplUtil {
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 		map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
 		
+		PageData pd=new PageData();
+		pd.put("TABLE_NO", tableNo);
+		PageData pdResult=tmplconfigService.findTableCodeByTableNo(pd);
+		String tableCodeTmpl=pdResult.getString("TABLE_CODE");
+		String tableCodeOri="";//数据库真实业务数据表
+		if(tableCodeTmpl.startsWith("TB_STAFF_DETAIL")){
+			tableCodeOri="TB_STAFF_DETAIL";
+		}else if(tableCodeTmpl.startsWith("TB_STAFF_SUMMY")){
+			tableCodeOri="TB_STAFF_SUMMY";
+		}else if(tableCodeTmpl.startsWith("TB_STAFF_AUDIT")){
+			tableCodeOri="TB_STAFF_AUDIT";
+		}else if(tableCodeTmpl.startsWith("TB_STAFF_TRANSFER")){
+			tableCodeOri="TB_STAFF_SUMMY";
+		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_DETAIL")){
+			tableCodeOri="TB_SOCIAL_INC_DETAIL";
+		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_SUMMY")){
+			tableCodeOri="TB_SOCIAL_INC_SUMMY";
+		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_AUDIT")){
+			tableCodeOri="TB_SOCIAL_INC_AUDIT";
+		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_TRANSFER")){
+			tableCodeOri="TB_SOCIAL_INC_SUMMY";
+		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_DETAIL")){
+			tableCodeOri="TB_HOUSE_FUND_DETAIL";
+		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_SUMMY")){
+			tableCodeOri="TB_HOUSE_FUND_SUMMY";
+		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_AUDIT")){
+			tableCodeOri="TB_HOUSE_FUND_AUDIT";
+		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_TRANSFER")){
+			tableCodeOri="TB_HOUSE_FUND_SUMMY";
+		}
 		// 用语句查询出数据库表的所有字段及其属性；拼接成jqgrid全部列
-		List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCode);
+		List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCodeOri);
 		Map<String, Map<String, Object>> listColModelAll = jqGridColModelAllNoEdit(tableColumns);
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-		List<TmplConfigDetail> m_columnsList = getShowColumnList(tableCode, departCode);
+		List<TmplConfigDetail> m_columnsList = getShowColumnList(tableCodeTmpl, departCode);
 		// 拼接真正设置的jqGrid的ColModel
 		StringBuilder jqGridColModel = new StringBuilder();
 
@@ -374,7 +404,7 @@ public class TmplUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public String generateStructure(String tableCode, String departCode, int columnCount) throws Exception {
+	public String generateStructure(String tableNo, String departCode, int columnCount) throws Exception {
 		// 默认值
 		//m_defaultValueList = new LinkedHashMap<String, Object>();
 		// 表全部 类型
@@ -389,12 +419,42 @@ public class TmplUtil {
 		m_sqlUserdata = new StringBuilder();
 		// 拼接真正设置的jqGrid的ColModel
 		StringBuilder jqGridColModel = new StringBuilder();
-
+		
+		PageData pd=new PageData();
+		pd.put("TABLE_NO", tableNo);
+		PageData pdResult=tmplconfigService.findTableCodeByTableNo(pd);
+		String tableCodeTmpl=pdResult.getString("TABLE_CODE");
+		String tableCodeOri="";//数据库真实业务数据表
+		if(tableCodeTmpl.startsWith("TB_STAFF_DETAIL")){
+			tableCodeOri="TB_STAFF_DETAIL";
+		}else if(tableCodeTmpl.startsWith("TB_STAFF_SUMMY")){
+			tableCodeOri="TB_STAFF_SUMMY";
+		}else if(tableCodeTmpl.startsWith("TB_STAFF_AUDIT")){
+			tableCodeOri="TB_STAFF_AUDIT";
+		}else if(tableCodeTmpl.startsWith("TB_STAFF_TRANSFER")){
+			tableCodeOri="TB_STAFF_SUMMY";
+		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_DETAIL")){
+			tableCodeOri="TB_SOCIAL_INC_DETAIL";
+		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_SUMMY")){
+			tableCodeOri="TB_SOCIAL_INC_SUMMY";
+		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_AUDIT")){
+			tableCodeOri="TB_SOCIAL_INC_AUDIT";
+		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_TRANSFER")){
+			tableCodeOri="TB_SOCIAL_INC_SUMMY";
+		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_DETAIL")){
+			tableCodeOri="TB_HOUSE_FUND_DETAIL";
+		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_SUMMY")){
+			tableCodeOri="TB_HOUSE_FUND_SUMMY";
+		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_AUDIT")){
+			tableCodeOri="TB_HOUSE_FUND_AUDIT";
+		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_TRANSFER")){
+			tableCodeOri="TB_HOUSE_FUND_SUMMY";
+		}
 		// 用语句查询出数据库表的所有字段及其属性；拼接成jqgrid全部列
-		List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCode);
+		List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCodeOri);
 		Map<String, Map<String, Object>> listColModelAll = jqGridColModelAll(tableColumns);
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-		List<TmplConfigDetail> m_columnsList = getShowColumnList(tableCode, departCode);
+		List<TmplConfigDetail> m_columnsList = getShowColumnList(tableCodeTmpl, departCode);
 		int row = 1;
 		int col = 1;
 
@@ -575,7 +635,7 @@ public class TmplUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public String generateStructureAccount(String tableCode, String departCode) throws Exception {
+	public String generateStructureAccount(String tableNo, String departCode) throws Exception {
 		// 底行显示的求和与平均值字段
 		m_sqlUserdata = new StringBuilder();
 		// 字典
@@ -585,11 +645,42 @@ public class TmplUtil {
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 		map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
 		
+		PageData pd=new PageData();
+		pd.put("TABLE_NO", tableNo);
+		PageData pdResult=tmplconfigService.findTableCodeByTableNo(pd);
+		String tableCodeTmpl=pdResult.getString("TABLE_CODE");
+		String tableCodeOri="";//数据库真实业务数据表
+		if(tableCodeTmpl.startsWith("TB_STAFF_DETAIL")){
+			tableCodeOri="TB_STAFF_DETAIL";
+		}else if(tableCodeTmpl.startsWith("TB_STAFF_SUMMY")){
+			tableCodeOri="TB_STAFF_SUMMY";
+		}else if(tableCodeTmpl.startsWith("TB_STAFF_AUDIT")){
+			tableCodeOri="TB_STAFF_AUDIT";
+		}else if(tableCodeTmpl.startsWith("TB_STAFF_TRANSFER")){
+			tableCodeOri="TB_STAFF_SUMMY";
+		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_DETAIL")){
+			tableCodeOri="TB_SOCIAL_INC_DETAIL";
+		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_SUMMY")){
+			tableCodeOri="TB_SOCIAL_INC_SUMMY";
+		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_AUDIT")){
+			tableCodeOri="TB_SOCIAL_INC_AUDIT";
+		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_TRANSFER")){
+			tableCodeOri="TB_SOCIAL_INC_SUMMY";
+		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_DETAIL")){
+			tableCodeOri="TB_HOUSE_FUND_DETAIL";
+		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_SUMMY")){
+			tableCodeOri="TB_HOUSE_FUND_SUMMY";
+		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_AUDIT")){
+			tableCodeOri="TB_HOUSE_FUND_AUDIT";
+		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_TRANSFER")){
+			tableCodeOri="TB_HOUSE_FUND_SUMMY";
+		}
+		
 		// 用语句查询出数据库表的所有字段及其属性；拼接成jqgrid全部列
-		List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCode);
+		List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCodeOri);
 		Map<String, Map<String, Object>> listColModelAll = jqGridColModelAccount(tableColumns);
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-		List<TmplConfigDetail> m_columnsList = getShowColumnList(tableCode, departCode);
+		List<TmplConfigDetail> m_columnsList = getShowColumnList(tableCodeTmpl, departCode);
 		// 拼接真正设置的jqGrid的ColModel
 		StringBuilder jqGridColModel = new StringBuilder();
 

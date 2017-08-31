@@ -120,7 +120,9 @@ public class VoucherController extends BaseController {
 		mv.setViewName("voucher/voucher/voucher_list");
 		PageData pd = this.getPageData();
 		String which = pd.getString("TABLE_CODE");
-		String tableCode = getTableCode(which);
+		if(which==null)
+			which="S006";//取默认值-合同化工资传输表
+		//String tableCode = getTableCode(which);
 		// 此处放当前页面初始化时用到的一些数据，例如搜索的下拉列表数据，所需的字典数据、权限数据等等。
 		// mv.addObject("pd", pd);
 		// *********************加载单位树*******************************
@@ -139,7 +141,7 @@ public class VoucherController extends BaseController {
 		// 生成主表结构
 		TmplUtil tmplUtil = new TmplUtil(tmplconfigService, tmplConfigDictService, dictionariesService,
 				departmentService,userService);
-		String jqGridColModel = tmplUtil.generateStructureNoEdit(tableCode, Jurisdiction.getCurrentDepartmentID());
+		String jqGridColModel = tmplUtil.generateStructureNoEdit(which, Jurisdiction.getCurrentDepartmentID());
 		mv.addObject("jqGridColModel", jqGridColModel);
 
 		// 生成子表结构
@@ -157,6 +159,9 @@ public class VoucherController extends BaseController {
 			hasUserData = true;
 		}
 		mv.addObject("HasUserData", hasUserData);
+		
+		//CUST_COL7 FMISACC 帐套字典
+		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));
 		return mv;
 	}
 	
@@ -174,7 +179,7 @@ public class VoucherController extends BaseController {
 		mv.setViewName("voucher/voucher/voucher_search");
 		PageData pd = this.getPageData();
 		String which = pd.getString("TABLE_CODE");
-		String tableCode = getTableCode(which);
+		//String tableCode = getTableCode(which);
 		// 此处放当前页面初始化时用到的一些数据，例如搜索的下拉列表数据，所需的字典数据、权限数据等等。
 		// mv.addObject("pd", pd);
 		// *********************加载单位树*******************************
@@ -193,7 +198,7 @@ public class VoucherController extends BaseController {
 		// 生成主表结构
 		TmplUtil tmplUtil = new TmplUtil(tmplconfigService, tmplConfigDictService, dictionariesService,
 				departmentService,userService);
-		String jqGridColModel = tmplUtil.generateStructureNoEdit(tableCode, Jurisdiction.getCurrentDepartmentID());
+		String jqGridColModel = tmplUtil.generateStructureNoEdit(which, Jurisdiction.getCurrentDepartmentID());
 		mv.addObject("jqGridColModel", jqGridColModel);
 
 		// 生成子表结构
@@ -683,11 +688,28 @@ public class VoucherController extends BaseController {
 	/**
 	 * 根据前端业务表索引获取表名称
 	 * 
-	 * @param which
+	 * @param which 1、合同化工资 2、社保 3、公积金 4、市场化工资  5、系统内劳务工资 6、运行人员工资 7、劳务派遣工资
 	 * @return
+	 * @throws Exception 
 	 */
-	private String getTableCode(String which) {
-		String tableCode = "";
+	private String getTableCode(String which) throws Exception {
+		PageData pd=new PageData();
+		pd.put("TABLE_NO", which);
+		PageData pdResult=tmplconfigService.findTableCodeByTableNo(pd);
+		String tableCodeTmpl=pdResult.getString("TABLE_CODE");
+		String tableCodeOri="";//数据库真实业务数据表
+		if(tableCodeTmpl.startsWith("TB_STAFF_TRANSFER")){
+			tableCodeOri="TB_STAFF_SUMMY";
+		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_TRANSFER")){
+			tableCodeOri="TB_SOCIAL_INC_SUMMY";
+		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_TRANSFER")){
+			tableCodeOri="TB_HOUSE_FUND_SUMMY";
+		}else{
+			tableCodeOri = "TB_STAFF_SUMMY";
+		}
+		return tableCodeOri;
+		
+		/*String tableCode = "";
 		if (which != null && which.equals("1")) {
 			tableCode = "TB_STAFF_SUMMY";
 		} else if (which != null && which.equals("2")) {
@@ -697,7 +719,7 @@ public class VoucherController extends BaseController {
 		} else {
 			tableCode = "TB_STAFF_SUMMY";
 		}
-		return tableCode;
+		return tableCode;*/
 	}
 
 	/**
@@ -705,9 +727,26 @@ public class VoucherController extends BaseController {
 	 * 
 	 * @param which
 	 * @return
+	 * @throws Exception 
 	 */
-	private String getSubTableCode(String which) {
-		String tableCode = "";
+	private String getSubTableCode(String which) throws Exception {
+		PageData pd=new PageData();
+		pd.put("TABLE_NO", which);
+		PageData pdResult=tmplconfigService.findTableCodeByTableNo(pd);
+		String tableCodeTmpl=pdResult.getString("TABLE_CODE");
+		String tableCodeOri="";//数据库真实业务数据表
+		if(tableCodeTmpl.startsWith("TB_STAFF_TRANSFER")){
+			tableCodeOri="TB_STAFF_DETAIL";
+		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_TRANSFER")){
+			tableCodeOri="TB_SOCIAL_INC_DETAIL";
+		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_TRANSFER")){
+			tableCodeOri="TB_HOUSE_FUND_DETAIL";
+		}else{
+			tableCodeOri = "TB_STAFF_DETAIL";
+		}
+		return tableCodeOri;
+		
+		/*String tableCode = "";
 		if (which != null && which.equals("1")) {
 			tableCode = "TB_STAFF_DETAIL";
 		} else if (which != null && which.equals("2")) {
@@ -717,7 +756,7 @@ public class VoucherController extends BaseController {
 		} else {
 			tableCode = "TB_STAFF_DETAIL";
 		}
-		return tableCode;
+		return tableCode;*/
 	}
 
 	/**
