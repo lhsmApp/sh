@@ -212,9 +212,7 @@
 		where DEPT_CODE = #{DEPT_CODE}
 		and UPPER(TABLE_CODE) = UPPER(#{TABLE_CODE})
 		and RPT_DUR in (select KEY_VALUE from tb_sys_config where KEY_CODE = 'SystemDataTime')
-		and UPPER(TABLE_CODE) in (select UPPER(TABLE_CODE) from tb_tmpl_config_base where STATE = '1')
-		order by COL_HIDE desc,
-		DISP_ORDER
+		order by COL_HIDE desc, DISP_ORDER
 		<!-- COL_HIDE必修倒序排列，关系添加或修改弹出框的显示 -->
 	</select>
 

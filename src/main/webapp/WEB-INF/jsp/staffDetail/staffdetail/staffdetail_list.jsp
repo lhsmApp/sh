@@ -40,23 +40,41 @@
 				<div class="page-content">
 					<!-- /section:settings.box -->
 					<div class="page-header">
-								    <span class="label label-xlg label-success arrowed-right">人工成本</span>
-									<!-- arrowed-in-right --> 
-									<span class="label label-xlg label-yellow arrowed-in arrowed-right"
+						<span class="label label-xlg label-success arrowed-right">人工成本</span>
+							<!-- arrowed-in-right --> 
+							<span class="label label-xlg label-yellow arrowed-in arrowed-right"
 									    id="subTitle" style="margin-left: 2px;">工资数据导入</span> 
-                                    <span style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
+                            <span style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
 								
-									<button id="btnQuery" class="btn btn-white btn-info btn-sm"
+							<button id="btnQuery" class="btn btn-white btn-info btn-sm"
 										onclick="showQueryCondi($('#jqGridBase'),null,true)">
-										<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
-									</button>
+								<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
+							</button>
 								
-						            <div class="pull-right">
-									    <span class="label label-xlg label-blue arrowed-left"
-									        id = "showDur" style="background:#428bca; margin-right: 2px;"></span> 
-								        <!-- <span class="label label-xlg label-blue arrowed-left"
-								            id = "showDept" style="background:#428bca"></span> -->
+						    <div class="pull-right">
+								<!--<span class="label label-xlg label-blue arrowed-left"
+									        id = "showDur" style="background:#428bca; margin-right: 2px;"></span>  -->
+									    
+							    <div class="btn-toolbar inline middle no-margin">
+								    <div data-toggle="buttons" class="btn-group no-margin">
+									    <label class="btn btn-sm btn-primary active"> <span
+									    	class="bigger-110">合同化</span> <input type="radio" value="S001" />
+									    </label> 
+									    <label class="btn btn-sm btn-primary"> <span
+									    	class="bigger-110">市场化</span> <input type="radio" value="S002" />
+									    </label> 
+									    <label class="btn btn-sm btn-primary"> <span
+									    	class="bigger-110">系统内劳务</span> <input type="radio" value="S003" />
+									    </label>
+									    <label class="btn btn-sm btn-primary"> <span
+									    	class="bigger-110">运行人员</span> <input type="radio" value="S004" />
+									    </label>
+									    <label class="btn btn-sm btn-primary"> <span
+										    class="bigger-110">劳务派遣</span> <input type="radio" value="S005" />
+									    </label>
 								    </div>
+							    </div>      
+						</div>
 					</div><!-- /.page-header -->
 			
 						<div class="row">
@@ -67,18 +85,6 @@
 										<form class="form-inline">
 											<span>
 												<select class="chosen-select form-control"
-													name="USER_GROP" id="USER_GROP"
-													data-placeholder="请选择员工组"
-													style="vertical-align: top; height:32px;width: 150px;">
-													<option value="">请选择员工组</option>
-													<c:forEach items="${EMPLGRP}" var="each">
-														<option value="${each.DICT_CODE}" 
-														    <c:if test="${pd.USER_GROP==each.DICT_CODE}">selected</c:if>>${each.NAME}</option>
-													</c:forEach>
-												</select>
-											</span>
-											<span>
-												<select class="chosen-select form-control"
 													name="CUST_COL7" id="CUST_COL7"
 													data-placeholder="请选择帐套"
 													style="vertical-align: top; height:32px;width: 150px;">
@@ -86,6 +92,18 @@
 													<c:forEach items="${FMISACC}" var="each">
 														<option value="${each.DICT_CODE}" 
 														    <c:if test="${pd.CUST_COL7==each.DICT_CODE}">selected</c:if>>${each.NAME}</option>
+													</c:forEach>
+												</select>
+											</span>
+											<span>
+												<select class="chosen-select form-control"
+													name="USER_GROP" id="USER_GROP"
+													data-placeholder="请选择员工组"
+													style="vertical-align: top; height:32px;width: 150px;">
+													<option value="">请选择员工组</option>
+													<c:forEach items="${EMPLGRP}" var="each">
+														<option value="${each.DICT_CODE}" 
+														    <c:if test="${pd.USER_GROP==each.DICT_CODE}">selected</c:if>>${each.NAME}</option>
 													</c:forEach>
 												</select>
 											</span>
@@ -148,17 +166,13 @@
     var pagerBase_selector = "#jqGridBasePager";  
     
 	$(document).ready(function () {
-		/* $.jgrid.defaults.width = 780;*/
-		//$.jgrid.defaults.styleUI = 'Bootstrap'; 
-		
 		$(top.hangge());//关闭加载状态
 	    
 		//当前期间,取自tb_system_config的SystemDateTime字段
-	    var SystemDateTime = '${SystemDateTime}';
+	    //var SystemDateTime = '${SystemDateTime}';
 		//当前登录人所在二级单位
-	    var DepartName = '${DepartName}';
-	    $("#showDur").text('当前期间：' + SystemDateTime + ' 当前单位：' + DepartName);
-	    //$("#showDept").text('当前单位：' + DepartName);
+	    //var DepartName = '${DepartName}';
+	    //$("#showDur").text('当前期间：' + SystemDateTime + ' 当前单位：' + DepartName);
 		//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
 	    // 枚举  1封存,0解封
 		var State = '${State}';
