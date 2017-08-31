@@ -25,7 +25,9 @@
 		from 
 		<include refid="tableName"></include>
 		where BUSI_DATE = '${pd.SystemDateTime}'
-		and DEPT_CODE = '${pd.DepartCode}'
+		<if test="pd.DepartCode!= null and pd.DepartCode != ''">
+		    and DEPT_CODE = '${pd.DepartCode}'
+		</if>
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
@@ -42,7 +44,9 @@
 	<select id="countJqGridExtend" parameterType="jqPage" resultType="int">
 		select count(*) from <include refid="tableName"></include> 
 		where BUSI_DATE = '${pd.SystemDateTime}'
-		and DEPT_CODE = '${pd.DepartCode}'
+		<if test="pd.DepartCode!= null and pd.DepartCode != ''">
+		    and DEPT_CODE = '${pd.DepartCode}'
+		</if>
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
@@ -54,7 +58,9 @@
 		select ${pd.Userdata} 
 		from <include refid="tableName"></include> 
 		where BUSI_DATE = '${pd.SystemDateTime}'
-		and DEPT_CODE = '${pd.DepartCode}'
+		<if test="pd.DepartCode!= null and pd.DepartCode != ''">
+		    and DEPT_CODE = '${pd.DepartCode}'
+		</if>
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>

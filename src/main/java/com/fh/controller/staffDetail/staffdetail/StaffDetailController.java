@@ -97,10 +97,10 @@ public class StaffDetailController extends BaseController {
 	//页面显示数据的年月
 	String SystemDateTime = "";
 	//页面显示数据的二级单位
-	String DepartCode = "";
+	String UserDepartCode = "";
 
 	//默认的which值
-	String DefaultWhile = "S001";
+	String DefaultWhile = "1";
 	
 	//底行显示的求和与平均值字段
 	StringBuilder SqlUserdata = new StringBuilder();
@@ -128,7 +128,7 @@ public class StaffDetailController extends BaseController {
 		//当前期间,取自tb_system_config的SystemDateTime字段
 		SystemDateTime = sysConfigManager.currentSection(pd);
 		//当前登录人所在二级单位
-		DepartCode = Jurisdiction.getCurrentDepartmentID();//
+		UserDepartCode = Jurisdiction.getCurrentDepartmentID();//
 		//User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
 		//String DepartName = user.getDEPARTMENT_NAME();
 		
@@ -139,16 +139,10 @@ public class StaffDetailController extends BaseController {
 		mv.addObject("pd", pd);
 		//mv.addObject("SystemDateTime", SystemDateTime);
 		//mv.addObject("DepartName", DepartName);
-		//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
-		pd.put("BILL_OFF", WhileBillOff);
-		pd.put("RPT_DEPT", DepartCode);
-		pd.put("RPT_DUR", SystemDateTime);
-		pd.put("BILL_TYPE", TypeCodeDetail);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
-		String State = syssealedinfoService.getState(pd);
-		if(!(State != null && !State.equals(""))){
-			State = DurState.Release.getNameKey();
-		}
-		mv.addObject("State", State.equals(DurState.Release.getNameKey())? true:false);// 枚举  1封存,0解封
+		
+		// 枚举  1封存,0解封
+		String State = DurState.Sealed.getNameKey();
+		mv.addObject("State", State.equals(DurState.Release.getNameKey())? true:false);
 
 		//CUST_COL7 FMISACC 帐套字典
 		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));
@@ -156,7 +150,7 @@ public class StaffDetailController extends BaseController {
 		mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService));
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
-		String jqGridColModel = tmpl.generateStructure(WhileBillOff, DepartCode, 3);
+		String jqGridColModel = tmpl.generateStructure(WhileBillOff, UserDepartCode, 3);
 		
 		SqlUserdata = tmpl.getSqlUserdata();
 		//字典
@@ -169,6 +163,38 @@ public class StaffDetailController extends BaseController {
 		mv.addObject("jqGridColModel", jqGridColModel);
 		return mv;
 	}
+
+	/**状态
+	 * @param
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/getState")
+	public @ResponseBody CommonBase getState() throws Exception{
+		CommonBase commonBase = new CommonBase();
+		commonBase.setCode(-1);
+		String retState = DurState.Sealed.getNameKey();
+		
+		PageData pd = this.getPageData();
+		//账套
+		String CUST_COL7 = pd.getString("CUST_COL7");
+		String DEPT_CODE = pd.getString("DEPT_CODE");
+		
+		if(CUST_COL7 != null && CUST_COL7.trim() != "" && DEPT_CODE != null && DEPT_CODE.trim() != ""){
+			//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
+			pd.put("BILL_OFF", CUST_COL7);
+			pd.put("RPT_DEPT", DEPT_CODE);
+			pd.put("RPT_DUR", SystemDateTime);
+			pd.put("BILL_TYPE", TypeCodeDetail);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+			retState = syssealedinfoService.getState(pd);
+			if(!(retState != null && !retState.equals("") && retState == DurState.Sealed.getNameKey())){
+				retState = DurState.Release.getNameKey();
+			}
+		}
+		commonBase.setMessage(retState);
+		commonBase.setCode(0);
+		
+		return commonBase;
+	}
 	
 	/**列表
 	 * @param page
@@ -180,19 +206,20 @@ public class StaffDetailController extends BaseController {
 		PageData pd = this.getPageData();
 		//员工组
 		String WhileBillOff = getWhileValue(pd.getString("WhileBillOff"));
+		//账套
+		String CUST_COL7 = pd.getString("CUST_COL7");
+		String DEPT_CODE = pd.getString("DEPT_CODE");
 		
 		//根据凭证上报情况判断当前显示信息
 		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-				DepartCode, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
+				DEPT_CODE, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
 		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 			strHelpful += " and 1 != 1 ";
 		}
 
 		String QueryFeild = QueryFeildString.getQueryFeild(pd, QueryFeildList);
 		QueryFeild += strHelpful;
-		if(QueryFeild!=null && !QueryFeild.equals("")){
-			pd.put("QueryFeild", QueryFeild);
-		}
+		pd.put("QueryFeild", QueryFeild);
 		//多条件过滤条件
 		String filters = pd.getString("filters");
 		if(null != filters && !"".equals(filters)){
@@ -201,7 +228,7 @@ public class StaffDetailController extends BaseController {
 		//页面显示数据的年月
 		pd.put("SystemDateTime", SystemDateTime);
 		//页面显示数据的二级单位
-		pd.put("DepartCode", DepartCode);
+		//pd.put("DepartCode", DEPT_CODE);
 		page.setPd(pd);
 		List<PageData> varList = staffdetailService.JqPage(page);	//列出Betting列表
 		int records = staffdetailService.countJqGridExtend(page);
@@ -255,17 +282,8 @@ public class StaffDetailController extends BaseController {
 			String BILL_CODE = "BILL_CODE";
 			String BUSI_DATE = "BUSI_DATE";
 			String DEPT_CODE = "DEPT_CODE";
-			if(pd.containsKey(BILL_CODE)){
-				pd.remove(BILL_CODE);
-			}
 			pd.put(BILL_CODE, " ");
-			if(pd.containsKey(BUSI_DATE)){
-				pd.remove(BUSI_DATE);
-			}
 			pd.put(BUSI_DATE, SystemDateTime);
-			if(pd.containsKey(DEPT_CODE)){
-				pd.remove(DEPT_CODE);
-			}
 			pd.put(DEPT_CODE, DepartCode);
 			TmplUtil.setModelDefault(pd, map_HaveColumnsList);
 			
@@ -670,14 +688,18 @@ public class StaffDetailController extends BaseController {
 		return commonBase;
 	}
 	
-	private String CheckState(PageData pd) throws Exception{
+	private String CheckState(PageData pd, String CUST_COL7, String DEPT_CODE) throws Exception{
 		String strRut = "当前期间已封存！";
-		pd.put("RPT_DEPT", DepartCode);
-		pd.put("RPT_DUR", SystemDateTime);
-		pd.put("BILL_TYPE", TypeCodeDetail);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
-		String State = syssealedinfoService.getState(pd);
-		if(!DurState.Sealed.getNameKey().equals(State)){// 枚举  1封存,0解封
-			strRut = "";
+		if(CUST_COL7 != null && CUST_COL7.trim() != "" && DEPT_CODE != null && DEPT_CODE.trim() != ""){
+			//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
+			pd.put("BILL_OFF", CUST_COL7);
+			pd.put("RPT_DEPT", DEPT_CODE);
+			pd.put("RPT_DUR", SystemDateTime);
+			pd.put("BILL_TYPE", TypeCodeDetail);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+			String State = syssealedinfoService.getState(pd);
+			if(!DurState.Sealed.getNameKey().equals(State)){// 枚举  1封存,0解封
+				strRut = "";
+			}
 		}
 		return strRut;
 	}

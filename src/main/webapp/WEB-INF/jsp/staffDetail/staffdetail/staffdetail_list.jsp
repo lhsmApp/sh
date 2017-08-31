@@ -58,19 +58,19 @@
 							    <div class="btn-toolbar inline middle no-margin">
 								    <div data-toggle="buttons" class="btn-group no-margin">
 									    <label class="btn btn-sm btn-primary active"> <span
-									    	class="bigger-110">合同化</span> <input type="radio" value="S001" />
+									    	class="bigger-110">合同化</span> <input type="radio" value="1" />
 									    </label> 
 									    <label class="btn btn-sm btn-primary"> <span
-									    	class="bigger-110">市场化</span> <input type="radio" value="S002" />
+									    	class="bigger-110">市场化</span> <input type="radio" value="2" />
 									    </label> 
 									    <label class="btn btn-sm btn-primary"> <span
-									    	class="bigger-110">系统内劳务</span> <input type="radio" value="S003" />
+									    	class="bigger-110">系统内劳务</span> <input type="radio" value="3" />
 									    </label>
 									    <label class="btn btn-sm btn-primary"> <span
-									    	class="bigger-110">运行人员</span> <input type="radio" value="S004" />
+									    	class="bigger-110">运行人员</span> <input type="radio" value="4" />
 									    </label>
 									    <label class="btn btn-sm btn-primary"> <span
-										    class="bigger-110">劳务派遣</span> <input type="radio" value="S005" />
+										    class="bigger-110">劳务派遣</span> <input type="radio" value="5" />
 									    </label>
 								    </div>
 							    </div>      
@@ -158,7 +158,7 @@
     var gridBase_selector = "#jqGridBase";  
     var pagerBase_selector = "#jqGridBasePager";  
 
-	var which='S001';
+	var which='';
 	//var jqGridColModel;
     
 	$(document).ready(function () {
@@ -255,6 +255,7 @@
 			which = parseInt(target.val());
 			if(which!='${pd.which}'){
 				window.location.href="<%=basePath%>staffdetail/list.do?WhileBillOff="+which;
+                //+'&DEPT_CODE='+$("#DEPT_CODE").val() + '&CUST_COL7='+$("#CUST_COL7").val()
 			}
 		});
 		
@@ -274,7 +275,9 @@
             multiboxonly: true,
             sortable: true,
 			altRows: true, //斑马条纹
-			editurl: '<%=basePath%>staffdetail/edit.do?WhileBillOff='+which,
+			editurl: '<%=basePath%>staffdetail/edit.do?WhileBillOff='+which
+                +'&DEPT_CODE='+$("#DEPT_CODE").val()
+                +'&CUST_COL7='+$("#CUST_COL7").val(),
 			
 			pager: pagerBase_selector,
 			footerrow: true,
@@ -536,7 +539,9 @@
 	    					top.jzts();
 	    					$.ajax({
 	    						type: "POST",
-	    						url: '<%=basePath%>staffdetail/deleteAll.do?WhileBillOff='+which,
+	    						url: '<%=basePath%>staffdetail/deleteAll.do?WhileBillOff='+which
+	    		                    +'&DEPT_CODE='+$("#DEPT_CODE").val()
+	    		                    +'&CUST_COL7='+$("#CUST_COL7").val(),
 	    				    	data: {DATA_ROWS:JSON.stringify(listData)},
 	    						dataType:'json',
 	    						cache: false,
@@ -604,7 +609,9 @@
     					top.jzts();
     					$.ajax({
     						type: "POST",
-    						url: '<%=basePath%>staffdetail/updateAll.do?WhileBillOff='+which,
+    						url: '<%=basePath%>staffdetail/updateAll.do?WhileBillOff='+which
+    		                    +'&DEPT_CODE='+$("#DEPT_CODE").val()
+    		                    +'&CUST_COL7='+$("#CUST_COL7").val(),
     				    	data: {DATA_ROWS:JSON.stringify(listData)},
     						dataType:'json',
     						cache: false,
@@ -653,7 +660,9 @@
 	   	   var diag = new top.Dialog();
 	   	   diag.Drag=true;
 	   	   diag.Title ="EXCEL 导入到数据库";
-	   	   diag.URL = '<%=basePath%>staffdetail/goUploadExcel.do?WhileBillOff='+which;
+	   	   diag.URL = '<%=basePath%>staffdetail/goUploadExcel.do?WhileBillOff='+which
+               +'&DEPT_CODE='+$("#DEPT_CODE").val()
+               +'&CUST_COL7='+$("#CUST_COL7").val();
 	   	   diag.Width = 300;
 	   	   diag.Height = 150;
 	   	   diag.CancelEvent = function(){ //关闭事件
@@ -669,7 +678,9 @@
 		 * 导出
 		 */
 	    function exportItems(){
-	    	window.location.href='<%=basePath%>staffdetail/excel.do?WhileBillOff='+which;
+	    	window.location.href='<%=basePath%>staffdetail/excel.do?WhileBillOff='+which
+                +'&DEPT_CODE='+$("#DEPT_CODE").val()
+                +'&CUST_COL7='+$("#CUST_COL7").val();
 	    }
 
 		/**
@@ -692,7 +703,9 @@
 					top.jzts();
 					$.ajax({
 						type: "POST",
-						url: '<%=basePath%>staffdetail/report.do?WhileBillOff='+which,
+						url: '<%=basePath%>staffdetail/report.do?WhileBillOff='+which
+		                    +'&DEPT_CODE='+$("#DEPT_CODE").val()
+		                    +'&CUST_COL7='+$("#CUST_COL7").val(),
 						cache: false,
 						success: function(response){
 							if(response.code==0){
@@ -733,7 +746,6 @@
 	
 	//检索
 	function tosearch() {
-		var UserCode = $("#UserCode").val();
 		$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据
 			url:'<%=basePath%>staffdetail/getPageList.do?WhileBillOff='+which
 	            +'&DEPT_CODE='+$("#DEPT_CODE").val()
