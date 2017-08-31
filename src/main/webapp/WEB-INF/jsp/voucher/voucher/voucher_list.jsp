@@ -50,26 +50,40 @@
 
 						<button id="btnQuery" class="btn btn-white btn-info btn-sm"
 							onclick="showQueryCondi($('#jqGrid'),gridHeight)">
-							<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
+							<i class="ace-icon fa fa-chevron-up bigger-120 blue"></i> <span>隐藏查询</span>
 						</button>
-						<button id="btnValidate" class="btn btn-white btn-info btn-sm"
+						<button id="btnValidate" class="btn btn-white btn-info btn-sm" title="校验还未进行上报的二级单位汇总数据"
 							onclick="transferValidate()">
 							<i class="ace-icon fa fa-flask  bigger-120 blue"></i> <span>上传校验</span>
 						</button>
-						<sub class="text-warning orange" style="font-size: 14px;"> <!-- fa-exclamation-triangle -->
+						<!-- <sub class="text-warning orange" style="font-size: 14px;"> fa-exclamation-triangle
 							&nbsp;<i class="ace-icon fa fa-star"></i> 校验还未进行上报的二级单位汇总数据
-						</sub>
+						</sub> -->
 						<div class="pull-right">
 							<span class="green middle bolder">凭证数据类型: &nbsp;</span>
 
 							<div class="btn-toolbar inline middle no-margin">
 								<div data-toggle="buttons" class="btn-group no-margin">
 									<label class="btn btn-sm btn-primary active"> <span
-										class="bigger-110">工资</span> <input type="radio" value="1" />
-									</label> <label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">社保</span> <input type="radio" value="2" />
-									</label> <label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">公积金</span> <input type="radio" value="3" />
+										class="bigger-110">合同化</span> <input type="radio" value="S006" />
+									</label>
+									<label class="btn btn-sm btn-primary active"> <span
+										class="bigger-110">市场化</span> <input type="radio" value="S007" />
+									</label>
+									<label class="btn btn-sm btn-primary active"> <span
+										class="bigger-110">系统内劳务</span> <input type="radio" value="S008" />
+									</label>
+									<label class="btn btn-sm btn-primary active"> <span
+										class="bigger-110">运行人员</span> <input type="radio" value="S009" />
+									</label>
+									<label class="btn btn-sm btn-primary active"> <span
+										class="bigger-110">劳务派遣</span> <input type="radio" value="S010" />
+									</label> 
+									<label class="btn btn-sm btn-primary"> <span
+										class="bigger-110">社保</span> <input type="radio" value="SI002" />
+									</label> 
+									<label class="btn btn-sm btn-primary"> <span
+										class="bigger-110">公积金</span> <input type="radio" value="HF002" />
 									</label>
 								</div>
 							</div>
@@ -79,7 +93,7 @@
 
 					<div class="row">
 						<div class="col-xs-12">
-							<div class="widget-box" style="display: none;">
+							<div class="widget-box" style="display: block;">
 								<div class="widget-body">
 									<div class="widget-main">
 										<form class="form-inline">
@@ -98,6 +112,18 @@
 											<span class="pull-left" style="margin-right: 5px;">
 												<div class="selectTree" id="selectTree" multiMode="true"
 													allSelectable="false" noGroup="false"></div>
+											</span>
+											<span class="pull-left" style="margin-right: 5px;">
+												<select class="chosen-select form-control"
+													name="CUST_COL7" id="CUST_COL7"
+													data-placeholder="请选择帐套"
+													style="vertical-align: top; height:32px;width: 150px;">
+													<option value="">请选择帐套</option>
+													<c:forEach items="${FMISACC}" var="each">
+														<option value="${each.DICT_CODE}" 
+														    <c:if test="${pd.CUST_COL7==each.DICT_CODE}">selected</c:if>>${each.NAME}</option>
+													</c:forEach>
+												</select>
 											</span>
 											<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
 												<i class="ace-icon fa fa-search bigger-110"></i>
