@@ -250,7 +250,7 @@ public class VoucherController extends BaseController {
 			sealType1 = BillType.SECURITY_LISTEN.getNameKey();
 		}
 		pd.put("BILL_TYPE1", sealType1);// 封存类型
-
+		pd.put("EMPL_GROUP_TYPE",DictsUtil.getEmplGroupType(which));
 		String strDeptCode = pd.getString("DEPT_CODE");// 单位检索条件
 		if (StringUtil.isNotEmpty(strDeptCode)) {
 			String[] strDeptCodes = strDeptCode.split(",");

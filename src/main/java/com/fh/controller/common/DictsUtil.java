@@ -15,6 +15,8 @@ import com.fh.service.tmplConfigDict.tmplconfigdict.TmplConfigDictManager;
 import com.fh.util.PageData;
 import com.fh.util.StringUtil;
 import com.fh.util.enums.BillState;
+import com.fh.util.enums.EmplGroupType;
+import com.fh.util.enums.TmplType;
 
 import net.sf.json.JSONArray;
 
@@ -147,5 +149,44 @@ public class DictsUtil {
 	public static List<PageData> getDepartmentSelectTreeSourceList(DepartmentManager departmentService) throws Exception{
 		List<PageData> zdepartmentPdList = new ArrayList<PageData>();
 		return departmentService.listAllDepartmentToSelect("0", zdepartmentPdList);
+	}
+	
+	/**
+	 * 根据模板基本类型获取员工组编码
+	 * @param 
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getEmplGroupType(String tmplCode) throws Exception{
+		String emplGroupType="";
+		if(tmplCode.equals(TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey())
+			||tmplCode.equals(TmplType.TB_STAFF_SUMMY_CONTRACT.getNameKey())
+			||tmplCode.equals(TmplType.TB_STAFF_AUDIT_CONTRACT.getNameKey())
+			||tmplCode.equals(TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey())){
+			emplGroupType=EmplGroupType.HTH.getNameKey();
+		}else if(tmplCode.equals(TmplType.TB_STAFF_DETAIL_MARKET.getNameKey())
+				||tmplCode.equals(TmplType.TB_STAFF_SUMMY_MARKET.getNameKey())
+				||tmplCode.equals(TmplType.TB_STAFF_AUDIT_MARKET.getNameKey())
+				||tmplCode.equals(TmplType.TB_STAFF_TRANSFER_MARKET.getNameKey())){
+				emplGroupType=EmplGroupType.SCH.getNameKey();
+		}else if(tmplCode.equals(TmplType.TB_STAFF_DETAIL_LABOR.getNameKey())
+				||tmplCode.equals(TmplType.TB_STAFF_SUMMY_LABOR.getNameKey())
+				||tmplCode.equals(TmplType.TB_STAFF_AUDIT_LABOR.getNameKey())
+				||tmplCode.equals(TmplType.TB_STAFF_TRANSFER_LABOR.getNameKey())){
+				emplGroupType=EmplGroupType.LWPQ.getNameKey();
+		}
+		else if(tmplCode.equals(TmplType.TB_STAFF_DETAIL_SYS_LABOR.getNameKey())
+				||tmplCode.equals(TmplType.TB_STAFF_SUMMY_SYS_LABOR.getNameKey())
+				||tmplCode.equals(TmplType.TB_STAFF_AUDIT_SYS_LABOR.getNameKey())
+				||tmplCode.equals(TmplType.TB_STAFF_TRANSFER_SYS_LABOR.getNameKey())){
+				emplGroupType=EmplGroupType.XTNLW.getNameKey();
+		}
+		else if(tmplCode.equals(TmplType.TB_STAFF_DETAIL_OPER_LABOR.getNameKey())
+				||tmplCode.equals(TmplType.TB_STAFF_SUMMY_OPER_LABOR.getNameKey())
+				||tmplCode.equals(TmplType.TB_STAFF_AUDIT_OPER_LABOR.getNameKey())
+				||tmplCode.equals(TmplType.TB_STAFF_TRANSFER_OPER_LABOR.getNameKey())){
+				emplGroupType=EmplGroupType.YXRY.getNameKey();
+		}
+		return emplGroupType;
 	}
 }
