@@ -96,7 +96,7 @@
 												</select>
 											</span>
 											<span class="pull-left" style="margin-right: 5px;">
-												<div class="selectTree" id="selectTree" multiMode="true"
+												<div class="selectTree" id="selectTree" multiMode="false"
 												    allSelectable="false" noGroup="false"></div>
 											    <input type="text" id="DEPT_CODE" hidden></input>
 											</span>
