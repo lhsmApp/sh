@@ -128,6 +128,7 @@ public class VoucherController extends BaseController {
 		// 此处放当前页面初始化时用到的一些数据，例如搜索的下拉列表数据，所需的字典数据、权限数据等等。
 		// mv.addObject("pd", pd);
 		// *********************加载单位树*******************************
+		
 		mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService));
 		// ***********************************************************
 
@@ -404,7 +405,7 @@ public class VoucherController extends BaseController {
 	@RequestMapping(value = "/voucherTransfer")
 	public @ResponseBody CommonBase voucherTransfer() throws Exception {
 		logBefore(logger, Jurisdiction.getUsername() + "凭证传输");
-		String orgCode = Tools.readTxtFile(Const.ORG_CODE); // 读取总部组织机构编码
+		//String orgCode = Tools.readTxtFile(Const.ORG_CODE); // 读取总部组织机构编码
 		// if(!Jurisdiction.buttonJurisdiction(menuUrl, "del")){return null;}
 		// //校验权限
 		CommonBase commonBase = new CommonBase();
@@ -425,6 +426,8 @@ public class VoucherController extends BaseController {
 			GenerateTransferData generateTransferData = new GenerateTransferData();
 			Map<String, List<PageData>> mapTransferData = new HashMap<String, List<PageData>>();
 			mapTransferData.put(tableCode, listTransferData);
+			PageData pdFirst=listTransferData.get(0);
+			String orgCode=pdFirst.getString("CUST_COL7");
 			String transferData = generateTransferData.generateTransferData(tableColumns, mapTransferData, orgCode,
 					TransferOperType.DELETE);
 
@@ -500,7 +503,7 @@ public class VoucherController extends BaseController {
 	@RequestMapping(value = "/syncDel")
 	public @ResponseBody CommonBase syncDel() throws Exception {
 		logBefore(logger, Jurisdiction.getUsername() + "同步删除");
-		String orgCode = Tools.readTxtFile(Const.ORG_CODE); // 读取总部组织机构编码
+		//String orgCode = Tools.readTxtFile(Const.ORG_CODE); // 读取总部组织机构编码
 		// if(!Jurisdiction.buttonJurisdiction(menuUrl, "del")){return null;}
 		// //校验权限
 		CommonBase commonBase = new CommonBase();
@@ -521,6 +524,8 @@ public class VoucherController extends BaseController {
 			GenerateTransferData generateTransferData = new GenerateTransferData();
 			Map<String, List<PageData>> mapTransferData = new HashMap<String, List<PageData>>();
 			mapTransferData.put(tableCode, listTransferData);
+			PageData pdFirst=listTransferData.get(0);
+			String orgCode=pdFirst.getString("CUST_COL7");
 			String transferData = generateTransferData.generateTransferData(tableColumns, mapTransferData, orgCode,
 					TransferOperType.DELETE);
 
@@ -815,10 +820,18 @@ public class VoucherController extends BaseController {
 		ModelAndView mv = this.getModelAndView();
 		PageData pd = this.getPageData();
 		String which = pd.getString("TABLE_CODE");
+		//String billOff=pd.getString("BILL_OFF");
 		pd.put("TABLE_CODE", which);
+		pd.put("TABLE_NAME", TmplType.getValueByKey(which));
+		//pd.put("BILL_OFF", billOff);
 		// String empty=" : ;";
 		String strDict = DictsUtil.getDepartmentValue(departmentService);
 		pd.put("strDict", strDict);
+		
+		String billOffValus = DictsUtil.getDicValue(dictionariesService, "FMISACC");
+		String billOffString = ":[All];" + billOffValus;
+		pd.put("strBillOff", billOffString);
+
 		mv.setViewName("voucher/voucher/voucher_transvali");
 		mv.addObject("pd", pd);
 		return mv;
@@ -837,7 +850,7 @@ public class VoucherController extends BaseController {
 		String tableCode = getTableCode(which);
 		pd.put("TABLE_CODE", tableCode);
 		String sealType = getSealType(which);
-		pd.put("BILL_TYPE", sealType);// 封存类型
+		pd.put("BILL_TYPE", sealType);// 汇总封存类型
 		String filters = pd.getString("filters"); // 多条件过滤条件
 		if (null != filters && !"".equals(filters)) {
 			pd.put("filterWhereResult", SqlTools.constructWhere(filters, null));

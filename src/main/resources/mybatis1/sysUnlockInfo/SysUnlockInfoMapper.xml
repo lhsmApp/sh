@@ -17,7 +17,8 @@
 		UNLK_DATE,
 		DEL_STATE,
 		DEL_USER,
-		DEL_DATE
+		DEL_DATE,
+		BILL_OFF
 	</sql>
 
 	<!-- 字段值 -->
@@ -30,19 +31,21 @@
 		#{UNLK_DATE},
 		#{DEL_STATE},
 		#{DEL_USER},
-		#{DEL_DATE}
+		#{DEL_DATE},
+		#{BILL_OFF}
 	</sql>
 
 	<!-- 获取当前接口类型， 当前二级单位当前期间当前封存状态为封存的的传输列表-->
 	<select id="listSyncDelUnlock" parameterType="pd" resultType="pd">
-		SELECT A.BILL_CODE,C.CERT_CODE,C.REVCERT_CODE,B.RPT_DEPT AS UNLK_DEPT,B.RPT_DUR AS UNLK_DUR,B.BILL_TYPE,'1' AS UNLK_USER, NOW() AS UNLK_DATE 
+		SELECT A.BILL_CODE,C.CERT_CODE,C.REVCERT_CODE,B.RPT_DEPT AS UNLK_DEPT,B.RPT_DUR AS UNLK_DUR,B.BILL_TYPE,'1' AS UNLK_USER, NOW() AS UNLK_DATE,B.BILL_OFF 
 		FROM ${TABLE_CODE} A
 		JOIN tb_sys_sealed_info B
 		ON A.DEPT_CODE=B.RPT_DEPT
 		AND A.BUSI_DATE=B.RPT_DUR
+		AND A.CUST_COL7=B.BILL_OFF
 		LEFT JOIN tb_gl_cert C
 		ON A.BILL_CODE=C.BILL_CODE
-		WHERE B.STATE='1' and B.BILL_TYPE=#{BILL_TYPE} AND A.dept_code=#{RPT_DEPT} AND A.BUSI_DATE=#{RPT_DUR}
+		WHERE B.STATE='1' and B.BILL_TYPE=#{BILL_TYPE} AND A.dept_code=#{RPT_DEPT} AND A.BUSI_DATE=#{RPT_DUR} AND B.BILL_OFF=#{BILL_OFF}
 	</select>
 
 	<!-- 新增 -->
@@ -54,9 +57,9 @@
 				<include refid="tableName"></include>
 				where BILL_CODE = #{item.BILL_CODE};
 				insert into
-				<include refid="tableName"></include>(BILL_CODE,UNLK_DEPT,UNLK_DUR,BILL_TYPE,UNLK_USER,UNLK_DATE)
+				<include refid="tableName"></include>(BILL_CODE,UNLK_DEPT,UNLK_DUR,BILL_TYPE,UNLK_USER,UNLK_DATE,BILL_OFF)
 				values
-				(#{item.BILL_CODE},#{item.UNLK_DEPT},#{item.UNLK_DUR},#{item.BILL_TYPE},#{item.UNLK_USER},#{item.UNLK_DATE})
+				(#{item.BILL_CODE},#{item.UNLK_DEPT},#{item.UNLK_DUR},#{item.BILL_TYPE},#{item.UNLK_USER},#{item.UNLK_DATE},#{item.BILL_OFF})
 			</if>
 		</foreach>
 	</insert>

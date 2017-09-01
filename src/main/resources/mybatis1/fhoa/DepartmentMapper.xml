@@ -171,6 +171,18 @@
 			PARENT_CODE = #{parentId} order by DEPARTMENT_CODE 
 	</select>
 	
+	<!-- 通过ID获取其子级列表及其自身节点 -->
+	<select id="listSubDepartmentAndSelfByParentId" parameterType="String" resultMap="departmentResultMap">
+		select 
+		<include refid="Field"></include>
+		from 
+		<include refid="tableName"></include>
+		where 
+			DEPARTMENT_CODE=#{parentId} or
+			PARENT_CODE = #{parentId}
+	     order by DEPARTMENT_CODE 
+	</select>
+	
 	<!-- 获取表字典-->
 	<!-- 张晓柳 -->
 	<select id="getDepartDic" parameterType="pd" resultType="com.fh.entity.system.Department">

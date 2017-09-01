@@ -97,6 +97,17 @@ public class DepartmentService implements DepartmentManager{
 	}
 	
 	/**
+	 * 通过ID获取其子级列表
+	 * @param parentId
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Department> listSubDepartmentAndSelfByParentId(String parentId) throws Exception {
+		return (List<Department>) dao.findForList("DepartmentMapper.listSubDepartmentAndSelfByParentId", parentId);
+	}
+	
+	/**
 	 * 获取所有数据并填充每条数据的子级列表(递归处理ZTreeV3.5)
 	 * @param MENU_ID
 	 * @return
@@ -163,6 +174,21 @@ public class DepartmentService implements DepartmentManager{
 		return arrayDep[0];
 	}
 	
+	/**
+	 * 获取所有数据并填充每条数据的子级列表及本身节点(递归处理)下拉ztree用
+	 * @param MENU_ID
+	 * @return
+	 * @throws Exception
+	 */
+	public List<PageData> listAllDepartmentAndSelfToSelect(String parentId,List<PageData> zdepartmentPdList) throws Exception {
+		List<PageData>[] arrayDep = this.listAllbyPd(parentId,zdepartmentPdList);
+		List<PageData> departmentPdList = arrayDep[1];
+		for(PageData pdItem : departmentPdList){
+			this.listAllDepartmentAndSelfToSelect(pdItem.getString("id"),arrayDep[0]);
+		}
+		return arrayDep[0];
+	}
+	
 	/**下拉ztree用
 	 * @param parentId
 	 * @return
@@ -171,6 +197,30 @@ public class DepartmentService implements DepartmentManager{
 	@SuppressWarnings("unchecked")
 	public List<PageData>[] listAllbyPd(String parentId,List<PageData> zdepartmentPdList) throws Exception {
 		List<Department> departmentList = this.listSubDepartmentByParentId(parentId);
+		List<PageData> departmentPdList = new ArrayList<PageData>();
+		for(Department depar : departmentList){
+			PageData pd = new PageData();
+			pd.put("id", depar.getDEPARTMENT_CODE());
+			pd.put("parentId", depar.getPARENT_CODE());
+			pd.put("name", depar.getNAME());
+			pd.put("icon", "static/images/user.gif");
+			departmentPdList.add(pd);
+			zdepartmentPdList.add(pd);
+		}
+		List<PageData>[] arrayDep = new List[2];
+		arrayDep[0] = zdepartmentPdList;
+		arrayDep[1] = departmentPdList;
+		return arrayDep;
+	}
+	
+	/**下拉ztree用
+	 * @param parentId
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PageData>[] listAllAndSelfbyPd(String parentId,List<PageData> zdepartmentPdList) throws Exception {
+		List<Department> departmentList = this.listSubDepartmentAndSelfByParentId(parentId);
 		List<PageData> departmentPdList = new ArrayList<PageData>();
 		for(Department depar : departmentList){
 			PageData pd = new PageData();

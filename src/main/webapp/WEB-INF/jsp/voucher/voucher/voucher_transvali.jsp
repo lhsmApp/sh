@@ -29,7 +29,8 @@
 					<!-- /section:settings.box -->
 					<div class="page-header">
 						<span class="green middle bolder">凭证数据类型: &nbsp;</span>
-						<span class="label label-xlg label-info"><c:choose><c:when test='${pd.TABLE_CODE=="1"}'>工资</c:when><c:when test='${pd.TABLE_CODE=="2"}'>社保</c:when><c:otherwise>公积金</c:otherwise></c:choose></span>
+						<%-- <span class="label label-xlg label-info"><c:choose><c:when test='${pd.TABLE_CODE=="1"}'>工资</c:when><c:when test='${pd.TABLE_CODE=="2"}'>社保</c:when><c:otherwise>公积金</c:otherwise></c:choose></span> --%>
+						<span class="label label-xlg label-info">${pd.TABLE_NAME}</span>
 					</div>
 					<!-- /.page-header -->
 					<div class="row">
@@ -88,7 +89,8 @@
 			 colModel: [
 				{ label: '单据编号', name: 'BILL_CODE', width: 75,editable: false},
 				{ label: '业务区间', name: 'BUSI_DATE', width: 90,editable: false},
-				{ label: '二级单位', name: 'DEPT_CODE', width: 100,editable: false,edittype: 'select',editoptions:{value:"${pd.strDict}"},formatter:'select',formatoptions:{value:"${pd.strDict}"},stype: 'select',searchoptions:{value:"${pd.strDict}"},},          
+				{ label: '二级单位', name: 'DEPT_CODE', width: 100,editable: false,edittype: 'select',editoptions:{value:"${pd.strDict}"},formatter:'select',formatoptions:{value:"${pd.strDict}"},stype: 'select',searchoptions:{value:"${pd.strDict}"},}, 
+				{ label: '帐套', name: 'CUST_COL7', width: 100,editable: false,edittype: 'select',editoptions:{value:"${pd.strBillOff}"},formatter:'select',formatoptions:{value:"${pd.strBillOff}"},stype: 'select',searchoptions:{value:"${pd.strBillOff}"},},
 				/* { label: '封存状态', name: 'STATE', width: 90,editable: false,align:'center',formatter: customFmatterState} */
 			],
 			//reloadAfterSubmit: true, 

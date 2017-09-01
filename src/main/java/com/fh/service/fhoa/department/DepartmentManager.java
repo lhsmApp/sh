@@ -67,6 +67,14 @@ public interface DepartmentManager{
 	public List<Department> listSubDepartmentByParentId(String parentId) throws Exception;
 	
 	/**
+	 * 通过ID获取其子级列表及其自身节点
+	 * @param parentId
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Department> listSubDepartmentAndSelfByParentId(String parentId) throws Exception;
+	
+	/**
 	 * 获取所有数据并填充每条数据的子级列表(递归处理ZTreeV3.5)
 	 * @param MENU_ID
 	 * @return
@@ -89,6 +97,14 @@ public interface DepartmentManager{
 	 * @throws Exception
 	 */
 	public List<PageData> listAllDepartmentToSelect(String parentId, List<PageData> zdepartmentPdList) throws Exception;
+	
+	/**
+	 * 获取所有数据并填充每条数据的子级列表及本身节点(递归处理)下拉ztree用
+	 * @param MENU_ID
+	 * @return
+	 * @throws Exception
+	 */
+	public List<PageData> listAllDepartmentAndSelfToSelect(String parentId, List<PageData> zdepartmentPdList) throws Exception;
 	
 	/**获取某个部门所有下级部门ID(返回拼接字符串 in的形式)
 	 * @param DEPARTMENT_ID
