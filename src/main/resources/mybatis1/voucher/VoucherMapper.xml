@@ -355,7 +355,7 @@
 
 	<!-- Jq分页列表 -->
 	<select id="datalistJqPage" parameterType="jqPage" resultType="pd">
-		<if test='pd.BILL_TYPE=="2" or pd.BILL_TYPE=="4" or pd.BILL_TYPE=="6"'>
+		<if test='VOUCHER_TYPE=="1"'>
 			SELECT A.* FROM ${pd.TABLE_CODE} A
 			JOIN
 			(SELECT
@@ -364,10 +364,12 @@
 			(SELECT bill_code,rpt_dept,rpt_dur,state FROM
 			tb_sys_sealed_info WHERE
 			<!-- bill_type=#{pd.BILL_TYPE1} AND state='1') N -->
-			bill_type=#{pd.BILL_TYPE1}) N
+			bill_type=#{pd.BILL_TYPE_TRANSFER}) N
 			ON M.bill_code=N.bill_code AND M.rpt_dept=N.rpt_dept
 			AND
 			M.rpt_dur=N.rpt_dur
+			AND
+			M.BILL_OFF=N.BILL_OFF
 			WHERE (M.bill_type=#{pd.BILL_TYPE} AND
 			M.state='1')
 			<!-- OR (M.BILL_TYPE='8' AND M.state='0') -->
@@ -377,9 +379,11 @@
 			A.BUSI_DATE=B.RPT_DUR
 			AND
 			A.DEPT_CODE=B.RPT_DEPT
+			AND
+			A.CUST_COL7=B.BILL_OFF
 			<where>
 				A.BILL_STATE='1'
-				and A.USER_GROP=#{pd.USER_GROP}
+				<!-- and A.USER_GROP=#{pd.USER_GROP} -->
 				<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
 					and
 					(
@@ -403,7 +407,7 @@
 			</where>
 		</if>
 
-		<if test='pd.BILL_TYPE=="7" or pd.BILL_TYPE=="8" or pd.BILL_TYPE=="9"'>
+		<if test='VOUCHER_TYPE=="2"'>
 			select A.*,C.CERT_CODE,C.REVCERT_CODE,C.BILL_USER
 			CERT_BILL_USER,C.BILL_DATE CERT_BILL_DATE
 			from ${pd.TABLE_CODE} A
@@ -415,13 +419,15 @@
 			A.BUSI_DATE=B.RPT_DUR
 			AND
 			A.DEPT_CODE=B.RPT_DEPT
+			AND
+			A.CUST_COL7=B.BILL_OFF
 			LEFT JOIN tb_gl_cert C
 			ON
 			A.BILL_CODE=C.BILL_CODE
 			WHERE A.BILL_STATE='1' and B.STATE='1'
-			and A.USER_GROP=#{pd.USER_GROP}
+			<!-- and A.USER_GROP=#{pd.USER_GROP} -->
 			AND
-			B.BILL_TYPE=#{pd.BILL_TYPE}
+			B.BILL_TYPE=#{pd.BILL_TYPE_TRANSFER}
 			<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
 				and
 				(
@@ -454,7 +460,7 @@
 	</select>
 
 	<select id="countJqGrid" parameterType="pd" resultType="int">
-		<if test='BILL_TYPE=="2" or BILL_TYPE=="4" or BILL_TYPE=="6"'>
+		<if test='VOUCHER_TYPE=="1"'>
 			SELECT count(*) FROM ${TABLE_CODE} A
 			JOIN
 			(SELECT
@@ -463,11 +469,13 @@
 			(SELECT bill_code,rpt_dept,rpt_dur,state FROM
 			tb_sys_sealed_info WHERE
 			<!-- bill_type=#{BILL_TYPE1} AND state='1') N -->
-			bill_type=#{BILL_TYPE1}) N
+			bill_type=#{BILL_TYPE_TRANSFER}) N
 			ON
 			M.bill_code=N.bill_code AND M.rpt_dept=N.rpt_dept
 			AND
 			M.rpt_dur=N.rpt_dur
+			AND
+			M.bill_off=N.BILL_OFF
 			WHERE (M.bill_type=#{BILL_TYPE} AND
 			M.state='1')
 			<!-- OR (M.BILL_TYPE='8' AND M.state='0') -->
@@ -477,9 +485,11 @@
 			A.BUSI_DATE=B.RPT_DUR
 			AND
 			A.DEPT_CODE=B.RPT_DEPT
+			AND
+			A.CUST_COL7=B.BILL_OFF
 			<where>
 				A.BILL_STATE='1'
-				and A.USER_GROP=#{USER_GROP}
+				<!-- and A.USER_GROP=#{USER_GROP} -->
 				<if test="keywords!= null and keywords != ''"><!-- 关键词检索 -->
 					and
 					(
@@ -509,7 +519,7 @@
 			</where>
 		</if>
 
-		<if test='BILL_TYPE=="7" or BILL_TYPE=="8" or BILL_TYPE=="9"'>
+		<if test='VOUCHER_TYPE=="2"'>
 			select count(*)
 			from ${TABLE_CODE} A
 			JOIN
@@ -520,13 +530,15 @@
 			A.BUSI_DATE=B.RPT_DUR
 			AND
 			A.DEPT_CODE=B.RPT_DEPT
+			AND
+			A.CUST_COL7=B.BILL_OFF
 			LEFT JOIN tb_gl_cert C
 			ON
 			A.BILL_CODE=C.BILL_CODE
 			WHERE A.BILL_STATE='1' and B.STATE='1'
-			and A.USER_GROP=#{USER_GROP}
+			<!-- and A.USER_GROP=#{USER_GROP} -->
 			AND
-			B.BILL_TYPE=#{BILL_TYPE}
+			B.BILL_TYPE=#{BILL_TYPE_TRANSFER}
 			<if test="keywords!= null and keywords != ''"><!-- 关键词检索 -->
 				and
 				(
@@ -557,7 +569,7 @@
 	</select>
 
 	<select id="getFooterSummary" parameterType="jqPage" resultType="pd">
-		<if test='pd.BILL_TYPE=="2" or pd.BILL_TYPE=="4" or pd.BILL_TYPE=="6"'>
+		<if test='VOUCHER_TYPE=="1"'>
 			SELECT ${pd.Userdata} from
 			(SELECT A.*
 			FROM ${pd.TABLE_CODE} A
@@ -570,11 +582,13 @@
 			FROM
 			tb_sys_sealed_info WHERE
 			<!-- bill_type=#{pd.BILL_TYPE1} AND state='1') -->
-			bill_type=#{pd.BILL_TYPE1})
+			bill_type=#{pd.BILL_TYPE_TRANSFER})
 			N
 			ON M.bill_code=N.bill_code AND M.rpt_dept=N.rpt_dept
 			AND
 			M.rpt_dur=N.rpt_dur
+			AND
+			M.BILL_OFF=N.BILL_OFF
 			WHERE (M.bill_type=#{pd.BILL_TYPE} AND
 			M.state='1')
 			<!-- OR (M.BILL_TYPE='8' AND M.state='0') -->
@@ -584,9 +598,11 @@
 			A.BUSI_DATE=B.RPT_DUR
 			AND
 			A.DEPT_CODE=B.RPT_DEPT
+			AND
+			A.CUST_COL7=B.BILL_OFF
 			<where>
 				A.BILL_STATE='1'
-				and A.USER_GROP=#{pd.USER_GROP}
+				<!-- and A.USER_GROP=#{pd.USER_GROP} -->
 				<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
 					and
 					(
@@ -622,7 +638,7 @@
 			) T
 		</if>
 
-		<if test='pd.BILL_TYPE=="7" or pd.BILL_TYPE=="8" or pd.BILL_TYPE=="9"'>
+		<if test='VOUCHER_TYPE=="2"'>
 			SELECT ${pd.Userdata} from
 			(select A.*
 			from ${pd.TABLE_CODE}
@@ -634,10 +650,12 @@
 			AND
 			A.BUSI_DATE=B.RPT_DUR
 			AND A.DEPT_CODE=B.RPT_DEPT
-			WHERE A.BILL_STATE='1' and B.STATE='1'
-			and A.USER_GROP=#{pd.USER_GROP}
 			AND
-			B.BILL_TYPE=#{pd.BILL_TYPE}
+			A.CUST_COL7=B.BILL_OFF
+			WHERE A.BILL_STATE='1' and B.STATE='1'
+			<!-- and A.USER_GROP=#{pd.USER_GROP} -->
+			AND
+			B.BILL_TYPE=#{pd.BILL_TYPE_TRANSFER}
 			<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
 				and
 				(
@@ -676,7 +694,8 @@
 
 	<!-- 列表(全部) -->
 	<select id="listAll" parameterType="pd" resultType="pd">
-		<if test='BILL_TYPE=="2" or BILL_TYPE=="4" or BILL_TYPE=="6"'>
+		<!-- <if test='BILL_TYPE=="2" or BILL_TYPE=="4" or BILL_TYPE=="6"'> -->
+		<if test='VOUCHER_TYPE=="1"'>
 			SELECT A.* FROM ${TABLE_CODE} A
 			JOIN
 			(SELECT
@@ -685,12 +704,14 @@
 			(SELECT bill_code,rpt_dept,rpt_dur,state FROM
 			tb_sys_sealed_info WHERE
 			<!-- bill_type=#{BILL_TYPE1} AND state='1') N -->
-			bill_type=#{BILL_TYPE1}) N
+			bill_type=#{BILL_TYPE_TRANSFER}) N
 			ON <!-- 
 				M.bill_code=N.bill_code AND -->
 			M.rpt_dept=N.rpt_dept
 			AND
 			M.rpt_dur=N.rpt_dur
+			AND
+			M.BILL_OFF=N.BILL_OFF
 			WHERE
 			(M.bill_type=#{BILL_TYPE} AND
 			M.state='1')
@@ -700,9 +721,11 @@
 			A.BUSI_DATE=B.RPT_DUR
 			AND
 			A.DEPT_CODE=B.RPT_DEPT
+			AND
+			A.CUST_COL7=B.BILL_OFF
 			<where>
 				A.BILL_STATE='1'
-				and A.USER_GROP=#{USER_GROP}
+				<!-- and A.USER_GROP=#{USER_GROP} -->
 				<if test="keywords!= null and keywords != ''"><!-- 关键词检索 -->
 					and
 					(
@@ -733,7 +756,7 @@
 			</where>
 		</if>
 
-		<if test='BILL_TYPE=="7" or BILL_TYPE=="8" or BILL_TYPE=="9"'>
+		<if test='VOUCHER_TYPE=="2"'>
 			select A.*,C.CERT_CODE,C.REVCERT_CODE,C.BILL_USER
 			CERT_BILL_USER,C.BILL_DATE CERT_BILL_DATE
 			from ${TABLE_CODE} A
@@ -744,13 +767,15 @@
 			A.BUSI_DATE=B.RPT_DUR
 			AND
 			A.DEPT_CODE=B.RPT_DEPT
+			AND
+			A.CUST_COL7=B.BILL_OFF
 			LEFT JOIN tb_gl_cert C
 			ON
 			A.BILL_CODE=C.BILL_CODE
 			WHERE A.BILL_STATE='1' and B.STATE='1'
-		    and A.USER_GROP=#{USER_GROP}
+		    <!-- and A.USER_GROP=#{USER_GROP} -->
 			AND
-			B.BILL_TYPE=#{BILL_TYPE}
+			B.BILL_TYPE=#{BILL_TYPE_TRANSFER}
 			<if test="keywords!= null and keywords != ''"><!-- 关键词检索 -->
 				and
 				(
@@ -791,6 +816,7 @@
 		ON A.BILL_CODE=B.BILL_CODE
 		AND A.DEPT_CODE=B.UNLK_DEPT
 		AND A.BUSI_DATE=B.UNLK_DUR
+		AND A.CUST_COL7=B.BILL_OFF
 		<where>
 			B.DEL_STATE='0'
 			and B.bill_type=#{BILL_TYPE}

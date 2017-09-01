@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.alibaba.druid.sql.visitor.functions.If;
 import com.fh.controller.base.BaseController;
 import com.fh.controller.common.DictsUtil;
 import com.fh.controller.common.GenerateTransferData;
@@ -58,6 +59,7 @@ import com.fh.util.Tools;
 import com.fh.util.date.DateFormatUtils;
 import com.fh.util.date.DateUtils;
 import com.fh.util.enums.BillType;
+import com.fh.util.enums.TmplType;
 import com.fh.util.enums.TransferOperType;
 
 import net.sf.json.JSONArray;
@@ -96,10 +98,10 @@ public class VoucherController extends BaseController {
 
 	@Resource(name = "sysconfigService")
 	private SysConfigManager sysConfigManager;
-	
+
 	@Resource(name = "userService")
 	private UserManager userService;
-	
+
 	@Resource(name = "sysunlockinfoService")
 	private SysUnlockInfoManager sysUnlockInfoService;
 
@@ -120,9 +122,9 @@ public class VoucherController extends BaseController {
 		mv.setViewName("voucher/voucher/voucher_list");
 		PageData pd = this.getPageData();
 		String which = pd.getString("TABLE_CODE");
-		if(which==null)
-			which="16";//取默认值-合同化工资传输表
-		//String tableCode = getTableCode(which);
+		if (which == null)
+			which = "16";// 取默认值-合同化工资传输表
+		// String tableCode = getTableCode(which);
 		// 此处放当前页面初始化时用到的一些数据，例如搜索的下拉列表数据，所需的字典数据、权限数据等等。
 		// mv.addObject("pd", pd);
 		// *********************加载单位树*******************************
@@ -140,7 +142,7 @@ public class VoucherController extends BaseController {
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 		// 生成主表结构
 		TmplUtil tmplUtil = new TmplUtil(tmplconfigService, tmplConfigDictService, dictionariesService,
-				departmentService,userService);
+				departmentService, userService);
 		String jqGridColModel = tmplUtil.generateStructureNoEdit(which, Jurisdiction.getCurrentDepartmentID());
 		mv.addObject("jqGridColModel", jqGridColModel);
 
@@ -159,12 +161,12 @@ public class VoucherController extends BaseController {
 			hasUserData = true;
 		}
 		mv.addObject("HasUserData", hasUserData);
-		
-		//CUST_COL7 FMISACC 帐套字典
+
+		// CUST_COL7 FMISACC 帐套字典
 		mv.addObject("fmisacc", DictsUtil.getDictsByParentBianma(dictionariesService, "FMISACC"));
 		return mv;
 	}
-	
+
 	/**
 	 * 传输数据查询
 	 * 
@@ -179,9 +181,9 @@ public class VoucherController extends BaseController {
 		mv.setViewName("voucher/voucher/voucher_search");
 		PageData pd = this.getPageData();
 		String which = pd.getString("TABLE_CODE");
-		if(which==null)
-			which="16";//取默认值-合同化工资传输表
-		//String tableCode = getTableCode(which);
+		if (which == null)
+			which = "16";// 取默认值-合同化工资传输表
+		// String tableCode = getTableCode(which);
 		// 此处放当前页面初始化时用到的一些数据，例如搜索的下拉列表数据，所需的字典数据、权限数据等等。
 		// mv.addObject("pd", pd);
 		// *********************加载单位树*******************************
@@ -199,7 +201,7 @@ public class VoucherController extends BaseController {
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 		// 生成主表结构
 		TmplUtil tmplUtil = new TmplUtil(tmplconfigService, tmplConfigDictService, dictionariesService,
-				departmentService,userService);
+				departmentService, userService);
 		String jqGridColModel = tmplUtil.generateStructureNoEdit(which, Jurisdiction.getCurrentDepartmentID());
 		mv.addObject("jqGridColModel", jqGridColModel);
 
@@ -218,7 +220,7 @@ public class VoucherController extends BaseController {
 			hasUserData = true;
 		}
 		mv.addObject("HasUserData", hasUserData);
-		
+
 		mv.addObject("emplgrp", DictsUtil.getDictsByParentBianma(dictionariesService, "EMPLGRP"));
 		mv.addObject("fmisacc", DictsUtil.getDictsByParentBianma(dictionariesService, "FMISACC"));
 		return mv;
@@ -239,18 +241,12 @@ public class VoucherController extends BaseController {
 		String voucherType = pd.getString("VOUCHER_TYPE");
 		String tableCode = getTableCode(which);
 		pd.put("TABLE_CODE", tableCode);
-		String sealType = getSealType(which, voucherType);
-		pd.put("BILL_TYPE", sealType);// 封存类型
-		String sealType1 = "";// 汇总封存类型对应的传输接口类型
-		if (sealType.equals(BillType.SALLARY_SUMMARY.getNameKey())) {
-			sealType1 = BillType.SALLARY_LISTEN.getNameKey();
-		} else if (sealType.equals(BillType.GOLD_SUMMARY.getNameKey())) {
-			sealType1 = BillType.GOLD_LISTEN.getNameKey();
-		} else if (sealType.equals(BillType.SECURITY_SUMMARY.getNameKey())) {
-			sealType1 = BillType.SECURITY_LISTEN.getNameKey();
-		}
-		pd.put("BILL_TYPE1", sealType1);// 封存类型
-		pd.put("USER_GROP",DictsUtil.getEmplGroupType(which));
+		String sealTypeTransfer = which==null?TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey():which;// 传输接口类型
+		String sealType = getSealType(which);// 接口封存类型对应的汇总接口类型
+		pd.put("BILL_TYPE_TRANSFER", sealTypeTransfer);// 接口封存类型
+		pd.put("VOUCHER_TYPE", voucherType);// 接口封存类型
+		pd.put("BILL_TYPE", sealType);// 接口封存类型对应的汇总接口类型
+		pd.put("USER_GROP", DictsUtil.getEmplGroupType(which));
 		String strDeptCode = pd.getString("DEPT_CODE");// 单位检索条件
 		if (StringUtil.isNotEmpty(strDeptCode)) {
 			String[] strDeptCodes = strDeptCode.split(",");
@@ -290,7 +286,7 @@ public class VoucherController extends BaseController {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * 列表
 	 * 
@@ -303,10 +299,10 @@ public class VoucherController extends BaseController {
 		PageData pd = new PageData();
 		pd = this.getPageData();
 		String which = pd.getString("TABLE_CODE");
-		String voucherType = pd.getString("VOUCHER_TYPE");
+		//String voucherType = pd.getString("VOUCHER_TYPE");
 		String tableCode = getTableCode(which);
 		pd.put("TABLE_CODE", tableCode);
-		String sealType = getSealType(which, voucherType);
+		String sealType = which==null?TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey():which;// 传输接口类型;
 		pd.put("BILL_TYPE", sealType);// 封存类型
 
 		String strDeptCode = pd.getString("DEPT_CODE");// 单位检索条件
@@ -336,13 +332,13 @@ public class VoucherController extends BaseController {
 		PageResult<PageData> result = new PageResult<PageData>();
 		result.setRows(varList);
 
-		/*PageData userdata = null;
-		if (SqlUserdata != null && !SqlUserdata.toString().trim().equals("")) {
-			// 底行显示的求和与平均值字段
-			pd.put("Userdata", SqlUserdata.toString());
-			userdata = voucherService.getFooterSummary(page);
-			result.setUserdata(userdata);
-		}*/
+		/*
+		 * PageData userdata = null; if (SqlUserdata != null &&
+		 * !SqlUserdata.toString().trim().equals("")) { // 底行显示的求和与平均值字段
+		 * pd.put("Userdata", SqlUserdata.toString()); userdata =
+		 * voucherService.getFooterSummary(page); result.setUserdata(userdata);
+		 * }
+		 */
 		return result;
 	}
 
@@ -371,7 +367,8 @@ public class VoucherController extends BaseController {
 		} else {
 			tableCodeSub = "TB_STAFF_DETAIL";
 		}
-		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplConfigDictService, dictionariesService, departmentService,userService);
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplConfigDictService, dictionariesService, departmentService,
+				userService);
 		String detailColModel = tmpl.generateStructureNoEdit(tableCodeSub, DEPT_CODE);
 
 		commonBase.setCode(0);
@@ -469,10 +466,12 @@ public class VoucherController extends BaseController {
 						List<PageData> listItem = entry.getValue();
 						PageData pgItem = listItem.get(0);
 						item.setRPT_DUR(pgItem.getString("BUSI_DATE"));
+						item.setBILL_OFF(pgItem.getString("CUST_COL7"));
 						item.setRPT_USER(userId);
 						item.setRPT_DATE(DateUtils.getCurrentTime());// YYYY-MM-DD
 																		// HH:MM:SS
-						String sealType = getSealType(which, "2");// 封存类型
+						//String sealType = getSealType(which, "2");// 封存类型
+						String sealType =which==null?TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey():which;// 传输接口类型
 						item.setBILL_TYPE(sealType);
 						item.setSTATE("1");// 枚举 1封存,0解封
 						listSysSealed.add(item);
@@ -491,7 +490,7 @@ public class VoucherController extends BaseController {
 		}
 		return commonBase;
 	}
-	
+
 	/**
 	 * 同步删除
 	 * 
@@ -537,12 +536,13 @@ public class VoucherController extends BaseController {
 			String message = (String) call.invoke(new Object[] { transferData });
 			System.out.println(message);
 			if (message.equals("TRUE")) {
-				//更改TB_SYS_UNLOCK_INFO删除状态
+				// 更改TB_SYS_UNLOCK_INFO删除状态
 				User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
 				String userId = user.getUSER_ID();
-				for(PageData pdItem:listTransferData ){
+				for (PageData pdItem : listTransferData) {
 					pdItem.put("DEL_USER", userId);
-					pdItem.put("DEL_DATE", DateUtils.getCurrentTime());//YYYY-MM-DD HH:MM:SS
+					pdItem.put("DEL_DATE", DateUtils.getCurrentTime());// YYYY-MM-DD
+																		// HH:MM:SS
 				}
 				sysUnlockInfoService.edit(listTransferData);
 				commonBase.setCode(0);
@@ -590,7 +590,7 @@ public class VoucherController extends BaseController {
 			String userId = user.getUSER_ID();
 			for (PageData item : listTransferData) {
 				String invoiceNumber = item.getString("BILL_CODE");// 单据编号
-				//String fmisOrg = item.getString("DEPT_CODE");// FMIS组织机构编码
+				// String fmisOrg = item.getString("DEPT_CODE");// FMIS组织机构编码
 				String fmisOrg = Tools.readTxtFile(Const.ORG_CODE); // 读取总部组织机构编码
 				String tableName = "T_" + getTableCode(which);// 在fmis建立的业务表名
 				String result = (String) call.invoke(new Object[] { tableName, invoiceNumber, fmisOrg });// 对应定义参数
@@ -667,7 +667,7 @@ public class VoucherController extends BaseController {
 					String flag = stringArr[0];
 					if (flag.equals("TRUE")) {
 						String reseverNumber = stringArr[1];// 冲销凭证编号
-						//String invoiceNumbers = "";// 冲销凭证编号
+						// String invoiceNumbers = "";// 冲销凭证编号
 
 						// 执行获取凭证成功后对数据表进行凭证号更新
 						PageData pdCert = new PageData();
@@ -675,7 +675,8 @@ public class VoucherController extends BaseController {
 						pdCert.put("CERT_CODE", item.getString("CERT_CODE"));
 						pdCert.put("REVCERT_CODE", reseverNumber);
 						pdCert.put("BILL_USER", userId);
-						pdCert.put("BILL_DATE", DateUtils.getCurrentTime());// YYYY-MM-DD HH:MM:SS
+						pdCert.put("BILL_DATE", DateUtils.getCurrentTime());// YYYY-MM-DD
+																			// HH:MM:SS
 						listVoucherNo.add(pdCert);
 					}
 				}
@@ -690,38 +691,36 @@ public class VoucherController extends BaseController {
 	/**
 	 * 根据前端业务表索引获取表名称
 	 * 
-	 * @param which 1、合同化工资 2、社保 3、公积金 4、市场化工资  5、系统内劳务工资 6、运行人员工资 7、劳务派遣工资
+	 * @param which
+	 *            1、合同化工资 2、社保 3、公积金 4、市场化工资 5、系统内劳务工资 6、运行人员工资 7、劳务派遣工资
 	 * @return
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	private String getTableCode(String which) throws Exception {
-		PageData pd=new PageData();
+		PageData pd = new PageData();
 		pd.put("TABLE_NO", which);
-		PageData pdResult=tmplconfigService.findTableCodeByTableNo(pd);
-		String tableCodeTmpl=pdResult.getString("TABLE_CODE");
-		String tableCodeOri="";//数据库真实业务数据表
-		if(tableCodeTmpl.startsWith("TB_STAFF_TRANSFER")){
-			tableCodeOri="TB_STAFF_SUMMY";
-		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_TRANSFER")){
-			tableCodeOri="TB_SOCIAL_INC_SUMMY";
-		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_TRANSFER")){
-			tableCodeOri="TB_HOUSE_FUND_SUMMY";
-		}else{
+		PageData pdResult = tmplconfigService.findTableCodeByTableNo(pd);
+		String tableCodeTmpl = pdResult.getString("TABLE_CODE");
+		String tableCodeOri = "";// 数据库真实业务数据表
+		if (tableCodeTmpl.startsWith("TB_STAFF_TRANSFER")) {
+			tableCodeOri = "TB_STAFF_SUMMY";
+		} else if (tableCodeTmpl.equals("TB_SOCIAL_INC_TRANSFER")) {
+			tableCodeOri = "TB_SOCIAL_INC_SUMMY";
+		} else if (tableCodeTmpl.equals("TB_HOUSE_FUND_TRANSFER")) {
+			tableCodeOri = "TB_HOUSE_FUND_SUMMY";
+		} else {
 			tableCodeOri = "TB_STAFF_SUMMY";
 		}
 		return tableCodeOri;
-		
-		/*String tableCode = "";
-		if (which != null && which.equals("1")) {
-			tableCode = "TB_STAFF_SUMMY";
-		} else if (which != null && which.equals("2")) {
-			tableCode = "TB_SOCIAL_INC_SUMMY";
-		} else if (which != null && which.equals("3")) {
-			tableCode = "TB_HOUSE_FUND_SUMMY";
-		} else {
-			tableCode = "TB_STAFF_SUMMY";
-		}
-		return tableCode;*/
+
+		/*
+		 * String tableCode = ""; if (which != null && which.equals("1")) {
+		 * tableCode = "TB_STAFF_SUMMY"; } else if (which != null &&
+		 * which.equals("2")) { tableCode = "TB_SOCIAL_INC_SUMMY"; } else if
+		 * (which != null && which.equals("3")) { tableCode =
+		 * "TB_HOUSE_FUND_SUMMY"; } else { tableCode = "TB_STAFF_SUMMY"; }
+		 * return tableCode;
+		 */
 	}
 
 	/**
@@ -729,66 +728,78 @@ public class VoucherController extends BaseController {
 	 * 
 	 * @param which
 	 * @return
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	private String getSubTableCode(String which) throws Exception {
-		PageData pd=new PageData();
+		PageData pd = new PageData();
 		pd.put("TABLE_NO", which);
-		PageData pdResult=tmplconfigService.findTableCodeByTableNo(pd);
-		String tableCodeTmpl=pdResult.getString("TABLE_CODE");
-		String tableCodeOri="";//数据库真实业务数据表
-		if(tableCodeTmpl.startsWith("TB_STAFF_TRANSFER")){
-			tableCodeOri="TB_STAFF_DETAIL";
-		}else if(tableCodeTmpl.equals("TB_SOCIAL_INC_TRANSFER")){
-			tableCodeOri="TB_SOCIAL_INC_DETAIL";
-		}else if(tableCodeTmpl.equals("TB_HOUSE_FUND_TRANSFER")){
-			tableCodeOri="TB_HOUSE_FUND_DETAIL";
-		}else{
+		PageData pdResult = tmplconfigService.findTableCodeByTableNo(pd);
+		String tableCodeTmpl = pdResult.getString("TABLE_CODE");
+		String tableCodeOri = "";// 数据库真实业务数据表
+		if (tableCodeTmpl.startsWith("TB_STAFF_TRANSFER")) {
+			tableCodeOri = "TB_STAFF_DETAIL";
+		} else if (tableCodeTmpl.equals("TB_SOCIAL_INC_TRANSFER")) {
+			tableCodeOri = "TB_SOCIAL_INC_DETAIL";
+		} else if (tableCodeTmpl.equals("TB_HOUSE_FUND_TRANSFER")) {
+			tableCodeOri = "TB_HOUSE_FUND_DETAIL";
+		} else {
 			tableCodeOri = "TB_STAFF_DETAIL";
 		}
 		return tableCodeOri;
-		
-		/*String tableCode = "";
-		if (which != null && which.equals("1")) {
-			tableCode = "TB_STAFF_DETAIL";
-		} else if (which != null && which.equals("2")) {
-			tableCode = "TB_SOCIAL_INC_DETAIL";
-		} else if (which != null && which.equals("3")) {
-			tableCode = "TB_HOUSE_FUND_DETAIL";
-		} else {
-			tableCode = "TB_STAFF_DETAIL";
-		}
-		return tableCode;*/
+
+		/*
+		 * String tableCode = ""; if (which != null && which.equals("1")) {
+		 * tableCode = "TB_STAFF_DETAIL"; } else if (which != null &&
+		 * which.equals("2")) { tableCode = "TB_SOCIAL_INC_DETAIL"; } else if
+		 * (which != null && which.equals("3")) { tableCode =
+		 * "TB_HOUSE_FUND_DETAIL"; } else { tableCode = "TB_STAFF_DETAIL"; }
+		 * return tableCode;
+		 */
 	}
 
 	/**
-	 * 根据前端业务表索引,及凭证功能类型获取封存类型
+	 * 根据前端业务表接口类型,获取对应的汇总类型
 	 * 
 	 * @param which
 	 * @return
 	 */
-	private String getSealType(String which, String voucherType) {
+	private String getSealType(String which) {
+		/*
+		 * String sealType = ""; if (voucherType.equals("1")) { if (which !=
+		 * null && which.equals("1")) { sealType =
+		 * BillType.SALLARY_SUMMARY.getNameKey(); } else if (which != null &&
+		 * which.equals("2")) { sealType =
+		 * BillType.SECURITY_SUMMARY.getNameKey(); } else if (which != null &&
+		 * which.equals("3")) { sealType = BillType.GOLD_SUMMARY.getNameKey(); }
+		 * else { sealType = BillType.SALLARY_SUMMARY.getNameKey(); } } else if
+		 * (voucherType.equals("2")) { if (which != null && which.equals("1")) {
+		 * sealType = BillType.SALLARY_LISTEN.getNameKey(); } else if (which !=
+		 * null && which.equals("2")) { sealType =
+		 * BillType.SECURITY_LISTEN.getNameKey(); } else if (which != null &&
+		 * which.equals("3")) { sealType = BillType.GOLD_LISTEN.getNameKey(); }
+		 * else { sealType = BillType.SALLARY_LISTEN.getNameKey(); } } return
+		 * sealType;
+		 */
+
 		String sealType = "";
-		if (voucherType.equals("1")) {
-			if (which != null && which.equals("1")) {
-				sealType = BillType.SALLARY_SUMMARY.getNameKey();
-			} else if (which != null && which.equals("2")) {
-				sealType = BillType.SECURITY_SUMMARY.getNameKey();
-			} else if (which != null && which.equals("3")) {
-				sealType = BillType.GOLD_SUMMARY.getNameKey();
-			} else {
-				sealType = BillType.SALLARY_SUMMARY.getNameKey();
+		if (which != null) {
+			if (which.equals(TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey())) {
+				sealType = TmplType.TB_STAFF_SUMMY_CONTRACT.getNameKey();
+			} else if (which.equals(TmplType.TB_STAFF_TRANSFER_MARKET.getNameKey())) {
+				sealType = TmplType.TB_STAFF_SUMMY_MARKET.getNameKey();
+			} else if (which.equals(TmplType.TB_STAFF_TRANSFER_LABOR.getNameKey())) {
+				sealType = TmplType.TB_STAFF_SUMMY_LABOR.getNameKey();
+			} else if (which.equals(TmplType.TB_STAFF_TRANSFER_SYS_LABOR.getNameKey())) {
+				sealType = TmplType.TB_STAFF_SUMMY_SYS_LABOR.getNameKey();
+			} else if (which.equals(TmplType.TB_STAFF_TRANSFER_OPER_LABOR.getNameKey())) {
+				sealType = TmplType.TB_STAFF_SUMMY_OPER_LABOR.getNameKey();
+			} else if (which.equals(TmplType.TB_SOCIAL_INC_TRANSFER.getNameKey())) {
+				sealType = TmplType.TB_SOCIAL_INC_SUMMY.getNameKey();
+			} else if (which.equals(TmplType.TB_HOUSE_FUND_TRANSFER.getNameKey())) {
+				sealType = TmplType.TB_HOUSE_FUND_SUMMY.getNameKey();
 			}
-		} else if (voucherType.equals("2")) {
-			if (which != null && which.equals("1")) {
-				sealType = BillType.SALLARY_LISTEN.getNameKey();
-			} else if (which != null && which.equals("2")) {
-				sealType = BillType.SECURITY_LISTEN.getNameKey();
-			} else if (which != null && which.equals("3")) {
-				sealType = BillType.GOLD_LISTEN.getNameKey();
-			} else {
-				sealType = BillType.SALLARY_LISTEN.getNameKey();
-			}
+		} else {
+			sealType = TmplType.TB_STAFF_SUMMY_CONTRACT.getNameKey();
 		}
 		return sealType;
 	}
@@ -825,7 +836,7 @@ public class VoucherController extends BaseController {
 		String which = pd.getString("TABLE_CODE");
 		String tableCode = getTableCode(which);
 		pd.put("TABLE_CODE", tableCode);
-		String sealType = getSealType(which, "1");
+		String sealType = getSealType(which);
 		pd.put("BILL_TYPE", sealType);// 封存类型
 		String filters = pd.getString("filters"); // 多条件过滤条件
 		if (null != filters && !"".equals(filters)) {
