@@ -379,6 +379,7 @@
 			A.DEPT_CODE=B.RPT_DEPT
 			<where>
 				A.BILL_STATE='1'
+				and A.USER_GROP=#{pd.USER_GROP}
 				<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
 					and
 					(
@@ -418,6 +419,7 @@
 			ON
 			A.BILL_CODE=C.BILL_CODE
 			WHERE A.BILL_STATE='1' and B.STATE='1'
+			and A.USER_GROP=#{pd.USER_GROP}
 			AND
 			B.BILL_TYPE=#{pd.BILL_TYPE}
 			<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
@@ -477,6 +479,7 @@
 			A.DEPT_CODE=B.RPT_DEPT
 			<where>
 				A.BILL_STATE='1'
+				and A.USER_GROP=#{USER_GROP}
 				<if test="keywords!= null and keywords != ''"><!-- 关键词检索 -->
 					and
 					(
@@ -521,6 +524,7 @@
 			ON
 			A.BILL_CODE=C.BILL_CODE
 			WHERE A.BILL_STATE='1' and B.STATE='1'
+			and A.USER_GROP=#{USER_GROP}
 			AND
 			B.BILL_TYPE=#{BILL_TYPE}
 			<if test="keywords!= null and keywords != ''"><!-- 关键词检索 -->
@@ -582,6 +586,7 @@
 			A.DEPT_CODE=B.RPT_DEPT
 			<where>
 				A.BILL_STATE='1'
+				and A.USER_GROP=#{pd.USER_GROP}
 				<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
 					and
 					(
@@ -630,6 +635,7 @@
 			A.BUSI_DATE=B.RPT_DUR
 			AND A.DEPT_CODE=B.RPT_DEPT
 			WHERE A.BILL_STATE='1' and B.STATE='1'
+			and A.USER_GROP=#{pd.USER_GROP}
 			AND
 			B.BILL_TYPE=#{pd.BILL_TYPE}
 			<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
@@ -696,6 +702,7 @@
 			A.DEPT_CODE=B.RPT_DEPT
 			<where>
 				A.BILL_STATE='1'
+				and A.USER_GROP=#{USER_GROP}
 				<if test="keywords!= null and keywords != ''"><!-- 关键词检索 -->
 					and
 					(
@@ -741,6 +748,7 @@
 			ON
 			A.BILL_CODE=C.BILL_CODE
 			WHERE A.BILL_STATE='1' and B.STATE='1'
+		    and A.USER_GROP=#{USER_GROP}
 			AND
 			B.BILL_TYPE=#{BILL_TYPE}
 			<if test="keywords!= null and keywords != ''"><!-- 关键词检索 -->

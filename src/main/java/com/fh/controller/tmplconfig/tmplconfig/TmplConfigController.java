@@ -109,10 +109,8 @@ public class TmplConfigController extends BaseController {
 		 * List<PageData> temporaryList = tmplconfigService.temporaryList(page);
 		 * result.setRows(temporaryList); }
 		 */
-		
-		if(pd.getString("TABLE_CODE").startsWith("TB_STAFF_DETAIL")){
-			pd.put("TABLE_CODE", "TB_STAFF_DETAIL");
-		}
+		String tableCodeOri=DictsUtil.getActualTable(pd.getString("TABLE_CODE"));//数据库真实业务数据表
+		pd.put("TABLE_CODE", tableCodeOri);
 		List<PageData> temporaryList = tmplconfigService.temporaryList(page);
 		if (varList.size() != 0) {
 			for(PageData temp:temporaryList){
