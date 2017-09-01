@@ -144,7 +144,7 @@ public class StaffDetailController extends BaseController {
 		
 		// 枚举  1封存,0解封
 		String State = DurState.Sealed.getNameKey();
-		mv.addObject("State", State.equals(DurState.Release.getNameKey())? true:false);
+		mv.addObject("State", String.valueOf(State.equals(DurState.Release.getNameKey())? true:false));
 
 		//CUST_COL7 FMISACC 帐套字典
 		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));
@@ -196,7 +196,7 @@ public class StaffDetailController extends BaseController {
 				retState = DurState.Release.getNameKey();
 			}
 		}
-		commonBase.setMessage(retState);
+		commonBase.setMessage(String.valueOf(retState.equals(DurState.Release.getNameKey())? true:false));
 		commonBase.setCode(0);
 		
 		return commonBase;

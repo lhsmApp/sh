@@ -22,6 +22,16 @@
 	<!-- 最新版的Jqgrid Css，如果旧版本（Ace）某些方法不好用，尝试用此版本Css，替换旧版本Css -->
 	<!-- <link rel="stylesheet" type="text/css" media="screen" href="static/ace/css/ui.jqgrid-bootstrap.css" /> -->
 	
+<script type="text/javascript" src="static/js/jquery-1.7.2.js"></script>
+<!-- 树形下拉框start -->
+<script type="text/javascript" src="plugins/selectZtree/selectTree.js"></script>
+<script type="text/javascript" src="plugins/selectZtree/framework.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="plugins/selectZtree/import_fh.css" />
+<script type="text/javascript" src="plugins/selectZtree/ztree/ztree.js"></script>
+<link type="text/css" rel="stylesheet"
+	href="plugins/selectZtree/ztree/ztree.css"></link>
+<!-- 树形下拉框end -->
     <!-- 标准页面统一样式 -->
     <link rel="stylesheet" href="static/css/normal.css" />
 	
@@ -83,7 +93,7 @@
 								<div class="widget-body">
 									<div class="widget-main">
 										<form class="form-inline">
-											<span>
+											<span class="pull-left" style="margin-right: 5px;">
 												<select class="chosen-select form-control"
 													name="CUST_COL7" id="CUST_COL7"
 													data-placeholder="请选择帐套"
@@ -95,7 +105,7 @@
 													</c:forEach>
 												</select>
 											</span>
-											<span class="pull-left" style="margin-right: 5px;">
+											<span class="pull-left" id="spanSelectTree" style="margin-right: 5px;">
 												<div class="selectTree" id="selectTree" multiMode="false"
 												    allSelectable="false" noGroup="false"></div>
 											    <input type="text" id="DEPT_CODE" hidden></input>
@@ -151,16 +161,24 @@
 	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
 	<!-- JqGrid统一样式统一操作 -->
 	<script type="text/javascript" src="static/js/common/jqgrid_style.js"></script>
+	<script type="text/javascript"
+		src="static/js/common/cusElement_style.js"></script>
+	<script type="text/javascript" src="static/js/util/toolkit.js"></script>
+	<script src="static/ace/js/ace/ace.widget-box.js"></script>
+	<script type="text/javascript"> 
 	<!-- 上传控件 -->
 	<script src="static/ace/js/ace/elements.fileinput.js"></script>
 	
-	<script type="text/javascript"> 
+<script type="text/javascript"> 
     var gridBase_selector = "#jqGridBase";  
     var pagerBase_selector = "#jqGridBasePager";  
 
 	var which='';
-	//var jqGridColModel;
-    
+    // 枚举  1封存,0解封
+	var State='';
+	//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
+	var jqGridColModel='';
+	    
 	$(document).ready(function () {
 		$(top.hangge());//关闭加载状态
 	    
@@ -171,10 +189,10 @@
 	    //$("#showDur").text('当前期间：' + SystemDateTime + ' 当前单位：' + DepartName);
 		//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
 	    // 枚举  1封存,0解封
-		var State = '${State}';
+		State = '${State}';
 		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-	    var jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
-	    
+	    jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
+	
 	    function setStateFalse(){
 	    	State = "false";
 	    }
@@ -184,8 +202,8 @@
 	        }
 	        return false;
 	    };
-	    
 	    function setNavButtonState(){
+			console.log($.trim(State));
 	        if($.trim(State) == "true"){
 	            $("#edit").removeClass('ui-state-disabled'); //Disable 按钮灰掉不可用
 	            $("#add").removeClass('ui-state-disabled'); //Disable 按钮灰掉不可用
@@ -229,6 +247,46 @@
 	        }
 	    };
 	    
+	    function getCheckState(){
+			top.jzts();
+			$.ajax({
+				type: "POST",
+				url: '<%=basePath%>staffdetail/getState.do?WhileBillOff='+which
+                    +'&DEPT_CODE='+$("#DEPT_CODE").val()
+                    +'&CUST_COL7='+$("#CUST_COL7").val(),
+				cache: false,
+				success: function(response){
+					if(response.code==0){
+					    // 枚举  1封存,0解封
+						State = response.message;
+						setNavButtonState();
+						$(top.hangge());//关闭加载状态
+					}else{
+						setStateFalse();  
+						setNavButtonState();
+						$(top.hangge());//关闭加载状态
+						$("#subTitle").tips({
+							side:3,
+				            msg:'获取封存状态失败,'+response.message,
+				            bg:'#cc0033',
+				            time:3
+				        });
+					}
+				},
+		    	error: function(response) {
+					setStateFalse();  
+					setNavButtonState();
+					$(top.hangge());//关闭加载状态
+					$("#subTitle").tips({
+						side:3,
+			            msg:'获取封存状态出错！',
+			            bg:'#cc0033',
+			            time:3
+			        });
+		    	}
+			});
+	    };
+	    
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
 			$(gridBase_selector).jqGrid( 'setGridWidth', $(".page-content").width());
@@ -253,10 +311,10 @@
 		$('[data-toggle="buttons"] .btn').on('click', function(e){
 			var target = $(this).find('input[type=radio]');
 			which = parseInt(target.val());
-			if(which!='${pd.which}'){
+			//if(which!='${pd.which}'){
 				window.location.href="<%=basePath%>staffdetail/list.do?WhileBillOff="+which;
                 //+'&DEPT_CODE='+$("#DEPT_CODE").val() + '&CUST_COL7='+$("#CUST_COL7").val()
-			}
+			//}
 		});
 		
 		$(gridBase_selector).jqGrid({
@@ -292,6 +350,7 @@
 					updatePagerIcons(table);
 					enableTooltips(table);
 				}, 0);
+				getCheckState();
 			},
 		});
 	    
@@ -434,9 +493,8 @@
             var lastSelection;
 			function doubleClickRow(rowid,iRow,iCol,e){
 				if(getState()){
-                    var grid = $(gridBase_selector);
-                    grid.restoreRow(lastSelection);
-                    grid.editRow(rowid, {
+					$(gridBase_selector).restoreRow(lastSelection);
+					$(gridBase_selector).editRow(rowid, {
                     	keys:true, //keys:true 这里按[enter]保存  
                         restoreAfterError: false,  
                     	oneditfunc: function(rowid){  
@@ -444,7 +502,7 @@
                         },  
                         successfunc: function(response){
 							if(response.responseJSON.code==0){
-								grid.trigger("reloadGrid");  
+								$(gridBase_selector).trigger("reloadGrid");  
 								$(top.hangge());//关闭加载状态
 								$("#subTitle").tips({
 									side:3,
@@ -455,7 +513,7 @@
 								lastSelection = rowid;
 								return [true,"",""];
 							}//else{
-					        //   grid.jqGrid('editRow',lastSelection);
+					        //   $(gridBase_selector).jqGrid('editRow',lastSelection);
 							//	$(top.hangge());//关闭加载状态
 							//	$("#subTitle").tips({
 							//		side:3,
@@ -466,11 +524,11 @@
 							//}
                         },  
                         errorfunc: function(rowid, response){
-				            grid.jqGrid('editRow',lastSelection);
+                        	$(gridBase_selector).jqGrid('editRow',lastSelection);
 							$(top.hangge());//关闭加载状态
 							if(response.statusText == "success"){
 								if(response.responseJSON.code != 0){
-							        grid.jqGrid('editRow',lastSelection);
+									$(gridBase_selector).jqGrid('editRow',lastSelection);
 									$(top.hangge());//关闭加载状态
 									$("#subTitle").tips({
 										side:3,
@@ -495,19 +553,17 @@
 
 			//批量编辑
 			function batchEdit(e) {
-				var grid = $(gridBase_selector);
-		        var ids = grid.jqGrid('getDataIDs');
+		        var ids = $(gridBase_selector).jqGrid('getDataIDs');
 		        for (var i = 0; i < ids.length; i++) {
-		            grid.jqGrid('editRow',ids[i]);
+		        	$(gridBase_selector).jqGrid('editRow',ids[i]);
 		        }
 		    }
 			
 			//取消批量编辑
 			function batchCancelEdit(e) {
-				var grid = $(gridBase_selector);
-		        var ids = grid.jqGrid('getDataIDs');
+		        var ids = $(gridBase_selector).jqGrid('getDataIDs');
 		        for (var i = 0; i < ids.length; i++) {
-		            grid.jqGrid('restoreRow',ids[i]);
+		        	$(gridBase_selector).jqGrid('restoreRow',ids[i]);
 		        }
 		    }
 
@@ -746,6 +802,8 @@
 	
 	//检索
 	function tosearch() {
+		//setStateFalse();  
+		//setNavButtonState();
 		$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据
 			url:'<%=basePath%>staffdetail/getPageList.do?WhileBillOff='+which
 	            +'&DEPT_CODE='+$("#DEPT_CODE").val()
@@ -758,7 +816,14 @@
 	//加载单位树
 	function initComplete(){
 		//下拉树
-		var defaultNodes = {"treeNodes":${zTreeNodes}};
+		var nodes = ${zTreeNodes};
+		if(nodes.length <= 1){
+            $("#spanSelectTree").hide();
+			return;
+		} else {
+            $("#spanSelectTree").show();
+		}
+		var defaultNodes = {"treeNodes":nodes};
 		//绑定change事件
 		$("#selectTree").bind("change",function(){
 			$("#DEPT_CODE").val("");
@@ -772,5 +837,5 @@
 		$("#selectTree2_input").val("请选择");
 	}
 
- 	</script>
+</script>
 </html>
