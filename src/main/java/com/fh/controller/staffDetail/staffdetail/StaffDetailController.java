@@ -99,7 +99,7 @@ public class StaffDetailController extends BaseController {
 	//页面显示数据的二级单位
 	String UserDepartCode = "";
 	//登录人的二级单位是最末层
-	Boolean IsUserDepartLayer;
+	Boolean IsUserDepartLayer = false;
 
 	//默认的which值
 	String DefaultWhile = "1";
@@ -143,14 +143,20 @@ public class StaffDetailController extends BaseController {
 		//mv.addObject("DepartName", DepartName);
 		
 		// 枚举  1封存,0解封
-		String State = DurState.Sealed.getNameKey();
+		String State = DurState.Release.getNameKey();
 		mv.addObject("State", String.valueOf(State.equals(DurState.Release.getNameKey())? true:false));
 
 		//CUST_COL7 FMISACC 帐套字典
 		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));
 		//DEPT_CODE 
-		mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService));
-		IsUserDepartLayer = true;
+		String DepartmentSelectTreeSource = DictsUtil.getDepartmentSelectTreeSource(departmentService);
+		mv.addObject("zTreeNodes", DepartmentSelectTreeSource);
+        JSONArray myJsonArray = JSONArray.fromObject(DepartmentSelectTreeSource);  
+		if(myJsonArray.size() <= 1){
+		    IsUserDepartLayer = true;
+		} else {
+		    IsUserDepartLayer = false;
+		}
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
 		String jqGridColModel = tmpl.generateStructure(WhileBillOff, UserDepartCode, 3);
@@ -466,7 +472,7 @@ public class StaffDetailController extends BaseController {
 	 * @return
 	 * @throws Exception
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked" })
 	@RequestMapping(value = "/readExcel")
 	//public @ResponseBody CommonBase readExcel(@RequestParam(value="excel",required=false) MultipartFile file) throws Exception{
 	public ModelAndView readExcel(@RequestParam(value="excel",required=false) MultipartFile file) throws Exception{

@@ -138,6 +138,7 @@ public class SocialIncDetailController extends BaseController {
 		if(!(State != null && !State.trim().equals(""))){
 			State = DurState.Release.getNameKey();
 		}
+		State = DurState.Sealed.getNameKey();
 		mv.addObject("State", State.equals(DurState.Release.getNameKey())? true:false);// 枚举  1封存,0解封
 
 		//USER_GROP EMPLGRP 员工组字典
@@ -146,7 +147,7 @@ public class SocialIncDetailController extends BaseController {
 		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
-		String jqGridColModel = tmpl.generateStructure(TableNameDetail, DepartCode, 3);
+		String jqGridColModel = tmpl.generateStructure("21", DepartCode, 3);
 		
 		SqlUserdata = tmpl.getSqlUserdata();
 		//字典
