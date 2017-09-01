@@ -127,7 +127,7 @@ public class DaoSupport implements DAO {
 	 * @return
 	 * @throws Exception
 	 */
-	public void insertCopy(String strDelete, String strInsert, List<?> objs )throws Exception{
+	public void insertCopy(String strDelete, String strInsert, List<?> objs)throws Exception{
 		SqlSessionFactory sqlSessionFactory = sqlSessionTemplate.getSqlSessionFactory();
 		//批量执行器
 		SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH,false);

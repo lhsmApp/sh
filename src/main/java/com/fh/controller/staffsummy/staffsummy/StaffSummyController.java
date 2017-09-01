@@ -366,11 +366,13 @@ public class StaffSummyController extends BaseController {
     			Map<String, TableColumns> setColumnsList = tmpl.getHaveColumnsList();
     			
     			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
-    					depart, SystemDateTime,
+    					depart, SystemDateTime, "", 
     					TypeCodeListen, TypeCodeSummy, TableNameBase, TableNameDetail, 
+    					"", 
     					setColumnsList);
     			String strHelpfulDetail = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-    					depart, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameBase);
+    					depart, SystemDateTime, "",
+    					TypeCodeListen, TypeCodeSummy, TableNameBase);
     			if(!(strHelpfulDetail != null && !strHelpfulDetail.trim().equals(""))){
     				commonBase.setCode(2);
     				commonBase.setMessage("获取可操作的数据的条件失败！");

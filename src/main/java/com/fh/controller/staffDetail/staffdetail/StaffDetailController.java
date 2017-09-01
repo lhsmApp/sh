@@ -39,8 +39,8 @@ import com.fh.util.PageData;
 import com.fh.util.SqlTools;
 import com.fh.util.date.DateFormatUtils;
 import com.fh.util.date.DateUtils;
-import com.fh.util.enums.BillType;
 import com.fh.util.enums.DurState;
+import com.fh.util.enums.TmplType;
 import com.fh.util.Const;
 import com.fh.util.Jurisdiction;
 import com.fh.util.excel.LeadingInExcelToPageData;
@@ -89,10 +89,10 @@ public class StaffDetailController extends BaseController {
 	//表名
 	String TableNameDetail = "TB_STAFF_DETAIL";
 	String TableNameSummy = "TB_STAFF_summy";
-	//枚举类型  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
-	String TypeCodeDetail = BillType.SALLARY_DETAIL.getNameKey();
-	String TypeCodeSummy = BillType.SALLARY_SUMMARY.getNameKey();
-	String TypeCodeListen = BillType.SALLARY_LISTEN.getNameKey();
+	//枚举类型 TmplType
+	String TypeCodeDetail = "";
+	String TypeCodeSummy = "";
+	String TypeCodeListen = "";
 
 	//页面显示数据的年月
 	String SystemDateTime = "";
@@ -115,6 +115,8 @@ public class StaffDetailController extends BaseController {
 
 	//界面查询字段
     List<String> QueryFeildList = Arrays.asList("DEPT_CODE", "CUST_COL7", "USER_GROP");
+    //设置必定不用编辑的列
+    List<String> MustNotEditList = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP");
 
 	/**列表
 	 * @param page
@@ -126,7 +128,7 @@ public class StaffDetailController extends BaseController {
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
 		PageData pd = this.getPageData();
 		//员工组
-		String WhileBillOff = getWhileValue(pd.getString("WhileBillOff"));
+		String TABLE_NO = getWhileValue(pd.getString("TABLE_NO"));
 		//当前期间,取自tb_system_config的SystemDateTime字段
 		SystemDateTime = sysConfigManager.currentSection(pd);
 		//当前登录人所在二级单位
@@ -137,7 +139,7 @@ public class StaffDetailController extends BaseController {
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("staffDetail/staffdetail/staffdetail_list");
 		//while
-		pd.put("which", WhileBillOff);
+		pd.put("which", TABLE_NO);
 		mv.addObject("pd", pd);
 		//mv.addObject("SystemDateTime", SystemDateTime);
 		//mv.addObject("DepartName", DepartName);
@@ -159,7 +161,8 @@ public class StaffDetailController extends BaseController {
 		}
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
-		String jqGridColModel = tmpl.generateStructure(WhileBillOff, UserDepartCode, 3);
+		tmpl.setMustNotEditList(MustNotEditList);
+		String jqGridColModel = tmpl.generateStructure(TABLE_NO, UserDepartCode, 3);
 		
 		SqlUserdata = tmpl.getSqlUserdata();
 		//字典
@@ -217,8 +220,8 @@ public class StaffDetailController extends BaseController {
 		logBefore(logger, Jurisdiction.getUsername()+"列表StaffDetail");
 		PageData pd = this.getPageData();
 		//员工组
-		String WhileBillOff = getWhileValue(pd.getString("WhileBillOff"));
-		String emplGroupType = DictsUtil.getEmplGroupType(WhileBillOff);
+		String TABLE_NO = getWhileValue(pd.getString("TABLE_NO"));
+		String emplGroupType = DictsUtil.getEmplGroupType(TABLE_NO);
 		pd.put("USER_GROP", emplGroupType);
 		//单位
 		String DEPT_CODE = pd.getString("DEPT_CODE");
@@ -238,7 +241,8 @@ public class StaffDetailController extends BaseController {
 		}
 		//根据凭证上报情况判断当前显示信息
 		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-				DEPT_CODE, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
+				DEPT_CODE, SystemDateTime, CUST_COL7, 
+				TypeCodeListen, TypeCodeSummy, TableNameSummy);
 		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 			strHelpful += " and 1 != 1 ";
 		}
@@ -286,8 +290,8 @@ public class StaffDetailController extends BaseController {
 
 		PageData pd = this.getPageData();
 		//员工组
-		String WhileBillOff = getWhileValue(pd.getString("WhileBillOff"));
-		String emplGroupType = DictsUtil.getEmplGroupType(WhileBillOff);
+		String TABLE_NO = getWhileValue(pd.getString("TABLE_NO"));
+		String emplGroupType = DictsUtil.getEmplGroupType(TABLE_NO);
 		//单位
 		String DepartCode = pd.getString("DEPT_CODE");
 		if(IsUserDepartLayer){
@@ -295,31 +299,45 @@ public class StaffDetailController extends BaseController {
 		}
 		//账套
 		String CUST_COL7 = pd.getString("CUST_COL7");
+		//操作
+		String oper = pd.getString("oper");
+
+		//判断选择为必须选择的
+		String strGetCheckMustSelected = CheckMustSelected(CUST_COL7, DepartCode);
+		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
+			commonBase.setCode(2);
+			commonBase.setMessage(strGetCheckMustSelected);
+			return commonBase;
+		}
 		
 		String checkState = CheckState(pd, CUST_COL7, DepartCode);
 		if(checkState!=null && !checkState.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(checkState);
 		} else {
+			pd.put("BILL_CODE", " ");
+			if(oper.equals("add")){
+				pd.put("BUSI_DATE", SystemDateTime);
+				pd.put("DEPT_CODE", DepartCode);
+				pd.put("CUST_COL7", CUST_COL7);
+				pd.put("USER_GROP", emplGroupType);
+			}
+			TmplUtil.setModelDefault(pd, map_HaveColumnsList);
+			
 			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
-					DepartCode, SystemDateTime,
+					DepartCode, SystemDateTime, CUST_COL7, 
 					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+					emplGroupType,
 					map_HaveColumnsList);
 			String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-					DepartCode, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
+					DepartCode, SystemDateTime, CUST_COL7, 
+					TypeCodeListen, TypeCodeSummy, TableNameSummy);
 			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 				commonBase.setCode(2);
 				commonBase.setMessage("获取可操作的数据的条件失败！");
 				return commonBase;
 			}
 			pd.put("CanOperate", strHelpful);
-			
-			pd.put("BILL_CODE", " ");
-			pd.put("BUSI_DATE", SystemDateTime);
-			pd.put("DEPT_CODE", DepartCode);
-			pd.put("CUST_COL7", CUST_COL7);
-			pd.put("USER_GROP", emplGroupType);
-			TmplUtil.setModelDefault(pd, map_HaveColumnsList);
 			
 			List<PageData> listData = new ArrayList<PageData>();
 			listData.add(pd);
@@ -348,8 +366,8 @@ public class StaffDetailController extends BaseController {
 		
 		PageData pd = this.getPageData();
 		//员工组
-		String WhileBillOff = getWhileValue(pd.getString("WhileBillOff"));
-		String emplGroupType = DictsUtil.getEmplGroupType(WhileBillOff);
+		String TABLE_NO = getWhileValue(pd.getString("TABLE_NO"));
+		String emplGroupType = DictsUtil.getEmplGroupType(TABLE_NO);
 		//单位
 		String DepartCode = pd.getString("DEPT_CODE");
 		if(IsUserDepartLayer){
@@ -357,6 +375,14 @@ public class StaffDetailController extends BaseController {
 		}
 		//账套
 		String CUST_COL7 = pd.getString("CUST_COL7");
+
+		//判断选择为必须选择的
+		String strGetCheckMustSelected = CheckMustSelected(CUST_COL7, DepartCode);
+		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
+			commonBase.setCode(2);
+			commonBase.setMessage(strGetCheckMustSelected);
+			return commonBase;
+		}
 		
 		String checkState = CheckState(pd, CUST_COL7, DepartCode);
 		if(checkState!=null && !checkState.trim().equals("")){
@@ -364,11 +390,13 @@ public class StaffDetailController extends BaseController {
 			commonBase.setMessage(checkState);
 		} else {
 			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
-					DepartCode, SystemDateTime,
+					DepartCode, SystemDateTime, CUST_COL7, 
 					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+					emplGroupType,
 					map_HaveColumnsList);
 			String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-					DepartCode, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
+					DepartCode, SystemDateTime, CUST_COL7, 
+					TypeCodeListen, TypeCodeSummy, TableNameSummy);
 			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 				commonBase.setCode(2);
 				commonBase.setMessage("获取可操作的数据的条件失败！");
@@ -381,8 +409,6 @@ public class StaffDetailController extends BaseController {
 	        List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);
 	        for(PageData item : listData){
 	        	item.put("BILL_CODE", " ");
-	        	item.put("BUSI_DATE", SystemDateTime);
-	        	item.put("DEPT_CODE", DepartCode);
 	        	item.put("CanOperate", strHelpful);
 				TmplUtil.setModelDefault(item, map_HaveColumnsList);
 	        }
@@ -400,7 +426,8 @@ public class StaffDetailController extends BaseController {
 		return commonBase;
 	}
 	
-	 /**批量删除
+	 
+	/**批量删除
 	 * @param
 	 * @throws Exception
 	 */
@@ -413,8 +440,8 @@ public class StaffDetailController extends BaseController {
 		
 		PageData pd = this.getPageData();
 		//员工组
-		String WhileBillOff = getWhileValue(pd.getString("WhileBillOff"));
-		String emplGroupType = DictsUtil.getEmplGroupType(WhileBillOff);
+		String TABLE_NO = getWhileValue(pd.getString("TABLE_NO"));
+		String emplGroupType = DictsUtil.getEmplGroupType(TABLE_NO);
 		//单位
 		String DepartCode = pd.getString("DEPT_CODE");
 		if(IsUserDepartLayer){
@@ -422,6 +449,14 @@ public class StaffDetailController extends BaseController {
 		}
 		//账套
 		String CUST_COL7 = pd.getString("CUST_COL7");
+
+		//判断选择为必须选择的
+		String strGetCheckMustSelected = CheckMustSelected(CUST_COL7, DepartCode);
+		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
+			commonBase.setCode(2);
+			commonBase.setMessage(strGetCheckMustSelected);
+			return commonBase;
+		}
 		
 		String checkState = CheckState(pd, CUST_COL7, DepartCode);
 		if(checkState!=null && !checkState.trim().equals("")){
@@ -429,11 +464,13 @@ public class StaffDetailController extends BaseController {
 			commonBase.setMessage(checkState);
 		} else {
 			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
-					DepartCode, SystemDateTime,
+					DepartCode, SystemDateTime, CUST_COL7, 
 					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+					emplGroupType,
 					map_HaveColumnsList);
 			String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-					DepartCode, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
+					DepartCode, SystemDateTime, CUST_COL7, 
+				    TypeCodeListen, TypeCodeSummy, TableNameSummy);
 			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 				commonBase.setCode(2);
 				commonBase.setMessage("获取可操作的数据的条件失败！");
@@ -455,18 +492,45 @@ public class StaffDetailController extends BaseController {
 		return commonBase;
 	}
 	
+	
 	/**打开上传EXCEL页面
 	 * @return
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/goUploadExcel")
 	public ModelAndView goUploadExcel()throws Exception{
+		CommonBase commonBase = new CommonBase();
+	    commonBase.setCode(-1);
+	    
+		PageData pd = this.getPageData();
+		//员工组
+		String TABLE_NO = getWhileValue(pd.getString("TABLE_NO"));
+		//单位
+		String DepartCode = pd.getString("DEPT_CODE");
+		if(IsUserDepartLayer){
+			DepartCode = UserDepartCode;
+		}
+		//账套
+		String CUST_COL7 = pd.getString("CUST_COL7");
+
+		//判断选择为必须选择的
+		String strGetCheckMustSelected = CheckMustSelected(CUST_COL7, DepartCode);
+		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
+			commonBase.setCode(2);
+			commonBase.setMessage(strGetCheckMustSelected);
+		}
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("common/uploadExcel");
 		mv.addObject("local", "staffdetail");
+		mv.addObject("which", TABLE_NO);
+		mv.addObject("DEPT_CODE", DepartCode);
+		mv.addObject("CUST_COL7", CUST_COL7);
+		mv.addObject("commonBaseCode", commonBase.getCode());
+		mv.addObject("commonMessage", commonBase.getMessage());
 		return mv;
 	}
 
+	
 	/**从EXCEL导入到数据库
 	 * @param file
 	 * @return
@@ -482,8 +546,8 @@ public class StaffDetailController extends BaseController {
 
 		PageData pd = this.getPageData();
 		//员工组
-		String WhileBillOff = getWhileValue(pd.getString("WhileBillOff"));
-		String emplGroupType = DictsUtil.getEmplGroupType(WhileBillOff);
+		String TABLE_NO = getWhileValue(pd.getString("TABLE_NO"));
+		String emplGroupType = DictsUtil.getEmplGroupType(TABLE_NO);
 		//单位
 		String DepartCode = pd.getString("DEPT_CODE");
 		if(IsUserDepartLayer){
@@ -491,135 +555,168 @@ public class StaffDetailController extends BaseController {
 		}
 		//账套
 		String CUST_COL7 = pd.getString("CUST_COL7");
-		
-		String checkState = CheckState(pd, CUST_COL7, DepartCode);
-		if(checkState!=null && !checkState.trim().equals("")){
+		//判断选择为必须选择的
+		String strGetCheckMustSelected = CheckMustSelected(CUST_COL7, DepartCode);
+		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
-			commonBase.setMessage(checkState);
+			commonBase.setMessage(strGetCheckMustSelected);
 		} else {
-			if(!(SystemDateTime!=null && !SystemDateTime.trim().equals("")
-					&& DepartCode!=null && !DepartCode.trim().equals(""))){
+			String checkState = CheckState(pd, CUST_COL7, DepartCode);
+			if(checkState!=null && !checkState.trim().equals("")){
 				commonBase.setCode(2);
-				commonBase.setMessage("当前区间和当前单位不能为空！");
+				commonBase.setMessage(checkState);
 			} else {
-				FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
-						DepartCode, SystemDateTime,
-						TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
-						map_HaveColumnsList);
-				String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-						DepartCode, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
-				if(!(strHelpful != null && !strHelpful.trim().equals(""))){
+				if(!(SystemDateTime!=null && !SystemDateTime.trim().equals("")
+						&& DepartCode!=null && !DepartCode.trim().equals(""))){
 					commonBase.setCode(2);
-					commonBase.setMessage("获取可操作的数据的条件失败！");
+					commonBase.setMessage("当前区间和当前单位不能为空！");
 				} else {
-					// 局部变量
-					LeadingInExcelToPageData<PageData> testExcel = null;
-					Map<Integer, Object> uploadAndReadMap = null;
-					try {
-						// 定义需要读取的数据
-						String formart = "yyyy-MM-dd";
-						String propertiesFileName = "config";
-						String kyeName = "file_path";
-						int sheetIndex = 0;
-						Map<String, String> titleAndAttribute = null;
-						// 定义对应的标题名与对应属性名
-						titleAndAttribute = new LinkedHashMap<String, String>();
-						
-						//配置表设置列
-						if(map_SetColumnsList != null && map_SetColumnsList.size() > 0){
-							for (TmplConfigDetail col : map_SetColumnsList.values()) {
-								titleAndAttribute.put(col.getCOL_NAME(), col.getCOL_CODE());
-							}
-						}
-
-						// 调用解析工具包
-						testExcel = new LeadingInExcelToPageData<PageData>(formart);
-						// 解析excel，获取客户信息集合
-
-						uploadAndReadMap = testExcel.uploadAndRead(file, propertiesFileName, kyeName, sheetIndex,
-								titleAndAttribute, map_HaveColumnsList, map_SetColumnsList, DicList);
-					} catch (Exception e) {
-						e.printStackTrace();
-						logger.error("读取Excel文件错误", e);
-						throw new CustomException("读取Excel文件错误",false);
-					}
-					boolean judgement = false;
-					if(uploadAndReadMap.get(1).equals(false)){
-						Map<String, Object> returnError =  (Map<String, Object>) uploadAndReadMap.get(2);
-						String message = "字典无此翻译： "; // \n
-						for (String k : returnError.keySet())  
-					    {
-							message += k + " : " + returnError.get(k);
-					    }
+					FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
+							DepartCode, SystemDateTime, CUST_COL7, 
+							TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+							emplGroupType,
+							map_HaveColumnsList);
+					String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
+							DepartCode, SystemDateTime, CUST_COL7, 
+							TypeCodeListen, TypeCodeSummy, TableNameSummy);
+					if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 						commonBase.setCode(2);
-						commonBase.setMessage(message);
+						commonBase.setMessage("获取可操作的数据的条件失败！");
 					} else {
-						List<PageData> uploadAndRead = (List<PageData>) uploadAndReadMap.get(2);
-						if (uploadAndRead != null && !"[]".equals(uploadAndRead.toString()) && uploadAndRead.size() >= 1) {
-							judgement = true;
+						// 局部变量
+						LeadingInExcelToPageData<PageData> testExcel = null;
+						Map<Integer, Object> uploadAndReadMap = null;
+						try {
+							// 定义需要读取的数据
+							String formart = "yyyy-MM-dd";
+							String propertiesFileName = "config";
+							String kyeName = "file_path";
+							int sheetIndex = 0;
+							Map<String, String> titleAndAttribute = null;
+							// 定义对应的标题名与对应属性名
+							titleAndAttribute = new LinkedHashMap<String, String>();
+							
+							//配置表设置列
+							if(map_SetColumnsList != null && map_SetColumnsList.size() > 0){
+								for (TmplConfigDetail col : map_SetColumnsList.values()) {
+									titleAndAttribute.put(col.getCOL_NAME(), col.getCOL_CODE());
+								}
+							}
+
+							// 调用解析工具包
+							testExcel = new LeadingInExcelToPageData<PageData>(formart);
+							// 解析excel，获取客户信息集合
+
+							uploadAndReadMap = testExcel.uploadAndRead(file, propertiesFileName, kyeName, sheetIndex,
+									titleAndAttribute, map_HaveColumnsList, map_SetColumnsList, DicList);
+						} catch (Exception e) {
+							e.printStackTrace();
+							logger.error("读取Excel文件错误", e);
+							throw new CustomException("读取Excel文件错误",false);
 						}
-						if (judgement) {
-							List<String> sbRet = new ArrayList<String>();
-							List<String> listUserCode = new ArrayList<String>();
-							int listSize = uploadAndRead.size();
-							for(int i=0;i<listSize;i++){
-								uploadAndRead.get(i).put("CanOperate", strHelpful);
-								uploadAndRead.get(i).put("BILL_CODE", " ");
-								String getBUSI_DATE = (String) uploadAndRead.get(i).get("BUSI_DATE");
-								String getDEPT_CODE = (String) uploadAndRead.get(i).get("DEPT_CODE");
-								String getUSER_CODE = (String) uploadAndRead.get(i).get("USER_CODE");
-								if(!(getBUSI_DATE!=null && !getBUSI_DATE.trim().equals(""))){
-									uploadAndRead.get(i).put("BUSI_DATE", SystemDateTime);
-									getBUSI_DATE = SystemDateTime;
-								}
-								if(!SystemDateTime.equals(getBUSI_DATE)){
-									if(!sbRet.contains("导入区间和当前区间必须一致！")){
-										sbRet.add("导入区间和当前区间必须一致！");
-									}
-								}
-								if(!(getDEPT_CODE!=null && !getDEPT_CODE.trim().equals(""))){
-									uploadAndRead.get(i).put("DEPT_CODE", DepartCode);
-									getDEPT_CODE = DepartCode;
-								}
-								if(!DepartCode.equals(getDEPT_CODE)){
-									if(!sbRet.contains("导入单位和当前单位必须一致！")){
-										sbRet.add("导入单位和当前单位必须一致！");
-									}
-								}
-								if(!(getUSER_CODE!=null && !getUSER_CODE.trim().equals(""))){
-									if(!sbRet.contains("人员编码不能为空！")){
-										sbRet.add("人员编码不能为空！");
-									}
-								}
-								if(listUserCode.contains(getUSER_CODE.trim())){
-									String strUserAdd = "编码" + getUSER_CODE + "重复！";
-									if(!sbRet.contains(strUserAdd)){
-										sbRet.add(strUserAdd);
-									}
-								} else {
-									listUserCode.add(getUSER_CODE.trim());
-								}
-								String getESTB_DEPT = (String) uploadAndRead.get(i).get("ESTB_DEPT");
-								if(!(getESTB_DEPT!=null && !getESTB_DEPT.trim().equals(""))){
-									uploadAndRead.get(i).put("ESTB_DEPT", DepartCode);
-								}
-								TmplUtil.setModelDefault(uploadAndRead.get(i), map_HaveColumnsList);
-							}
-							if(sbRet.size()>0){
-								StringBuilder sbTitle = new StringBuilder();
-								for(String str : sbRet){
-									sbTitle.append(str + "  "); // \n
-								}
-								commonBase.setCode(2);
-								commonBase.setMessage(sbTitle.toString());
-							} else {
-								//此处执行集合添加 
-								staffdetailService.batchImport(uploadAndRead);
-								commonBase.setCode(0);
-							}
+						boolean judgement = false;
+						if(uploadAndReadMap.get(1).equals(false)){
+							Map<String, Object> returnError =  (Map<String, Object>) uploadAndReadMap.get(2);
+							String message = "字典无此翻译： "; // \n
+							for (String k : returnError.keySet())  
+						    {
+								message += k + " : " + returnError.get(k);
+						    }
+							commonBase.setCode(2);
+							commonBase.setMessage(message);
 						} else {
-							commonBase.setCode(-1);
-							commonBase.setMessage("TranslateUtil");
+							List<PageData> uploadAndRead = (List<PageData>) uploadAndReadMap.get(2);
+							if (uploadAndRead != null && !"[]".equals(uploadAndRead.toString()) && uploadAndRead.size() >= 1) {
+								judgement = true;
+							}
+							if (judgement) {
+								List<String> sbRet = new ArrayList<String>();
+								List<String> listUserCode = new ArrayList<String>();
+								//获取数据库中不是本部门、员工组和账套中的UserCode
+								
+								
+								
+								
+								int listSize = uploadAndRead.size();
+								for(int i=0;i<listSize;i++){
+									uploadAndRead.get(i).put("CanOperate", strHelpful);
+									uploadAndRead.get(i).put("BILL_CODE", " ");
+									String getCUST_COL7 = (String) uploadAndRead.get(i).get("CUST_COL7");
+									String getUSER_GROP = (String) uploadAndRead.get(i).get("USER_GROP");
+									if(!(getCUST_COL7!=null && !getCUST_COL7.trim().equals(""))){
+										uploadAndRead.get(i).put("CUST_COL7", CUST_COL7);
+										getCUST_COL7 = CUST_COL7;
+									}
+									if(!CUST_COL7.equals(getCUST_COL7)){
+										if(!sbRet.contains("导入账套和当前账套必须一致！")){
+											sbRet.add("导入账套和当前账套必须一致！");
+										}
+									}
+									if(!(getUSER_GROP!=null && !getUSER_GROP.trim().equals(""))){
+										uploadAndRead.get(i).put("USER_GROP", emplGroupType);
+										getUSER_GROP = emplGroupType;
+									}
+									if(!emplGroupType.equals(getUSER_GROP)){
+										if(!sbRet.contains("导入员工组和当前员工组必须一致！")){
+											sbRet.add("导入员工组和当前员工组必须一致！");
+										}
+									}
+									String getBUSI_DATE = (String) uploadAndRead.get(i).get("BUSI_DATE");
+									String getDEPT_CODE = (String) uploadAndRead.get(i).get("DEPT_CODE");
+									String getUSER_CODE = (String) uploadAndRead.get(i).get("USER_CODE");
+									if(!(getBUSI_DATE!=null && !getBUSI_DATE.trim().equals(""))){
+										uploadAndRead.get(i).put("BUSI_DATE", SystemDateTime);
+										getBUSI_DATE = SystemDateTime;
+									}
+									if(!SystemDateTime.equals(getBUSI_DATE)){
+										if(!sbRet.contains("导入区间和当前区间必须一致！")){
+											sbRet.add("导入区间和当前区间必须一致！");
+										}
+									}
+									if(!(getDEPT_CODE!=null && !getDEPT_CODE.trim().equals(""))){
+										uploadAndRead.get(i).put("DEPT_CODE", DepartCode);
+										getDEPT_CODE = DepartCode;
+									}
+									if(!DepartCode.equals(getDEPT_CODE)){
+										if(!sbRet.contains("导入单位和当前单位必须一致！")){
+											sbRet.add("导入单位和当前单位必须一致！");
+										}
+									}
+									if(!(getUSER_CODE!=null && !getUSER_CODE.trim().equals(""))){
+										if(!sbRet.contains("人员编码不能为空！")){
+											sbRet.add("人员编码不能为空！");
+										}
+									}
+									if(listUserCode.contains(getUSER_CODE.trim())){
+										String strUserAdd = "人员编码" + getUSER_CODE + "重复！";
+										if(!sbRet.contains(strUserAdd)){
+											sbRet.add(strUserAdd);
+										}
+									} else {
+										listUserCode.add(getUSER_CODE.trim());
+									}
+									String getESTB_DEPT = (String) uploadAndRead.get(i).get("ESTB_DEPT");
+									if(!(getESTB_DEPT!=null && !getESTB_DEPT.trim().equals(""))){
+										uploadAndRead.get(i).put("ESTB_DEPT", DepartCode);
+									}
+									TmplUtil.setModelDefault(uploadAndRead.get(i), map_HaveColumnsList);
+								}
+								if(sbRet.size()>0){
+									StringBuilder sbTitle = new StringBuilder();
+									for(String str : sbRet){
+										sbTitle.append(str + "  "); // \n
+									}
+									commonBase.setCode(2);
+									commonBase.setMessage(sbTitle.toString());
+								} else {
+									//此处执行集合添加 
+									staffdetailService.batchImport(uploadAndRead);
+									commonBase.setCode(0);
+								}
+							} else {
+								commonBase.setCode(-1);
+								commonBase.setMessage("TranslateUtil");
+							}
 						}
 					}
 				}
@@ -628,10 +725,14 @@ public class StaffDetailController extends BaseController {
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("common/uploadExcel");
 		mv.addObject("local", "staffdetail");
+		mv.addObject("which", TABLE_NO);
+		mv.addObject("DEPT_CODE", DepartCode);
+		mv.addObject("CUST_COL7", CUST_COL7);
 		mv.addObject("commonBaseCode", commonBase.getCode());
 		mv.addObject("commonMessage", commonBase.getMessage());
 		return mv;
 	}
+	
 	
 	/**下载模版
 	 * @param response
@@ -640,13 +741,25 @@ public class StaffDetailController extends BaseController {
 	@RequestMapping(value="/downExcel")
 	//public void downExcel(HttpServletResponse response)throws Exception{
 	public ModelAndView downExcel(JqPage page) throws Exception{
+		PageData pd = this.getPageData();
+		//员工组
+		String TABLE_NO = getWhileValue(pd.getString("TABLE_NO"));
+		//单位
+		String DepartCode = pd.getString("DEPT_CODE");
+		if(IsUserDepartLayer){
+			DepartCode = UserDepartCode;
+		}
+		pd.put("DEPT_CODE", DepartCode);
+		//账套
+		String CUST_COL7 = pd.getString("CUST_COL7");
+		
 		//页面显示数据的二级单位
-		//List<PageData> varOList = staffdetailService.exportModel(DepartCode);
-		//return export(varOList, "StaffDetail"); //工资明细
-		return export(null, "StaffDetail");
+		List<PageData> varOList = staffdetailService.exportModel(pd);
+		return export(varOList, "StaffDetail"); //工资明细
 	}
 	
-	 /**导出到excel
+	
+	/**导出到excel
 	 * @param
 	 * @throws Exception
 	 */
@@ -656,8 +769,8 @@ public class StaffDetailController extends BaseController {
 		if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
 		PageData pd = this.getPageData();
 		//员工组
-		String WhileBillOff = getWhileValue(pd.getString("WhileBillOff"));
-		String emplGroupType = DictsUtil.getEmplGroupType(WhileBillOff);
+		String TABLE_NO = getWhileValue(pd.getString("TABLE_NO"));
+		String emplGroupType = DictsUtil.getEmplGroupType(TABLE_NO);
 		//单位
 		String DepartCode = pd.getString("DEPT_CODE");
 		if(IsUserDepartLayer){
@@ -666,14 +779,18 @@ public class StaffDetailController extends BaseController {
 		//账套
 		String CUST_COL7 = pd.getString("CUST_COL7");
 		
-		String checkState = CheckState(pd, CUST_COL7, DepartCode);
 		//页面显示数据的年月
 		pd.put("SystemDateTime", SystemDateTime);
 		//页面显示数据的二级单位
 		pd.put("DepartCode", DepartCode);
+		//账套
+		pd.put("CUST_COL7", CUST_COL7);
+		//员工组
+		pd.put("USER_GROP", emplGroupType);
 
 		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-				DepartCode, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
+				DepartCode, SystemDateTime, CUST_COL7, 
+				TypeCodeListen, TypeCodeSummy, TableNameSummy);
 		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 			ObjectExcelView erv = new ObjectExcelView();
 			Map<String,Object> dataMap = new LinkedHashMap<String,Object>();
@@ -741,9 +858,9 @@ public class StaffDetailController extends BaseController {
 		commonBase.setCode(-1);
 
 		PageData pd = this.getPageData();
-		//员工组
-		String WhileBillOff = getWhileValue(pd.getString("WhileBillOff"));
-		String emplGroupType = DictsUtil.getEmplGroupType(WhileBillOff);
+		//员工组 必须执行，用来设置汇总和传输上报类型
+		String TABLE_NO = getWhileValue(pd.getString("TABLE_NO"));
+		String emplGroupType = DictsUtil.getEmplGroupType(TABLE_NO);
 		//单位
 		String DepartCode = pd.getString("DEPT_CODE");
 		if(IsUserDepartLayer){
@@ -751,6 +868,14 @@ public class StaffDetailController extends BaseController {
 		}
 		//账套
 		String CUST_COL7 = pd.getString("CUST_COL7");
+
+		//判断选择为必须选择的
+		String strGetCheckMustSelected = CheckMustSelected(CUST_COL7, DepartCode);
+		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
+			commonBase.setCode(2);
+			commonBase.setMessage(strGetCheckMustSelected);
+			return commonBase;
+		}
 		
 		String checkState = CheckState(pd, CUST_COL7, DepartCode);
 		if(checkState!=null && !checkState.trim().equals("")){
@@ -758,8 +883,9 @@ public class StaffDetailController extends BaseController {
 			commonBase.setMessage(checkState);
 		} else {
 			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
-					DepartCode, SystemDateTime,
+					DepartCode, SystemDateTime, CUST_COL7, 
 					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+					emplGroupType,
 					map_HaveColumnsList);
 			
 			User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
@@ -770,9 +896,10 @@ public class StaffDetailController extends BaseController {
 			item.setBILL_CODE(" ");
 			item.setRPT_DEPT(DepartCode);
 			item.setRPT_DUR(SystemDateTime);
+			item.setBILL_OFF(CUST_COL7);
 			item.setRPT_USER(userId);
 			item.setRPT_DATE(time);//YYYY-MM-DD HH:MM:SS
-			item.setBILL_TYPE(TypeCodeDetail.toString());// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+			item.setBILL_TYPE(TypeCodeDetail);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 			item.setSTATE(DurState.Sealed.getNameKey());// 枚举  1封存,0解封
 			syssealedinfoService.report(item);
 			commonBase.setCode(0);
@@ -780,17 +907,31 @@ public class StaffDetailController extends BaseController {
 		return commonBase;
 	}
 	
+	private String CheckMustSelected(String CUST_COL7, String DEPT_CODE) throws Exception{
+		String strRut = "";
+		if(!(CUST_COL7 != null && !CUST_COL7.trim().equals(""))){
+			strRut += "查询条件中的账套必须选择！";
+		}
+		if(!(DEPT_CODE != null && !DEPT_CODE.trim().equals(""))){
+			strRut += "单位不能为空！";
+		}
+		return strRut;
+	}
+
 	private String CheckState(PageData pd, String CUST_COL7, String DEPT_CODE) throws Exception{
-		String strRut = "当前期间已封存！";
-		if(CUST_COL7 != null && CUST_COL7.trim() != "" && DEPT_CODE != null && DEPT_CODE.trim() != ""){
-			//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
-			pd.put("BILL_OFF", CUST_COL7);
-			pd.put("RPT_DEPT", DEPT_CODE);
-			pd.put("RPT_DUR", SystemDateTime);
-			pd.put("BILL_TYPE", TypeCodeDetail);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
-			String State = syssealedinfoService.getState(pd);
-			if(!DurState.Sealed.getNameKey().equals(State)){// 枚举  1封存,0解封
-				strRut = "";
+		String strRut = "选项卡对应的封存类型为空！";
+		if(TypeCodeDetail != null && !TypeCodeDetail.trim().equals("")){
+			strRut = "当前期间已封存！";
+			if(CUST_COL7 != null && CUST_COL7.trim() != "" && DEPT_CODE != null && DEPT_CODE.trim() != ""){
+				//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
+				pd.put("BILL_OFF", CUST_COL7);
+				pd.put("RPT_DEPT", DEPT_CODE);
+				pd.put("RPT_DUR", SystemDateTime);
+				pd.put("BILL_TYPE", TypeCodeDetail);
+				String State = syssealedinfoService.getState(pd);
+				if(!DurState.Sealed.getNameKey().equals(State)){// 枚举  1封存,0解封
+					strRut = "";
+				}
 			}
 		}
 		return strRut;
@@ -800,6 +941,40 @@ public class StaffDetailController extends BaseController {
         String which = DefaultWhile;
 		if(value != null && !value.trim().equals("")){
 			which = value;
+		}
+		//枚举类型 TmplType
+		TypeCodeDetail = "";
+		TypeCodeSummy = "";
+		TypeCodeListen = "";
+		if(which.equals(TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey())){
+			//合同化
+			TypeCodeDetail = TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey();
+			TypeCodeSummy = TmplType.TB_STAFF_SUMMY_CONTRACT.getNameKey();
+			TypeCodeListen = TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey();
+		}
+		if(which.equals(TmplType.TB_STAFF_DETAIL_MARKET.getNameKey())){
+			//市场化
+			TypeCodeDetail = TmplType.TB_STAFF_DETAIL_MARKET.getNameKey();
+			TypeCodeSummy = TmplType.TB_STAFF_SUMMY_MARKET.getNameKey();
+			TypeCodeListen = TmplType.TB_STAFF_TRANSFER_MARKET.getNameKey();
+		}
+		if(which.equals(TmplType.TB_STAFF_DETAIL_SYS_LABOR.getNameKey())){
+			//系统内劳务
+			TypeCodeDetail = TmplType.TB_STAFF_DETAIL_SYS_LABOR.getNameKey();
+			TypeCodeSummy = TmplType.TB_STAFF_SUMMY_SYS_LABOR.getNameKey();
+			TypeCodeListen = TmplType.TB_STAFF_TRANSFER_SYS_LABOR.getNameKey();
+		}
+		if(which.equals(TmplType.TB_STAFF_DETAIL_OPER_LABOR.getNameKey())){
+			//运行人员
+			TypeCodeDetail = TmplType.TB_STAFF_DETAIL_OPER_LABOR.getNameKey();
+			TypeCodeSummy = TmplType.TB_STAFF_SUMMY_OPER_LABOR.getNameKey();
+			TypeCodeListen = TmplType.TB_STAFF_TRANSFER_OPER_LABOR.getNameKey();
+		}
+		if(which.equals(TmplType.TB_STAFF_DETAIL_LABOR.getNameKey())){
+			//劳务派遣工资
+			TypeCodeDetail = TmplType.TB_STAFF_DETAIL_LABOR.getNameKey();
+			TypeCodeSummy = TmplType.TB_STAFF_SUMMY_LABOR.getNameKey();
+			TypeCodeListen = TmplType.TB_STAFF_TRANSFER_LABOR.getNameKey();
 		}
 		return which;
 	}

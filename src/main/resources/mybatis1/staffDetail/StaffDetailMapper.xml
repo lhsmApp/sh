@@ -104,6 +104,8 @@
 		<include refid="tableName"></include>
 		where BUSI_DATE = #{BUSI_DATE}
 	    and DEPT_CODE = #{DEPT_CODE} 
+	    and CUST_COL7 = #{CUST_COL7} 
+	    and USER_GROP = #{USER_GROP} 
 	    ${CanOperate}
 	</delete>
 	
@@ -114,6 +116,8 @@
 		<include refid="tableName"></include>
 		where BUSI_DATE = '${pd.SystemDateTime}'
 		and DEPT_CODE = '${pd.DepartCode}'
+	    and CUST_COL7 = #{pd.CUST_COL7} 
+	    and USER_GROP = #{pd.USER_GROP} 
 		${pd.CanOperate}
 		<!-- <if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''">
 			and ${pd.filterWhereResult}
@@ -123,7 +127,7 @@
     	</if>
 	</select>
 	<!-- 导出模板 -->
-	<select id="exportModel" parameterType="String" resultType="pd">
+	<select id="exportModel" parameterType="pd" resultType="pd">
 		select * 
 		from 
 		<include refid="tableName"></include>

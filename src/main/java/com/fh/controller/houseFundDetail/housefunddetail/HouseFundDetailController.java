@@ -167,7 +167,8 @@ public class HouseFundDetailController extends BaseController {
 		logBefore(logger, Jurisdiction.getUsername()+"列表HouseFundDetail");
 		PageData pd = this.getPageData();
 		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-				DepartCode, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
+				DepartCode, SystemDateTime, "",
+				TypeCodeListen, TypeCodeSummy, TableNameSummy);
 		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 			strHelpful += " and 1 != 1 ";
 		}
@@ -224,11 +225,13 @@ public class HouseFundDetailController extends BaseController {
 			commonBase.setMessage(checkState);
 		} else {
 			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
-					DepartCode, SystemDateTime,
+					DepartCode, SystemDateTime, "", 
 					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+					"", 
 					map_HaveColumnsList);
 			String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-					DepartCode, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
+					DepartCode, SystemDateTime, "",
+					TypeCodeListen, TypeCodeSummy, TableNameSummy);
 			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 				commonBase.setCode(2);
 				commonBase.setMessage("获取可操作的数据的条件失败！");
@@ -285,11 +288,13 @@ public class HouseFundDetailController extends BaseController {
 			commonBase.setMessage(checkState);
 		} else {
 			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
-					DepartCode, SystemDateTime,
+					DepartCode, SystemDateTime, "", 
 					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+					"", 
 					map_HaveColumnsList);
 			String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-					DepartCode, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
+					DepartCode, SystemDateTime, "",
+					TypeCodeListen, TypeCodeSummy, TableNameSummy);
 			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 				commonBase.setCode(2);
 				commonBase.setMessage("获取可操作的数据的条件失败！");
@@ -339,11 +344,13 @@ public class HouseFundDetailController extends BaseController {
 			commonBase.setMessage(checkState);
 		} else {
 			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
-					DepartCode, SystemDateTime,
+					DepartCode, SystemDateTime, "", 
 					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+					"", 
 					map_HaveColumnsList);
 			String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-					DepartCode, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
+					DepartCode, SystemDateTime, "",
+					TypeCodeListen, TypeCodeSummy, TableNameSummy);
 			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 				commonBase.setCode(2);
 				commonBase.setMessage("获取可操作的数据的条件失败！");
@@ -402,11 +409,13 @@ public class HouseFundDetailController extends BaseController {
 				commonBase.setMessage("当前区间和当前单位不能为空！");
 			} else {
 				FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
-						DepartCode, SystemDateTime,
+						DepartCode, SystemDateTime, "", 
 						TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+						"", 
 						map_HaveColumnsList);
 				String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-						DepartCode, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
+						DepartCode, SystemDateTime, "",
+    					TypeCodeListen, TypeCodeSummy, TableNameSummy);
 				if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 					commonBase.setCode(2);
 					commonBase.setMessage("获取可操作的数据的条件失败！");
@@ -559,7 +568,8 @@ public class HouseFundDetailController extends BaseController {
 		pd.put("DepartCode", DepartCode);
 
 		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-				DepartCode, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
+				DepartCode, SystemDateTime, "",
+				TypeCodeListen, TypeCodeSummy, TableNameSummy);
 		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 			ObjectExcelView erv = new ObjectExcelView();
 			Map<String,Object> dataMap = new LinkedHashMap<String,Object>();
@@ -633,8 +643,9 @@ public class HouseFundDetailController extends BaseController {
 			commonBase.setMessage(checkState);
 		} else {
 			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
-					DepartCode, SystemDateTime,
+					DepartCode, SystemDateTime, "", 
 					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+					"", 
 					map_HaveColumnsList);
 			
 			User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
