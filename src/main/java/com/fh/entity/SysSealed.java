@@ -9,6 +9,7 @@ public class SysSealed {
 	private String RPT_DATE; 
 	private String BILL_TYPE; 
 	private String STATE;
+	private String BILL_OFF;
 	public String getBILL_CODE() {
 		return BILL_CODE;
 	}
@@ -50,5 +51,11 @@ public class SysSealed {
 	}
 	public void setSTATE(String sTATE) {
 		STATE = sTATE;
+	}
+	public String getBILL_OFF() {
+		return BILL_OFF;
+	}
+	public void setBILL_OFF(String bILL_OFF) {
+		BILL_OFF = bILL_OFF;
 	} 
 }
