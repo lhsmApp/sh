@@ -92,8 +92,8 @@ public class StaffDetailService implements StaffDetailManager{
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	public List<PageData> exportModel(String DepartCode)throws Exception{
-		return (List<PageData>)dao.findForList("StaffDetailMapper.exportModel", DepartCode);
+	public List<PageData> exportModel(PageData pd)throws Exception{
+		return (List<PageData>)dao.findForList("StaffDetailMapper.exportModel", pd);
 	}
 
 	

@@ -30,7 +30,7 @@ public interface StaffDetailManager{
 	 * @param page
 	 * @throws Exception
 	 */
-	public List<PageData> exportModel(String DepartCode)throws Exception;
+	public List<PageData> exportModel(PageData pd)throws Exception;
 	
 	/**列表
 	 * @param page

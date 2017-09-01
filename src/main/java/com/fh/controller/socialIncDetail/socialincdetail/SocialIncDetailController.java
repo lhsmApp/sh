@@ -138,6 +138,7 @@ public class SocialIncDetailController extends BaseController {
 		if(!(State != null && !State.trim().equals(""))){
 			State = DurState.Release.getNameKey();
 		}
+		State = DurState.Sealed.getNameKey();
 		mv.addObject("State", State.equals(DurState.Release.getNameKey())? true:false);// 枚举  1封存,0解封
 
 		//USER_GROP EMPLGRP 员工组字典
@@ -146,7 +147,7 @@ public class SocialIncDetailController extends BaseController {
 		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
-		String jqGridColModel = tmpl.generateStructure(TableNameDetail, DepartCode, 3);
+		String jqGridColModel = tmpl.generateStructure("21", DepartCode, 3);
 		
 		SqlUserdata = tmpl.getSqlUserdata();
 		//字典
@@ -169,7 +170,8 @@ public class SocialIncDetailController extends BaseController {
 		logBefore(logger, Jurisdiction.getUsername()+"列表SocialIncDetail");
 		PageData pd = this.getPageData();
 		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-				DepartCode, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
+				DepartCode, SystemDateTime, "",
+				TypeCodeListen, TypeCodeSummy, TableNameSummy);
 		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 			strHelpful += " and 1 != 1 ";
 		}
@@ -226,11 +228,13 @@ public class SocialIncDetailController extends BaseController {
 			commonBase.setMessage(checkState);
 		} else {
 			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
-					DepartCode, SystemDateTime,
+					DepartCode, SystemDateTime, "", 
 					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+					"", 
 					map_HaveColumnsList);
 			String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-					DepartCode, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
+					DepartCode, SystemDateTime, "",
+					TypeCodeListen, TypeCodeSummy, TableNameSummy);
 			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 				commonBase.setCode(2);
 				commonBase.setMessage("获取可操作的数据的条件失败！");
@@ -287,11 +291,13 @@ public class SocialIncDetailController extends BaseController {
 			commonBase.setMessage(checkState);
 		} else {
 			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
-					DepartCode, SystemDateTime,
+					DepartCode, SystemDateTime, "", 
 					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+					"", 
 					map_HaveColumnsList);
 			String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-					DepartCode, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
+					DepartCode, SystemDateTime, "",
+					TypeCodeListen, TypeCodeSummy, TableNameSummy);
 			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 				commonBase.setCode(2);
 				commonBase.setMessage("获取可操作的数据的条件失败！");
@@ -341,11 +347,13 @@ public class SocialIncDetailController extends BaseController {
 			commonBase.setMessage(checkState);
 		} else {
 			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
-					DepartCode, SystemDateTime,
+					DepartCode, SystemDateTime, "", 
 					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+					"", 
 					map_HaveColumnsList);
 			String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-					DepartCode, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
+					DepartCode, SystemDateTime, "",
+					TypeCodeListen, TypeCodeSummy, TableNameSummy);
 			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 				commonBase.setCode(2);
 				commonBase.setMessage("获取可操作的数据的条件失败！");
@@ -404,11 +412,13 @@ public class SocialIncDetailController extends BaseController {
 				commonBase.setMessage("当前区间和当前单位不能为空！");
 			} else {
 				FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
-						DepartCode, SystemDateTime,
+						DepartCode, SystemDateTime, "", 
 						TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+						"", 
 						map_HaveColumnsList);
 				String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-						DepartCode, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
+						DepartCode, SystemDateTime, "",
+    					TypeCodeListen, TypeCodeSummy, TableNameSummy);
 				if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 					commonBase.setCode(2);
 					commonBase.setMessage("获取可操作的数据的条件失败！");
@@ -561,7 +571,8 @@ public class SocialIncDetailController extends BaseController {
 		pd.put("DepartCode", DepartCode);
 
 		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-				DepartCode, SystemDateTime, TypeCodeListen, TypeCodeSummy, TableNameSummy);
+				DepartCode, SystemDateTime, "",
+				TypeCodeListen, TypeCodeSummy, TableNameSummy);
 		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 			ObjectExcelView erv = new ObjectExcelView();
 			Map<String,Object> dataMap = new LinkedHashMap<String,Object>();
@@ -635,8 +646,9 @@ public class SocialIncDetailController extends BaseController {
 			commonBase.setMessage(checkState);
 		} else {
 			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
-					DepartCode, SystemDateTime,
+					DepartCode, SystemDateTime, "", 
 					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+					"", 
 					map_HaveColumnsList);
 			
 			User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);

@@ -24,8 +24,9 @@ public class FilterBillCode {
 	
 	//复制插入数据：在接口已上报过（接口有记录），汇总已上报过（汇总有记录）时执行复制插入，并删掉汇总上报记录
 	public static CommonBase copyInsert(SysSealedInfoService syssealedinfoService, ImportDetailService importdetailService, 
-			String DepartCode, String SystemDateTime, 
+			String DepartCode, String SystemDateTime, String CUST_COL7,
 			String TypeCodeListen, String TypeCodeSummy, String TableNameSummy, String TableNameDetail,
+			String emplGroupType,
 			Map<String, TableColumns> map_HaveColumnsList) throws Exception{
 		//, Boolean report
 		CommonBase commonBase = new CommonBase();
@@ -35,7 +36,8 @@ public class FilterBillCode {
 		PageData pdGetState = new PageData();
 		pdGetState.put("RPT_DEPT", DepartCode);
 		pdGetState.put("RPT_DUR", SystemDateTime);
-		pdGetState.put("BILL_TYPE", TypeCodeListen);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+		pdGetState.put("BILL_TYPE", TypeCodeListen);
+		pdGetState.put("BILL_OFF", CUST_COL7);
 		String stateListen = syssealedinfoService.getState(pdGetState);
 		if(stateListen != null && !stateListen.equals("")){
 			//重新汇总接口上报记录删掉，明细有改动汇总上报记录删掉
@@ -50,6 +52,8 @@ public class FilterBillCode {
 				pdGetList.put("TableName", TableNameDetail);
 				pdGetList.put("SystemDateTime", SystemDateTime);
 				pdGetList.put("DepartCode", DepartCode);
+				pdGetList.put("BILL_OFF", CUST_COL7);
+				pdGetList.put("USER_GROP", emplGroupType);
 				pdGetList.put("QueryFeild", strHelpful);
 				List<PageData> getList = importdetailService.getCopyInsertList(pdGetList);
 				if(!(getList != null && getList.size() > 0)){
@@ -73,13 +77,15 @@ public class FilterBillCode {
 	
 	
 	//导入界面的显示数据
-	public static String getCanOperateCondition(SysSealedInfoService syssealedinfoService, String DepartCode, String SystemDateTime, 
+	public static String getCanOperateCondition(SysSealedInfoService syssealedinfoService, 
+			String DepartCode, String SystemDateTime, String CUST_COL7,
 			String TypeCodeListen, String TypeCodeSummy, String TableNameSummy) throws Exception{
 		String strHelpful = "";
 		PageData pd = new PageData();
 		pd.put("RPT_DEPT", DepartCode);
 		pd.put("RPT_DUR", SystemDateTime);
-		pd.put("BILL_TYPE", TypeCodeListen);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+		pd.put("BILL_TYPE", TypeCodeListen);
+		pd.put("BILL_OFF", CUST_COL7);
 		String stateListen = syssealedinfoService.getState(pd);
 		if(!(stateListen != null && !stateListen.equals(""))){
 			//接口没上报过（接口没记录），取汇总单据状态不为0的
@@ -87,7 +93,7 @@ public class FilterBillCode {
 		} else {
 			//重新汇总接口上报记录删掉，明细有改动汇总上报记录删掉
 			//接口已上报过（接口有记录），汇总没上报过（汇总没记录），取未在汇总表中出现单号的记录
-			pd.put("BILL_TYPE", TypeCodeSummy);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
+			pd.put("BILL_TYPE", TypeCodeSummy);
 			String stateSummy = syssealedinfoService.getState(pd);
 			if(!(stateSummy != null && !stateSummy.equals(""))){
 				//汇总没上报过（汇总没记录），取汇总单据中不存在的单号
