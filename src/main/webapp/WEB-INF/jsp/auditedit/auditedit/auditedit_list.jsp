@@ -102,7 +102,7 @@
 										<form class="form-inline">
 											<span class="pull-left" style="margin-right: 5px;">
 												<select class="chosen-select form-control"
-													name="CUST_COL7" id="CUST_COL7"
+													name="SelectedCustCol7" id="SelectedCustCol7"
 													data-placeholder="请选择帐套"
 													style="vertical-align: top; height:32px;width: 150px;">
 													<option value="">请选择帐套</option>
@@ -112,7 +112,7 @@
 												</select>
 											</span>
 											<span class="pull-left" id="spanSelectTree" style="margin-right: 5px;">
-												<div class="selectTree" id="selectTree" multiMode="false"
+												<div class="selectTree" id="selectTree" multiMode="true"
 												    allSelectable="false" noGroup="false"></div>
 											    <input type="text" id="SelectedDepartCode" hidden></input>
 											</span>
@@ -181,14 +181,13 @@
     var gridBase_selector = "#jqGrid";  
     var pagerBase_selector = "#jqGridPager";  
 
-	var which='1';
-	var jqGridColModel;
+	var which;
 	
 	$(document).ready(function () {
 		$(top.hangge());//关闭加载状态
 		
 		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-	    jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
+	    var jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
 
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
@@ -215,14 +214,16 @@
 			var target = $(this).find('input[type=radio]');
 			which = parseInt(target.val());
 			if(which!='${pd.which}'){
-				window.location.href="<%=basePath%>auditedit/list.do?TABLE_NO="+which;
+				window.location.href='<%=basePath%>auditedit/list.do?SelectedTableNo='+which
+	                +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+	                +'&SelectedCustCol7='+$("#SelectedCustCol7").val();
 			}
 		});
 
 		$(gridBase_selector).jqGrid({
-			url: '<%=basePath%>auditedit/getPageList.do?TABLE_NO='+which
+			url: '<%=basePath%>auditedit/getPageList.do?SelectedTableNo='+which
                 +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-                +'&CUST_COL7='+$("#CUST_COL7").val(),
+                +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 			datatype: "json",
 			colModel: jqGridColModel,
 			//caption: '当前期间：' + SystemDateTime + '， 当前单位：' + DepartName + '',
@@ -235,7 +236,9 @@
             multiboxonly: true,
             sortable: true,
 			altRows: true, //斑马条纹
-			editurl: '<%=basePath%>auditedit/edit.do?TABLE_NO='+which,
+			editurl: '<%=basePath%>auditedit/edit.do?SelectedTableNo='+which
+            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+            +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 			
 			pager: pagerBase_selector,
 			footerrow: true,
@@ -480,7 +483,9 @@
 	    					top.jzts();
 	    					$.ajax({
 	    						type: "POST",
-	    						url: '<%=basePath%>auditedit/deleteAll.do?TABLE_NO='+which,
+	    						url: '<%=basePath%>auditedit/deleteAll.do?SelectedTableNo='+which
+	    		                +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+	    		                +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 	    				    	data: {DATA_ROWS:JSON.stringify(listData)},
 	    						dataType:'json',
 	    						cache: false,
@@ -548,7 +553,9 @@
     					top.jzts();
     					$.ajax({
     						type: "POST",
-    						url: '<%=basePath%>auditedit/updateAll.do?TABLE_NO='+which,
+    						url: '<%=basePath%>auditedit/updateAll.do?SelectedTableNo='+which
+    		                +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+    		                +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
     				    	data: {DATA_ROWS:JSON.stringify(listData)},
     						dataType:'json',
     						cache: false,
@@ -597,7 +604,9 @@
 	   	   var diag = new top.Dialog();
 	   	   diag.Drag=true;
 	   	   diag.Title ="EXCEL 导入到数据库";
-	   	   diag.URL = '<%=basePath%>auditedit/goUploadExcel.do?TABLE_NO='+which;
+	   	   diag.URL = '<%=basePath%>auditedit/goUploadExcel.do?SelectedTableNo='+which
+           +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+           +'&SelectedCustCol7='+$("#SelectedCustCol7").val();
 	   	   diag.Width = 300;
 	   	   diag.Height = 150;
 	   	   diag.CancelEvent = function(){ //关闭事件
@@ -613,7 +622,9 @@
 		 * 导出
 		 */
 	    function exportItems(){
-	    	window.location.href='<%=basePath%>auditedit/excel.do?TABLE_NO='+which;
+	    	window.location.href='<%=basePath%>auditedit/excel.do?SelectedTableNo='+which
+            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+            +'&SelectedCustCol7='+$("#SelectedCustCol7").val();
 	    }
 
 	    /**
@@ -673,9 +684,9 @@
 	function tosearch() {
 		console.log($("#SelectedDepartCode").val());
 		$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据
-			url:'<%=basePath%>auditedit/getPageList.do?TABLE_NO='+which
-                +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-                +'&CUST_COL7='+$("#CUST_COL7").val(),  
+			url:'<%=basePath%>auditedit/getPageList.do?SelectedTableNo='+which
+            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+            +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),  
 			datatype:'json',
 		      page:1
 		}).trigger("reloadGrid");

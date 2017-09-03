@@ -97,13 +97,13 @@
 										<form class="form-inline">
 											<span class="pull-left" style="margin-right: 5px;">
 												<select class="chosen-select form-control"
-													name="CUST_COL7" id="CUST_COL7"
+													name="SelectedCustCol7" id="SelectedCustCol7"
 													data-placeholder="请选择帐套"
 													style="vertical-align: top; height:32px;width: 150px;">
 													<option value="">请选择帐套</option>
 													<c:forEach items="${FMISACC}" var="each">
 														<option value="${each.DICT_CODE}">${each.NAME}</option>
-														    <!-- <c:if test="${pd.CUST_COL7==each.DICT_CODE}">selected</c:if> -->
+														    <!-- <c:if test="${pd.SelectedCustCol7==each.DICT_CODE}">selected</c:if> -->
 													</c:forEach>
 												</select>
 											</span>
@@ -170,7 +170,7 @@
     var gridBase_selector = "#jqGridBase";  
     var pagerBase_selector = "#jqGridBasePager"; 
     
-	var which='1'; 
+	var which; 
     
 	$(document).ready(function () {
 		$(top.hangge());//关闭加载状态
@@ -287,15 +287,15 @@
 			var target = $(this).find('input[type=radio]');
 			which = parseInt(target.val());
 			//if(which!='${pd.which}'){
-				window.location.href="<%=basePath%>staffdetail/list.do?TABLE_NO="+which;
-                //+'&SelectedDepartCode='+$("#SelectedDepartCode").val() + '&CUST_COL7='+$("#CUST_COL7").val()
+				window.location.href="<%=basePath%>staffdetail/list.do?SelectedTableNo="+which;
+                //+'&SelectedDepartCode='+$("#SelectedDepartCode").val() + '&SelectedCustCol7='+$("#SelectedCustCol7").val()
 			//}
 		});
 		
 		$(gridBase_selector).jqGrid({
-			url: '<%=basePath%>staffdetail/getPageList.do?TABLE_NO='+which
+			url: '<%=basePath%>staffdetail/getPageList.do?SelectedTableNo='+which
             +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-            +'&CUST_COL7='+$("#CUST_COL7").val(),
+            +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 			datatype: "json",
 			colModel: jqGridColModel,
 			//caption: '当前期间：' + SystemDateTime + '， 当前单位：' + DepartName + '',
@@ -308,9 +308,9 @@
             multiboxonly: true,
             sortable: true,
 			altRows: true, //斑马条纹
-			editurl: '<%=basePath%>staffdetail/edit.do?TABLE_NO='+which
+			editurl: '<%=basePath%>staffdetail/edit.do?SelectedTableNo='+which
             +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-            +'&CUST_COL7='+$("#CUST_COL7").val(),
+            +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 			
 			pager: pagerBase_selector,
 			footerrow: true,
@@ -477,7 +477,8 @@
 				                    console.log(rowid);  
 				                },  
 				                successfunc: function(response){
-									if(response.responseJSON.code==0){
+							        var responseJSON = JSON.parse(response.responseText);
+							    	if (responseJSON.code == 0) {
 										$(gridBase_selector).trigger("reloadGrid");  
 										$(top.hangge());//关闭加载状态
 										$("#subTitle").tips({
@@ -500,15 +501,16 @@
 									//}
 				                },  
 				                errorfunc: function(rowid, response){
+		                            var responseJSON = JSON.parse(response.responseText);
 				                	$(gridBase_selector).jqGrid('editRow',lastSelection);
 									$(top.hangge());//关闭加载状态
 									if(response.statusText == "success"){
-										if(response.responseJSON.code != 0){
+										if(responseJSON.code != 0){
 											$(gridBase_selector).jqGrid('editRow',lastSelection);
 											$(top.hangge());//关闭加载状态
 											$("#subTitle").tips({
 												side:3,
-										        msg:'保存失败:'+response.responseJSON.message,
+										        msg:'保存失败:'+responseJSON.message,
 										        bg:'#cc0033',
 										        time:3
 										    });
@@ -516,7 +518,7 @@
 									} else {
 										$("#subTitle").tips({
 											side:3,
-								            msg:'保存出错:' + response.responseJSON.message,
+								            msg:'保存出错:' + responseJSON.message,
 								            bg:'#cc0033',
 								            time:3
 								        });
@@ -571,9 +573,9 @@
 									top.jzts();
 									$.ajax({
 										type: "POST",
-										url: '<%=basePath%>staffdetail/deleteAll.do?TABLE_NO='+which
+										url: '<%=basePath%>staffdetail/deleteAll.do?SelectedTableNo='+which
 						                    +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-						                    +'&CUST_COL7='+$("#CUST_COL7").val(),
+						                    +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 								    	data: {DATA_ROWS:JSON.stringify(listData)},
 										dataType:'json',
 										cache: false,
@@ -640,9 +642,9 @@
 								    top.jzts();
 								    $.ajax({
 									    type: "POST",
-									    url: '<%=basePath%>staffdetail/updateAll.do?TABLE_NO='+which
+									    url: '<%=basePath%>staffdetail/updateAll.do?SelectedTableNo='+which
 					                        +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-					                        +'&CUST_COL7='+$("#CUST_COL7").val(),
+					                        +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 							    	    data: {DATA_ROWS:JSON.stringify(listData)},
 									    dataType:'json',
 									    cache: false,
@@ -691,9 +693,9 @@
 					    var diag = new top.Dialog();
 					    diag.Drag=true;
 					    diag.Title ="EXCEL 导入到数据库";
-					    diag.URL = '<%=basePath%>staffdetail/goUploadExcel.do?TABLE_NO='+which
+					    diag.URL = '<%=basePath%>staffdetail/goUploadExcel.do?SelectedTableNo='+which
 				           +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-				           +'&CUST_COL7='+$("#CUST_COL7").val();
+				           +'&SelectedCustCol7='+$("#SelectedCustCol7").val();
 					    diag.Width = 300;
 					    diag.Height = 150;
 					    diag.CancelEvent = function(){ //关闭事件
@@ -709,9 +711,9 @@
 				     * 导出
 				     */
 				    function exportItems(){
-					    window.location.href='<%=basePath%>staffdetail/excel.do?TABLE_NO='+which
+					    window.location.href='<%=basePath%>staffdetail/excel.do?SelectedTableNo='+which
 				            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-				            +'&CUST_COL7='+$("#CUST_COL7").val();
+				            +'&SelectedCustCol7='+$("#SelectedCustCol7").val();
 				    }
 
 				    /**
@@ -734,9 +736,9 @@
 					        	    top.jzts();
 					        	    $.ajax({
 					        	        type: "POST",
-					        	        url: '<%=basePath%>staffdetail/report.do?TABLE_NO='+which
+					        	        url: '<%=basePath%>staffdetail/report.do?SelectedTableNo='+which
 					        	            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-				                            +'&CUST_COL7='+$("#CUST_COL7").val(),
+				                            +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 				                        cache: false,
 								        success: function(response){
 									        if(response.code==0){
@@ -781,9 +783,9 @@
 						top.jzts();
 						$.ajax({
 							type: "POST",
-							url: '<%=basePath%>staffdetail/getState.do?TABLE_NO='+which
+							url: '<%=basePath%>staffdetail/getState.do?SelectedTableNo='+which
 				                +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-				                +'&CUST_COL7='+$("#CUST_COL7").val(),
+				                +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 							cache: false,
 							success: function(response){
 								if(response.code==0){
@@ -816,14 +818,44 @@
 					    	}
 						});
 				    };
+
+				    /**
+				     * 增加成功
+				     * 
+				     * @param response
+				     * @param postdata
+				     * @returns
+				     */
+				    function fn_addSubmit_extend(response, postdata) {
+				        var responseJSON = JSON.parse(response.responseText);
+				    	if (responseJSON.code == 0) {
+				    		// console.log("Add Success");
+				    		$("#subTitle").tips({
+				    			side : 3,
+				    			msg : '保存成功',
+				    			bg : '#009933',
+				    			time : 3
+				    		});
+				    		return [ true ];
+				    	} else {
+				    		// console.log("Add Failed"+response.responseJSON.message);
+				    		$("#subTitle").tips({
+				    			side : 3,
+				    			msg : '保存失败,' + responseJSON.message,
+				    			bg : '#cc0033',
+				    			time : 3
+				    		});
+				    		return [ false, responseJSON.message ];
+				    	}
+				    }
 	});
 	
 	//检索
 	function tosearch() {
 		$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据
-			url:'<%=basePath%>staffdetail/getPageList.do?TABLE_NO='+which
+			url:'<%=basePath%>staffdetail/getPageList.do?SelectedTableNo='+which
             +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-            +'&CUST_COL7='+$("#CUST_COL7").val(),  
+            +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),  
 			datatype:'json',
 		      page:1
 		}).trigger("reloadGrid");
@@ -852,36 +884,6 @@
 		$("#selectTree").render();
 		$("#selectTree2_input").val("请选择");
 	}
-
-    /**
-     * 增加成功
-     * 
-     * @param response
-     * @param postdata
-     * @returns
-     */
-    function fn_addSubmit_extend(response, postdata) {
-        var responseJSON = JSON.parse(response.responseText);
-    	if (responseJSON.code == 0) {
-    		// console.log("Add Success");
-    		$("#subTitle").tips({
-    			side : 3,
-    			msg : '保存成功',
-    			bg : '#009933',
-    			time : 3
-    		});
-    		return [ true ];
-    	} else {
-    		// console.log("Add Failed"+response.responseJSON.message);
-    		$("#subTitle").tips({
-    			side : 3,
-    			msg : '保存失败,' + responseJSON.message,
-    			bg : '#cc0033',
-    			time : 3
-    		});
-    		return [ false, responseJSON.message ];
-    	}
-    }
 
  	</script>
 </html>

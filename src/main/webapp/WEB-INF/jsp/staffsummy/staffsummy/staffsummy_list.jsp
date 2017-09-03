@@ -67,19 +67,19 @@
 									    <!-- <span class="label label-xlg label-blue arrowed-left"
 									        id = "showDur" style="background:#428bca; margin-right: 2px;"></span> -->
 									            <label class="btn btn-sm btn-primary active"> <span
-									    	        class="bigger-110">合同化</span> <input type="radio" value="1" />
+									    	        class="bigger-110">合同化</span> <input type="radio" value="6" />
 									            </label> 
 									            <label class="btn btn-sm btn-primary"> <span
-									            	class="bigger-110">市场化</span> <input type="radio" value="2" />
+									            	class="bigger-110">市场化</span> <input type="radio" value="7" />
 									            </label> 
 									            <label class="btn btn-sm btn-primary"> <span
-									            	class="bigger-110">系统内劳务</span> <input type="radio" value="3" />
+									            	class="bigger-110">系统内劳务</span> <input type="radio" value="8" />
 									            </label>
 									            <label class="btn btn-sm btn-primary"> <span
-									    	        class="bigger-110">运行人员</span> <input type="radio" value="4" />
+									    	        class="bigger-110">运行人员</span> <input type="radio" value="9" />
 									            </label>
 									            <label class="btn btn-sm btn-primary"> <span
-										            class="bigger-110">劳务派遣</span> <input type="radio" value="5" />
+										            class="bigger-110">劳务派遣</span> <input type="radio" value="10" />
 									            </label>
 								    </div>
 						</div><!-- /.page-header -->
@@ -92,20 +92,19 @@
 											<form class="form-inline">
 											<span class="pull-left" style="margin-right: 5px;">
 												<select class="chosen-select form-control"
-													name="CUST_COL7" id="CUST_COL7"
+													name="SelectedCustCol7" id="SelectedCustCol7"
 													data-placeholder="请选择帐套"
 													style="vertical-align: top; height:32px;width: 150px;">
 													<option value="">请选择帐套</option>
 													<c:forEach items="${FMISACC}" var="each">
-														<option value="${each.DICT_CODE}" 
-														    <c:if test="${pd.CUST_COL7==each.DICT_CODE}">selected</c:if>>${each.NAME}</option>
+														<option value="${each.DICT_CODE}">${each.NAME}</option>
 													</c:forEach>
 												</select>
 											</span>
 											<span class="pull-left" id="spanSelectTree" style="margin-right: 5px;">
 												<div class="selectTree" id="selectTree" multiMode="true"
 												    allSelectable="false" noGroup="false"></div>
-											    <input type="text" id="RPT_DEPT" hidden></input>
+											    <input type="text" id="SelectedDepartCode" hidden></input>
 											</span>
 												<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
 													<i class="ace-icon fa fa-search bigger-110"></i>
@@ -165,7 +164,7 @@
 	    var gridBase_selector = "#jqGrid";  
 	    var pagerBase_selector = "#jqGridPager"; 
 	    
-		var which='1';  
+		var which;  
 	    
 		$(document).ready(function () {
 			$(top.hangge());//关闭加载状态
@@ -184,9 +183,9 @@
 		    });
 			
 			$(gridBase_selector).jqGrid({
-				url: '<%=basePath%>staffsummy/getPageList.do?TABLE_NO='+which
-	            +'&DEPT_CODE='+$("#RPT_DEPT").val()
-	            +'&CUST_COL7='+$("#CUST_COL7").val(),
+				url: '<%=basePath%>staffsummy/getPageList.do?SelectedTableNo='+which
+	            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+	            +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 				datatype: "json",
 				colModel: jqGridColModel,
 				viewrecords: true, 
@@ -345,9 +344,9 @@
 		    					top.jzts();
 		    					$.ajax({
 		    						type: "POST",
-		    						url: '<%=basePath%>staffsummy/summaryDepartString.do?TABLE_NO='+which
-		    			            +'&DEPT_CODE='+$("#RPT_DEPT").val()
-		    			            +'&CUST_COL7='+$("#CUST_COL7").val(),
+		    						url: '<%=basePath%>staffsummy/summaryDepartString.do?SelectedTableNo='+which
+		    			            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+		    			            +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 		    				    	data: {DATA_DEPART:transfer_RPT_DEPT},
 		    						dataType:'json',
 		    						cache: false,
@@ -413,9 +412,9 @@
 							top.jzts();
 							$.ajax({
 								type: "POST",
-								url: '<%=basePath%>staffsummy/report.do?TABLE_NO='+which
-					            +'&DEPT_CODE='+$("#RPT_DEPT").val()
-					            +'&CUST_COL7='+$("#CUST_COL7").val(),
+								url: '<%=basePath%>staffsummy/report.do?SelectedTableNo='+which
+					            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+					            +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 	    				    	data: {DATA_ROWS_REPORT:JSON.stringify(listData)},
 	    						dataType:'json',
 	    						cache: false,
@@ -540,9 +539,9 @@
 			var defaultNodes = {"treeNodes":${zTreeNodes}};
 			//绑定change事件
 			$("#selectTree").bind("change",function(){
-				$("#RPT_DEPT").val("");
+				$("#SelectedDepartCode").val("");
 				if($(this).attr("relValue")){
-					$("#RPT_DEPT").val($(this).attr("relValue"));
+					$("#SelectedDepartCode").val($(this).attr("relValue"));
 					console.log($(this).attr("relValue"));
 			    }
 			});
@@ -554,7 +553,7 @@
 		
 		//汇总
 		function btnSummyClick(){
-			var transfer_RPT_DEPT = $("#RPT_DEPT").val();
+			var transfer_RPT_DEPT = $("#SelectedDepartCode").val();
 			
 			if(!(transfer_RPT_DEPT!=null && transfer_RPT_DEPT.trim()!="")){
 			    bootbox.dialog({
@@ -569,9 +568,9 @@
     					top.jzts();
     					$.ajax({
     						type: "POST",
-    						url: '<%=basePath%>staffsummy/summaryDepartString.do?TABLE_NO='+which
-    			            +'&DEPT_CODE='+$("#RPT_DEPT").val()
-    			            +'&CUST_COL7='+$("#CUST_COL7").val(),
+    						url: '<%=basePath%>staffsummy/summaryDepartString.do?SelectedTableNo='+which
+    			            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+    			            +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
     				    	data: {DATA_DEPART:transfer_RPT_DEPT},
     						dataType:'json',
     						cache: false,
@@ -612,12 +611,12 @@
 		
 		//检索
 		function tosearch() {
-			console.log($("#RPT_DEPT").val());
-			var RPT_DEPT = $("#RPT_DEPT").val();
+			console.log($("#SelectedDepartCode").val());
+			var SelectedDepartCode = $("#SelectedDepartCode").val();
 			$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据
-				url:'<%=basePath%>staffsummy/getPageList.do?TABLE_NO='+which
-	            +'&DEPT_CODE='+$("#RPT_DEPT").val()
-	            +'&CUST_COL7='+$("#CUST_COL7").val(),  
+				url:'<%=basePath%>staffsummy/getPageList.do?SelectedTableNo='+which
+	            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+	            +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),  
 				datatype:'json',
 			      page:1
 			}).trigger("reloadGrid");

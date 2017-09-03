@@ -541,7 +541,7 @@ public class TmplUtil {
 
 			// 设置必定不用编辑的列
 			if (MustNotEditList.contains(col.getColumn_name())) {
-				model_notedit.append(" editable: false ");
+				model_notedit.append(" editable: true, editrules: {edithidden: false} ");
 				editable = false;
 			} else {
 				model_notedit.append(" editable: true ");
