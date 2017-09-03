@@ -46,6 +46,7 @@ import com.fh.util.enums.BillNumType;
 import com.fh.util.enums.BillState;
 import com.fh.util.enums.BillType;
 import com.fh.util.enums.DurState;
+import com.fh.util.enums.TmplType;
 
 import net.sf.json.JSONArray;
 
@@ -101,9 +102,9 @@ public class SocialIncSummyController extends BaseController {
 	String TableNameBase = "tb_social_inc_summy";
 	String TableNameDetail = "tb_social_inc_detail";
 	//枚举类型  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
-	String TypeCodeDetail = BillType.SECURITY_DETAIL.getNameKey();
-	String TypeCodeSummy = BillType.SECURITY_SUMMARY.getNameKey();
-	String TypeCodeListen = BillType.SECURITY_LISTEN.getNameKey();
+	String TypeCodeDetail = TmplType.TB_SOCIAL_INC_DETAIL.getNameKey();
+	String TypeCodeSummy = TmplType.TB_SOCIAL_INC_SUMMY.getNameKey();
+	String TypeCodeListen = TmplType.TB_SOCIAL_INC_TRANSFER.getNameKey();
 	//显示结构的单位
     String ShowDepartCode = "01001";
 	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列

@@ -56,7 +56,7 @@
 									
 										<button id="btnQuery" class="btn btn-white btn-info btn-sm"
 											onclick="showQueryCondi($('#jqGrid'),null,true)">
-											<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
+											<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>隐藏查询</span>
 										</button>
 						<button id="btnSummy" class="btn btn-white btn-info btn-sm"
 							onclick="btnSummyClick()">
@@ -64,22 +64,49 @@
 						</button>
 								
 						            <div class="pull-right">
-									    <span class="label label-xlg label-blue arrowed-left"
-									        id = "showDur" style="background:#428bca; margin-right: 2px;"></span>
+									    <!-- <span class="label label-xlg label-blue arrowed-left"
+									        id = "showDur" style="background:#428bca; margin-right: 2px;"></span> -->
+									            <label class="btn btn-sm btn-primary active"> <span
+									    	        class="bigger-110">合同化</span> <input type="radio" value="1" />
+									            </label> 
+									            <label class="btn btn-sm btn-primary"> <span
+									            	class="bigger-110">市场化</span> <input type="radio" value="2" />
+									            </label> 
+									            <label class="btn btn-sm btn-primary"> <span
+									            	class="bigger-110">系统内劳务</span> <input type="radio" value="3" />
+									            </label>
+									            <label class="btn btn-sm btn-primary"> <span
+									    	        class="bigger-110">运行人员</span> <input type="radio" value="4" />
+									            </label>
+									            <label class="btn btn-sm btn-primary"> <span
+										            class="bigger-110">劳务派遣</span> <input type="radio" value="5" />
+									            </label>
 								    </div>
 						</div><!-- /.page-header -->
 				
 							<div class="row">
 							<div class="col-xs-12">
-								<div class="widget-box" style="display: none;">
+								<div class="widget-box" style="display: block;">
 									<div class="widget-body">
 										<div class="widget-main">
 											<form class="form-inline">
-											    <span style="margin-right: 5px;">
-												    <div class="selectTree" id="selectTree" multiMode="true"
-												    	allSelectable="false" noGroup="false"></div>
-											    	<input type="text" id="RPT_DEPT" hidden></input>
-											    </span> 
+											<span class="pull-left" style="margin-right: 5px;">
+												<select class="chosen-select form-control"
+													name="CUST_COL7" id="CUST_COL7"
+													data-placeholder="请选择帐套"
+													style="vertical-align: top; height:32px;width: 150px;">
+													<option value="">请选择帐套</option>
+													<c:forEach items="${FMISACC}" var="each">
+														<option value="${each.DICT_CODE}" 
+														    <c:if test="${pd.CUST_COL7==each.DICT_CODE}">selected</c:if>>${each.NAME}</option>
+													</c:forEach>
+												</select>
+											</span>
+											<span class="pull-left" id="spanSelectTree" style="margin-right: 5px;">
+												<div class="selectTree" id="selectTree" multiMode="true"
+												    allSelectable="false" noGroup="false"></div>
+											    <input type="text" id="RPT_DEPT" hidden></input>
+											</span>
 												<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
 													<i class="ace-icon fa fa-search bigger-110"></i>
 												</button>
@@ -136,14 +163,16 @@
 		
 		<script type="text/javascript"> 
 	    var gridBase_selector = "#jqGrid";  
-	    var pagerBase_selector = "#jqGridPager";  
+	    var pagerBase_selector = "#jqGridPager"; 
+	    
+		var which='1';  
 	    
 		$(document).ready(function () {
 			$(top.hangge());//关闭加载状态
 		    
 			//当前期间,取自tb_system_config的SystemDateTime字段
-		    var SystemDateTime = '${SystemDateTime}';
-		    $("#showDur").text('当前期间：' + SystemDateTime);
+		    //var SystemDateTime = '${SystemDateTime}';
+		    //$("#showDur").text('当前期间：' + SystemDateTime);
 		    
 			//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 		    var jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
@@ -151,12 +180,13 @@
 			//resize to fit page size
 			$(window).on('resize.jqGrid', function () {
 				$(gridBase_selector).jqGrid( 'setGridWidth', $(".page-content").width());
-				//$(gridBase_selector).jqGrid( 'setGridHeight', $(window).height() - 240);
 				resizeGridHeight($(gridBase_selector),null,true);
 		    });
 			
 			$(gridBase_selector).jqGrid({
-				url: '<%=basePath%>staffsummy/getPageList.do',
+				url: '<%=basePath%>staffsummy/getPageList.do?TABLE_NO='+which
+	            +'&DEPT_CODE='+$("#RPT_DEPT").val()
+	            +'&CUST_COL7='+$("#CUST_COL7").val(),
 				datatype: "json",
 				colModel: jqGridColModel,
 				viewrecords: true, 
@@ -315,7 +345,9 @@
 		    					top.jzts();
 		    					$.ajax({
 		    						type: "POST",
-		    						url: '<%=basePath%>staffsummy/summaryDepartString.do?',
+		    						url: '<%=basePath%>staffsummy/summaryDepartString.do?TABLE_NO='+which
+		    			            +'&DEPT_CODE='+$("#RPT_DEPT").val()
+		    			            +'&CUST_COL7='+$("#CUST_COL7").val(),
 		    				    	data: {DATA_DEPART:transfer_RPT_DEPT},
 		    						dataType:'json',
 		    						cache: false,
@@ -381,7 +413,9 @@
 							top.jzts();
 							$.ajax({
 								type: "POST",
-								url: '<%=basePath%>staffsummy/report.do?',
+								url: '<%=basePath%>staffsummy/report.do?TABLE_NO='+which
+					            +'&DEPT_CODE='+$("#RPT_DEPT").val()
+					            +'&CUST_COL7='+$("#CUST_COL7").val(),
 	    				    	data: {DATA_ROWS_REPORT:JSON.stringify(listData)},
 	    						dataType:'json',
 	    						cache: false,
@@ -520,7 +554,7 @@
 		
 		//汇总
 		function btnSummyClick(){
-			var transfer_RPT_DEPT = transfer_RPT_DEPT = $("#RPT_DEPT").val();
+			var transfer_RPT_DEPT = $("#RPT_DEPT").val();
 			
 			if(!(transfer_RPT_DEPT!=null && transfer_RPT_DEPT.trim()!="")){
 			    bootbox.dialog({
@@ -535,7 +569,9 @@
     					top.jzts();
     					$.ajax({
     						type: "POST",
-    						url: '<%=basePath%>staffsummy/summaryDepartString.do?',
+    						url: '<%=basePath%>staffsummy/summaryDepartString.do?TABLE_NO='+which
+    			            +'&DEPT_CODE='+$("#RPT_DEPT").val()
+    			            +'&CUST_COL7='+$("#CUST_COL7").val(),
     				    	data: {DATA_DEPART:transfer_RPT_DEPT},
     						dataType:'json',
     						cache: false,
@@ -579,7 +615,9 @@
 			console.log($("#RPT_DEPT").val());
 			var RPT_DEPT = $("#RPT_DEPT").val();
 			$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据
-				url:'<%=basePath%>staffsummy/getPageList.do?DEPT_CODE='+RPT_DEPT,  
+				url:'<%=basePath%>staffsummy/getPageList.do?TABLE_NO='+which
+	            +'&DEPT_CODE='+$("#RPT_DEPT").val()
+	            +'&CUST_COL7='+$("#CUST_COL7").val(),  
 				datatype:'json',
 			      page:1
 			}).trigger("reloadGrid");

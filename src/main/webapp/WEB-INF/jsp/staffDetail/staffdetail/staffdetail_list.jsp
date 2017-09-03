@@ -102,15 +102,15 @@
 													style="vertical-align: top; height:32px;width: 150px;">
 													<option value="">请选择帐套</option>
 													<c:forEach items="${FMISACC}" var="each">
-														<option value="${each.DICT_CODE}" 
-														    <c:if test="${pd.CUST_COL7==each.DICT_CODE}">selected</c:if>>${each.NAME}</option>
+														<option value="${each.DICT_CODE}">${each.NAME}</option>
+														    <!-- <c:if test="${pd.CUST_COL7==each.DICT_CODE}">selected</c:if> -->
 													</c:forEach>
 												</select>
 											</span>
 											<span class="pull-left" id="spanSelectTree" style="margin-right: 5px;">
 												<div class="selectTree" id="selectTree" multiMode="false"
 												    allSelectable="false" noGroup="false"></div>
-											    <input type="text" id="DEPT_CODE" hidden></input>
+											    <input type="text" id="SelectedDepartCode" hidden></input>
 											</span>
 											<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
 												<i class="ace-icon fa fa-search bigger-110"></i>
@@ -288,13 +288,13 @@
 			which = parseInt(target.val());
 			//if(which!='${pd.which}'){
 				window.location.href="<%=basePath%>staffdetail/list.do?TABLE_NO="+which;
-                //+'&DEPT_CODE='+$("#DEPT_CODE").val() + '&CUST_COL7='+$("#CUST_COL7").val()
+                //+'&SelectedDepartCode='+$("#SelectedDepartCode").val() + '&CUST_COL7='+$("#CUST_COL7").val()
 			//}
 		});
 		
 		$(gridBase_selector).jqGrid({
 			url: '<%=basePath%>staffdetail/getPageList.do?TABLE_NO='+which
-            +'&DEPT_CODE='+$("#DEPT_CODE").val()
+            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
             +'&CUST_COL7='+$("#CUST_COL7").val(),
 			datatype: "json",
 			colModel: jqGridColModel,
@@ -309,7 +309,7 @@
             sortable: true,
 			altRows: true, //斑马条纹
 			editurl: '<%=basePath%>staffdetail/edit.do?TABLE_NO='+which
-            +'&DEPT_CODE='+$("#DEPT_CODE").val()
+            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
             +'&CUST_COL7='+$("#CUST_COL7").val(),
 			
 			pager: pagerBase_selector,
@@ -572,7 +572,7 @@
 									$.ajax({
 										type: "POST",
 										url: '<%=basePath%>staffdetail/deleteAll.do?TABLE_NO='+which
-						                    +'&DEPT_CODE='+$("#DEPT_CODE").val()
+						                    +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
 						                    +'&CUST_COL7='+$("#CUST_COL7").val(),
 								    	data: {DATA_ROWS:JSON.stringify(listData)},
 										dataType:'json',
@@ -641,7 +641,7 @@
 								    $.ajax({
 									    type: "POST",
 									    url: '<%=basePath%>staffdetail/updateAll.do?TABLE_NO='+which
-					                        +'&DEPT_CODE='+$("#DEPT_CODE").val()
+					                        +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
 					                        +'&CUST_COL7='+$("#CUST_COL7").val(),
 							    	    data: {DATA_ROWS:JSON.stringify(listData)},
 									    dataType:'json',
@@ -692,7 +692,7 @@
 					    diag.Drag=true;
 					    diag.Title ="EXCEL 导入到数据库";
 					    diag.URL = '<%=basePath%>staffdetail/goUploadExcel.do?TABLE_NO='+which
-				           +'&DEPT_CODE='+$("#DEPT_CODE").val()
+				           +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
 				           +'&CUST_COL7='+$("#CUST_COL7").val();
 					    diag.Width = 300;
 					    diag.Height = 150;
@@ -710,7 +710,7 @@
 				     */
 				    function exportItems(){
 					    window.location.href='<%=basePath%>staffdetail/excel.do?TABLE_NO='+which
-				            +'&DEPT_CODE='+$("#DEPT_CODE").val()
+				            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
 				            +'&CUST_COL7='+$("#CUST_COL7").val();
 				    }
 
@@ -735,7 +735,7 @@
 					        	    $.ajax({
 					        	        type: "POST",
 					        	        url: '<%=basePath%>staffdetail/report.do?TABLE_NO='+which
-					        	            +'&DEPT_CODE='+$("#DEPT_CODE").val()
+					        	            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
 				                            +'&CUST_COL7='+$("#CUST_COL7").val(),
 				                        cache: false,
 								        success: function(response){
@@ -782,7 +782,7 @@
 						$.ajax({
 							type: "POST",
 							url: '<%=basePath%>staffdetail/getState.do?TABLE_NO='+which
-				                +'&DEPT_CODE='+$("#DEPT_CODE").val()
+				                +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
 				                +'&CUST_COL7='+$("#CUST_COL7").val(),
 							cache: false,
 							success: function(response){
@@ -822,7 +822,7 @@
 	function tosearch() {
 		$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据
 			url:'<%=basePath%>staffdetail/getPageList.do?TABLE_NO='+which
-            +'&DEPT_CODE='+$("#DEPT_CODE").val()
+            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
             +'&CUST_COL7='+$("#CUST_COL7").val(),  
 			datatype:'json',
 		      page:1
@@ -842,9 +842,9 @@
 		var defaultNodes = {"treeNodes":nodes};
 		//绑定change事件
 		$("#selectTree").bind("change",function(){
-			$("#DEPT_CODE").val("");
+			$("#SelectedDepartCode").val("");
 			if($(this).attr("relValue")){
-				$("#DEPT_CODE").val($(this).attr("relValue"));
+				$("#SelectedDepartCode").val($(this).attr("relValue"));
 		    }
 		});
 		//赋给data属性

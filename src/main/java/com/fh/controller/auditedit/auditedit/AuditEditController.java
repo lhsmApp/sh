@@ -101,7 +101,7 @@ public class AuditEditController extends BaseController {
 	public ModelAndView list(Page page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"列表AuditEdit");
 		PageData pd = this.getPageData();
-		String which = getWhileValue(pd.getString("TABLE_CODE"));
+		String which = getWhileValue(pd.getString("TABLE_NO"));
 		String tableName = getTableCode(which);
 		String sallaryType = getSallaryType(which);
 		
@@ -120,8 +120,6 @@ public class AuditEditController extends BaseController {
 		}
 		//DEPT_CODE
 		mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService));
-		//USER_GROP EMPLGRP 员工组字典
-		mv.addObject("EMPLGRP", DictsUtil.getDictsByParentCode(dictionariesService, "EMPLGRP"));
 		//CUST_COL7 FMISACC 帐套字典
 		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));
 		
@@ -152,7 +150,7 @@ public class AuditEditController extends BaseController {
 		logBefore(logger, Jurisdiction.getUsername()+"列表AuditEdit");
 		
 		PageData pd = this.getPageData();
-		String which = getWhileValue(pd.getString("TABLE_CODE"));
+		String which = getWhileValue(pd.getString("TABLE_NO"));
 		String tableName = getTableCode(which);
 		String sallaryType = getSallaryType(which);
 
@@ -194,7 +192,7 @@ public class AuditEditController extends BaseController {
 	}
 	
 	//界面查询字段
-    List<String> QueryFeildList = Arrays.asList("DEPT_CODE", "USER_GROP", "CUST_COL7");
+    List<String> QueryFeildList = Arrays.asList("DEPT_CODE", "CUST_COL7");
 
 	/**修改
 	 * @param
@@ -207,7 +205,7 @@ public class AuditEditController extends BaseController {
 		logBefore(logger, Jurisdiction.getUsername()+"修改AuditEdit");
 		
 		PageData pd = this.getPageData();
-		String which = getWhileValue(pd.getString("TABLE_CODE"));
+		String which = getWhileValue(pd.getString("TABLE_NO"));
 		String tableName = getTableCode(which);
 		
 			String BUSI_DATE = "BUSI_DATE";
@@ -248,7 +246,7 @@ public class AuditEditController extends BaseController {
 		commonBase.setCode(-1);
 
 		PageData pd = this.getPageData();
-		String which = getWhileValue(pd.getString("TABLE_CODE"));
+		String which = getWhileValue(pd.getString("TABLE_NO"));
 		String tableName = getTableCode(which);
 		
 			Object DATA_ROWS = pd.get("DATA_ROWS");
@@ -289,7 +287,7 @@ public class AuditEditController extends BaseController {
 		commonBase.setCode(-1);
 		
 		PageData pd = this.getPageData();
-		String which = getWhileValue(pd.getString("TABLE_CODE"));
+		String which = getWhileValue(pd.getString("TABLE_NO"));
 		String tableName = getTableCode(which);
 		
 		
@@ -318,7 +316,7 @@ public class AuditEditController extends BaseController {
 	@RequestMapping(value="/goUploadExcel")
 	public ModelAndView goUploadExcel()throws Exception{
 		PageData pd = this.getPageData();
-		String which = getWhileValue(pd.getString("TABLE_CODE"));
+		String which = getWhileValue(pd.getString("TABLE_NO"));
 		
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("common/uploadExcel");
@@ -341,7 +339,7 @@ public class AuditEditController extends BaseController {
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;}//校验权限
 
 		PageData pd = this.getPageData();
-		String which = getWhileValue(pd.getString("TABLE_CODE"));
+		String which = getWhileValue(pd.getString("TABLE_NO"));
 		String tableName = getTableCode(which);
 		//String sallaryType = getSallaryType(which);
 		
@@ -481,7 +479,7 @@ public class AuditEditController extends BaseController {
 	//public void downExcel(HttpServletResponse response)throws Exception{
 	public ModelAndView downExcel(JqPage page) throws Exception{
 		PageData pd = this.getPageData();
-		String which = getWhileValue(pd.getString("TABLE_CODE"));
+		String which = getWhileValue(pd.getString("TABLE_NO"));
 		String tableName = getTableCode(which);
 		String sallaryType = getSallaryType(which);
 		
@@ -506,7 +504,7 @@ public class AuditEditController extends BaseController {
 		logBefore(logger, Jurisdiction.getUsername()+"导出AuditEdit到excel");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
 		PageData pd = this.getPageData();
-		String which = getWhileValue(pd.getString("TABLE_CODE"));
+		String which = getWhileValue(pd.getString("TABLE_NO"));
 		String tableName = getTableCode(which);
 		String sallaryType = getSallaryType(which);
 		

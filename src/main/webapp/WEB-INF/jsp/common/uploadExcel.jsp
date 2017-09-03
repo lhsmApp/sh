@@ -68,14 +68,14 @@
 	<script type="text/javascript">
 	    var local = '${local}';
 	    var which = '${which}';
-	    var DEPT_CODE = '${DEPT_CODE}';
+	    var SelectedDepartCode = '${SelectedDepartCode}';
 	    var CUST_COL7 = '${CUST_COL7}';
 	    
 		$(document).ready(function () {
 			$(top.hangge());
 			
 			document.getElementById("Form").action = local + "/readExcel.do?TABLE_CODE="+which+"&TABLE_NO="+which
-                +'&DEPT_CODE='+DEPT_CODE+'&CUST_COL7='+CUST_COL7;
+                +'&SelectedDepartCode='+SelectedDepartCode+'&CUST_COL7='+CUST_COL7;
 			
 		    var commonBaseCode = '${commonBaseCode}';
 		    var commonMessage = '${commonMessage}';
@@ -118,7 +118,7 @@
 		//下载模板
 		function downModel(basePath){
 			var url = basePath + local + '/downExcel.do?TABLE_CODE='+which+"&TABLE_NO="+which
-                +'&DEPT_CODE='+DEPT_CODE+'&CUST_COL7='+CUST_COL7;
+                +'&SelectedDepartCode='+SelectedDepartCode+'&CUST_COL7='+CUST_COL7;
 			window.location.href = url;
 		}
 		//保存

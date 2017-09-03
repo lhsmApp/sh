@@ -59,7 +59,7 @@
 								
 						<button id="btnQuery" class="btn btn-white btn-info btn-sm"
 								onclick="showQueryCondi($('#jqGrid'),null,true)">
-							<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
+							<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>隐藏查询</span>
 						</button>
 						
 						<div class="pull-right">
@@ -67,20 +67,26 @@
 
 							<div class="btn-toolbar inline middle no-margin">
 								<div data-toggle="buttons" class="btn-group no-margin">
-									<label class="btn btn-sm btn-primary active"> <span
-										class="bigger-110">合同化、市场化</span> <input type="radio" value="1" />
-									</label> 
+									            <label class="btn btn-sm btn-primary active"> <span
+									    	        class="bigger-110">合同化</span> <input type="radio" value="1" />
+									            </label> 
+									            <label class="btn btn-sm btn-primary"> <span
+									            	class="bigger-110">市场化</span> <input type="radio" value="2" />
+									            </label> 
+									            <label class="btn btn-sm btn-primary"> <span
+									            	class="bigger-110">系统内劳务</span> <input type="radio" value="3" />
+									            </label>
+									            <label class="btn btn-sm btn-primary"> <span
+									    	        class="bigger-110">运行人员</span> <input type="radio" value="4" />
+									            </label>
+									            <label class="btn btn-sm btn-primary"> <span
+										            class="bigger-110">劳务派遣</span> <input type="radio" value="5" />
+									            </label>
 									<label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">运行人员</span> <input type="radio" value="2" />
-									</label> 
-									<label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">外雇劳务</span> <input type="radio" value="3" />
+										class="bigger-110">社保</span> <input type="radio" value="23" />
 									</label>
 									<label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">社保</span> <input type="radio" value="4" />
-									</label>
-									<label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">公积金</span> <input type="radio" value="5" />
+										class="bigger-110">公积金</span> <input type="radio" value="27" />
 									</label>
 								</div>
 							</div>
@@ -90,38 +96,25 @@
 
 						<div class="row">
 						<div class="col-xs-12">
-							<div class="widget-box" style="display: none;">
+							<div class="widget-box" style="display: block;">
 								<div class="widget-body">
 									<div class="widget-main">
 										<form class="form-inline">
 											<span class="pull-left" style="margin-right: 5px;">
-												<div class="selectTree" id="selectTree" multiMode="true"
-												    allSelectable="false" noGroup="false"></div>
-											    <input type="text" id="DEPT_CODE" hidden></input>
-											</span>
-											<span>
-												<select class="chosen-select form-control"
-													name="USER_GROP" id="USER_GROP"
-													data-placeholder="请选择员工组"
-													style="vertical-align: top; height:32px;width: 150px;">
-													<option value="">请选择员工组</option>
-													<c:forEach items="${EMPLGRP}" var="each">
-														<option value="${each.DICT_CODE}" 
-														    <c:if test="${pd.USER_GROP==each.DICT_CODE}">selected</c:if>>${each.NAME}</option>
-													</c:forEach>
-												</select>
-											</span>
-											<span>
 												<select class="chosen-select form-control"
 													name="CUST_COL7" id="CUST_COL7"
 													data-placeholder="请选择帐套"
 													style="vertical-align: top; height:32px;width: 150px;">
 													<option value="">请选择帐套</option>
 													<c:forEach items="${FMISACC}" var="each">
-														<option value="${each.DICT_CODE}" 
-														    <c:if test="${pd.CUST_COL7==each.DICT_CODE}">selected</c:if>>${each.NAME}</option>
+														<option value="${each.DICT_CODE}">${each.NAME}</option>
 													</c:forEach>
 												</select>
+											</span>
+											<span class="pull-left" id="spanSelectTree" style="margin-right: 5px;">
+												<div class="selectTree" id="selectTree" multiMode="false"
+												    allSelectable="false" noGroup="false"></div>
+											    <input type="text" id="SelectedDepartCode" hidden></input>
 											</span>
 											<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
 												<i class="ace-icon fa fa-search bigger-110"></i>
@@ -222,14 +215,13 @@
 			var target = $(this).find('input[type=radio]');
 			which = parseInt(target.val());
 			if(which!='${pd.which}'){
-				window.location.href="<%=basePath%>auditedit/list.do?TABLE_CODE="+which;
+				window.location.href="<%=basePath%>auditedit/list.do?TABLE_NO="+which;
 			}
 		});
 
 		$(gridBase_selector).jqGrid({
-			url: '<%=basePath%>auditedit/getPageList.do?TABLE_CODE='+which
-                +'&DEPT_CODE='+$("#DEPT_CODE").val()
-                +'&USER_GROP='+$("#USER_GROP").val()
+			url: '<%=basePath%>auditedit/getPageList.do?TABLE_NO='+which
+                +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
                 +'&CUST_COL7='+$("#CUST_COL7").val(),
 			datatype: "json",
 			colModel: jqGridColModel,
@@ -243,7 +235,7 @@
             multiboxonly: true,
             sortable: true,
 			altRows: true, //斑马条纹
-			editurl: '<%=basePath%>auditedit/edit.do?TABLE_CODE='+which,
+			editurl: '<%=basePath%>auditedit/edit.do?TABLE_NO='+which,
 			
 			pager: pagerBase_selector,
 			footerrow: true,
@@ -488,7 +480,7 @@
 	    					top.jzts();
 	    					$.ajax({
 	    						type: "POST",
-	    						url: '<%=basePath%>auditedit/deleteAll.do?TABLE_CODE='+which,
+	    						url: '<%=basePath%>auditedit/deleteAll.do?TABLE_NO='+which,
 	    				    	data: {DATA_ROWS:JSON.stringify(listData)},
 	    						dataType:'json',
 	    						cache: false,
@@ -556,7 +548,7 @@
     					top.jzts();
     					$.ajax({
     						type: "POST",
-    						url: '<%=basePath%>auditedit/updateAll.do?TABLE_CODE='+which,
+    						url: '<%=basePath%>auditedit/updateAll.do?TABLE_NO='+which,
     				    	data: {DATA_ROWS:JSON.stringify(listData)},
     						dataType:'json',
     						cache: false,
@@ -605,7 +597,7 @@
 	   	   var diag = new top.Dialog();
 	   	   diag.Drag=true;
 	   	   diag.Title ="EXCEL 导入到数据库";
-	   	   diag.URL = '<%=basePath%>auditedit/goUploadExcel.do?TABLE_CODE='+which;
+	   	   diag.URL = '<%=basePath%>auditedit/goUploadExcel.do?TABLE_NO='+which;
 	   	   diag.Width = 300;
 	   	   diag.Height = 150;
 	   	   diag.CancelEvent = function(){ //关闭事件
@@ -621,7 +613,7 @@
 		 * 导出
 		 */
 	    function exportItems(){
-	    	window.location.href='<%=basePath%>auditedit/excel.do?TABLE_CODE='+which;
+	    	window.location.href='<%=basePath%>auditedit/excel.do?TABLE_NO='+which;
 	    }
 
 	    /**
@@ -662,10 +654,10 @@
 		//绑定change事件
 		$("#selectTree").bind("change",function(){
 			console.log(1);
-			$("#DEPT_CODE").val("");
+			$("#SelectedDepartCode").val("");
 			if($(this).attr("relValue")){
 				console.log(2);
-				$("#DEPT_CODE").val($(this).attr("relValue"));
+				$("#SelectedDepartCode").val($(this).attr("relValue"));
 				console.log(3);
 		    }
 			console.log(4);
@@ -679,11 +671,10 @@
 
 	//检索
 	function tosearch() {
-		console.log($("#DEPT_CODE").val());
+		console.log($("#SelectedDepartCode").val());
 		$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据
-			url:'<%=basePath%>auditedit/getPageList.do?TABLE_CODE='+which
-                +'&DEPT_CODE='+$("#DEPT_CODE").val()
-                +'&USER_GROP='+$("#USER_GROP").val()
+			url:'<%=basePath%>auditedit/getPageList.do?TABLE_NO='+which
+                +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
                 +'&CUST_COL7='+$("#CUST_COL7").val(),  
 			datatype:'json',
 		      page:1

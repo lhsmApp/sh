@@ -40,6 +40,7 @@ import com.fh.util.date.DateFormatUtils;
 import com.fh.util.date.DateUtils;
 import com.fh.util.enums.BillType;
 import com.fh.util.enums.DurState;
+import com.fh.util.enums.TmplType;
 import com.fh.util.Jurisdiction;
 import com.fh.util.excel.LeadingInExcelToPageData;
 
@@ -87,10 +88,10 @@ public class HouseFundDetailController extends BaseController {
 	//表名
 	String TableNameDetail = "tb_house_fund_detail";
 	String TableNameSummy = "tb_house_fund_summy";
-	//枚举类型  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
-	String TypeCodeDetail = BillType.GOLD_DETAIL.getNameKey();
-	String TypeCodeSummy = BillType.GOLD_SUMMARY.getNameKey();
-	String TypeCodeListen = BillType.GOLD_LISTEN.getNameKey();
+	//枚举类型  
+	String TypeCodeDetail = TmplType.TB_HOUSE_FUND_DETAIL.getNameKey();
+	String TypeCodeSummy = TmplType.TB_HOUSE_FUND_SUMMY.getNameKey();
+	String TypeCodeListen = TmplType.TB_HOUSE_FUND_TRANSFER.getNameKey();
 	
 	//页面显示数据的年月
 	String SystemDateTime = "";
