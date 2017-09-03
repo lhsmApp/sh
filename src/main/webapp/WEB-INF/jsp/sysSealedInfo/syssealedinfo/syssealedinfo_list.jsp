@@ -78,6 +78,17 @@
 																<c:if test="${pd.BILL_TYPE==billType.nameKey}">selected</c:if>>${billType.nameValue}</option>
 														</c:forEach>
 												</select>
+											</span>
+											<span style="margin-right: 5px;"> 
+												<select
+													class="chosen-select form-control" name="FMISACC"
+													id="FMISACC" data-placeholder="请选择帐套"
+													style="vertical-align: top; height: 32px; width: 150px;">
+														<option value="">请选择帐套</option>
+														<c:forEach items="${fmisacc}" var="fmi">
+															<option value="${fmi.DICT_CODE}">${fmi.NAME}</option>
+														</c:forEach>
+												</select>
 											</span> 
 											<span style="margin-right: 5px;"> 
 												<select class="chosen-select form-control"
@@ -209,13 +220,15 @@
 				{ label: '单据单位', name: 'RPT_DEPT', width: 90,hidden : true,editable: true,edittype: 'select',formatter:'select',formatoptions:{value:"${departmentStr}"},editoptions:{value:"${departmentStr}"},stype: 'select',searchoptions:{value:"${departmentStr}"}},
 				{ label: '单据期间', name: 'RPT_DUR', width: 60,hidden : true,editable: true,},
 				{ label: '单据类型', name: 'BILL_TYPE', width: 60,hidden : true,editable: true,},
+				{ label: '帐套', name: 'BILL_OFF', width: 60,hidden : true,editable: true,},
 				
 				/* { label: '单据编码',name:'BILL_CODE', width:90}, */
 				{ label: '单据单位', name: 'RPT_DEPT', width: 90,edittype: 'select',formatter:'select',formatoptions:{value:"${departmentStr}"},editoptions:{value:"${departmentStr}"},stype: 'select',searchoptions:{value:"${departmentStr}"}},
 				{ label: '单据期间', name: 'RPT_DUR', width: 60},
 				{ label: '上传人', name: 'RPT_USER', width: 60,edittype: 'select',formatter:'select',formatoptions:{value:"${userStr}"},editoptions:{value:"${userStr}"},stype: 'select',searchoptions:{value:"${userStr}"}},
 				{ label: '上传时间', name: 'RPT_DATE', width: 80, formatter: 'data'},
-				{ label: '单据类型', name: 'BILL_TYPE', width: 80,edittype: 'select',formatter:'select',formatoptions:{value:"${billTypeStr}"},editoptions:{value:"${billTypeStr}"},stype: 'select',searchoptions:{value:"${billTypeStr}"}},                  
+				{ label: '单据类型', name: 'BILL_TYPE', width: 80,edittype: 'select',formatter:'select',formatoptions:{value:"${billTypeStr}"},editoptions:{value:"${billTypeStr}"},stype: 'select',searchoptions:{value:"${billTypeStr}"}}, 
+				{ label: '帐套', name: 'BILL_OFF', width: 80,edittype: 'select',formatter:'select',formatoptions:{value:"${billOffStr}"},editoptions:{value:"${billOffStr}"},stype: 'select',searchoptions:{value:"${billOffStr}"}},
 				{ label: '状态', name: 'STATE', width: 80, editable: true,align:'center',formatter: customFmatterState,edittype:"checkbox",editoptions: {value:"0:1"},unformat: aceSwitch,search:false}                   
 			],
 			reloadAfterSubmit: true, 
@@ -423,12 +436,14 @@
 			var RPT_DEPT = $("#RPT_DEPT").val();
 			var STATUS = $("#STATUS").val();
 			var BILL_TYPE = $("#BILL_TYPE").val();
+			var BILL_OFF=$("#FMISACC").val();
 			$("#jqGrid").jqGrid('setGridParam',{  // 重新加载数据
 				url:'<%=basePath%>syssealedinfo/getPageList.do?RPT_DEPT='
 										+ RPT_DEPT
 										+ '&STATUS='
 										+ STATUS
-										+ '&BILL_TYPE=' + BILL_TYPE,
+										+ '&BILL_TYPE=' + BILL_TYPE
+										+ '&BILL_OFF=' + BILL_OFF,
 								datatype : 'json',
 								page : 1
 							}).trigger("reloadGrid");

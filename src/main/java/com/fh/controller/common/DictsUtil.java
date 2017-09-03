@@ -8,12 +8,16 @@ import java.util.Map;
 
 import com.fh.entity.system.Department;
 import com.fh.entity.system.Dictionaries;
+import com.fh.entity.system.User;
 import com.fh.service.fhoa.department.DepartmentManager;
 import com.fh.service.system.dictionaries.DictionariesManager;
 import com.fh.service.system.user.UserManager;
 import com.fh.service.tmplConfigDict.tmplconfigdict.TmplConfigDictManager;
+import com.fh.util.Const;
+import com.fh.util.Jurisdiction;
 import com.fh.util.PageData;
 import com.fh.util.StringUtil;
+import com.fh.util.Tools;
 import com.fh.util.enums.BillState;
 import com.fh.util.enums.EmplGroupType;
 import com.fh.util.enums.TmplType;
@@ -140,8 +144,30 @@ public class DictsUtil {
 	 * @throws Exception
 	 */
 	public static String getDepartmentSelectTreeSource(DepartmentManager departmentService) throws Exception {
+		String curUserDepartCode = Jurisdiction.getCurrentDepartmentID();//当前登录人所在二级单位
+		User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
+		String departName = user.getDEPARTMENT_NAME();
+		String parentDepartCode="";
+		String parentDepartName="";
+		String orgCode = Tools.readTxtFile(Const.ORG_CODE); 
+		String [] orgInfo=orgCode.split(",");
+		
+		if(curUserDepartCode.equals("01001")){//机关
+			parentDepartCode=orgInfo[0];
+			parentDepartName=orgInfo[1];
+		}
+		else{
+			parentDepartCode=curUserDepartCode;
+			parentDepartName=departName;
+		}
 		List<PageData> zdepartmentPdList = new ArrayList<PageData>();
-		JSONArray arr = JSONArray.fromObject(departmentService.listAllDepartmentToSelect("0", zdepartmentPdList));
+		PageData pd = new PageData();
+		pd.put("id", parentDepartCode);
+		pd.put("parentId", "");
+		pd.put("name",parentDepartName);
+		pd.put("icon", "static/images/user.gif");
+		zdepartmentPdList.add(pd);
+		JSONArray arr = JSONArray.fromObject(departmentService.listAllDepartmentAndSelfToSelect(parentDepartCode,zdepartmentPdList));
 		return (null == arr ? "" : arr.toString());
 	}
 

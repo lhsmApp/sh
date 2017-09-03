@@ -359,9 +359,9 @@
 			SELECT A.* FROM ${pd.TABLE_CODE} A
 			JOIN
 			(SELECT
-			M.bill_code,M.rpt_dept,m.rpt_dur,m.state FROM tb_sys_sealed_info M
+			M.bill_code,M.rpt_dept,m.rpt_dur,m.state,M.bill_off FROM tb_sys_sealed_info M
 			LEFT JOIN
-			(SELECT bill_code,rpt_dept,rpt_dur,state FROM
+			(SELECT bill_code,rpt_dept,rpt_dur,state,bill_off FROM
 			tb_sys_sealed_info WHERE
 			<!-- bill_type=#{pd.BILL_TYPE1} AND state='1') N -->
 			bill_type=#{pd.BILL_TYPE_TRANSFER}) N
@@ -464,9 +464,9 @@
 			SELECT count(*) FROM ${TABLE_CODE} A
 			JOIN
 			(SELECT
-			M.bill_code,M.rpt_dept,m.rpt_dur,m.state FROM tb_sys_sealed_info M
+			M.bill_code,M.rpt_dept,m.rpt_dur,m.state,m.bill_off FROM tb_sys_sealed_info M
 			LEFT JOIN
-			(SELECT bill_code,rpt_dept,rpt_dur,state FROM
+			(SELECT bill_code,rpt_dept,rpt_dur,state,bill_off FROM
 			tb_sys_sealed_info WHERE
 			<!-- bill_type=#{BILL_TYPE1} AND state='1') N -->
 			bill_type=#{BILL_TYPE_TRANSFER}) N
@@ -575,10 +575,10 @@
 			FROM ${pd.TABLE_CODE} A
 			JOIN
 			(SELECT
-			M.bill_code,M.rpt_dept,m.rpt_dur,m.state FROM
+			M.bill_code,M.rpt_dept,m.rpt_dur,m.state,m.bill_off FROM
 			tb_sys_sealed_info M
 			LEFT JOIN
-			(SELECT bill_code,rpt_dept,rpt_dur,state
+			(SELECT bill_code,rpt_dept,rpt_dur,state,bill_off
 			FROM
 			tb_sys_sealed_info WHERE
 			<!-- bill_type=#{pd.BILL_TYPE1} AND state='1') -->
@@ -699,9 +699,9 @@
 			SELECT A.* FROM ${TABLE_CODE} A
 			JOIN
 			(SELECT
-			M.bill_code,M.rpt_dept,m.rpt_dur,m.state FROM tb_sys_sealed_info M
+			M.bill_code,M.rpt_dept,m.rpt_dur,m.state,m.bill_off FROM tb_sys_sealed_info M
 			LEFT JOIN
-			(SELECT bill_code,rpt_dept,rpt_dur,state FROM
+			(SELECT bill_code,rpt_dept,rpt_dur,state,bill_off FROM
 			tb_sys_sealed_info WHERE
 			<!-- bill_type=#{BILL_TYPE1} AND state='1') N -->
 			bill_type=#{BILL_TYPE_TRANSFER}) N
@@ -879,6 +879,8 @@
 		A.BUSI_DATE=B.RPT_DUR
 		AND
 		A.DEPT_CODE=B.RPT_DEPT
+		AND
+		A.CUST_COL7=B.BILL_OFF
 		where B.RPT_DEPT IS
 		NULL) T
 		<where>

@@ -24,17 +24,24 @@ import com.fh.entity.PageResult;
 import com.fh.service.fhoa.department.DepartmentManager;
 import com.fh.service.sysSealedInfo.syssealedinfo.SysSealedInfoManager;
 import com.fh.service.sysUnlockInfo.sysunlockinfo.SysUnlockInfoManager;
+import com.fh.service.system.dictionaries.DictionariesManager;
 import com.fh.service.system.user.UserManager;
 import com.fh.util.Jurisdiction;
 import com.fh.util.PageData;
 import com.fh.util.SqlTools;
 import com.fh.util.StringUtil;
 import com.fh.util.enums.BillType;
+import com.fh.util.enums.TmplType;
 
 import net.sf.json.JSONArray;
 
 /**
- * 说明：业务封存信息 创建人：FH Q313596790 创建时间：2017-06-16
+ * 业务封存信息
+* @ClassName: SysSealedInfoController
+* @Description: TODO(这里用一句话描述这个类的作用)
+* @author jiachao
+* @date 2017年6月6日
+*
  */
 @Controller
 @RequestMapping(value = "/syssealedinfo")
@@ -52,6 +59,9 @@ public class SysSealedInfoController extends BaseController {
 
 	@Resource(name = "sysunlockinfoService")
 	private SysUnlockInfoManager sysUnlockInfoService;
+
+	@Resource(name = "dictionariesService")
+	private DictionariesManager dictionariesService;
 
 	/**
 	 * 修改
@@ -71,29 +81,61 @@ public class SysSealedInfoController extends BaseController {
 			if (pd.getString("STATE").equals("0")) {
 				String valiType = "";
 				String message = "";
-				if (pd.getString("BILL_TYPE").equals(BillType.SALLARY_DETAIL.getNameKey())) {// 工资明细
-					// 验证工资汇总
-					valiType = BillType.SALLARY_SUMMARY.getNameKey();
-					message = "当前记录的【工资汇总】业务还没有进行解封,请先对对应的【工资汇总】业务进行解封.";
-				} else if (pd.getString("BILL_TYPE").equals(BillType.SALLARY_SUMMARY.getNameKey())) {// 工资汇总
-					// 验证工资接口
-					valiType = BillType.SALLARY_LISTEN.getNameKey();
-					message = "当前记录的【工资接口】业务还没有进行解封,请先对对应的【工资接口】业务进行解封.";
-				} else if (pd.getString("BILL_TYPE").equals(BillType.GOLD_DETAIL.getNameKey())) {// 公积金明细
+				if (pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey())) {// 合同化工资明细
+					// 验证合同工资汇总
+					valiType = TmplType.TB_STAFF_SUMMY_CONTRACT.getNameKey();
+					message = "当前记录的【合同化工资汇总】业务还没有进行解封,请先对对应的【合同化工资汇总】业务进行解封.";
+				} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_DETAIL_MARKET.getNameKey())) {// 市场化工资明细
+					// 验证市场化工资汇总
+					valiType = TmplType.TB_STAFF_SUMMY_MARKET.getNameKey();
+					message = "当前记录的【市场化工资汇总】业务还没有进行解封,请先对对应的【市场化工资汇总】业务进行解封.";
+				} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_DETAIL_SYS_LABOR.getNameKey())) {// 系统内工资明细
+					// 验证系统内工资汇总
+					valiType = TmplType.TB_STAFF_SUMMY_SYS_LABOR.getNameKey();
+					message = "当前记录的【系统内工资汇总】业务还没有进行解封,请先对对应的【系统内工资汇总】业务进行解封.";
+				} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_DETAIL_OPER_LABOR.getNameKey())) {// 运行人员工资明细
+					// 验证运行人员工资汇总
+					valiType = TmplType.TB_STAFF_SUMMY_OPER_LABOR.getNameKey();
+					message = "当前记录的【运行人员工资汇总】业务还没有进行解封,请先对对应的【运行人员工资汇总】业务进行解封.";
+				} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_DETAIL_LABOR.getNameKey())) {// 劳务派遣工资明细
+					// 验证劳务派遣工资汇总
+					valiType = TmplType.TB_STAFF_SUMMY_LABOR.getNameKey();
+					message = "当前记录的【劳务派遣工资汇总】业务还没有进行解封,请先对对应的【劳务派遣工资汇总】业务进行解封.";
+				} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_SUMMY_CONTRACT.getNameKey())) {// 合同化工资汇总
+					// 验证合同化工资接口
+					valiType = TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey();
+					message = "当前记录的【合同化工资接口】业务还没有进行解封,请先对对应的【合同化工资接口】业务进行解封.";
+				} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_SUMMY_MARKET.getNameKey())) {// 市场化工资汇总
+					// 验证市场化工资接口
+					valiType = TmplType.TB_STAFF_TRANSFER_MARKET.getNameKey();
+					message = "当前记录的【市场化工资接口】业务还没有进行解封,请先对对应的【市场化工资接口】业务进行解封.";
+				} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_SUMMY_SYS_LABOR.getNameKey())) {// 系统内工资汇总
+					// 验证系统内工资接口
+					valiType = TmplType.TB_STAFF_TRANSFER_SYS_LABOR.getNameKey();
+					message = "当前记录的【系统内工资接口】业务还没有进行解封,请先对对应的【系统内工资接口】业务进行解封.";
+				} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_SUMMY_OPER_LABOR.getNameKey())) {// 运行人员工资汇总
+					// 验证运行人员工资接口
+					valiType = TmplType.TB_STAFF_TRANSFER_OPER_LABOR.getNameKey();
+					message = "当前记录的【运行人员工资接口】业务还没有进行解封,请先对对应的【运行人员工资接口】业务进行解封.";
+				} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_SUMMY_LABOR.getNameKey())) {// 劳务派遣工资汇总
+					// 验证劳务派遣工资接口
+					valiType = TmplType.TB_STAFF_TRANSFER_LABOR.getNameKey();
+					message = "当前记录的【劳务派遣工资接口】业务还没有进行解封,请先对对应的【劳务派遣工资接口】业务进行解封.";
+				} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_HOUSE_FUND_DETAIL.getNameKey())) {// 公积金明细
 					// 验证公积金汇总
-					valiType = BillType.GOLD_SUMMARY.getNameKey();
+					valiType = TmplType.TB_HOUSE_FUND_SUMMY.getNameKey();
 					message = "当前记录的【公积金汇总】业务还没有进行解封,请先对对应的【公积金汇总】业务进行解封.";
-				} else if (pd.getString("BILL_TYPE").equals(BillType.GOLD_SUMMARY.getNameKey())) {// 公积金汇总
+				} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_HOUSE_FUND_SUMMY.getNameKey())) {// 公积金汇总
 					// 验证公积金接口
-					valiType = BillType.GOLD_LISTEN.getNameKey();
+					valiType = TmplType.TB_HOUSE_FUND_TRANSFER.getNameKey();
 					message = "当前记录的【公积金接口】业务还没有进行解封,请先对对应的【公积金接口】业务进行解封.";
-				} else if (pd.getString("BILL_TYPE").equals(BillType.SECURITY_DETAIL.getNameKey())) {// 社保明细
+				} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_SOCIAL_INC_DETAIL.getNameKey())) {// 社保明细
 					// 验证社保汇总
-					valiType = BillType.SECURITY_SUMMARY.getNameKey();
+					valiType = TmplType.TB_SOCIAL_INC_SUMMY.getNameKey();
 					message = "当前记录的【社保汇总】业务还没有进行解封,请先对对应的【社保汇总】业务进行解封.";
-				} else if (pd.getString("BILL_TYPE").equals(BillType.SECURITY_SUMMARY.getNameKey())) {// 社保汇总
+				} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_SOCIAL_INC_SUMMY.getNameKey())) {// 社保汇总
 					// 验证社保接口
-					valiType = BillType.SECURITY_LISTEN.getNameKey();
+					valiType = TmplType.TB_SOCIAL_INC_TRANSFER.getNameKey();
 					message = "当前记录的【社保接口】业务还没有进行解封,请先对对应的【社保接口】业务进行解封.";
 				}
 				pd.put("VALI_TYPE", valiType);
@@ -103,12 +145,20 @@ public class SysSealedInfoController extends BaseController {
 					commonBase.setMessage(message);
 					return commonBase;
 				}
-
-				if (pd.getString("BILL_TYPE").equals(BillType.SALLARY_LISTEN.getNameKey())
-						|| pd.getString("BILL_TYPE").equals(BillType.GOLD_LISTEN.getNameKey())
-						|| pd.getString("BILL_TYPE").equals(BillType.SECURITY_LISTEN.getNameKey())) {
+				//针对解封接口类型的封存信息需要判断是否已经生成了凭证号
+				if (pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey())
+						||pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_MARKET.getNameKey())
+						||pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_SYS_LABOR.getNameKey())
+						||pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_OPER_LABOR.getNameKey())
+						||pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_LABOR.getNameKey())
+						|| pd.getString("BILL_TYPE").equals(TmplType.TB_SOCIAL_INC_TRANSFER.getNameKey())
+						|| pd.getString("BILL_TYPE").equals(TmplType.TB_HOUSE_FUND_TRANSFER.getNameKey())) {
 					String tableCode = "";
-					if (pd.getString("BILL_TYPE").equals(BillType.SALLARY_LISTEN.getNameKey())) {
+					if (pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey())
+							||pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_MARKET.getNameKey())
+							||pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_SYS_LABOR.getNameKey())
+							||pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_OPER_LABOR.getNameKey())
+							||pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_LABOR.getNameKey())) {
 						tableCode = "TB_STAFF_SUMMY";
 					} else if (pd.getString("BILL_TYPE").equals(BillType.GOLD_LISTEN.getNameKey())) {
 						tableCode = "TB_HOUSE_FUND_SUMMY";
@@ -119,14 +169,14 @@ public class SysSealedInfoController extends BaseController {
 					}
 					pd.put("TABLE_CODE", tableCode);
 					List<PageData> listSysUnlockInfo = sysUnlockInfoService.listSyncDelUnlock(pd); // 获取当前接口类型，当前二级单位当前期间当前封存状态为封存的的传输列表
-					if(listSysUnlockInfo!=null&&listSysUnlockInfo.size()>0){
-						PageData pdItem0=listSysUnlockInfo.get(0);//如果包含其中一条带有凭证号的记录，就可以证明此二级单位所有记录已经生成凭证号，不能再进行解封操作。
-						if(StringUtil.isNotEmpty(pdItem0.getString("CERT_CODE"))){
+					if (listSysUnlockInfo != null && listSysUnlockInfo.size() > 0) {
+						PageData pdItem0 = listSysUnlockInfo.get(0);// 如果包含其中一条带有凭证号的记录，就可以证明此二级单位所有记录已经生成凭证号，不能再进行解封操作。
+						if (StringUtil.isNotEmpty(pdItem0.getString("CERT_CODE"))) {
 							commonBase.setCode(3);
 							commonBase.setMessage("当前封存记录的下的二级单位汇总数据已经生成凭证,不能再进行解封.");
 							return commonBase;
 						}
-						if(StringUtil.isEmpty(pdItem0.getString("REVCERT_CODE"))){//如果已生成冲销凭证号，则历史记录不允许删除，即不再往tb_sys_unlock_info插入记录
+						if (StringUtil.isEmpty(pdItem0.getString("REVCERT_CODE"))) {// 如果已生成冲销凭证号，则历史记录不允许删除，即不再往tb_sys_unlock_info插入记录
 							sysUnlockInfoService.save(listSysUnlockInfo);
 						}
 					}
@@ -158,7 +208,10 @@ public class SysSealedInfoController extends BaseController {
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("sysSealedInfo/syssealedinfo/syssealedinfo_list");
 		mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService));
-		mv.addObject("billTypeList", BillType.values());
+		mv.addObject("billTypeList", TmplType.values());
+
+		// CUST_COL7 FMISACC 帐套字典
+		mv.addObject("fmisacc", DictsUtil.getDictsByParentBianma(dictionariesService, "FMISACC"));
 
 		String departmentValus = DictsUtil.getDepartmentValue(departmentService);
 		String departmentString = ":[All];" + departmentValus;
@@ -168,8 +221,12 @@ public class SysSealedInfoController extends BaseController {
 		String userString = ":[All];" + userValus;
 		mv.addObject("userStr", userString);
 
+		String billOffValus = DictsUtil.getDicValue(dictionariesService, "FMISACC");
+		String billOffString = ":[All];" + billOffValus;
+		mv.addObject("billOffStr", billOffString);
+
 		StringBuilder sbBillType = new StringBuilder();
-		for (BillType billType : BillType.values()) {
+		for (TmplType billType : TmplType.values()) {
 			sbBillType.append(billType.getNameKey() + ":" + billType.getNameValue());
 			sbBillType.append(';');
 		}

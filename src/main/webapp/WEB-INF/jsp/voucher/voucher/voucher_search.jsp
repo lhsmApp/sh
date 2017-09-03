@@ -58,11 +58,25 @@
 							<div class="btn-toolbar inline middle no-margin">
 								<div data-toggle="buttons" class="btn-group no-margin">
 									<label class="btn btn-sm btn-primary active"> <span
-										class="bigger-110">工资</span> <input type="radio" value="1" />
-									</label> <label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">社保</span> <input type="radio" value="2" />
-									</label> <label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">公积金</span> <input type="radio" value="3" />
+										class="bigger-110">合同化</span> <input type="radio" value="16" />
+									</label>
+									<label class="btn btn-sm btn-primary"> <span
+										class="bigger-110">市场化</span> <input type="radio" value="17" />
+									</label>
+									<label class="btn btn-sm btn-primary"> <span
+										class="bigger-110">系统内劳务</span> <input type="radio" value="18" />
+									</label>
+									<label class="btn btn-sm btn-primary"> <span
+										class="bigger-110">运行人员</span> <input type="radio" value="19" />
+									</label>
+									<label class="btn btn-sm btn-primary"> <span
+										class="bigger-110">劳务派遣</span> <input type="radio" value="20" />
+									</label> 
+									<label class="btn btn-sm btn-primary"> <span
+										class="bigger-110">社保</span> <input type="radio" value="24" />
+									</label> 
+									<label class="btn btn-sm btn-primary"> <span
+										class="bigger-110">公积金</span> <input type="radio" value="28" />
 									</label>
 								</div>
 							</div>
