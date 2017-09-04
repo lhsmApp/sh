@@ -109,7 +109,7 @@
 												placeholder="请输入业务区间"> <i
 												class="ace-icon fa fa-calendar blue"></i>
 											</span>
-											<span class="pull-left" style="margin-right: 5px;">
+											<span class="pull-left" style="margin-right: 5px;" <c:if test="${pd.departTreeSource=='0'}">hidden</c:if>>
 												<div class="selectTree" id="selectTree" multiMode="true"
 													allSelectable="false" noGroup="false"></div>
 											</span>
@@ -695,7 +695,8 @@
 	        });
 			return;
 		}
-		var msg = '您当前选择的帐套为'+$("#FMISACC").text()+',确定要将选择的数据上传到FMIS融合系统吗?';
+		var options=$("#FMISACC option:selected"); //获取选中的项
+		var msg = '您当前选择的帐套为【'+options.text()+'】,确定要将选择的数据上传到FMIS融合系统吗?';
         bootbox.confirm(msg, function(result) {
 		if(result) {
 			top.jzts();

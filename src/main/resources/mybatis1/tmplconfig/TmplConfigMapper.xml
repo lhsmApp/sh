@@ -18,7 +18,8 @@
 		DICT_TRANS,
 		COL_HIDE,
 		COL_SUM,
-		COL_AVE
+		COL_AVE,
+		COL_TRANSFER
 	</sql>
 	<sql id="FieldColumns">
 		RPT_DUR,
@@ -30,7 +31,8 @@
 		DICT_TRANS,
 		COL_HIDE,
 		COL_SUM,
-		COL_AVE
+		COL_AVE,
+		COL_TRANSFER
 	</sql>
 
 	<!-- 字段值 -->
@@ -44,7 +46,8 @@
 		#{DICT_TRANS},
 		#{COL_HIDE},
 		#{COL_SUM},
-		#{COL_AVE}
+		#{COL_AVE},
+		#{COL_TRANSFER}
 	</sql>
 
 	<!-- 新增 -->
@@ -86,12 +89,11 @@
 		<!-- DEPT_CODE = #{DEPT_CODE}, TABLE_CODE = #{TABLE_CODE}, COL_CODE = #{COL_CODE}, -->
 		COL_NAME = #{COL_NAME},
 		DISP_ORDER = #{DISP_ORDER},
-		DICT_TRANS =
-		#{DICT_TRANS},
+		DICT_TRANS =#{DICT_TRANS},
 		COL_HIDE = #{COL_HIDE},
 		COL_SUM = #{COL_SUM},
-		COL_AVE =
-		#{COL_AVE}
+		COL_AVE =#{COL_AVE},
+		COL_TRANSFER =#{COL_TRANSFER}
 		where
 		DEPT_CODE = #{DEPT_CODE}
 		and
@@ -151,6 +153,7 @@
 		a.COL_HIDE,
 		a.COL_SUM,
 		a.COL_AVE,
+		a.COL_TRANSFER,
 		b.NAME DNAME,
 		c.TABLE_NAME,
 		d.DICT_NAME
@@ -234,7 +237,7 @@
 		TABLE_CODE,#{pd.DNAME} AS DNAME,#{pd.TABLE_NAME} AS TABLE_NAME,
 		'0' AS
 		DISP_ORDER,'0' AS DICT_TRANS,'1' AS COL_HIDE,'0' AS COL_SUM,'0' AS
-		COL_AVE
+		COL_AVE,'0' AS COL_TRANSFER
 		FROM
 		information_schema.columns
 		WHERE
@@ -255,7 +258,7 @@
 			separator=", " close=" ">
 			<if test="item!=null">
 				<trim prefix="(" suffix=")" suffixOverrides=",">
-					#{item.RPT_DUR},#{item.DEPT_CODE},#{item.TABLE_CODE},#{item.COL_CODE},#{item.COL_NAME},#{item.DISP_ORDER},#{item.DICT_TRANS},#{item.COL_HIDE},#{item.COL_SUM},#{item.COL_AVE}
+					#{item.RPT_DUR},#{item.DEPT_CODE},#{item.TABLE_CODE},#{item.COL_CODE},#{item.COL_NAME},#{item.DISP_ORDER},#{item.DICT_TRANS},#{item.COL_HIDE},#{item.COL_SUM},#{item.COL_AVE},#{item.COL_TRANSFER}
 					<!-- <include refid="FieldValue"></include> -->
 				</trim>
 			</if>
@@ -287,7 +290,7 @@
 			open=" " separator="union all " close=" ">
 			<if test="item!=null">
 				SELECT RPT_DUR,#{item} AS 'DEPT_CODE',
-				TABLE_CODE,COL_CODE,COL_NAME,DISP_ORDER,DICT_TRANS,COL_HIDE,COL_SUM,COL_AVE
+				TABLE_CODE,COL_CODE,COL_NAME,DISP_ORDER,DICT_TRANS,COL_HIDE,COL_SUM,COL_AVE,COL_TRANSFER
 				FROM tb_tmpl_config_detail WHERE DEPT_CODE=#{DEPT_CODE} AND
 				TABLE_CODE=#{TABLE_CODE}
 			</if>
@@ -303,7 +306,7 @@
 		<include refid="Field"></include>
 		)
 		SELECT #{NEXT_RPT_DUR} as RPT_DUR,DEPT_CODE,
-		TABLE_CODE,COL_CODE,COL_NAME,DISP_ORDER,DICT_TRANS,COL_HIDE,COL_SUM,COL_AVE
+		TABLE_CODE,COL_CODE,COL_NAME,DISP_ORDER,DICT_TRANS,COL_HIDE,COL_SUM,COL_AVE,COL_TRANSFER
 		FROM tb_tmpl_config_detail WHERE RPT_DUR=#{CUR_RPT_DUR}
 	</insert>
 

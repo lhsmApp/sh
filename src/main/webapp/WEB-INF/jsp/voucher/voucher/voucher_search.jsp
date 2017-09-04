@@ -50,7 +50,7 @@
 
 						<button id="btnQuery" class="btn btn-white btn-info btn-sm"
 							onclick="showQueryCondi($('#jqGrid'),gridHeight)">
-							<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
+							<i class="ace-icon fa fa-chevron-up bigger-120 blue"></i> <span>隐藏查询</span>
 						</button>
 						<div class="pull-right">
 							<span class="green middle bolder">凭证数据类型: &nbsp;</span>
@@ -86,7 +86,7 @@
 
 					<div class="row">
 						<div class="col-xs-12">
-							<div class="widget-box" style="display: none;">
+							<div class="widget-box" style="display: block;">
 								<div class="widget-body">
 									<div class="widget-main">
 										<form class="form-inline">
@@ -102,7 +102,7 @@
 												placeholder="请输入业务区间"> <i
 												class="ace-icon fa fa-calendar blue"></i>
 											</span>
-											<span class="pull-left" style="margin-right: 5px;">
+											<span class="pull-left" style="margin-right: 5px;" <c:if test="${pd.departTreeSource=='0'}">hidden</c:if>>
 												<div class="selectTree" id="selectTree" multiMode="true"
 													allSelectable="false" noGroup="false"></div>
 											</span>

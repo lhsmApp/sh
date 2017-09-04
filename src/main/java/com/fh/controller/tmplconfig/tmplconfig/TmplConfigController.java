@@ -116,12 +116,14 @@ public class TmplConfigController extends BaseController {
 			for(PageData temp:temporaryList){
 				for(PageData item:varList){
 					if(temp.getString("COL_CODE").equals(item.getString("COL_CODE"))){
+						temp.put("TABLE_CODE", item.get("TABLE_CODE"));
 						temp.put("COL_NAME", item.get("COL_NAME"));
 						temp.put("DISP_ORDER", item.get("DISP_ORDER"));
 						temp.put("DICT_TRANS", item.get("DICT_TRANS"));
 						temp.put("COL_HIDE", item.get("COL_HIDE"));
 						temp.put("COL_SUM", item.get("COL_SUM"));
 						temp.put("COL_AVE", item.get("COL_AVE"));
+						temp.put("COL_TRANSFER", item.get("COL_TRANSFER"));
 					}
 				}
 			}
