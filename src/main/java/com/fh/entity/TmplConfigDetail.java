@@ -18,6 +18,7 @@ public class TmplConfigDetail implements Serializable {
 	private String COL_HIDE;
 	private String COL_SUM;
 	private String COL_AVE;
+	private String COL_TRANSFER;
 	public String getRPT_DUR() {
 		return RPT_DUR;
 	}
@@ -77,6 +78,12 @@ public class TmplConfigDetail implements Serializable {
 	}
 	public void setCOL_AVE(String cOL_AVE) {
 		COL_AVE = cOL_AVE;
+	}
+	public String getCOL_TRANSFER() {
+		return COL_TRANSFER;
+	}
+	public void setCOL_TRANSFER(String cOL_TRANSFER) {
+		COL_TRANSFER = cOL_TRANSFER;
 	}
 	
 }

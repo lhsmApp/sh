@@ -167,7 +167,9 @@ public class DictsUtil {
 		pd.put("name",parentDepartName);
 		pd.put("icon", "static/images/user.gif");
 		zdepartmentPdList.add(pd);
-		JSONArray arr = JSONArray.fromObject(departmentService.listAllDepartmentAndSelfToSelect(parentDepartCode,zdepartmentPdList));
+		List<PageData> listResult=departmentService.listAllDepartmentAndSelfToSelect(parentDepartCode,zdepartmentPdList);
+		if(zdepartmentPdList.size()==1) return "0";
+		JSONArray arr = JSONArray.fromObject(listResult);
 		return (null == arr ? "" : arr.toString());
 	}
 

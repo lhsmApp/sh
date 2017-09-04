@@ -160,9 +160,9 @@ public class SysSealedInfoController extends BaseController {
 							||pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_OPER_LABOR.getNameKey())
 							||pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_LABOR.getNameKey())) {
 						tableCode = "TB_STAFF_SUMMY";
-					} else if (pd.getString("BILL_TYPE").equals(BillType.GOLD_LISTEN.getNameKey())) {
+					} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_HOUSE_FUND_TRANSFER.getNameKey())) {
 						tableCode = "TB_HOUSE_FUND_SUMMY";
-					} else if (pd.getString("BILL_TYPE").equals(BillType.SECURITY_LISTEN.getNameKey())) {
+					} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_SOCIAL_INC_TRANSFER.getNameKey())) {
 						tableCode = "TB_SOCIAL_INC_SUMMY";
 					} else {
 						tableCode = "TB_STAFF_SUMMY";

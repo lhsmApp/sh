@@ -8,6 +8,7 @@ import com.fh.entity.JqPage;
 import com.fh.entity.SysSealed;
 import com.fh.util.PageData;
 import com.fh.util.enums.BillType;
+import com.fh.util.enums.TmplType;
 import com.fh.service.sysSealedInfo.syssealedinfo.SysSealedInfoManager;
 
 /** 
@@ -54,7 +55,7 @@ public class SysSealedInfoService implements SysSealedInfoManager{
 	public List<PageData> list(JqPage page)throws Exception{
 		List<PageData> listPageData = (List<PageData>)dao.findForList("SysSealedInfoMapper.datalistJqPage", page);
 		for (PageData pageData : listPageData) {
-			pageData.put("BILL_TYPE_TR", BillType.getValueByKey(pageData.getString("BILL_TYPE")));
+			pageData.put("BILL_TYPE_TR", TmplType.getValueByKey(pageData.getString("BILL_TYPE")));
 		}
 		return listPageData;
 	}
