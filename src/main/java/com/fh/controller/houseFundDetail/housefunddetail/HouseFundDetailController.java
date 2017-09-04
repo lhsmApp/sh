@@ -38,7 +38,6 @@ import com.fh.util.PageData;
 import com.fh.util.SqlTools;
 import com.fh.util.date.DateFormatUtils;
 import com.fh.util.date.DateUtils;
-import com.fh.util.enums.BillType;
 import com.fh.util.enums.DurState;
 import com.fh.util.enums.TmplType;
 import com.fh.util.Jurisdiction;
@@ -145,7 +144,7 @@ public class HouseFundDetailController extends BaseController {
 		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
-		String jqGridColModel = tmpl.generateStructure(TableNameDetail, DepartCode, 3);
+		String jqGridColModel = tmpl.generateStructure(TypeCodeDetail, DepartCode, 3);
 		
 		SqlUserdata = tmpl.getSqlUserdata();
 		//字典

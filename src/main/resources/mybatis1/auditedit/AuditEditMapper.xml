@@ -2,15 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="AuditEditMapper">
 	
-	
-	<!-- 字段 -->
-	<sql id="FieldSelectKey"> BUSI_DATE BUSI_DATE__, USER_CODE USER_CODE__</sql>
-	
 	<!-- 列表 -->
 	<select id="datalistJqPage" parameterType="jqPage" resultType="pd">
 		select 
-		    * ,
-		    <include refid="FieldSelectKey"></include>
+		    * 
+		    <if test="pd.FieldSelectKey!= null and pd.FieldSelectKey != ''">
+		        ${pd.FieldSelectKey}
+		    </if>
 		from ${pd.TableName}
 		where BUSI_DATE = '${pd.SystemDateTime}'
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->

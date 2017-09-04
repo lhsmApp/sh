@@ -170,132 +170,101 @@
     var gridBase_selector = "#jqGridBase";  
     var pagerBase_selector = "#jqGridBasePager"; 
     
-	var which; 
+	var which;
+	// 枚举  1封存,0解封
+	var State;
+	//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
+    var jqGridColModel;
     
-	$(document).ready(function () {
-		$(top.hangge());//关闭加载状态
-	    
-		//当前期间,取自tb_system_config的SystemDateTime字段
-	    //var SystemDateTime = '${SystemDateTime}';
-		//当前登录人所在二级单位
-	    //var DepartName = '${DepartName}';
-	    //$("#showDur").text('当前期间：' + SystemDateTime + ' 当前单位：' + DepartName);
-	    //$("#showDept").text('当前单位：' + DepartName);
-		//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
-	    // 枚举  1封存,0解封
-		var State = '${State}';
-		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-	    var jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
-	    
-	    function setStateFalse(){
-	    	State = "false";
-	    }
-	    function getState(){
-	        if($.trim(State) == "true"){
-	            return true; 
-	        }
-	        return false;
-	    };
-	    
-	    function setNavButtonState(){
-	        if($.trim(State) == "true"){
-	        	//Enable 按钮可用
-	            $("#edit").removeClass('ui-state-disabled');
-	            $("#add").removeClass('ui-state-disabled');
-	            $("#del").removeClass('ui-state-disabled');
-	            $("#batchDelete").removeClass('ui-state-disabled');
-	            $("#batchEdit").removeClass('ui-state-disabled');
-	            $("#batchCancelEdit").removeClass('ui-state-disabled');
-	            $("#batchSave").removeClass('ui-state-disabled');
-	            $("#importItems").removeClass('ui-state-disabled');
-	            $("#report").removeClass('ui-state-disabled');
-	            
-	            $("#edit").show();
-	            $("#add").show();
-	            $("#del").show();
-	            $("#batchDelete").show();
-	            $("#batchEdit").show();
-	            $("#batchCancelEdit").show();
-	            $("#batchSave").show();
-	            $("#importItems").show();
-	            $("#report").show();
-	            
-	            $("#edit.ui-state-disabled .ui-icon").removeAttr("style");
-	            $("#add.ui-state-disabled .ui-icon").removeAttr("style");
-	            $("#del.ui-state-disabled .ui-icon").removeAttr("style");
-	            $("#batchDelete.ui-state-disabled .ui-icon").removeAttr("style");
-	            $("#batchEdit.ui-state-disabled .ui-icon").removeAttr("style");
-	            $("#batchCancelEdit.ui-state-disabled .ui-icon").removeAttr("style");
-	            $("#batchSave.ui-state-disabled .ui-icon").removeAttr("style");
-	            $("#importItems.ui-state-disabled .ui-icon").removeAttr("style");
-	            $("#report.ui-state-disabled .ui-icon").removeAttr("style");
-	        } else {
-	        	 //Disable 按钮灰掉不可用
-	            $("#edit").addClass('ui-state-disabled');
-	            $("#add").addClass('ui-state-disabled');
-	            $("#del").addClass('ui-state-disabled');
-	            $("#batchDelete").addClass('ui-state-disabled');
-	            $("#batchEdit").addClass('ui-state-disabled');
-	            $("#batchCancelEdit").addClass('ui-state-disabled');
-	            $("#batchSave").addClass('ui-state-disabled');
-	            $("#importItems").addClass('ui-state-disabled');
-	            $("#report").addClass('ui-state-disabled');
-	            
-	            $("#edit").hide();
-	            $("#add").hide();
-	            $("#del").hide();
-	            $("#batchDelete").hide();
-	            $("#batchEdit").hide();
-	            $("#batchCancelEdit").hide();
-	            $("#batchSave").hide();
-	            $("#importItems").hide();
-	            $("#report").hide();
-	            
-	            $("#edit.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important');
-	            $("#add.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important');
-	            $("#del.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important');
-	            $("#batchDelete.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important');
-	            $("#batchEdit.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important');
-	            $("#batchCancelEdit.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important');
-	            $("#batchSave.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important');
-	            $("#importItems.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important');
-	            $("#report.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important');
-	        }
-	    };
-	    
+    function setStateFalse(){
+    	State = "false";
+    }
+    function getState(){
+        if($.trim(State) == "true"){
+            return true; 
+        }
+        return false;
+    };
+    
+    function setNavButtonState(){
+        if($.trim(State) == "true"){
+        	console.log("按钮可用");
+        	//Enable 按钮可用
+            $("#edit").removeClass('ui-state-disabled');
+            $("#add").removeClass('ui-state-disabled');
+            $("#del").removeClass('ui-state-disabled');
+            $("#batchDelete").removeClass('ui-state-disabled');
+            $("#batchEdit").removeClass('ui-state-disabled');
+            $("#batchCancelEdit").removeClass('ui-state-disabled');
+            $("#batchSave").removeClass('ui-state-disabled');
+            $("#importItems").removeClass('ui-state-disabled');
+            $("#report").removeClass('ui-state-disabled');
+            
+            //$("#edit").show();
+            //$("#add").show();
+            //$("#del").show();
+            //$("#batchDelete").show();
+            //$("#batchEdit").show();
+            //$("#batchCancelEdit").show();
+            //$("#batchSave").show();
+            //$("#importItems").show();
+            //$("#report").show();
+            
+            $("#edit.ui-state-disabled .ui-icon").removeAttr("style");
+            $("#add.ui-state-disabled .ui-icon").removeAttr("style");
+            $("#del.ui-state-disabled .ui-icon").removeAttr("style");
+            $("#batchDelete.ui-state-disabled .ui-icon").removeAttr("style");
+            $("#batchEdit.ui-state-disabled .ui-icon").removeAttr("style");
+            $("#batchCancelEdit.ui-state-disabled .ui-icon").removeAttr("style");
+            $("#batchSave.ui-state-disabled .ui-icon").removeAttr("style");
+            $("#importItems.ui-state-disabled .ui-icon").removeAttr("style");
+            $("#report.ui-state-disabled .ui-icon").removeAttr("style");
+        } else {
+        	console.log("按钮灰掉不可用");
+        	 //Disable 按钮灰掉不可用
+            $("#edit").addClass('ui-state-disabled');
+            $("#add").addClass('ui-state-disabled');
+            $("#del").addClass('ui-state-disabled');
+            $("#batchDelete").addClass('ui-state-disabled');
+            $("#batchEdit").addClass('ui-state-disabled');
+            $("#batchCancelEdit").addClass('ui-state-disabled');
+            $("#batchSave").addClass('ui-state-disabled');
+            $("#importItems").addClass('ui-state-disabled');
+            $("#report").addClass('ui-state-disabled');
+            
+            //$("#edit").hide();
+            //$("#add").hide();
+            //$("#del").hide();
+            //$("#batchDelete").hide();
+            //$("#batchEdit").hide();
+            //$("#batchCancelEdit").hide();
+            //$("#batchSave").hide();
+            //$("#importItems").hide();
+            //$("#report").hide();
+            
+            $("#edit.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important');
+            $("#add.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important');
+            $("#del.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important');
+            $("#batchDelete.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important');
+            $("#batchEdit.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important');
+            $("#batchCancelEdit.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important');
+            $("#batchSave.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important');
+            $("#importItems.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important');
+            $("#report.ui-state-disabled .ui-icon").attr("style",'color:#B0B0B0 !important');
+        }
+    };
+    
+    function SetStructure(){
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
 			$(gridBase_selector).jqGrid( 'setGridWidth', $(".page-content").width());
 			resizeGridHeight($(gridBase_selector),null,true);
 	    });
 		
-		//初始化当前选择凭证类型
-		if('${pd.which}'!=""){
-			$('[data-toggle="buttons"] .btn').each(function(index, data){
-				var target = $(this).find('input[type=radio]');
-				$(this).removeClass('active');
-				var whichCur = parseInt(target.val());
-				console.log(which);
-				if(whichCur=='${pd.which}'){
-					$(this).addClass('active');
-					which=whichCur;
-				}
-			});
-		} 
-		//凭证类型变化
-		$('[data-toggle="buttons"] .btn').on('click', function(e){
-			var target = $(this).find('input[type=radio]');
-			which = parseInt(target.val());
-			//if(which!='${pd.which}'){
-				window.location.href="<%=basePath%>staffdetail/list.do?SelectedTableNo="+which;
-                //+'&SelectedDepartCode='+$("#SelectedDepartCode").val() + '&SelectedCustCol7='+$("#SelectedCustCol7").val()
-			//}
-		});
-		
 		$(gridBase_selector).jqGrid({
 			url: '<%=basePath%>staffdetail/getPageList.do?SelectedTableNo='+which
-            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-            +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
+                +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+                +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 			datatype: "json",
 			colModel: jqGridColModel,
 			//caption: '当前期间：' + SystemDateTime + '， 当前单位：' + DepartName + '',
@@ -309,8 +278,8 @@
             sortable: true,
 			altRows: true, //斑马条纹
 			editurl: '<%=basePath%>staffdetail/edit.do?SelectedTableNo='+which
-            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-            +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
+                +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+                +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 			
 			pager: pagerBase_selector,
 			footerrow: true,
@@ -325,7 +294,6 @@
 					updatePagerIcons(table);
 					enableTooltips(table);
 				}, 0);
-				//getCheckState();
 			},
 		});
 	    
@@ -464,401 +432,451 @@
 			             cursor : "pointer"
 			         });
 					setNavButtonState();
+					getCheckState();
+    }
+    
+	$(document).ready(function () {
+		$(top.hangge());//关闭加载状态
+	    
+		//当前期间,取自tb_system_config的SystemDateTime字段
+	    //var SystemDateTime = '${SystemDateTime}';
+		//当前登录人所在二级单位
+	    //var DepartName = '${DepartName}';
+	    //$("#showDur").text('当前期间：' + SystemDateTime + ' 当前单位：' + DepartName);
+	    //$("#showDept").text('当前单位：' + DepartName);
+		//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
+	    // 枚举  1封存,0解封
+		State = '${State}';
+		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
+	    jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
+		
+		//初始化当前选择凭证类型
+		if('${pd.which}'!=""){
+			$('[data-toggle="buttons"] .btn').each(function(index, data){
+				var target = $(this).find('input[type=radio]');
+				$(this).removeClass('active');
+				var whichCur = parseInt(target.val());
+				console.log(which);
+				if(whichCur=='${pd.which}'){
+					$(this).addClass('active');
+					which=whichCur;
+				}
+			});
+		} 
+		//凭证类型变化
+		$('[data-toggle="buttons"] .btn').on('click', function(e){
+			var target = $(this).find('input[type=radio]');
+			which = parseInt(target.val());
+			//if(which!='${pd.which}'){
+				window.location.href="<%=basePath%>staffdetail/list.do?SelectedTableNo="+which;
+                //+'&SelectedDepartCode='+$("#SelectedDepartCode").val() + '&SelectedCustCol7='+$("#SelectedCustCol7").val()
+			//}
+		});
+		
+		SetStructure();
+	});
 
-					//双击编辑行
-				    var lastSelection;
-					function doubleClickRow(rowid,iRow,iCol,e){
-						if(getState()){
-							$(gridBase_selector).restoreRow(lastSelection);
-							$(gridBase_selector).editRow(rowid, {
-				            	keys:true, //keys:true 这里按[enter]保存  
-				                restoreAfterError: false,  
-				            	oneditfunc: function(rowid){  
-				                    console.log(rowid);  
-				                },  
-				                successfunc: function(response){
-							        var responseJSON = JSON.parse(response.responseText);
-							    	if (responseJSON.code == 0) {
-										$(gridBase_selector).trigger("reloadGrid");  
-										$(top.hangge());//关闭加载状态
-										$("#subTitle").tips({
-											side:3,
-								            msg:'保存成功',
-								            bg:'#009933',
-								            time:3
-								        });
-										lastSelection = rowid;
-										return [true,"",""];
-									}//else{
-							        //   $(gridBase_selector).jqGrid('editRow',lastSelection);
-									//	$(top.hangge());//关闭加载状态
-									//	$("#subTitle").tips({
-									//		side:3,
-								    //        msg:'保存失败:'+response.responseJSON.message,
-								    //        bg:'#cc0033',
-								    //        time:3
-								    //    });
-									//}
-				                },  
-				                errorfunc: function(rowid, response){
-		                            var responseJSON = JSON.parse(response.responseText);
-				                	$(gridBase_selector).jqGrid('editRow',lastSelection);
-									$(top.hangge());//关闭加载状态
-									if(response.statusText == "success"){
-										if(responseJSON.code != 0){
-											$(gridBase_selector).jqGrid('editRow',lastSelection);
-											$(top.hangge());//关闭加载状态
-											$("#subTitle").tips({
-												side:3,
-										        msg:'保存失败:'+responseJSON.message,
-										        bg:'#cc0033',
-										        time:3
-										    });
-										}
-									} else {
-										$("#subTitle").tips({
-											side:3,
-								            msg:'保存出错:' + responseJSON.message,
-								            bg:'#cc0033',
-								            time:3
-								        });
-									}
-				                }  
-				            });
-				            lastSelection = rowid;
-				        }
-					} 
-
-					//批量编辑
-					function batchEdit(e) {
-				        var ids = $(gridBase_selector).jqGrid('getDataIDs');
-				        for (var i = 0; i < ids.length; i++) {
-				        	$(gridBase_selector).jqGrid('editRow',ids[i]);
-				        }
-				    }
-					
-					//取消批量编辑
-					function batchCancelEdit(e) {
-				        var ids = $(gridBase_selector).jqGrid('getDataIDs');
-				        for (var i = 0; i < ids.length; i++) {
-				        	$(gridBase_selector).jqGrid('restoreRow',ids[i]);
-				        }
-				    }
-
-					/**
-					 * 批量删除
-					 */
-				    function batchDelete(){
-				    	//获得选中的行ids的方法
-				    	var ids = $(gridBase_selector).getGridParam("selarrrow");  
-				    	
-						if(!(ids!=null && ids.length>0)){
-							bootbox.dialog({
-								message: "<span class='bigger-110'>您没有选择任何内容!</span>",
-								buttons: 			
-								{ "button":{ "label":"确定", "className":"btn-sm btn-success"}}
-							});
-						}else{
-				            var msg = '确定要删除选中的数据吗?';
-				            bootbox.confirm(msg, function(result) {
-								if(result) {
-									var listData =new Array();
-									
-									//遍历访问这个集合  
-									$(ids).each(function (index, id){  
-							            var rowData = $(gridBase_selector).getRowData(id);
-							            listData.push(rowData);
-									});
-									
-									top.jzts();
-									$.ajax({
-										type: "POST",
-										url: '<%=basePath%>staffdetail/deleteAll.do?SelectedTableNo='+which
-						                    +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-						                    +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
-								    	data: {DATA_ROWS:JSON.stringify(listData)},
-										dataType:'json',
-										cache: false,
-										success: function(response){
-											if(response.code==0){
-												$(gridBase_selector).trigger("reloadGrid");  
-												$(top.hangge());//关闭加载状态
-												$("#subTitle").tips({
-													side:3,
-										            msg:'删除成功',
-										            bg:'#009933',
-										            time:3
-										        });
-											}else{
-												$(top.hangge());//关闭加载状态
-												$("#subTitle").tips({
-													side:3,
-										            msg:'删除失败,'+response.message,
-										            bg:'#cc0033',
-										            time:3
-										        });
-											}
-										},
-								    	error: function(response) {
-											$(top.hangge());//关闭加载状态
-											$("#subTitle").tips({
-												side:3,
-									            msg:'删除出错:'+response.responseJSON.message,
-									            bg:'#cc0033',
-									            time:3
-									        });
-								    	}
-									});
-								}
-				            });
+	//双击编辑行
+    var lastSelection;
+	function doubleClickRow(rowid,iRow,iCol,e){
+		if(getState()){
+			$(gridBase_selector).restoreRow(lastSelection);
+			$(gridBase_selector).editRow(rowid, {
+            	keys:true, //keys:true 这里按[enter]保存  
+                restoreAfterError: false,  
+            	oneditfunc: function(rowid){  
+                    console.log(rowid);  
+                },  
+                successfunc: function(response){
+			        var responseJSON = JSON.parse(response.responseText);
+			    	if (responseJSON.code == 0) {
+						$(gridBase_selector).trigger("reloadGrid");  
+						$(top.hangge());//关闭加载状态
+						$("#subTitle").tips({
+							side:3,
+				            msg:'保存成功',
+				            bg:'#009933',
+				            time:3
+				        });
+						lastSelection = rowid;
+						return [true,"",""];
+					}//else{
+			        //   $(gridBase_selector).jqGrid('editRow',lastSelection);
+					//	$(top.hangge());//关闭加载状态
+					//	$("#subTitle").tips({
+					//		side:3,
+				    //        msg:'保存失败:'+response.responseJSON.message,
+				    //        bg:'#cc0033',
+				    //        time:3
+				    //    });
+					//}
+                },  
+                errorfunc: function(rowid, response){
+                    var responseJSON = JSON.parse(response.responseText);
+                	$(gridBase_selector).jqGrid('editRow',lastSelection);
+					$(top.hangge());//关闭加载状态
+					if(response.statusText == "success"){
+						if(responseJSON.code != 0){
+							$(gridBase_selector).jqGrid('editRow',lastSelection);
+							$(top.hangge());//关闭加载状态
+							$("#subTitle").tips({
+								side:3,
+						        msg:'保存失败:'+responseJSON.message,
+						        bg:'#cc0033',
+						        time:3
+						    });
 						}
+					} else {
+						$("#subTitle").tips({
+							side:3,
+				            msg:'保存出错:' + responseJSON.message,
+				            bg:'#cc0033',
+				            time:3
+				        });
 					}
+                }  
+            });
+            lastSelection = rowid;
+        }
+	} 
 
-					/**
-					 * 批量保存
-					 */
-				    function batchSave(){
-				        //获得选中行ids的方法
-				        var ids = $(gridBase_selector).getDataIDs();  
+	//批量编辑
+	function batchEdit(e) {
+        var ids = $(gridBase_selector).jqGrid('getDataIDs');
+        for (var i = 0; i < ids.length; i++) {
+        	$(gridBase_selector).jqGrid('editRow',ids[i]);
+        }
+    }
+	
+	//取消批量编辑
+	function batchCancelEdit(e) {
+        var ids = $(gridBase_selector).jqGrid('getDataIDs');
+        for (var i = 0; i < ids.length; i++) {
+        	$(gridBase_selector).jqGrid('restoreRow',ids[i]);
+        }
+    }
+
+	/**
+	 * 批量删除
+	 */
+    function batchDelete(){
+    	//获得选中的行ids的方法
+    	var ids = $(gridBase_selector).getGridParam("selarrrow");  
+    	
+		if(!(ids!=null && ids.length>0)){
+			bootbox.dialog({
+				message: "<span class='bigger-110'>您没有选择任何内容!</span>",
+				buttons: 			
+				{ "button":{ "label":"确定", "className":"btn-sm btn-success"}}
+			});
+		}else{
+            var msg = '确定要删除选中的数据吗?';
+            bootbox.confirm(msg, function(result) {
+				if(result) {
+					var listData =new Array();
 					
-				        if(!(ids!=null&&ids.length>0)){
-				            bootbox.dialog({
-				            	message: "<span class='bigger-110'>您没有选择任何内容!</span>",
-				            	buttons: { "button":{ "label":"确定", "className":"btn-sm btn-success"}}
-				            });
-				        }else{
-				            var msg = '确定要保存选中的数据吗?';
-				            bootbox.confirm(msg, function(result) {
-							    if(result) {
-								    var listData =new Array();
-								
-								    //遍历访问这个集合  
-								    $(ids).each(function (index, id){  
-								        $(gridBase_selector).saveRow(id, false, 'clientArray');
-								        var rowData = $(gridBase_selector).getRowData(id);
-						                listData.push(rowData);
-								    });
-								
-								    top.jzts();
-								    $.ajax({
-									    type: "POST",
-									    url: '<%=basePath%>staffdetail/updateAll.do?SelectedTableNo='+which
-					                        +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-					                        +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
-							    	    data: {DATA_ROWS:JSON.stringify(listData)},
-									    dataType:'json',
-									    cache: false,
-									    success: function(response){
-										    if(response.code==0){
-											    $(gridBase_selector).trigger("reloadGrid");  
-											    $(top.hangge());//关闭加载状态
-											    $("#subTitle").tips({
-											    	side:3,
-									                msg:'保存成功',
-									                bg:'#009933',
-									                time:3
-									            });
-										    }else{
-											    batchEdit(null);
-											    $(top.hangge());//关闭加载状态
-											    $("#subTitle").tips({
-											    	side:3,
-									                msg:'保存失败,'+response.message,
-									                bg:'#cc0033',
-									                time:3
-									            }); 
-										    }
-									    },
-							    	    error: function(response) {
-										    batchEdit(null);
-										    $(top.hangge());//关闭加载状态
-										    $("#subTitle").tips({
-											    side:3,
-								                msg:'保存出错:'+response.responseJSON.message,
-								                bg:'#cc0033',
-								                time:3
-								            });
-							    	    }
-								    });
-							    }
-				            });
-					    }
-				    }
-
-				    /**
-				     * 导入
-				     */
-				    function importItems(){
-					    top.jzts();
-					    var diag = new top.Dialog();
-					    diag.Drag=true;
-					    diag.Title ="EXCEL 导入到数据库";
-					    diag.URL = '<%=basePath%>staffdetail/goUploadExcel.do?SelectedTableNo='+which
-				           +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-				           +'&SelectedCustCol7='+$("#SelectedCustCol7").val();
-					    diag.Width = 300;
-					    diag.Height = 150;
-					    diag.CancelEvent = function(){ //关闭事件
-					        top.jzts();
-					        $(gridBase_selector).trigger("reloadGrid");  
-					        $(top.hangge());//关闭加载状态
-					        diag.close();
-				       };
-				       diag.show();
-				    }
-
-				    /**
-				     * 导出
-				     */
-				    function exportItems(){
-					    window.location.href='<%=basePath%>staffdetail/excel.do?SelectedTableNo='+which
-				            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-				            +'&SelectedCustCol7='+$("#SelectedCustCol7").val();
-				    }
-
-				    /**
-				     * 上报
-				     */
-				    function report(){
-				        //获得选中的行ids的方法
-					    var ids = $(gridBase_selector).getDataIDs();  
+					//遍历访问这个集合  
+					$(ids).each(function (index, id){  
+			            var rowData = $(gridBase_selector).getRowData(id);
+			            listData.push(rowData);
+					});
 					
-					    if(!(ids!=null && ids.length>0)){
-					        bootbox.dialog({
-					            message: "<span class='bigger-110'>界面没有任何内容!</span>",
-					            buttons: 			
-					                { "button":{ "label":"确定", "className":"btn-sm btn-success"}}
-					        });
-					    }else{
-					         var msg = '确定要上报吗?';
-					         bootbox.confirm(msg, function(result) {
-					        	if(result) {
-					        	    top.jzts();
-					        	    $.ajax({
-					        	        type: "POST",
-					        	        url: '<%=basePath%>staffdetail/report.do?SelectedTableNo='+which
-					        	            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-				                            +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
-				                        cache: false,
-								        success: function(response){
-									        if(response.code==0){
-										        setStateFalse();  
-										        setNavButtonState();
-										        $(top.hangge());//关闭加载状态
-										        $("#subTitle").tips({
-											        side:3,
-								                    msg:'上报成功',
-								                    bg:'#009933',
-								                    time:3
-								                });
-									        }else{
-										        $(top.hangge());//关闭加载状态
-									        	$("#subTitle").tips({
-									        		side:3,
-								                    msg:'上报失败,'+response.message,
-								                    bg:'#cc0033',
-								                    time:3
-								                });
-									        }
-								        },
-						    	        error: function(response) {
-									        $(top.hangge());//关闭加载状态
-									        $("#subTitle").tips({
-									        	side:3,
-							                    msg:'上报出错:'+response.responseJSON.message,
-							                    bg:'#cc0033',
-							                    time:3
-							                });
-						    	        }
-							        });
-						        }
-				            });
-				        }
-				    }
-				    
-				    /*
-				     * 判断state设置按钮状态
-				     */
-				    function getCheckState(){
-						top.jzts();
-						$.ajax({
-							type: "POST",
-							url: '<%=basePath%>staffdetail/getState.do?SelectedTableNo='+which
-				                +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-				                +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
-							cache: false,
-							success: function(response){
-								if(response.code==0){
-								    // 枚举  1封存,0解封
-									State = response.message;
-									setNavButtonState();
-									$(top.hangge());//关闭加载状态
-								}else{
-									setStateFalse();  
-									setNavButtonState();
-									$(top.hangge());//关闭加载状态
-									$("#subTitle").tips({
-										side:3,
-							            msg:'获取封存状态失败,'+response.message,
-							            bg:'#cc0033',
-							            time:3
-							        });
-								}
-							},
-					    	error: function(response) {
-								setStateFalse();  
-								setNavButtonState();
+					top.jzts();
+					$.ajax({
+						type: "POST",
+						url: '<%=basePath%>staffdetail/deleteAll.do?SelectedTableNo='+which
+		                    +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+		                    +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
+				    	data: {DATA_ROWS:JSON.stringify(listData)},
+						dataType:'json',
+						cache: false,
+						success: function(response){
+							if(response.code==0){
+								$(gridBase_selector).trigger("reloadGrid");  
 								$(top.hangge());//关闭加载状态
 								$("#subTitle").tips({
 									side:3,
-						            msg:'获取封存状态出错！',
+						            msg:'删除成功',
+						            bg:'#009933',
+						            time:3
+						        });
+							}else{
+								$(top.hangge());//关闭加载状态
+								$("#subTitle").tips({
+									side:3,
+						            msg:'删除失败,'+response.message,
 						            bg:'#cc0033',
 						            time:3
 						        });
-					    	}
-						});
-				    };
-
-				    /**
-				     * 增加成功
-				     * 
-				     * @param response
-				     * @param postdata
-				     * @returns
-				     */
-				    function fn_addSubmit_extend(response, postdata) {
-				        var responseJSON = JSON.parse(response.responseText);
-				    	if (responseJSON.code == 0) {
-				    		// console.log("Add Success");
-				    		$("#subTitle").tips({
-				    			side : 3,
-				    			msg : '保存成功',
-				    			bg : '#009933',
-				    			time : 3
-				    		});
-				    		return [ true ];
-				    	} else {
-				    		// console.log("Add Failed"+response.responseJSON.message);
-				    		$("#subTitle").tips({
-				    			side : 3,
-				    			msg : '保存失败,' + responseJSON.message,
-				    			bg : '#cc0033',
-				    			time : 3
-				    		});
-				    		return [ false, responseJSON.message ];
+							}
+						},
+				    	error: function(response) {
+							$(top.hangge());//关闭加载状态
+							$("#subTitle").tips({
+								side:3,
+					            msg:'删除出错:'+response.responseJSON.message,
+					            bg:'#cc0033',
+					            time:3
+					        });
 				    	}
-				    }
-	});
+					});
+				}
+            });
+		}
+	}
+
+	/**
+	 * 批量保存
+	 */
+    function batchSave(){
+        //获得选中行ids的方法
+        var ids = $(gridBase_selector).getDataIDs();  
+	
+        if(!(ids!=null&&ids.length>0)){
+            bootbox.dialog({
+            	message: "<span class='bigger-110'>您没有选择任何内容!</span>",
+            	buttons: { "button":{ "label":"确定", "className":"btn-sm btn-success"}}
+            });
+        }else{
+            var msg = '确定要保存选中的数据吗?';
+            bootbox.confirm(msg, function(result) {
+			    if(result) {
+				    var listData =new Array();
+				
+				    //遍历访问这个集合  
+				    $(ids).each(function (index, id){  
+				        $(gridBase_selector).saveRow(id, false, 'clientArray');
+				        var rowData = $(gridBase_selector).getRowData(id);
+		                listData.push(rowData);
+				    });
+				
+				    top.jzts();
+				    $.ajax({
+					    type: "POST",
+					    url: '<%=basePath%>staffdetail/updateAll.do?SelectedTableNo='+which
+	                        +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+	                        +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
+			    	    data: {DATA_ROWS:JSON.stringify(listData)},
+					    dataType:'json',
+					    cache: false,
+					    success: function(response){
+						    if(response.code==0){
+							    $(gridBase_selector).trigger("reloadGrid");  
+							    $(top.hangge());//关闭加载状态
+							    $("#subTitle").tips({
+							    	side:3,
+					                msg:'保存成功',
+					                bg:'#009933',
+					                time:3
+					            });
+						    }else{
+							    batchEdit(null);
+							    $(top.hangge());//关闭加载状态
+							    $("#subTitle").tips({
+							    	side:3,
+					                msg:'保存失败,'+response.message,
+					                bg:'#cc0033',
+					                time:3
+					            }); 
+						    }
+					    },
+			    	    error: function(response) {
+						    batchEdit(null);
+						    $(top.hangge());//关闭加载状态
+						    $("#subTitle").tips({
+							    side:3,
+				                msg:'保存出错:'+response.responseJSON.message,
+				                bg:'#cc0033',
+				                time:3
+				            });
+			    	    }
+				    });
+			    }
+            });
+	    }
+    }
+
+    /**
+     * 导入
+     */
+    function importItems(){
+	    top.jzts();
+	    var diag = new top.Dialog();
+	    diag.Drag=true;
+	    diag.Title ="EXCEL 导入到数据库";
+	    diag.URL = '<%=basePath%>staffdetail/goUploadExcel.do?SelectedTableNo='+which
+           +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+           +'&SelectedCustCol7='+$("#SelectedCustCol7").val();
+	    diag.Width = 300;
+	    diag.Height = 150;
+	    diag.CancelEvent = function(){ //关闭事件
+	        top.jzts();
+	        $(gridBase_selector).trigger("reloadGrid");  
+	        $(top.hangge());//关闭加载状态
+	        diag.close();
+       };
+       diag.show();
+    }
+
+    /**
+     * 导出
+     */
+    function exportItems(){
+	    window.location.href='<%=basePath%>staffdetail/excel.do?SelectedTableNo='+which
+            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+            +'&SelectedCustCol7='+$("#SelectedCustCol7").val();
+    }
+
+    /**
+     * 上报
+     */
+    function report(){
+        //获得选中的行ids的方法
+	    var ids = $(gridBase_selector).getDataIDs();  
+	
+	    if(!(ids!=null && ids.length>0)){
+	        bootbox.dialog({
+	            message: "<span class='bigger-110'>界面没有任何内容!</span>",
+	            buttons: 			
+	                { "button":{ "label":"确定", "className":"btn-sm btn-success"}}
+	        });
+	    }else{
+	         var msg = '确定要上报吗?';
+	         bootbox.confirm(msg, function(result) {
+	        	if(result) {
+	        	    top.jzts();
+	        	    $.ajax({
+	        	        type: "POST",
+	        	        url: '<%=basePath%>staffdetail/report.do?SelectedTableNo='+which
+	        	            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+                            +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
+                        cache: false,
+				        success: function(response){
+					        if(response.code==0){
+						        setStateFalse();  
+						        setNavButtonState();
+						        $(top.hangge());//关闭加载状态
+						        $("#subTitle").tips({
+							        side:3,
+				                    msg:'上报成功',
+				                    bg:'#009933',
+				                    time:3
+				                });
+					        }else{
+						        $(top.hangge());//关闭加载状态
+					        	$("#subTitle").tips({
+					        		side:3,
+				                    msg:'上报失败,'+response.message,
+				                    bg:'#cc0033',
+				                    time:3
+				                });
+					        }
+				        },
+		    	        error: function(response) {
+					        $(top.hangge());//关闭加载状态
+					        $("#subTitle").tips({
+					        	side:3,
+			                    msg:'上报出错:'+response.responseJSON.message,
+			                    bg:'#cc0033',
+			                    time:3
+			                });
+		    	        }
+			        });
+		        }
+            });
+        }
+    }
+    
+    /*
+     * 判断state设置按钮状态
+     */
+    function getCheckState(){
+		top.jzts();
+		$.ajax({
+			type: "POST",
+			url: '<%=basePath%>staffdetail/getState.do?SelectedTableNo='+which
+                +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+                +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
+			cache: false,
+			success: function(response){
+				console.log(response.code);
+				console.log("message:" + response.message);
+				if(response.code==0){
+				    // 枚举  1封存,0解封
+					State = response.message;
+
+					console.log("State:" + State);
+					console.log("true" == State);
+					setNavButtonState();
+					$(top.hangge());//关闭加载状态
+				}else{
+					setStateFalse();  
+					setNavButtonState();
+					$(top.hangge());//关闭加载状态
+					$("#subTitle").tips({
+						side:3,
+			            msg:'获取封存状态失败,'+response.message,
+			            bg:'#cc0033',
+			            time:3
+			        });
+				}
+			},
+	    	error: function(response) {
+				setStateFalse();  
+				setNavButtonState();
+				$(top.hangge());//关闭加载状态
+				$("#subTitle").tips({
+					side:3,
+		            msg:'获取封存状态出错！',
+		            bg:'#cc0033',
+		            time:3
+		        });
+	    	}
+		});
+    };
+
+    /**
+     * 增加成功
+     * 
+     * @param response
+     * @param postdata
+     * @returns
+     */
+    function fn_addSubmit_extend(response, postdata) {
+        var responseJSON = JSON.parse(response.responseText);
+    	if (responseJSON.code == 0) {
+    		// console.log("Add Success");
+    		$("#subTitle").tips({
+    			side : 3,
+    			msg : '保存成功',
+    			bg : '#009933',
+    			time : 3
+    		});
+    		return [ true ];
+    	} else {
+    		// console.log("Add Failed"+response.responseJSON.message);
+    		$("#subTitle").tips({
+    			side : 3,
+    			msg : '保存失败,' + responseJSON.message,
+    			bg : '#cc0033',
+    			time : 3
+    		});
+    		return [ false, responseJSON.message ];
+    	}
+    }
 	
 	//检索
 	function tosearch() {
-		$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据
-			url:'<%=basePath%>staffdetail/getPageList.do?SelectedTableNo='+which
-            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-            +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),  
-			datatype:'json',
-		      page:1
-		}).trigger("reloadGrid");
+		$(gridBase_selector).jqGrid('GridUnload'); 
+		SetStructure();
+		//$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据
+		//	url:'<%=basePath%>staffdetail/getPageList.do?SelectedTableNo='+which
+        //    +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+        //    +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),  
+		//	datatype:'json',
+		//      page:1
+		//}).trigger("reloadGrid");
+		//getCheckState();
 	}  
 	
 	//加载单位树

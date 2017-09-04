@@ -91,4 +91,25 @@ public class QueryFeildString {
 		}
 		return strIn;
 	}
+	
+	public static String getFieldSelectKey(List<String> keyListBase, String keyExtra) throws Exception{
+		String strReturn = "";
+		if(keyListBase!=null && keyListBase.size()>0){
+			for(String each : keyListBase){
+				strReturn += ", " + each + " " + each + keyExtra;
+			}
+		}
+		return strReturn.trim();
+	}
+	
+	public static String tranferSumFieldToString(List<String> SumField){
+		StringBuilder ret = new StringBuilder();
+		for(String field : SumField){
+			if(!ret.toString().trim().equals("")){
+				ret.append(",");
+			}
+			ret.append(field);
+		}
+		return ret.toString();
+	}
 }

@@ -44,7 +44,6 @@ import com.fh.util.date.DateFormatUtils;
 import com.fh.util.date.DateUtils;
 import com.fh.util.enums.BillNumType;
 import com.fh.util.enums.BillState;
-import com.fh.util.enums.BillType;
 import com.fh.util.enums.DurState;
 import com.fh.util.enums.TmplType;
 
@@ -145,7 +144,7 @@ public class SocialIncSummyController extends BaseController {
 		mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService));
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService, userService,keyListBase);
-		String jqGridColModel = tmpl.generateStructureNoEdit(TableNameBase, ShowDepartCode);
+		String jqGridColModel = tmpl.generateStructureNoEdit(TypeCodeSummy, ShowDepartCode);
 
 		//底行显示的求和与平均值字段
 		SqlUserdata = tmpl.getSqlUserdata();
@@ -218,7 +217,7 @@ public class SocialIncSummyController extends BaseController {
 		PageData pd = this.getPageData();
 		String DEPT_CODE = (String) pd.get("DATA_DEPT_CODE");
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
-		String detailColModel = tmpl.generateStructureNoEdit(TableNameDetail, DEPT_CODE);
+		String detailColModel = tmpl.generateStructureNoEdit(TypeCodeDetail, DEPT_CODE);
 		
 		commonBase.setCode(0);
 		commonBase.setMessage(detailColModel);
@@ -362,7 +361,7 @@ public class SocialIncSummyController extends BaseController {
     			}
     			
     			TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
-    			tmpl.generateStructureNoEdit(TableNameDetail, depart);
+    			tmpl.generateStructureNoEdit(TypeCodeDetail, depart);
     			Map<String, TableColumns> setColumnsList = tmpl.getHaveColumnsList();
     			
     			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 

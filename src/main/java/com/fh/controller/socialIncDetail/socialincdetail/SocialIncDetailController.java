@@ -30,8 +30,6 @@ import com.fh.entity.PageResult;
 import com.fh.entity.SysSealed;
 import com.fh.entity.TableColumns;
 import com.fh.entity.TmplConfigDetail;
-import com.fh.entity.system.Department;
-import com.fh.entity.system.Dictionaries;
 import com.fh.entity.system.User;
 import com.fh.exception.CustomException;
 import com.fh.util.Const;
@@ -40,7 +38,6 @@ import com.fh.util.PageData;
 import com.fh.util.SqlTools;
 import com.fh.util.date.DateFormatUtils;
 import com.fh.util.date.DateUtils;
-import com.fh.util.enums.BillType;
 import com.fh.util.enums.DurState;
 import com.fh.util.enums.TmplType;
 import com.fh.util.Jurisdiction;
@@ -148,7 +145,7 @@ public class SocialIncDetailController extends BaseController {
 		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
-		String jqGridColModel = tmpl.generateStructure("21", DepartCode, 3);
+		String jqGridColModel = tmpl.generateStructure(TypeCodeDetail, DepartCode, 3);
 		
 		SqlUserdata = tmpl.getSqlUserdata();
 		//字典

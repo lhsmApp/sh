@@ -66,6 +66,7 @@
 						            <div class="pull-right">
 									    <!-- <span class="label label-xlg label-blue arrowed-left"
 									        id = "showDur" style="background:#428bca; margin-right: 2px;"></span> -->
+								        <div data-toggle="buttons" class="btn-group no-margin">
 									            <label class="btn btn-sm btn-primary active"> <span
 									    	        class="bigger-110">合同化</span> <input type="radio" value="6" />
 									            </label> 
@@ -81,6 +82,7 @@
 									            <label class="btn btn-sm btn-primary"> <span
 										            class="bigger-110">劳务派遣</span> <input type="radio" value="10" />
 									            </label>
+								        </div>
 								    </div>
 						</div><!-- /.page-header -->
 				
@@ -181,6 +183,29 @@
 				$(gridBase_selector).jqGrid( 'setGridWidth', $(".page-content").width());
 				resizeGridHeight($(gridBase_selector),null,true);
 		    });
+			
+			//初始化当前选择凭证类型
+			if('${pd.which}'!=""){
+				$('[data-toggle="buttons"] .btn').each(function(index, data){
+					var target = $(this).find('input[type=radio]');
+					$(this).removeClass('active');
+					var whichCur = parseInt(target.val());
+					console.log(which);
+					if(whichCur=='${pd.which}'){
+						$(this).addClass('active');
+						which=whichCur;
+					}
+				});
+			} 
+			//凭证类型变化
+			$('[data-toggle="buttons"] .btn').on('click', function(e){
+				var target = $(this).find('input[type=radio]');
+				which = parseInt(target.val());
+				//if(which!='${pd.which}'){
+					window.location.href="<%=basePath%>staffsummy/list.do?SelectedTableNo="+which;
+	                //+'&SelectedDepartCode='+$("#SelectedDepartCode").val() + '&SelectedCustCol7='+$("#SelectedCustCol7").val()
+				//}
+			});
 			
 			$(gridBase_selector).jqGrid({
 				url: '<%=basePath%>staffsummy/getPageList.do?SelectedTableNo='+which
@@ -316,41 +341,37 @@
 
 				//汇总
 				function summary(e) {
-					var transfer_RPT_DEPT = "";
 			    	//获得选中的行ids的方法
 			    	var ids = $(gridBase_selector).getGridParam("selarrrow");  
-
-					if(ids!=null && ids.length>0){
-						//遍历访问这个集合  
-						$(ids).each(function (index, id){  
-				            var rowData = $(gridBase_selector).getRowData(id);
-				        	var DEPT_CODE = rowData.DEPT_CODE__;
-				        	if(transfer_RPT_DEPT!=null && transfer_RPT_DEPT.trim()!=""){
-				        		transfer_RPT_DEPT += ",";
-				        	}
-				        	transfer_RPT_DEPT += DEPT_CODE;
+			    	
+					if(!(ids!=null && ids.length>0)){
+						bootbox.dialog({
+							message: "<span class='bigger-110'>您没有选择任何内容!</span>",
+							buttons: 			
+							{ "button":{ "label":"确定", "className":"btn-sm btn-success"}}
 						});
-					} 
-					if(!(transfer_RPT_DEPT!=null && transfer_RPT_DEPT.trim()!="")){
-					    bootbox.dialog({
-						    message: "<span class='bigger-110'>您没有选择任何列表内容!</span>",
-						    buttons: 			
-						    { "button":{ "label":"确定", "className":"btn-sm btn-success"}}
-					    }); 
-					} else {
+					}else{
 		                var msg = '确定要汇总吗??';
 		                bootbox.confirm(msg, function(result) {
 		    				if(result) {
+		    					var listData =new Array();
+		    					//遍历访问这个集合  
+		    					$(ids).each(function (index, id){  
+		    			            var rowData = $(gridBase_selector).getRowData(id);
+		    			            listData.push(rowData);
+		    					});
 		    					top.jzts();
 		    					$.ajax({
 		    						type: "POST",
 		    						url: '<%=basePath%>staffsummy/summaryDepartString.do?SelectedTableNo='+which
-		    			            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-		    			            +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
-		    				    	data: {DATA_DEPART:transfer_RPT_DEPT},
+		    			                //+'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+		    			                //+'&SelectedCustCol7='+$("#SelectedCustCol7").val()
+		    			                +'&DATA_ROW_SUMMY='+JSON.stringify(listData),
+		    				    	//data: {DATA_ROW_SUMMY:JSON.stringify(listData)},
 		    						dataType:'json',
 		    						cache: false,
 		    						success: function(response){
+		    							console.log(response);
 		    							if(response.code==0){
 		    								$(gridBase_selector).trigger("reloadGrid");  
 		    								$(top.hangge());//关闭加载状态
@@ -371,6 +392,7 @@
 		    							}
 		    						},
 		    				    	error: function(response) {
+		    							console.log("error:" + response);
 		    							$(top.hangge());//关闭加载状态
 	    								$("#subTitle").tips({
 	    									side:3,
@@ -403,7 +425,6 @@
 	                bootbox.confirm(msg, function(result) {
 	    				if(result) {
 	    					var listData =new Array();
-	    					
 	    					//遍历访问这个集合  
 	    					$(ids).each(function (index, id){  
 	    			            var rowData = $(gridBase_selector).getRowData(id);
@@ -467,7 +488,9 @@
             var detailColModel = "[]";
 			$.ajax({
 				type: "GET",
-				url: '<%=basePath%>staffsummy/getDetailColModel.do?',
+				url: '<%=basePath%>staffsummy/getDetailColModel.do?SelectedTableNo='+which
+	            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+	            +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 		    	data: {DATA_DEPT_CODE:DEPT_CODE},
 				dataType:'json',
 				cache: false,
@@ -480,7 +503,7 @@
 			            var childGridID = parentRowID + "_table";
 			            var childGridPagerID = parentRowID + "_pager";
 			            // send the parent row primary key to the server so that we know which grid to show
-			            var childGridURL = '<%=basePath%>staffsummy/getDetailList.do?BILL_CODE='+BILL_CODE+'';
+			            var childGridURL = '<%=basePath%>staffsummy/getDetailList.do?SelectedBillCode='+BILL_CODE+'';
 			            //childGridURL = childGridURL + "&parentRowID=" + encodeURIComponent(parentRowKey)
 
 			            // add a table and pager HTML elements to the parent grid row - we will render the child grid here
@@ -553,25 +576,41 @@
 		
 		//汇总
 		function btnSummyClick(){
-			var transfer_RPT_DEPT = $("#SelectedDepartCode").val();
+			var transferCustCol7 = $("#SelectedCustCol7").val();
+			var transferDepartCode = $("#SelectedDepartCode").val();
 			
-			if(!(transfer_RPT_DEPT!=null && transfer_RPT_DEPT.trim()!="")){
+			if(!(transferDepartCode!=null && transferDepartCode.trim()!="")){
 			    bootbox.dialog({
 				    message: "<span class='bigger-110'>您没有选择任何单位!</span>",
 				    buttons: 			
 				    { "button":{ "label":"确定", "className":"btn-sm btn-success"}}
 			    }); 
+			} else if (!(transferCustCol7!=null && transferCustCol7.trim()!="")){
+			    bootbox.dialog({
+				    message: "<span class='bigger-110'>您没有选择账套信息!</span>",
+				    buttons: 			
+				    { "button":{ "label":"确定", "className":"btn-sm btn-success"}}
+			    }); 
 			} else {
-                var msg = '确定要汇总吗??';
+                var msg = '确定要汇总吗?';
                 bootbox.confirm(msg, function(result) {
     				if(result) {
+    					//var listData =new Array();
+    					//var listDepart = transferDepartCode.split(","); //字符分割 
+    					//for (i=0;i<listDepart.length ;i++) {
+    			        //    var rowData = new Array();
+    			        //    rowData.put();
+                        //    
+    			        //    listData.push(rowData);
+    					//}
     					top.jzts();
     					$.ajax({
     						type: "POST",
     						url: '<%=basePath%>staffsummy/summaryDepartString.do?SelectedTableNo='+which
-    			            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-    			            +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
-    				    	data: {DATA_DEPART:transfer_RPT_DEPT},
+    			                +'&SelectedDepartCode='+transferDepartCode
+    			                +'&SelectedCustCol7='+transferCustCol7
+    			                +'&DATA_ROW_SUMMY='+'',
+    				    	//data: {DATA_ROW_SUMMY:JSON.stringify(listData)},
     						dataType:'json',
     						cache: false,
     						success: function(response){

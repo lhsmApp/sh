@@ -92,10 +92,11 @@ public class AuditEditController extends BaseController {
 	Map<String, TmplConfigDetail> map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
 
 	// 设置必定不用编辑的列
-	List<String> MustNotEditList = Arrays.asList("BILL_CODE", "BUSI_DATE");
-	
+	List<String> MustNotEditList = Arrays.asList("BILL_CODE", "BUSI_DATE", "CUST_COL7", "USER_GROP");
 	//界面查询字段
     List<String> QueryFeildList = Arrays.asList("DEPT_CODE", "CUST_COL7", "USER_GROP");
+	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
+	List<String> keyListBase = Arrays.asList("BUSI_DATE", "USER_CODE");
 	
 	/**列表
 	 * @param page
@@ -181,6 +182,10 @@ public class AuditEditController extends BaseController {
 		getPd.put("SystemDateTime", SystemDateTime);
 		//表名
 		getPd.put("TableName", tableName);
+		String strFieldSelectKey = QueryFeildString.getFieldSelectKey(keyListBase, TmplUtil.keyExtra);
+		if(null != strFieldSelectKey && !"".equals(strFieldSelectKey.trim())){
+			getPd.put("FieldSelectKey", strFieldSelectKey);
+		}
 		page.setPd(getPd);
 		List<PageData> varList = auditeditService.JqPage(page);	//列出Betting列表
 		int records = auditeditService.countJqGridExtend(page);

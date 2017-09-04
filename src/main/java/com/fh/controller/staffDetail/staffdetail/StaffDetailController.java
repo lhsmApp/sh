@@ -117,6 +117,8 @@ public class StaffDetailController extends BaseController {
     List<String> QueryFeildList = Arrays.asList("DEPT_CODE", "CUST_COL7", "USER_GROP");
     //设置必定不用编辑的列
     List<String> MustNotEditList = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP");
+	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
+	List<String> keyListBase = Arrays.asList("BILL_CODE", "BUSI_DATE", "USER_CODE", "STAFF_IDENT");
 
 	/**列表
 	 * @param page
@@ -145,7 +147,7 @@ public class StaffDetailController extends BaseController {
 		//mv.addObject("DepartName", DepartName);
 		
 		// 枚举  1封存,0解封
-		String State = DurState.Release.getNameKey();
+		String State = DurState.Sealed.getNameKey();
 		mv.addObject("State", String.valueOf(State.equals(DurState.Release.getNameKey())? true:false));
 
 		//CUST_COL7 FMISACC 帐套字典
@@ -160,7 +162,7 @@ public class StaffDetailController extends BaseController {
 		    IsUserDepartLayer = false;
 		}
 		
-		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService,keyListBase);
 		tmpl.setMustNotEditList(MustNotEditList);
 		String jqGridColModel = tmpl.generateStructure(SelectedTableNo, UserDepartCode, 3);
 		
@@ -184,7 +186,7 @@ public class StaffDetailController extends BaseController {
 	public @ResponseBody CommonBase getState() throws Exception{
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
-		String retState = DurState.Sealed.getNameKey();
+		String returnState = DurState.Sealed.getNameKey();
 		
 		PageData getPd = this.getPageData();
 		//员工组 必须执行，用来设置汇总和传输上报类型
@@ -196,19 +198,19 @@ public class StaffDetailController extends BaseController {
 			SelectedDepartCode = UserDepartCode;
 		}
 		
-		if(SelectedCustCol7 != null && SelectedCustCol7.trim() != "" && SelectedDepartCode != null && SelectedDepartCode.trim() != ""){
+		if(SelectedCustCol7 != null && !SelectedCustCol7.trim().equals("") && SelectedDepartCode != null && !SelectedDepartCode.trim().equals("")){
 			PageData statePd = new PageData();
 			//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
 			statePd.put("BILL_OFF", SelectedCustCol7);
 			statePd.put("RPT_DEPT", SelectedDepartCode);
 			statePd.put("RPT_DUR", SystemDateTime);
 			statePd.put("BILL_TYPE", TypeCodeDetail);
-			retState = syssealedinfoService.getState(statePd);
-			if(!(retState != null && !retState.equals("") && retState == DurState.Sealed.getNameKey())){
-				retState = DurState.Release.getNameKey();
+			String getState = syssealedinfoService.getState(statePd);
+			if(!DurState.Sealed.getNameKey().equals(getState)){
+				returnState = DurState.Release.getNameKey();
 			}
 		}
-		commonBase.setMessage(String.valueOf(retState.equals(DurState.Release.getNameKey())? true:false));
+		commonBase.setMessage(String.valueOf(returnState.equals(DurState.Release.getNameKey())? true:false));
 		commonBase.setCode(0);
 		
 		return commonBase;
@@ -262,6 +264,10 @@ public class StaffDetailController extends BaseController {
 		getPd.put("SystemDateTime", SystemDateTime);
 		//页面显示数据的二级单位
 		//getPd.put("DepartCode", SelectedDepartCode);
+		String strFieldSelectKey = QueryFeildString.getFieldSelectKey(keyListBase, TmplUtil.keyExtra);
+		if(null != strFieldSelectKey && !"".equals(strFieldSelectKey.trim())){
+			getPd.put("FieldSelectKey", strFieldSelectKey);
+		}
 		page.setPd(getPd);
 		List<PageData> varList = staffdetailService.JqPage(page);	//列出Betting列表
 		int records = staffdetailService.countJqGridExtend(page);
@@ -319,42 +325,49 @@ public class StaffDetailController extends BaseController {
 		if(checkState!=null && !checkState.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(checkState);
-		} else {
-			getPd.put("BILL_CODE", " ");
-			if(oper.equals("add")){
-				getPd.put("BUSI_DATE", SystemDateTime);
-				getPd.put("DEPT_CODE", SelectedDepartCode);
-				getPd.put("CUST_COL7", SelectedCustCol7);
-				getPd.put("USER_GROP", emplGroupType);
-			}
-			TmplUtil.setModelDefault(getPd, map_HaveColumnsList);
-			
-			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
-					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
-					emplGroupType,
-					map_HaveColumnsList);
-			String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-					TypeCodeListen, TypeCodeSummy, TableNameSummy);
-			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
-				commonBase.setCode(2);
-				commonBase.setMessage("获取可操作的数据的条件失败！");
-				return commonBase;
-			}
-			getPd.put("CanOperate", strHelpful);
-			
-			List<PageData> listData = new ArrayList<PageData>();
-			listData.add(getPd);
-			List<PageData> repeatList = staffdetailService.findByModel(listData);
-			if(repeatList!=null && repeatList.size()>0){
-				commonBase.setCode(2);
-				commonBase.setMessage("此区间内编码已存在！");
-			} else {
-                staffdetailService.deleteUpdateAll(listData);
-				commonBase.setCode(0);
-			}
+			return commonBase;
 		}
+		getPd.put("BILL_CODE", " ");
+		if(oper.equals("add")){
+			getPd.put("BUSI_DATE", SystemDateTime);
+			getPd.put("DEPT_CODE", SelectedDepartCode);
+			getPd.put("CUST_COL7", SelectedCustCol7);
+			getPd.put("USER_GROP", emplGroupType);
+		}
+		TmplUtil.setModelDefault(getPd, map_HaveColumnsList);
+		
+		FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
+				SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
+				TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+				emplGroupType,
+				map_HaveColumnsList);
+		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
+				SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
+				TypeCodeListen, TypeCodeSummy, TableNameSummy);
+		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
+			commonBase.setCode(2);
+			commonBase.setMessage("获取可操作的数据的条件失败！");
+			return commonBase;
+		}
+		getPd.put("CanOperate", strHelpful);
+		
+		List<PageData> listData = new ArrayList<PageData>();
+		listData.add(getPd);
+		List<String> repeatList = staffdetailService.findByUserCodeModel(listData);
+		if(repeatList!=null && repeatList.size()>0){
+			commonBase.setCode(2);
+			commonBase.setMessage("此区间内编码已存在！");
+			return commonBase;
+		} 
+		List<String> StaffIdentList = staffdetailService.findStaffIdentByModel(listData);
+		if(StaffIdentList!=null && StaffIdentList.size()>0){
+			commonBase.setCode(2);
+			commonBase.setMessage("此区间内身份证号已存在！");
+			return commonBase;
+		} 
+        staffdetailService.deleteUpdateAll(listData);
+		commonBase.setCode(0);
+		
 		return commonBase;
 	}
 	
@@ -412,20 +425,42 @@ public class StaffDetailController extends BaseController {
 			String json = DATA_ROWS.toString();  
 	        JSONArray array = JSONArray.fromObject(json);  
 	        List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);
+	        List<String> listUserCodeAdd = new ArrayList<String>();
+	        List<String> listStaffIdentAdd = new ArrayList<String>();
 	        for(PageData item : listData){
+	        	String strUserCode = item.getString("USER_CODE__");
+	        	String strStaffIdent = item.getString("STAFF_IDENT__");
+	        	if(listUserCodeAdd.contains(strUserCode)){
+					commonBase.setCode(2);
+					commonBase.setMessage("此区间内编码重复:" + strUserCode);
+					return commonBase;
+	        	}
+	        	if(listStaffIdentAdd.contains(strStaffIdent)){
+					commonBase.setCode(2);
+					commonBase.setMessage("此区间内身份证号重复:" + strStaffIdent);
+					return commonBase;
+	        	}
+	        	listStaffIdentAdd.add(strStaffIdent);
 	        	item.put("BILL_CODE", " ");
 	        	item.put("CanOperate", strHelpful);
 				TmplUtil.setModelDefault(item, map_HaveColumnsList);
 	        }
 			if(null != listData && listData.size() > 0){
-				List<PageData> repeatList = staffdetailService.findByModel(listData);
+				List<String> repeatList = staffdetailService.findByUserCodeModel(listData);
 				if(repeatList!=null && repeatList.size()>0){
 					commonBase.setCode(2);
 					commonBase.setMessage("此区间内编码已存在！");
-				} else {
-					staffdetailService.deleteUpdateAll(listData);
-					commonBase.setCode(0);
+					return commonBase;
 				}
+
+				List<String> StaffIdentList = staffdetailService.findStaffIdentByModel(listData);
+				if(StaffIdentList!=null && StaffIdentList.size()>0){
+					commonBase.setCode(2);
+					commonBase.setMessage("此区间内身份证号已存在！");
+					return commonBase;
+				} 
+				staffdetailService.deleteUpdateAll(listData);
+				commonBase.setCode(0);
 			}
 		}
 		return commonBase;
@@ -636,87 +671,107 @@ public class StaffDetailController extends BaseController {
 							}
 							if (judgement) {
 								List<String> sbRet = new ArrayList<String>();
-								List<String> listUserCode = new ArrayList<String>();
-								//获取数据库中不是本部门、员工组和账套中的UserCode
-								
-								
-								
-								
 								int listSize = uploadAndRead.size();
-								for(int i=0;i<listSize;i++){
-									uploadAndRead.get(i).put("CanOperate", strHelpful);
-									uploadAndRead.get(i).put("BILL_CODE", " ");
-									String getCUST_COL7 = (String) uploadAndRead.get(i).get("CUST_COL7");
-									String getUSER_GROP = (String) uploadAndRead.get(i).get("USER_GROP");
-									if(!(getCUST_COL7!=null && !getCUST_COL7.trim().equals(""))){
-										uploadAndRead.get(i).put("CUST_COL7", SelectedCustCol7);
-										getCUST_COL7 = SelectedCustCol7;
-									}
-									if(!SelectedCustCol7.equals(getCUST_COL7)){
-										if(!sbRet.contains("导入账套和当前账套必须一致！")){
-											sbRet.add("导入账套和当前账套必须一致！");
+								if(listSize > 0){
+									//获取数据库中不是本部门、员工组和账套中的UserCode、StaffIdent
+									PageData pdHaveFeild = new PageData();
+									pdHaveFeild.put("SystemDateTime", SystemDateTime);
+									pdHaveFeild.put("SelectedDepartCode", SelectedDepartCode);
+									pdHaveFeild.put("SelectedCustCol7", SelectedCustCol7);
+									pdHaveFeild.put("emplGroupType", emplGroupType);
+									pdHaveFeild.put("CanOperate", strHelpful);
+									List<String> listUserCode = staffdetailService.exportHaveUserCode(pdHaveFeild);
+							        List<String> listStaffIdent = staffdetailService.exportHaveStaffIdent(pdHaveFeild);
+									
+									for(int i=0;i<listSize;i++){
+										uploadAndRead.get(i).put("CanOperate", strHelpful);
+										uploadAndRead.get(i).put("BILL_CODE", " ");
+										String getCUST_COL7 = (String) uploadAndRead.get(i).get("CUST_COL7");
+										String getUSER_GROP = (String) uploadAndRead.get(i).get("USER_GROP");
+										if(!(getCUST_COL7!=null && !getCUST_COL7.trim().equals(""))){
+											uploadAndRead.get(i).put("CUST_COL7", SelectedCustCol7);
+											getCUST_COL7 = SelectedCustCol7;
 										}
-									}
-									if(!(getUSER_GROP!=null && !getUSER_GROP.trim().equals(""))){
-										uploadAndRead.get(i).put("USER_GROP", emplGroupType);
-										getUSER_GROP = emplGroupType;
-									}
-									if(!emplGroupType.equals(getUSER_GROP)){
-										if(!sbRet.contains("导入员工组和当前员工组必须一致！")){
-											sbRet.add("导入员工组和当前员工组必须一致！");
+										if(!SelectedCustCol7.equals(getCUST_COL7)){
+											if(!sbRet.contains("导入账套和当前账套必须一致！")){
+												sbRet.add("导入账套和当前账套必须一致！");
+											}
 										}
-									}
-									String getBUSI_DATE = (String) uploadAndRead.get(i).get("BUSI_DATE");
-									String getDEPT_CODE = (String) uploadAndRead.get(i).get("DEPT_CODE");
-									String getUSER_CODE = (String) uploadAndRead.get(i).get("USER_CODE");
-									if(!(getBUSI_DATE!=null && !getBUSI_DATE.trim().equals(""))){
-										uploadAndRead.get(i).put("BUSI_DATE", SystemDateTime);
-										getBUSI_DATE = SystemDateTime;
-									}
-									if(!SystemDateTime.equals(getBUSI_DATE)){
-										if(!sbRet.contains("导入区间和当前区间必须一致！")){
-											sbRet.add("导入区间和当前区间必须一致！");
+										if(!(getUSER_GROP!=null && !getUSER_GROP.trim().equals(""))){
+											uploadAndRead.get(i).put("USER_GROP", emplGroupType);
+											getUSER_GROP = emplGroupType;
 										}
-									}
-									if(!(getDEPT_CODE!=null && !getDEPT_CODE.trim().equals(""))){
-										uploadAndRead.get(i).put("DEPT_CODE", SelectedDepartCode);
-										getDEPT_CODE = SelectedDepartCode;
-									}
-									if(!SelectedDepartCode.equals(getDEPT_CODE)){
-										if(!sbRet.contains("导入单位和当前单位必须一致！")){
-											sbRet.add("导入单位和当前单位必须一致！");
+										if(!emplGroupType.equals(getUSER_GROP)){
+											if(!sbRet.contains("导入员工组和当前员工组必须一致！")){
+												sbRet.add("导入员工组和当前员工组必须一致！");
+											}
 										}
-									}
-									if(!(getUSER_CODE!=null && !getUSER_CODE.trim().equals(""))){
-										if(!sbRet.contains("人员编码不能为空！")){
-											sbRet.add("人员编码不能为空！");
+										String getBUSI_DATE = (String) uploadAndRead.get(i).get("BUSI_DATE");
+										String getDEPT_CODE = (String) uploadAndRead.get(i).get("DEPT_CODE");
+										String getUSER_CODE = (String) uploadAndRead.get(i).get("USER_CODE");
+										String getSTAFF_IDENT = (String) uploadAndRead.get(i).get("STAFF_IDENT");
+										if(!(getBUSI_DATE!=null && !getBUSI_DATE.trim().equals(""))){
+											uploadAndRead.get(i).put("BUSI_DATE", SystemDateTime);
+											getBUSI_DATE = SystemDateTime;
 										}
-									}
-									if(listUserCode.contains(getUSER_CODE.trim())){
-										String strUserAdd = "人员编码" + getUSER_CODE + "重复！";
-										if(!sbRet.contains(strUserAdd)){
-											sbRet.add(strUserAdd);
+										if(!SystemDateTime.equals(getBUSI_DATE)){
+											if(!sbRet.contains("导入区间和当前区间必须一致！")){
+												sbRet.add("导入区间和当前区间必须一致！");
+											}
 										}
+										if(!(getDEPT_CODE!=null && !getDEPT_CODE.trim().equals(""))){
+											uploadAndRead.get(i).put("DEPT_CODE", SelectedDepartCode);
+											getDEPT_CODE = SelectedDepartCode;
+										}
+										if(!SelectedDepartCode.equals(getDEPT_CODE)){
+											if(!sbRet.contains("导入单位和当前单位必须一致！")){
+												sbRet.add("导入单位和当前单位必须一致！");
+											}
+										}
+										if(!(getUSER_CODE!=null && !getUSER_CODE.trim().equals(""))){
+											if(!sbRet.contains("人员编码不能为空！")){
+												sbRet.add("人员编码不能为空！");
+											}
+										}
+										if(listUserCode.contains(getUSER_CODE.trim())){
+											String strUserAdd = "人员编码" + getUSER_CODE + "重复！";
+											if(!sbRet.contains(strUserAdd)){
+												sbRet.add(strUserAdd);
+											}
+										} else {
+											listUserCode.add(getUSER_CODE.trim());
+										}
+										if(!(getSTAFF_IDENT!=null && !getSTAFF_IDENT.trim().equals(""))){
+											if(!sbRet.contains("身份证号不能为空！")){
+												sbRet.add("身份证号不能为空！");
+											}
+										}
+										if(listStaffIdent.contains(getSTAFF_IDENT.trim())){
+											String strUserAdd = "身份证号" + getSTAFF_IDENT + "重复！";
+											if(!sbRet.contains(strUserAdd)){
+												sbRet.add(strUserAdd);
+											}
+										} else {
+											listStaffIdent.add(getSTAFF_IDENT.trim());
+										}
+										String getESTB_DEPT = (String) uploadAndRead.get(i).get("ESTB_DEPT");
+										if(!(getESTB_DEPT!=null && !getESTB_DEPT.trim().equals(""))){
+											uploadAndRead.get(i).put("ESTB_DEPT", SelectedDepartCode);
+										}
+										TmplUtil.setModelDefault(uploadAndRead.get(i), map_HaveColumnsList);
+									}
+									if(sbRet.size()>0){
+										StringBuilder sbTitle = new StringBuilder();
+										for(String str : sbRet){
+											sbTitle.append(str + "  "); // \n
+										}
+										commonBase.setCode(2);
+										commonBase.setMessage(sbTitle.toString());
 									} else {
-										listUserCode.add(getUSER_CODE.trim());
+										//此处执行集合添加 
+										staffdetailService.batchImport(uploadAndRead);
+										commonBase.setCode(0);
 									}
-									String getESTB_DEPT = (String) uploadAndRead.get(i).get("ESTB_DEPT");
-									if(!(getESTB_DEPT!=null && !getESTB_DEPT.trim().equals(""))){
-										uploadAndRead.get(i).put("ESTB_DEPT", SelectedDepartCode);
-									}
-									TmplUtil.setModelDefault(uploadAndRead.get(i), map_HaveColumnsList);
-								}
-								if(sbRet.size()>0){
-									StringBuilder sbTitle = new StringBuilder();
-									for(String str : sbRet){
-										sbTitle.append(str + "  "); // \n
-									}
-									commonBase.setCode(2);
-									commonBase.setMessage(sbTitle.toString());
-								} else {
-									//此处执行集合添加 
-									staffdetailService.batchImport(uploadAndRead);
-									commonBase.setCode(0);
 								}
 							} else {
 								commonBase.setCode(-1);
@@ -933,7 +988,7 @@ public class StaffDetailController extends BaseController {
 		String strRut = "选项卡对应的封存类型为空！";
 		if(TypeCodeDetail != null && !TypeCodeDetail.trim().equals("")){
 			strRut = "当前期间已封存！";
-			if(CUST_COL7 != null && CUST_COL7.trim() != "" && DEPT_CODE != null && DEPT_CODE.trim() != ""){
+			if(CUST_COL7 != null && !CUST_COL7.trim().equals("") && DEPT_CODE != null && !DEPT_CODE.trim().equals("")){
 				//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
 				PageData statePd = new PageData();
 				statePd.put("BILL_OFF", CUST_COL7);

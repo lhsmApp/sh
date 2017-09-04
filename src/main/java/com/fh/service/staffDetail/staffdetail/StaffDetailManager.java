@@ -19,7 +19,10 @@ public interface StaffDetailManager{
 	 * @param pd
 	 * @throws Exception
 	 */
-	public List<PageData> findByModel(List<PageData> listData)throws Exception;
+	public List<String> findByUserCodeModel(List<PageData> listData)throws Exception;
+	public List<String> exportHaveUserCode(PageData listData)throws Exception;
+	public List<String> findStaffIdentByModel(List<PageData> listData)throws Exception;
+	public List<String> exportHaveStaffIdent(PageData listData)throws Exception;
 
 	/**导出列表
 	 * @param page
