@@ -107,7 +107,7 @@
 													</c:forEach>
 												</select>
 											</span>
-											<span class="pull-left" id="spanSelectTree" style="margin-right: 5px;">
+											<span class="pull-left" id="spanSelectTree" style="margin-right: 5px;" <c:if test="${pd.departTreeSource=='0'}">hidden</c:if>>
 												<div class="selectTree" id="selectTree" multiMode="false"
 												    allSelectable="false" noGroup="false"></div>
 											    <input type="text" id="SelectedDepartCode" hidden></input>
@@ -883,12 +883,12 @@
 	function initComplete(){
 		//下拉树
 		var nodes = ${zTreeNodes};
-		if(nodes.length <= 1){
-            $("#spanSelectTree").hide();
-			return;
-		} else {
-            $("#spanSelectTree").show();
-		}
+		//if(nodes.length <= 1){
+        //    $("#spanSelectTree").hide();
+		//	return;
+		//} else {
+        //    $("#spanSelectTree").show();
+		//}
 		var defaultNodes = {"treeNodes":nodes};
 		//绑定change事件
 		$("#selectTree").bind("change",function(){

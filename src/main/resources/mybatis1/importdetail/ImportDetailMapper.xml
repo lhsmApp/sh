@@ -32,15 +32,4 @@
 		(${InsertField}) values (${InsertVale})
 	</insert>
 	
-	<!-- 删除汇总上报记录 -->
-	<insert id="deleteReportRecord" parameterType="pd">
-		delete from tb_sys_sealed_info
-		where RPT_DUR = '${BUSI_DATE}'
-		and RPT_DEPT = '${DEPT_CODE}'
-		and BILL_TYPE = '${TypeCodeSummy}'
-		<if test="BILL_OFF!= null and BILL_OFF != ''">
-		    and BILL_OFF = '${BILL_OFF}'
-		</if>
-	</insert>
-	
 </mapper>

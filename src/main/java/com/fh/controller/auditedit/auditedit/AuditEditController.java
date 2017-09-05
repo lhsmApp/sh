@@ -96,7 +96,7 @@ public class AuditEditController extends BaseController {
 	//界面查询字段
     List<String> QueryFeildList = Arrays.asList("DEPT_CODE", "CUST_COL7", "USER_GROP");
 	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
-	List<String> keyListBase = Arrays.asList("BUSI_DATE", "USER_CODE");
+	List<String> keyListBase = Arrays.asList("BUSI_DATE", "USER_CODE", "CUST_COL7", "USER_GROP");
 	
 	/**列表
 	 * @param page
@@ -123,7 +123,7 @@ public class AuditEditController extends BaseController {
 		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));
 		
 		setMustNotEditList(SelectedTableNo);
-		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService, keyListBase);
 		tmpl.setMustNotEditList(MustNotEditList);
 		String jqGridColModel = tmpl.generateStructure(SelectedTableNo, DepartCode, 3);
 		
@@ -228,11 +228,14 @@ public class AuditEditController extends BaseController {
 		String tableName = getTableCode(SelectedTableNo);
 		//操作
 		String oper = getPd.getString("oper");
+
+		PageData pdFindByModel = new PageData();
+		pdFindByModel.put("StaffOrNot", "");
 		
-		String BUSI_DATE = "BUSI_DATE";
-		getPd.put(BUSI_DATE, SystemDateTime);
+		getPd.put("BUSI_DATE", SystemDateTime);
 		//工资无账套无数据
 		if(CheckStaffOrNot(SelectedTableNo)){
+			pdFindByModel.put("StaffOrNot", "true");
 			if(!(SelectedCustCol7!=null && !SelectedCustCol7.trim().equals(""))){
 				commonBase.setCode(2);
 				commonBase.setMessage("工资必须选择账套！");
@@ -249,8 +252,6 @@ public class AuditEditController extends BaseController {
 		
 		List<PageData> listData = new ArrayList<PageData>();
 		listData.add(getPd);
-		
-		PageData pdFindByModel = new PageData();
 		pdFindByModel.put("TableName", tableName);
 		pdFindByModel.put("ListData", listData);
 		List<PageData> repeatList = auditeditService.findByModel(pdFindByModel);

@@ -57,6 +57,17 @@
 		</foreach>
 		</where>
 	</select>
+	<select id="exportHaveUserCode" parameterType="pd" resultType="String">
+		select USER_CODE
+		from ${TableName}
+		where BUSI_DATE = '${SystemDateTime}'
+		and ( 
+		     DEPT_CODE != '${SelectedDepartCode}' 
+		     or CUST_COL7 != '${SelectedCustCol7}' 
+		     or USER_GROP != '${emplGroupType}'
+		     )
+		${CanOperate}
+	</select>
 	
 	<!-- 新增 -->
 	<insert id="save" parameterType="pd">
@@ -69,6 +80,10 @@
 		delete from ${TableName}
 		where BUSI_DATE = #{BUSI_DATE__} 
 		and USER_CODE = #{USER_CODE__} 
+		<if test="StaffOrNot!= null and StaffOrNot != ''">
+	        and CUST_COL7 = #{CUST_COL7__} 
+	        and USER_GROP = #{USER_GROP__} 
+		</if>
 	</delete>
 	
 	<!-- 批量删除 -->

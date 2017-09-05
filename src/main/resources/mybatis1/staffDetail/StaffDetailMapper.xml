@@ -84,9 +84,7 @@
 		from 
 		<include refid="tableName"></include>
 		where BUSI_DATE = '${SystemDateTime}'
-		and DEPT_CODE != '${SelectedDepartCode}'
-	    and CUST_COL7 != #{SelectedCustCol7} 
-	    and USER_GROP != #{emplGroupType} 
+		and (DEPT_CODE != '${SelectedDepartCode}' or CUST_COL7 != '${SelectedCustCol7}' or USER_GROP != '${emplGroupType}')
 		${CanOperate}
 	</select>
 	<select id="findStaffIdentByModel" parameterType="pd" resultType="String">
@@ -104,9 +102,7 @@
 		from 
 		<include refid="tableName"></include>
 		where BUSI_DATE = '${SystemDateTime}'
-		and DEPT_CODE != '${SelectedDepartCode}'
-	    and CUST_COL7 != #{SelectedCustCol7} 
-	    and USER_GROP != #{emplGroupType} 
+		and (DEPT_CODE != '${SelectedDepartCode}' or CUST_COL7 != '${SelectedCustCol7}' or USER_GROP != '${emplGroupType}') 
 		${CanOperate}
 	</select>
 	
@@ -123,7 +119,12 @@
 		<include refid="tableName"></include>
 		where
 		<foreach item="item" index="index" collection="list" open=" (" separator=" or " close=") ">
-            BUSI_DATE = #{item.BUSI_DATE__} and USER_CODE = #{item.USER_CODE__} ${item.CanOperate}
+            USER_CODE = #{item.USER_CODE__}
+            and BUSI_DATE = #{item.BUSI_DATE__} 
+	        and DEPT_CODE = #{item.DEPT_CODE__}  
+	        and CUST_COL7 = #{item.CUST_COL7__} 
+	        and USER_GROP = #{item.USER_GROP__}  
+	        ${item.CanOperate}
 		</foreach>
 	</delete>
 	
@@ -145,8 +146,8 @@
 		<include refid="tableName"></include>
 		where BUSI_DATE = '${pd.SystemDateTime}'
 		and DEPT_CODE = '${pd.SelectedDepartCode}'
-	    and CUST_COL7 = #{pd.SelectedCustCol7} 
-	    and USER_GROP = #{pd.emplGroupType} 
+	    and CUST_COL7 = '${pd.SelectedCustCol7}' 
+	    and USER_GROP = '${pd.emplGroupType}' 
 		${pd.CanOperate}
 		<!-- <if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''">
 			and ${pd.filterWhereResult}
@@ -161,8 +162,8 @@
 		from 
 		<include refid="tableName"></include>
 		where DEPT_CODE = '${pd.SelectedDepartCode}'
-	    and CUST_COL7 = #{pd.SelectedCustCol7} 
-	    and USER_GROP = #{pd.emplGroupType} 
+	    and CUST_COL7 = '${pd.SelectedCustCol7}'
+	    and USER_GROP = '${pd.emplGroupType}' 
 		order by BUSI_DATE desc
 		limit 1
 	</select>

@@ -14,18 +14,13 @@
 		tb_social_inc_summy
 	</sql>
 	
-	<!-- 字段 -->
-	<sql id="FieldSelectKey">
-		BILL_CODE BILL_CODE__, DEPT_CODE DEPT_CODE__, BUSI_DATE BUSI_DATE__, 
-		USER_CATG USER_CATG__, USER_GROP USER_GROP__, CUST_COL7 CUST_COL7__
-	</sql>
-	
-	<!-- 获取 -->
-	
 	<!-- 列表 -->
 	<select id="datalistJqPage" parameterType="jqPage" resultType="pd">
-		select *,
-		    <include refid="FieldSelectKey"></include>
+		select
+		    * 
+		    <if test="pd.FieldSelectKey!= null and pd.FieldSelectKey != ''">
+		        ${pd.FieldSelectKey}
+		    </if>
 		from 
 		<include refid="tableName"></include>
 		where BUSI_DATE = '${pd.SystemDateTime}'

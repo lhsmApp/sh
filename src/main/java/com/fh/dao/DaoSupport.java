@@ -153,7 +153,7 @@ public class DaoSupport implements DAO {
 	 * @return
 	 * @throws Exception
 	 */
-	public void batchImport(String importDelete, String importInsert, List<?> objs )throws Exception{
+	public void batchImport(String importDelete, String importInsert, List<?> objs)throws Exception{
 		SqlSessionFactory sqlSessionFactory = sqlSessionTemplate.getSqlSessionFactory();
 		//批量执行器
 		SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH,false);
@@ -229,14 +229,16 @@ public class DaoSupport implements DAO {
 	 * @return
 	 * @throws Exception
 	 */
-	public void report(String reportDelete, String reportInsert, Object obj )throws Exception{
+	public void report(String reportDelete, String reportInsert, List<?> objs)throws Exception{
 		SqlSessionFactory sqlSessionFactory = sqlSessionTemplate.getSqlSessionFactory();
 		//批量执行器
 		SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH,false);
 		try{
-			if(obj!=null){
-				sqlSession.delete(reportDelete, obj);
-				sqlSession.update(reportInsert, obj);
+			if(objs!=null&&objs.size()>0){
+				for(int i=0,size=objs.size();i<size;i++){
+					sqlSession.delete(reportDelete, objs.get(i));
+					sqlSession.update(reportInsert, objs.get(i));
+				}
 				sqlSession.flushStatements();
 				sqlSession.commit();
 				sqlSession.clearCache();

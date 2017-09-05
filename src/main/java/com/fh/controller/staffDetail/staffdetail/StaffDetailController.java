@@ -102,7 +102,7 @@ public class StaffDetailController extends BaseController {
 	//页面显示数据的二级单位
 	String UserDepartCode = "";
 	//登录人的二级单位是最末层
-	Boolean IsUserDepartLayer = false;
+	private int departSelf = 0;
 	
 	//底行显示的求和与平均值字段
 	StringBuilder SqlUserdata = new StringBuilder();
@@ -118,7 +118,7 @@ public class StaffDetailController extends BaseController {
     //设置必定不用编辑的列
     List<String> MustNotEditList = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP");
 	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
-	List<String> keyListBase = Arrays.asList("BILL_CODE", "BUSI_DATE", "USER_CODE", "STAFF_IDENT");
+	List<String> keyListBase = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP", "STAFF_IDENT", "USER_CODE");
 
 	/**列表
 	 * @param page
@@ -152,15 +152,15 @@ public class StaffDetailController extends BaseController {
 
 		//CUST_COL7 FMISACC 帐套字典
 		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));
-		//DEPT_CODE 
-		String DepartmentSelectTreeSource = DictsUtil.getDepartmentSelectTreeSource(departmentService);
-		mv.addObject("zTreeNodes", DepartmentSelectTreeSource);
-        JSONArray myJsonArray = JSONArray.fromObject(DepartmentSelectTreeSource);  
-		if(myJsonArray.size() <= 1){
-		    IsUserDepartLayer = true;
-		} else {
-		    IsUserDepartLayer = false;
+		// *********************加载单位树  DEPT_CODE*******************************
+		String DepartmentSelectTreeSource=DictsUtil.getDepartmentSelectTreeSource(departmentService);
+		if(DepartmentSelectTreeSource.equals("0"))
+		{
+			this.departSelf = 1;
+			getPd.put("departTreeSource", DepartmentSelectTreeSource);
 		}
+		mv.addObject("zTreeNodes", DepartmentSelectTreeSource);
+		// ***********************************************************
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService,keyListBase);
 		tmpl.setMustNotEditList(MustNotEditList);
@@ -194,7 +194,7 @@ public class StaffDetailController extends BaseController {
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
-		if(IsUserDepartLayer){
+		if(departSelf == 1){
 			SelectedDepartCode = UserDepartCode;
 		}
 		
@@ -229,7 +229,7 @@ public class StaffDetailController extends BaseController {
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
-		if(IsUserDepartLayer){
+		if(departSelf == 1){
 			SelectedDepartCode = UserDepartCode;
 		}
 		//账套
@@ -305,7 +305,7 @@ public class StaffDetailController extends BaseController {
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
-		if(IsUserDepartLayer){
+		if(departSelf == 1){
 			SelectedDepartCode = UserDepartCode;
 		}
 		//账套
@@ -388,7 +388,7 @@ public class StaffDetailController extends BaseController {
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
-		if(IsUserDepartLayer){
+		if(departSelf == 1){
 			SelectedDepartCode = UserDepartCode;
 		}
 		//账套
@@ -484,7 +484,7 @@ public class StaffDetailController extends BaseController {
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
-		if(IsUserDepartLayer){
+		if(departSelf == 1){
 			SelectedDepartCode = UserDepartCode;
 		}
 		//账套
@@ -547,7 +547,7 @@ public class StaffDetailController extends BaseController {
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
-		if(IsUserDepartLayer){
+		if(departSelf == 1){
 			SelectedDepartCode = UserDepartCode;
 		}
 		//账套
@@ -590,7 +590,7 @@ public class StaffDetailController extends BaseController {
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
-		if(IsUserDepartLayer){
+		if(departSelf == 1){
 			SelectedDepartCode = UserDepartCode;
 		}
 		//账套
@@ -807,7 +807,7 @@ public class StaffDetailController extends BaseController {
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
-		if(IsUserDepartLayer){
+		if(departSelf == 1){
 			SelectedDepartCode = UserDepartCode;
 		}
 		//账套
@@ -839,7 +839,7 @@ public class StaffDetailController extends BaseController {
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
-		if(IsUserDepartLayer){
+		if(departSelf == 1){
 			SelectedDepartCode = UserDepartCode;
 		}
 		//账套
@@ -929,7 +929,7 @@ public class StaffDetailController extends BaseController {
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
-		if(IsUserDepartLayer){
+		if(departSelf == 1){
 			SelectedDepartCode = UserDepartCode;
 		}
 		//账套
@@ -967,7 +967,9 @@ public class StaffDetailController extends BaseController {
 			item.setRPT_DATE(time);//YYYY-MM-DD HH:MM:SS
 			item.setBILL_TYPE(TypeCodeDetail);// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 			item.setSTATE(DurState.Sealed.getNameKey());// 枚举  1封存,0解封
-			syssealedinfoService.report(item);
+            List<SysSealed> listReport = new ArrayList<SysSealed>();
+            listReport.add(item);
+			syssealedinfoService.report(listReport);
 			commonBase.setCode(0);
 		}
 		return commonBase;

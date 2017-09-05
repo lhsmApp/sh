@@ -107,10 +107,10 @@ public class HouseFundSummyController extends BaseController {
 	//显示结构的单位
     String ShowDepartCode = "01001";
 	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
-	private List<String> keyListBase = Arrays.asList("BILL_CODE", "DEPT_CODE", "BUSI_DATE", "USER_CATG", "USER_GROP", "CUST_COL7");
+	private List<String> keyListBase = Arrays.asList("BILL_CODE", "DEPT_CODE", "BUSI_DATE", "USER_CATG", "USER_GROP", "CUST_COL7", "UNITS_CODE");
     
     //汇总字段
-    List<String> SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "USER_CATG", "USER_GROP", "CUST_COL7");
+    List<String> SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "USER_CATG", "USER_GROP", "CUST_COL7", "UNITS_CODE");
     String SumFieldToString = tranferSumFieldToString();
 	
 	//页面显示数据的年月
@@ -184,6 +184,10 @@ public class HouseFundSummyController extends BaseController {
 		pd.put("TypeCodeSummy", TypeCodeSummy);
 		pd.put("TypeCodeListen", TypeCodeListen);
 		pd.put("DurState", DurState.Sealed.getNameKey());
+		String strFieldSelectKey = QueryFeildString.getFieldSelectKey(keyListBase, TmplUtil.keyExtra);
+		if(null != strFieldSelectKey && !"".equals(strFieldSelectKey.trim())){
+			pd.put("FieldSelectKey", strFieldSelectKey);
+		}
 		page.setPd(pd);
 		List<PageData> varList = housefundsummyService.JqPage(page);	//列出Betting列表
 		int records = housefundsummyService.countJqGridExtend(page);
@@ -287,7 +291,7 @@ public class HouseFundSummyController extends BaseController {
 				item.setSTATE(DurState.Sealed.getNameKey());// 枚举  1封存,0解封
 				listSysSealed.add(item);
 			}
-			syssealedinfoService.insertBatch(listSysSealed);
+			syssealedinfoService.report(listSysSealed);
 			commonBase.setCode(0);
 		}
 		return commonBase;
