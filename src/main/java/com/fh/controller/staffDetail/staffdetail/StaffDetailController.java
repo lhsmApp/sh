@@ -162,7 +162,8 @@ public class StaffDetailController extends BaseController {
 		mv.addObject("zTreeNodes", DepartmentSelectTreeSource);
 		// ***********************************************************
 		
-		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService,keyListBase);
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, 
+				departmentService,userService,keyListBase);//
 		tmpl.setMustNotEditList(MustNotEditList);
 		String jqGridColModel = tmpl.generateStructure(SelectedTableNo, UserDepartCode, 3);
 		
