@@ -1,5 +1,6 @@
 package com.fh.controller.tmplconfig.tmplconfig;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -96,7 +97,8 @@ public class TmplConfigController extends BaseController {
 	public @ResponseBody PageResult<PageData> getPageList(Page page) throws Exception {
 		PageData pd = this.getPageData();
 		PageData tpd = tmplconfigService.findTableCodeByTableNo(pd);
-		pd.put("TABLE_CODE", tpd.getString("TABLE_CODE"));
+		String tmplTableCode=tpd.getString("TABLE_CODE");
+		pd.put("TABLE_CODE",tmplTableCode );
 		String filters = pd.getString("filters"); // 多条件过滤条件
 		if (null != filters && !"".equals(filters)) {
 			pd.put("filterWhereResult", SqlTools.constructWhere(filters, null));
@@ -109,13 +111,40 @@ public class TmplConfigController extends BaseController {
 		 * List<PageData> temporaryList = tmplconfigService.temporaryList(page);
 		 * result.setRows(temporaryList); }
 		 */
-		String tableCodeOri=DictsUtil.getActualTable(pd.getString("TABLE_CODE"));//数据库真实业务数据表
+		String tableCodeOri = DictsUtil.getActualTable(tmplTableCode);// 数据库真实业务数据表
 		pd.put("TABLE_CODE", tableCodeOri);
 		List<PageData> temporaryList = tmplconfigService.temporaryList(page);
-		if (varList.size() != 0) {
-			for(PageData temp:temporaryList){
-				for(PageData item:varList){
-					if(temp.getString("COL_CODE").equals(item.getString("COL_CODE"))){
+		if (varList!=null&&varList.size() != 0) {
+			List<PageData> plusList = new ArrayList<PageData>();
+			for (PageData temp : temporaryList) {
+				boolean plus=true;
+				for (PageData item : varList) {
+					if (temp.getString("COL_CODE").equals(item.getString("COL_CODE"))) {
+						plus=false;
+						break;
+					}
+				}
+				if(plus){
+					temp.put("TABLE_CODE", tmplTableCode);
+					plusList.add(temp);
+					//temp.put("TABLE_CODE", item.get("TABLE_CODE"));
+				}
+			}
+			for (PageData plusItem : plusList) {
+				varList.add(plusItem);
+			}
+			result.setRows(varList);
+		}else{
+			for (PageData temp : temporaryList) {
+				temp.put("TABLE_CODE", tmplTableCode);
+				result.setRows(temporaryList);
+			}
+		}
+
+		/*if (varList.size() != 0) {
+			for (PageData temp : temporaryList) {
+				for (PageData item : varList) {
+					if (temp.getString("COL_CODE").equals(item.getString("COL_CODE"))) {
 						temp.put("TABLE_CODE", item.get("TABLE_CODE"));
 						temp.put("COL_NAME", item.get("COL_NAME"));
 						temp.put("DISP_ORDER", item.get("DISP_ORDER"));
@@ -128,7 +157,7 @@ public class TmplConfigController extends BaseController {
 				}
 			}
 		}
-		result.setRows(temporaryList);
+		result.setRows(temporaryList);*/
 		return result;
 	}
 
