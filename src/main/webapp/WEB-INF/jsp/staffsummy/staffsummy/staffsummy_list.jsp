@@ -363,11 +363,11 @@
 		    					top.jzts();
 		    					$.ajax({
 		    						type: "POST",
-		    						url: '<%=basePath%>staffsummy/summaryDepartString.do?SelectedTableNo='+which
+		    						url: '<%=basePath%>staffsummy/summaryDepartString.do?SelectedTableNo='+which,
 		    			                //+'&SelectedDepartCode='+$("#SelectedDepartCode").val()
 		    			                //+'&SelectedCustCol7='+$("#SelectedCustCol7").val()
-		    			                +'&DATA_ROW_SUMMY='+JSON.stringify(listData),
-		    				    	//data: {DATA_ROW_SUMMY:JSON.stringify(listData)},
+		    			                //+'&DATA_ROW_SUMMY='+JSON.stringify(listData),
+		    				    	data: {DATA_ROW_SUMMY:JSON.stringify(listData)},
 		    						dataType:'json',
 		    						cache: false,
 		    						success: function(response){

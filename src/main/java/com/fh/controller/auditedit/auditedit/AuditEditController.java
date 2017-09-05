@@ -96,7 +96,7 @@ public class AuditEditController extends BaseController {
 	//界面查询字段
     List<String> QueryFeildList = Arrays.asList("DEPT_CODE", "CUST_COL7", "USER_GROP");
 	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
-	List<String> keyListBase = Arrays.asList("BUSI_DATE", "USER_CODE");
+	List<String> keyListBase = Arrays.asList("BUSI_DATE", "USER_CODE", "CUST_COL7", "USER_GROP");
 	
 	/**列表
 	 * @param page
@@ -123,7 +123,7 @@ public class AuditEditController extends BaseController {
 		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));
 		
 		setMustNotEditList(SelectedTableNo);
-		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService, keyListBase);
 		tmpl.setMustNotEditList(MustNotEditList);
 		String jqGridColModel = tmpl.generateStructure(SelectedTableNo, DepartCode, 3);
 		
@@ -228,11 +228,12 @@ public class AuditEditController extends BaseController {
 		String tableName = getTableCode(SelectedTableNo);
 		//操作
 		String oper = getPd.getString("oper");
-		
-		String BUSI_DATE = "BUSI_DATE";
-		getPd.put(BUSI_DATE, SystemDateTime);
+
+		getPd.put("StaffOrNot", "");
+		getPd.put("BUSI_DATE", SystemDateTime);
 		//工资无账套无数据
 		if(CheckStaffOrNot(SelectedTableNo)){
+			getPd.put("StaffOrNot", "true");
 			if(!(SelectedCustCol7!=null && !SelectedCustCol7.trim().equals(""))){
 				commonBase.setCode(2);
 				commonBase.setMessage("工资必须选择账套！");
@@ -249,7 +250,6 @@ public class AuditEditController extends BaseController {
 		
 		List<PageData> listData = new ArrayList<PageData>();
 		listData.add(getPd);
-		
 		PageData pdFindByModel = new PageData();
 		pdFindByModel.put("TableName", tableName);
 		pdFindByModel.put("ListData", listData);
@@ -284,13 +284,26 @@ public class AuditEditController extends BaseController {
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
 		
+		Boolean isStaffOrNot = CheckStaffOrNot(SelectedTableNo);
+		
 		String tableName = getTableCode(SelectedTableNo);
 		
 		Object DATA_ROWS = getPd.get("DATA_ROWS");
 		String json = DATA_ROWS.toString();  
         JSONArray array = JSONArray.fromObject(json);  
         List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);
+        List<String> listUserCodeAdd = new ArrayList<String>();
         for(PageData item : listData){
+        	String strUserCode = item.getString("USER_CODE__");
+        	if(listUserCodeAdd.contains(strUserCode)){
+				commonBase.setCode(2);
+				commonBase.setMessage("此区间内编码重复:" + strUserCode);
+				return commonBase;
+        	}
+			item.put("StaffOrNot", "");
+    		if(isStaffOrNot){
+    			item.put("StaffOrNot", "true");
+    		}
         	item.put("BUSI_DATE", SystemDateTime);
 			TmplUtil.setModelDefault(item, map_HaveColumnsList);
 			//表名
@@ -332,6 +345,8 @@ public class AuditEditController extends BaseController {
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
 		
+		Boolean isStaffOrNot = CheckStaffOrNot(SelectedTableNo);
+		
 		String tableName = getTableCode(SelectedTableNo);
 
 		Object DATA_ROWS = getPd.get("DATA_ROWS");
@@ -339,6 +354,10 @@ public class AuditEditController extends BaseController {
         JSONArray array = JSONArray.fromObject(json);  
         List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);
         for(PageData item : listData){
+			item.put("StaffOrNot", "");
+    		if(isStaffOrNot){
+    			item.put("StaffOrNot", "true");
+    		}
 			//表名
 			item.put("TableName", tableName);
         }
@@ -473,11 +492,13 @@ public class AuditEditController extends BaseController {
 						List<String> listUserCode = new ArrayList<String>();
 						//工资 获取数据库中不是本部门、员工组和账套中的UserCode
 						if(CheckStaffOrNot(SelectedTableNo)){
-							
-							
-							
-							
-							
+							//获取数据库中不是本部门、员工组和账套中的UserCode
+							PageData pdHaveFeild = new PageData();
+							pdHaveFeild.put("SystemDateTime", SystemDateTime);
+							pdHaveFeild.put("SelectedDepartCode", SelectedDepartCode);
+							pdHaveFeild.put("SelectedCustCol7", SelectedCustCol7);
+							pdHaveFeild.put("emplGroupType", emplGroupType);
+							listUserCode = auditeditService.exportHaveUserCode(pdHaveFeild);
 						}
 						int listSize = uploadAndRead.size();
 						for(int i=0;i<listSize;i++){

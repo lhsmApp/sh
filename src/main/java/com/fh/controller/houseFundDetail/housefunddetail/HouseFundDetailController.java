@@ -104,7 +104,9 @@ public class HouseFundDetailController extends BaseController {
 	Map<String, TableColumns> map_HaveColumnsList = new LinkedHashMap<String, TableColumns>();
 	// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 	Map<String, TmplConfigDetail> map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
-	
+
+	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
+	List<String> keyListBase = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP", "STAFF_IDENT", "USER_CODE");
 	//界面查询字段
     List<String> QueryFeildList = Arrays.asList("USER_GROP", "CUST_COL7");
 	
@@ -143,7 +145,7 @@ public class HouseFundDetailController extends BaseController {
 		//CUST_COL7 FMISACC 帐套字典
 		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));
 		
-		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService, keyListBase);
 		String jqGridColModel = tmpl.generateStructure(TypeCodeDetail, DepartCode, 3);
 		
 		SqlUserdata = tmpl.getSqlUserdata();
@@ -187,6 +189,10 @@ public class HouseFundDetailController extends BaseController {
 		pd.put("SystemDateTime", SystemDateTime);
 		//页面显示数据的二级单位
 		pd.put("DepartCode", DepartCode);
+		String strFieldSelectKey = QueryFeildString.getFieldSelectKey(keyListBase, TmplUtil.keyExtra);
+		if(null != strFieldSelectKey && !"".equals(strFieldSelectKey.trim())){
+			pd.put("FieldSelectKey", strFieldSelectKey);
+		}
 		page.setPd(pd);
 		List<PageData> varList = housefunddetailService.JqPage(page);	//列出Betting列表
 		int records = housefunddetailService.countJqGridExtend(page);
@@ -651,7 +657,7 @@ public class HouseFundDetailController extends BaseController {
 			User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
 			String userId = user.getUSER_ID();
             String time = DateUtils.getCurrentTime(DateFormatUtils.DATE_FORMAT2);
-			
+            
 			SysSealed item = new SysSealed();
 			item.setBILL_CODE(" ");
 			item.setRPT_DEPT(DepartCode);
@@ -660,7 +666,9 @@ public class HouseFundDetailController extends BaseController {
 			item.setRPT_DATE(time);//YYYY-MM-DD HH:MM:SS
 			item.setBILL_TYPE(TypeCodeDetail.toString());// 枚举  1工资明细,2工资汇总,3公积金明细,4公积金汇总,5社保明细,6社保汇总,7工资接口,8公积金接口,9社保接口
 			item.setSTATE(DurState.Sealed.getNameKey());// 枚举  1封存,0解封
-			syssealedinfoService.report(item);
+            List<SysSealed> listReport = new ArrayList<SysSealed>();
+            listReport.add(item);
+			syssealedinfoService.report(listReport);
 			commonBase.setCode(0);
 		}
 		return commonBase;

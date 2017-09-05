@@ -119,9 +119,9 @@ public class StaffSummyController extends BaseController {
 	Map<String, TmplConfigDetail> map_SetColumnsList = new HashMap<String, TmplConfigDetail>();
 
 	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
-	private List<String> keyListBase = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "USER_CATG", "USER_GROP", "CUST_COL7");
+	private List<String> keyListBase = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "USER_CATG", "USER_GROP", "CUST_COL7", "UNITS_CODE");
     //汇总字段
-    List<String> SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "USER_CATG", "USER_GROP", "CUST_COL7");
+    List<String> SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "USER_CATG", "USER_GROP", "CUST_COL7", "UNITS_CODE");
     String SumFieldToString = QueryFeildString.tranferSumFieldToString(SumField);
 	//界面查询字段
     List<String> QueryFeildList = Arrays.asList("DEPT_CODE", "USER_GROP", "CUST_COL7");
@@ -339,7 +339,7 @@ public class StaffSummyController extends BaseController {
 				item.setSTATE(DurState.Sealed.getNameKey());// 枚举  1封存,0解封
 				listSysSealed.add(item);
 			}
-			syssealedinfoService.insertBatch(listSysSealed);
+			syssealedinfoService.report(listSysSealed);
 			commonBase.setCode(0);
 		}
 		return commonBase;

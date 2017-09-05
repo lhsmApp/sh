@@ -20,16 +20,6 @@ public class AuditEditService implements AuditEditManager{
 
 	@Resource(name = "daoSupport")
 	private DaoSupport dao;
-
-	/**获取数据
-	 * 张晓柳
-	 * @param pd
-	 * @throws Exception
-	 */
-	@SuppressWarnings("unchecked")
-	public List<PageData> findByModel(PageData pd)throws Exception{
-		return (List<PageData>)dao.findForList("AuditEditMapper.findByModel", pd);
-	}
 	
 	/**列表
 	 * @param page
@@ -52,6 +42,20 @@ public class AuditEditService implements AuditEditManager{
 	 */
 	public PageData getFooterSummary(JqPage page)throws Exception{
 		return (PageData)dao.findForObject("AuditEditMapper.getFooterSummary", page);
+	}
+
+	/**获取数据
+	 * 张晓柳
+	 * @param pd
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PageData> findByModel(PageData pd)throws Exception{
+		return (List<PageData>)dao.findForList("AuditEditMapper.findByModel", pd);
+	}
+	@SuppressWarnings("unchecked")
+	public List<String> exportHaveUserCode(PageData listData)throws Exception{
+		return (List<String>)dao.findForList("AuditEditMapper.exportHaveUserCode", listData);
 	}
 
 	/**批量删除

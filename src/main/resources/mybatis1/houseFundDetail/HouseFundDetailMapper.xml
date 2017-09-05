@@ -14,14 +14,13 @@
 		tb_house_fund_detail
 	</sql>
 	
-	<!-- 字段 -->
-	<sql id="FieldSelectKey"> BILL_CODE BILL_CODE__, BUSI_DATE BUSI_DATE__, USER_CODE USER_CODE__</sql>
-	
 	<!-- 列表 -->
 	<select id="datalistJqPage" parameterType="jqPage" resultType="pd">
 		select 
-		    * ,
-		    <include refid="FieldSelectKey"></include>
+		    * 
+		    <if test="pd.FieldSelectKey!= null and pd.FieldSelectKey != ''">
+		        ${pd.FieldSelectKey}
+		    </if>
 		from 
 		<include refid="tableName"></include>
 		where BUSI_DATE = '${pd.SystemDateTime}'

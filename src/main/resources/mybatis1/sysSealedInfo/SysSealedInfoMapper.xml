@@ -18,6 +18,19 @@
 		STATE,
 		BILL_OFF
 	</sql>
+	<sql id="FieldPart">
+		BILL_CODE,
+		RPT_DEPT,
+		RPT_DUR,
+		RPT_USER,
+		RPT_DATE,
+		BILL_TYPE,
+		STATE
+	</sql>
+	<sql id="FieldLast">
+		,
+		BILL_OFF
+	</sql>
 
 	<!-- 字段值 -->
 	<sql id="FieldValue">
@@ -28,6 +41,19 @@
 		#{RPT_DATE},
 		#{BILL_TYPE},
 		#{STATE},
+		#{BILL_OFF}
+	</sql>
+	<sql id="FieldValuePart">
+		#{BILL_CODE},
+		#{RPT_DEPT},
+		#{RPT_DUR},
+		#{RPT_USER},
+		#{RPT_DATE},
+		#{BILL_TYPE},
+		#{STATE}
+	</sql>
+	<sql id="FieldValueLast">
+		,
 		#{BILL_OFF}
 	</sql>
 
@@ -205,17 +231,39 @@
 		where RPT_DUR = #{RPT_DUR}
 		and RPT_DEPT = #{RPT_DEPT}
 		and BILL_TYPE = #{BILL_TYPE}
-		and BILL_OFF=#{BILL_OFF}
+		<if test="BILL_OFF != null and BILL_OFF != ''">
+		    and BILL_OFF=#{BILL_OFF}
+		</if>
 	</delete>
 	<insert id="reportInsert" parameterType="com.fh.entity.SysSealed">
 		insert into
 		<include refid="tableName"></include>
 		(
-		<include refid="Field"></include>
+		    <include refid="FieldPart"></include>
+		    <if test="BILL_OFF != null and BILL_OFF != ''">
+		        <include refid="FieldLast"></include>
+		    </if>
 		) values (
-		<include refid="FieldValue"></include>
+		    <include refid="FieldValuePart"></include>
+		    <if test="BILL_OFF != null and BILL_OFF != ''">
+		        <include refid="FieldValueLast"></include>
+		    </if>
 		)
 	</insert>
+
+	<!-- 删除汇总上报记录 -->
+	<insert id="deleteReportRecord" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where RPT_DUR = '${BUSI_DATE}'
+		and RPT_DEPT = '${DEPT_CODE}'
+		and BILL_TYPE = '${TypeCodeSummy}'
+		<if test="BILL_OFF!= null and BILL_OFF != ''">
+		    and BILL_OFF = '${BILL_OFF}'
+		</if>
+	</insert>
+
+
 
 	<!-- 批量保存 -->
 	<update id="updateAll" parameterType="pd">

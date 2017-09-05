@@ -20,6 +20,7 @@ public interface AuditEditManager{
 	 * @throws Exception
 	 */
 	public List<PageData> findByModel(PageData pd)throws Exception;
+	public List<String> exportHaveUserCode(PageData listData)throws Exception;
 
 	/**导出列表
 	 * @param page
