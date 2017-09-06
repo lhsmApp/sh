@@ -91,12 +91,27 @@ public class AuditEditController extends BaseController {
 	// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 	Map<String, TmplConfigDetail> map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
 
-	// 设置必定不用编辑的列
-	List<String> MustNotEditList = Arrays.asList("BILL_CODE", "BUSI_DATE", "CUST_COL7", "USER_GROP");
 	//界面查询字段
     List<String> QueryFeildList = Arrays.asList("DEPT_CODE", "CUST_COL7", "USER_GROP");
+	// 设置必定不用编辑的列
+	List<String> MustNotEditList = Arrays.asList("BILL_CODE", "BUSI_DATE", "CUST_COL7", "USER_GROP");
 	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
-	List<String> keyListBase = Arrays.asList("BUSI_DATE", "USER_CODE", "CUST_COL7", "USER_GROP");
+    List<String> keyListAdd = Arrays.asList("USER_CODE");
+	List<String> keyListBase = getKeyListBase();
+	private List<String> getKeyListBase(){
+		List<String> list = new ArrayList<String>();
+		for(String strFeild : MustNotEditList){
+			if (!list.contains(strFeild)) {
+			    list.add(strFeild);
+			}
+		}
+		for(String strFeild : keyListAdd){
+			if (!list.contains(strFeild)) {
+				list.add(strFeild);
+			}
+		}
+		return list;
+	}
 	
 	/**列表
 	 * @param page
@@ -124,8 +139,8 @@ public class AuditEditController extends BaseController {
 		
 		setMustNotEditList(SelectedTableNo);
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService, keyListBase);
-		tmpl.setMustNotEditList(MustNotEditList);
-		String jqGridColModel = tmpl.generateStructure(SelectedTableNo, DepartCode, 3);
+		//tmpl.setMustNotEditFeildList(MustNotEditList);
+		String jqGridColModel = tmpl.generateStructure(SelectedTableNo, DepartCode, 3, MustNotEditList);
 		
 		SqlUserdata = tmpl.getSqlUserdata();
 		//字典
@@ -228,9 +243,7 @@ public class AuditEditController extends BaseController {
 		String tableName = getTableCode(SelectedTableNo);
 		//操作
 		String oper = getPd.getString("oper");
-
 		getPd.put("StaffOrNot", "");
-		getPd.put("BUSI_DATE", SystemDateTime);
 		//工资无账套无数据
 		if(CheckStaffOrNot(SelectedTableNo)){
 			getPd.put("StaffOrNot", "true");
@@ -239,9 +252,19 @@ public class AuditEditController extends BaseController {
 				commonBase.setMessage("工资必须选择账套！");
 		        return commonBase;
 			}
-			if(oper.equals("add")){
+		}
+		// MustNotEditList   Arrays.asList("BILL_CODE", "BUSI_DATE", "CUST_COL7", "USER_GROP");
+		// MustNotEditList   Arrays.asList("BILL_CODE", "BUSI_DATE");
+		getPd.put("BILL_CODE", " ");
+		if(oper.equals("add")){
+			getPd.put("BUSI_DATE", SystemDateTime);
+			if(CheckStaffOrNot(SelectedTableNo)){
 				getPd.put("CUST_COL7", SelectedCustCol7);
 				getPd.put("USER_GROP", emplGroupType);
+			}
+		} else {
+			for(String strFeild : MustNotEditList){
+				getPd.put(strFeild, getPd.get(strFeild + TmplUtil.keyExtra));
 			}
 		}
 		TmplUtil.setModelDefault(getPd, map_HaveColumnsList);
@@ -741,9 +764,11 @@ public class AuditEditController extends BaseController {
 					||which.equals(TmplType.TB_STAFF_AUDIT_OPER_LABOR.getNameKey())
 					||which.equals(TmplType.TB_STAFF_AUDIT_LABOR.getNameKey())) {
 				MustNotEditList = Arrays.asList("BILL_CODE", "BUSI_DATE", "CUST_COL7", "USER_GROP");
+				keyListBase = getKeyListBase();
 			} else if (which.equals(TmplType.TB_SOCIAL_INC_AUDIT.getNameKey())
 					||which.equals(TmplType.TB_HOUSE_FUND_AUDIT.getNameKey())) {
 				MustNotEditList = Arrays.asList("BILL_CODE", "BUSI_DATE");
+				keyListBase = getKeyListBase();
 			}
 		}
 	}

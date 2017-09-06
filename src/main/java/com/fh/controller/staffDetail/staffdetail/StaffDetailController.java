@@ -118,8 +118,26 @@ public class StaffDetailController extends BaseController {
     //设置必定不用编辑的列
     List<String> MustNotEditList = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP");
 	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
-	List<String> keyListBase = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP", "STAFF_IDENT", "USER_CODE");
-
+    List<String> keyListAdd = Arrays.asList("STAFF_IDENT", "USER_CODE");
+	List<String> keyListBase = getKeyListBase();
+	private List<String> getKeyListBase(){
+		List<String> list = new ArrayList<String>();
+		for(String strFeild : MustNotEditList){
+			if (!list.contains(strFeild)) {
+			    list.add(strFeild);
+			}
+		}
+		for(String strFeild : keyListAdd){
+			if (!list.contains(strFeild)) {
+				list.add(strFeild);
+			}
+		}
+		return list;
+	}
+	
+	String getPageListSelectedCustCol7 = "";
+	String getPageListSelectedDepartCode = "";
+	
 	/**列表
 	 * @param page
 	 * @throws Exception
@@ -128,6 +146,10 @@ public class StaffDetailController extends BaseController {
 	public ModelAndView list(Page page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"列表StaffDetail");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
+
+		getPageListSelectedCustCol7 = "";
+		getPageListSelectedDepartCode = "";
+		
 		PageData getPd = this.getPageData();
 		//员工组
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
@@ -164,8 +186,8 @@ public class StaffDetailController extends BaseController {
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, 
 				departmentService,userService,keyListBase);//
-		tmpl.setMustNotEditList(MustNotEditList);
-		String jqGridColModel = tmpl.generateStructure(SelectedTableNo, UserDepartCode, 3);
+		//tmpl.setMustNotEditFeildList(MustNotEditList);
+		String jqGridColModel = tmpl.generateStructure(SelectedTableNo, UserDepartCode, 3, MustNotEditList);
 		
 		SqlUserdata = tmpl.getSqlUserdata();
 		//字典
@@ -224,6 +246,10 @@ public class StaffDetailController extends BaseController {
 	@RequestMapping(value="/getPageList")
 	public @ResponseBody PageResult<PageData> getPageList(JqPage page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"列表StaffDetail");
+
+		getPageListSelectedCustCol7 = "";
+		getPageListSelectedDepartCode = "";
+		
 		PageData getPd = this.getPageData();
 		//员工组
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
@@ -235,6 +261,9 @@ public class StaffDetailController extends BaseController {
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		
+		getPageListSelectedCustCol7 = SelectedCustCol7;
+		getPageListSelectedDepartCode = SelectedDepartCode;
 
 		PageData getQueryFeildPd = new PageData();
 		getQueryFeildPd.put("USER_GROP", emplGroupType);
@@ -315,7 +344,7 @@ public class StaffDetailController extends BaseController {
 		String oper = getPd.getString("oper");
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelected(SelectedCustCol7, SelectedDepartCode);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
@@ -328,12 +357,17 @@ public class StaffDetailController extends BaseController {
 			commonBase.setMessage(checkState);
 			return commonBase;
 		}
+		//必定不用编辑的列  MustNotEditList Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP");
 		getPd.put("BILL_CODE", " ");
 		if(oper.equals("add")){
 			getPd.put("BUSI_DATE", SystemDateTime);
 			getPd.put("DEPT_CODE", SelectedDepartCode);
 			getPd.put("CUST_COL7", SelectedCustCol7);
 			getPd.put("USER_GROP", emplGroupType);
+		} else {
+			for(String strFeild : MustNotEditList){
+				getPd.put(strFeild, getPd.get(strFeild + TmplUtil.keyExtra));
+			}
 		}
 		TmplUtil.setModelDefault(getPd, map_HaveColumnsList);
 		
@@ -396,7 +430,7 @@ public class StaffDetailController extends BaseController {
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelected(SelectedCustCol7, SelectedDepartCode);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
@@ -492,7 +526,7 @@ public class StaffDetailController extends BaseController {
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelected(SelectedCustCol7, SelectedDepartCode);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
@@ -555,7 +589,7 @@ public class StaffDetailController extends BaseController {
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelected(SelectedCustCol7, SelectedDepartCode);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
@@ -597,7 +631,7 @@ public class StaffDetailController extends BaseController {
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelected(SelectedCustCol7, SelectedDepartCode);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
@@ -937,7 +971,7 @@ public class StaffDetailController extends BaseController {
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelected(SelectedCustCol7, SelectedDepartCode);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
@@ -976,13 +1010,21 @@ public class StaffDetailController extends BaseController {
 		return commonBase;
 	}
 	
-	private String CheckMustSelected(String CUST_COL7, String DEPT_CODE) throws Exception{
+	private String CheckMustSelectedAndSame(String CUST_COL7, String DEPT_CODE, Boolean isCheckSame) throws Exception{
 		String strRut = "";
 		if(!(CUST_COL7 != null && !CUST_COL7.trim().equals(""))){
 			strRut += "查询条件中的账套必须选择！";
 		}
 		if(!(DEPT_CODE != null && !DEPT_CODE.trim().equals(""))){
 			strRut += "单位不能为空！";
+		}
+		if(isCheckSame){
+			if(!CUST_COL7.equals(getPageListSelectedCustCol7)){
+				strRut += "查询条件中所选账套与页面显示数据账套不一致，请单击查询再进行操作！";
+			}
+			if(!DEPT_CODE.equals(getPageListSelectedDepartCode)){
+				strRut += "查询条件中所选责任中心与页面显示数据责任中心不一致，请单击查询再进行操作！";
+			}
 		}
 		return strRut;
 	}

@@ -104,12 +104,28 @@ public class HouseFundDetailController extends BaseController {
 	Map<String, TableColumns> map_HaveColumnsList = new LinkedHashMap<String, TableColumns>();
 	// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 	Map<String, TmplConfigDetail> map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
-
-	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
-	List<String> keyListBase = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP", "STAFF_IDENT", "USER_CODE");
+	
 	//界面查询字段
     List<String> QueryFeildList = Arrays.asList("USER_GROP", "CUST_COL7");
-	
+    //设置必定不用编辑的列
+    List<String> MustNotEditList = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE");
+	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
+    List<String> keyListAdd = Arrays.asList("CUST_COL7", "USER_GROP", "USER_CODE");
+	List<String> keyListBase = getKeyListBase();
+	private List<String> getKeyListBase(){
+		List<String> list = new ArrayList<String>();
+		for(String strFeild : MustNotEditList){
+			if (!list.contains(strFeild)) {
+			    list.add(strFeild);
+			}
+		}
+		for(String strFeild : keyListAdd){
+			if (!list.contains(strFeild)) {
+				list.add(strFeild);
+			}
+		}
+		return list;
+	}
 	/**列表
 	 * @param page
 	 * @throws Exception
@@ -146,7 +162,8 @@ public class HouseFundDetailController extends BaseController {
 		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService, keyListBase);
-		String jqGridColModel = tmpl.generateStructure(TypeCodeDetail, DepartCode, 3);
+		//tmpl.setMustNotEditFeildList(MustNotEditList);
+		String jqGridColModel = tmpl.generateStructure(TypeCodeDetail, DepartCode, 3, MustNotEditList);
 		
 		SqlUserdata = tmpl.getSqlUserdata();
 		//字典
@@ -244,22 +261,19 @@ public class HouseFundDetailController extends BaseController {
 				return commonBase;
 			}
 			pd.put("CanOperate", strHelpful);
-			
-			String BILL_CODE = "BILL_CODE";
-			String BUSI_DATE = "BUSI_DATE";
-			String DEPT_CODE = "DEPT_CODE";
-			if(pd.containsKey(BILL_CODE)){
-				pd.remove(BILL_CODE);
+			//操作
+			String oper = pd.getString("oper");
+
+			//必定不用编辑的列  MustNotEditList Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE");
+			pd.put("BILL_CODE", " ");
+			if(oper.equals("add")){
+				pd.put("BUSI_DATE", SystemDateTime);
+				pd.put("DEPT_CODE", DepartCode);
+			} else {
+				for(String strFeild : MustNotEditList){
+					pd.put(strFeild, pd.get(strFeild + TmplUtil.keyExtra));
+				}
 			}
-			pd.put(BILL_CODE, " ");
-			if(pd.containsKey(BUSI_DATE)){
-				pd.remove(BUSI_DATE);
-			}
-			pd.put(BUSI_DATE, SystemDateTime);
-			if(pd.containsKey(DEPT_CODE)){
-				pd.remove(DEPT_CODE);
-			}
-			pd.put(DEPT_CODE, DepartCode);
 			TmplUtil.setModelDefault(pd, map_HaveColumnsList);
 			
 			List<PageData> listData = new ArrayList<PageData>();

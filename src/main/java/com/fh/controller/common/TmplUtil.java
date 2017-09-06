@@ -47,10 +47,10 @@ public class TmplUtil {
 		return m_sqlUserdata;
 	}
 	// 设置必定不用编辑的列
-	private List<String> MustNotEditList = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE");
-	public void setMustNotEditList(List<String> list){
-		MustNotEditList = list;
-	}
+	//private List<String> MustNotEditFeildList = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE");
+	//public void setMustNotEditFeildList(List<String> list){
+	//	MustNotEditFeildList = list;
+	//}
 
 	// 字典
 	private Map<String, Object> m_dicList = new LinkedHashMap<String, Object>();
@@ -97,11 +97,7 @@ public class TmplUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public String generateStructure(String tableNo, String departCode, int columnCount) throws Exception {
-		// 默认值
-		//m_defaultValueList = new LinkedHashMap<String, Object>();
-		// 表全部 类型
-		//m_typeList = new LinkedHashMap<String, Object>();
+	public String generateStructure(String tableNo, String departCode, int columnCount, List<String> MustNotEditFeildList) throws Exception {
 		// 字典
 		m_dicList = new LinkedHashMap<String, Object>();
 		//表结构
@@ -130,13 +126,14 @@ public class TmplUtil {
 		// 添加配置表设置列，字典（未设置就使用表默认，text或number）、隐藏、表头显示
 		if (m_columnsList != null && m_columnsList.size() > 0) {
 			for (int i = 0; i < m_columnsList.size(); i++) {
-				map_SetColumnsList.put(m_columnsList.get(i).getCOL_CODE(), m_columnsList.get(i));
-				if (listColModelAll.containsKey(m_columnsList.get(i).getCOL_CODE().toUpperCase())) {
-					Map<String, Object> itemColModel = listColModelAll.get(m_columnsList.get(i).getCOL_CODE());
+				String getCOL_CODE = m_columnsList.get(i).getCOL_CODE();
+				map_SetColumnsList.put(getCOL_CODE, m_columnsList.get(i));
+				if (listColModelAll.containsKey(getCOL_CODE.toUpperCase())) {
+					Map<String, Object> itemColModel = listColModelAll.get(getCOL_CODE);
 					String name = (String) itemColModel.get("name");
 					String edittype = (String) itemColModel.get("edittype");
-					String notedit = (String) itemColModel.get("notedit");
-					Boolean editable = (Boolean) itemColModel.get("editable");
+					//String notedit = (String) itemColModel.get("notedit");
+					//Boolean editable = (Boolean) itemColModel.get("editable");
 					if (name != null && !name.trim().equals("")) {
 						if (jqGridColModelCustom!=null && !jqGridColModelCustom.toString().trim().equals("")) {
 							jqGridColModelCustom.append(", ");
@@ -168,22 +165,39 @@ public class TmplUtil {
 							jqGridColModelCustom.append(edittype).append(", ");
 						}
 					}
+					// 设置必定不用编辑的列
 					// 配置表中的隐藏
 					int intHide = Integer.parseInt(m_columnsList.get(i).getCOL_HIDE());
 					jqGridColModelCustom.append(" hidden: ").append(intHide == 1 ? "false" : "true").append(", ");
 					if (intHide != 1) {
 						jqGridColModelCustom.append(" editable:true, editrules: {edithidden: false}, ");
-					}
-					if (notedit != null && !notedit.trim().equals("")) {
-						jqGridColModelCustom.append(notedit).append(", ");
-					}
-					//if(editable){
-						jqGridColModelCustom.append(" formoptions:{ rowpos:" + row + ", colpos:" + col + " }, ");
-						col++;
-						if (col > columnCount) {
-							row++;
-							col = 1;
+					} else {
+						if (MustNotEditFeildList.contains(getCOL_CODE)) {
+							jqGridColModelCustom.append(" editable: false, editrules: {edithidden: false}, ");
+						} else {
+							jqGridColModelCustom.append(" editable: true, ");
+							jqGridColModelCustom.append(" formoptions:{ rowpos:" + row + ", colpos:" + col + " }, ");
+							col++;
+							if (col > columnCount) {
+								row++;
+								col = 1;
+							}
 						}
+					}
+					
+					
+					//if (notedit != null && !notedit.trim().equals("")) {
+					//	jqGridColModelCustom.append(notedit).append(", ");
+					//}
+					//if(editable){
+					//	jqGridColModelCustom.append(" formoptions:{ rowpos:" + row + ", colpos:" + col + " }, ");
+					//	col++;
+					//	if (col > columnCount) {
+					//		row++;
+					//		col = 1;
+					//	}
+					//} else {
+						
 					//}
 					/*
 					 * if(i < m_columnsList.size() -1){
@@ -195,8 +209,8 @@ public class TmplUtil {
 						if (m_sqlUserdata != null && !m_sqlUserdata.toString().trim().equals("")) {
 							m_sqlUserdata.append(", ");
 						}
-						m_sqlUserdata.append(" sum(" + m_columnsList.get(i).getCOL_CODE() + ") "
-								+ m_columnsList.get(i).getCOL_CODE());
+						m_sqlUserdata.append(" sum(" + getCOL_CODE + ") "
+								+ getCOL_CODE);
 						jqGridColModelCustom.append(" summaryType:'sum', summaryTpl:'<b>sum:{0}</b>', ");
 					}
 					// 0不计算 1计算 默认0
@@ -204,7 +218,7 @@ public class TmplUtil {
 						if (m_sqlUserdata != null && !m_sqlUserdata.toString().trim().equals("")) {
 							m_sqlUserdata.append(", ");
 						}
-						m_sqlUserdata.append(" round(avg(" + m_columnsList.get(i).getCOL_CODE() + "), 2) "
+						m_sqlUserdata.append(" round(avg(" + getCOL_CODE + "), 2) "
 								+ m_columnsList.get(i).getCOL_CODE());
 						jqGridColModelCustom.append(" summaryType:'avg', summaryTpl:'<b>avg:{0}</b>', ");
 					}
@@ -216,6 +230,8 @@ public class TmplUtil {
 			}
 		}
 		StringBuilder jqGridColModelKey = new StringBuilder();
+		row++;
+		col = 1;
 		// 添加关键字的保存列
 		if (keyList != null && keyList.size() > 0) {
 			for (int i = 0; i < keyList.size(); i++) {
@@ -256,9 +272,6 @@ public class TmplUtil {
 		Map<String, Map<String, Object>> list = new LinkedHashMap<String, Map<String, Object>>();
 
 		for (TableColumns col : columns) {
-			//m_defaultValueList.put(col.getColumn_name(), col.getColumn_default());
-			// 表全部 类型
-			//m_typeList.put(col.getColumn_name(), col.getData_type());
 			//表结构
 			map_HaveColumnsList.put(col.getColumn_name(), col);
 
@@ -266,17 +279,17 @@ public class TmplUtil {
 
 			StringBuilder model_name = new StringBuilder();
 			StringBuilder model_edittype = new StringBuilder();
-			StringBuilder model_notedit = new StringBuilder();
-			Boolean editable = null;
+			//StringBuilder model_notedit = new StringBuilder();
+			//Boolean editable = null;
 
 			// 设置必定不用编辑的列
-			if (MustNotEditList.contains(col.getColumn_name())) {
-				model_notedit.append(" editable: true, editrules: {edithidden: false} ");
-				editable = false;
-			} else {
-				model_notedit.append(" editable: true ");
-				editable = true;
-			}
+			//if (MustNotEditFeildList.contains(col.getColumn_name())) {
+			//	model_notedit.append(" editable: true, editrules: {edithidden: false} ");
+			//	editable = false;
+			//} else {
+			//	model_notedit.append(" editable: true ");
+			//	editable = true;
+			//}
 			int intLength = getColumnLength(col.getColumn_type(), col.getData_type());
 			if (col.getData_type() != null && IsNumFeild(col.getData_type())) {
 				model_name.append(" width: '150', ");
@@ -301,8 +314,8 @@ public class TmplUtil {
 
 			MapAdd.put("name", model_name.toString());
 			MapAdd.put("edittype", model_edittype.toString());
-			MapAdd.put("notedit", model_notedit.toString());
-			MapAdd.put("editable", editable);
+			//MapAdd.put("notedit", model_notedit.toString());
+			//MapAdd.put("editable", editable);
 			list.put(col.getColumn_name(), MapAdd);
 		}
 

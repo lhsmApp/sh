@@ -239,6 +239,19 @@
 		insert into
 		<include refid="tableName"></include>
 		(
+		    <include refid="Field"></include>
+		) values (
+		    <include refid="FieldValuePart"></include>
+		    <choose>
+		        <when test="BILL_OFF != null and BILL_OFF != ''">
+		            <include refid="FieldValueLast"></include>
+		        </when>
+		        <otherwise>
+		            , ' '
+		        </otherwise>
+		    </choose>
+		)
+		<!-- (
 		    <include refid="FieldPart"></include>
 		    <if test="BILL_OFF != null and BILL_OFF != ''">
 		        <include refid="FieldLast"></include>
@@ -248,7 +261,7 @@
 		    <if test="BILL_OFF != null and BILL_OFF != ''">
 		        <include refid="FieldValueLast"></include>
 		    </if>
-		)
+		) -->
 	</insert>
 
 	<!-- 删除汇总上报记录 -->
