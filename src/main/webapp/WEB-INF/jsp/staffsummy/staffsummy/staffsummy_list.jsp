@@ -92,8 +92,8 @@
 									<div class="widget-body">
 										<div class="widget-main">
 											<form class="form-inline">
-											<span class="pull-left" style="margin-right: 5px;">
-												<select class="chosen-select form-control"
+											    <span class="pull-left" style="margin-right: 5px;">
+												  <select class="chosen-select form-control"
 													name="SelectedCustCol7" id="SelectedCustCol7"
 													data-placeholder="请选择帐套"
 													style="vertical-align: top; height:32px;width: 150px;">
@@ -101,12 +101,28 @@
 													<c:forEach items="${FMISACC}" var="each">
 														<option value="${each.DICT_CODE}">${each.NAME}</option>
 													</c:forEach>
-												</select>
-											</span>
+												  </select>
+											    </span>
 											<span class="pull-left" id="spanSelectTree" style="margin-right: 5px;" <c:if test="${pd.departTreeSource=='0'}">hidden</c:if>>
-												<div class="selectTree" id="selectTree" multiMode="true"
+												<div class="selectTree" id="selectTree1" multiMode="true"
 												    allSelectable="false" noGroup="false"></div>
 											    <input type="text" id="SelectedDepartCode" hidden></input>
+											</span>
+											<span class="pull-left" style="margin-right: 5px;">
+												<select class="chosen-select form-control"
+													name="SelectedOrgUnit" id="SelectedOrgUnit"
+													data-placeholder="请选择组织单元文本"
+													style="vertical-align: top; height:32px;width: 150px;">
+													<option value="">请选择组织单元文本</option>
+													<c:forEach items="${ORGUNIT}" var="each">
+														<option value="${each.DICT_CODE}">${each.NAME}</option>
+													</c:forEach>
+												</select>
+											</span>
+											<span class="pull-left" style="margin-right: 5px;">
+												<div class="selectTree" id="selectTree2" multiMode="true"
+												    allSelectable="false" noGroup="false"></div>
+											    <input type="text" id="SelectedUnitsCode" hidden></input>
 											</span>
 												<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
 													<i class="ace-icon fa fa-search bigger-110"></i>
@@ -209,8 +225,10 @@
 			
 			$(gridBase_selector).jqGrid({
 				url: '<%=basePath%>staffsummy/getPageList.do?SelectedTableNo='+which
-	            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-	            +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
+			            +'&SelectedCustCol7='+$("#SelectedCustCol7").val()
+			            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+		                +'&SelectedOrgUnit='+$("#SelectedOrgUnit").val()
+		                +'&SelectedUnitsCode='+$("#SelectedUnitsCode").val(),
 				datatype: "json",
 				colModel: jqGridColModel,
 				viewrecords: true, 
@@ -268,7 +286,8 @@
 						$(gridBase_selector).setSelection(curRowId,true);
 	                    for (i = 0; i < ids.length; i++) { 
 	                    	var item=$(gridBase_selector).getRowData(ids[i]);
-	                    	if(item.DEPT_CODE==curRowData.DEPT_CODE)
+	                    	if(item.DEPT_CODE==curRowData.DEPT_CODE
+	                    			&& item.CUST_COL7==curRowData.CUST_COL7)
 	                    		$(gridBase_selector).setSelection(ids[i],true);
 	                    }
 					});
@@ -366,8 +385,8 @@
 		    						url: '<%=basePath%>staffsummy/summaryDepartString.do?SelectedTableNo='+which,
 		    			                //+'&SelectedDepartCode='+$("#SelectedDepartCode").val()
 		    			                //+'&SelectedCustCol7='+$("#SelectedCustCol7").val()
-		    			                //+'&DATA_ROW_SUMMY='+JSON.stringify(listData),
-		    				    	data: {DATA_ROW_SUMMY:JSON.stringify(listData)},
+		    			                //+'&DataRowSummy='+JSON.stringify(listData),
+		    				    	data: {DataRowSummy:JSON.stringify(listData)},
 		    						dataType:'json',
 		    						cache: false,
 		    						success: function(response){
@@ -433,10 +452,8 @@
 							top.jzts();
 							$.ajax({
 								type: "POST",
-								url: '<%=basePath%>staffsummy/report.do?SelectedTableNo='+which
-					            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-					            +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
-	    				    	data: {DATA_ROWS_REPORT:JSON.stringify(listData)},
+								url: '<%=basePath%>staffsummy/report.do?SelectedTableNo='+which,
+	    				    	data: {DataRowsReport:JSON.stringify(listData)},
 	    						dataType:'json',
 	    						cache: false,
 								success: function(response){
@@ -488,10 +505,8 @@
             var detailColModel = "[]";
 			$.ajax({
 				type: "GET",
-				url: '<%=basePath%>staffsummy/getDetailColModel.do?SelectedTableNo='+which
-	            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-	            +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
-		    	data: {DATA_DEPT_CODE:DEPT_CODE},
+				url: '<%=basePath%>staffsummy/getDetailColModel.do?SelectedTableNo='+which,
+		    	data: {DataDeptCode:DEPT_CODE},
 				dataType:'json',
 				cache: false,
 				success: function(response){
@@ -503,7 +518,7 @@
 			            var childGridID = parentRowID + "_table";
 			            var childGridPagerID = parentRowID + "_pager";
 			            // send the parent row primary key to the server so that we know which grid to show
-			            var childGridURL = '<%=basePath%>staffsummy/getDetailList.do?SelectedBillCode='+BILL_CODE+'';
+			            var childGridURL = '<%=basePath%>staffsummy/getDetailList.do?DetailListBillCode='+BILL_CODE+'';
 			            //childGridURL = childGridURL + "&parentRowID=" + encodeURIComponent(parentRowKey)
 
 			            // add a table and pager HTML elements to the parent grid row - we will render the child grid here
@@ -559,18 +574,28 @@
 		//加载单位树
 		function initComplete(){
 			//下拉树
-			var defaultNodes = {"treeNodes":${zTreeNodes}};
+			var defaultNodes1 = {"treeNodes":${zTreeNodes1}};
+			var defaultNodes2 = {"treeNodes":${zTreeNodes2}};
 			//绑定change事件
-			$("#selectTree").bind("change",function(){
+			$("#selectTree1").bind("change",function(){
 				$("#SelectedDepartCode").val("");
 				if($(this).attr("relValue")){
 					$("#SelectedDepartCode").val($(this).attr("relValue"));
 					console.log($(this).attr("relValue"));
 			    }
 			});
+			$("#selectTree2").bind("change",function(){
+				$("#SelectedUnitsCode").val("");
+				if($(this).attr("relValue")){
+					$("#SelectedUnitsCode").val($(this).attr("relValue"));
+					console.log($(this).attr("relValue"));
+			    }
+			});
 			//赋给data属性
-			$("#selectTree").data("data",defaultNodes);  
-			$("#selectTree").render();
+			$("#selectTree1").data("data",defaultNodes1);  
+			$("#selectTree1").render();
+			$("#selectTree2").data("data",defaultNodes2);  
+			$("#selectTree2").render();
 			$("#selectTree2_input").val("请选择单位");
 		}
 		
@@ -578,8 +603,9 @@
 		function btnSummyClick(){
 			var transferCustCol7 = $("#SelectedCustCol7").val();
 			var transferDepartCode = $("#SelectedDepartCode").val();
+			console.log($("#spanSelectTree").is(":hidden"));
 			
-			if(!(transferDepartCode!=null && transferDepartCode.trim()!="")){
+			if(!$("#spanSelectTree").is(":hidden") && !(transferDepartCode!=null && transferDepartCode.trim()!="")){
 			    bootbox.dialog({
 				    message: "<span class='bigger-110'>您没有选择任何单位!</span>",
 				    buttons: 			
@@ -609,8 +635,7 @@
     						url: '<%=basePath%>staffsummy/summaryDepartString.do?SelectedTableNo='+which
     			                +'&SelectedDepartCode='+transferDepartCode
     			                +'&SelectedCustCol7='+transferCustCol7
-    			                +'&DATA_ROW_SUMMY='+'',
-    				    	//data: {DATA_ROW_SUMMY:JSON.stringify(listData)},
+    			                +'&DataRowSummy='+'',
     						dataType:'json',
     						cache: false,
     						success: function(response){
@@ -654,8 +679,10 @@
 			var SelectedDepartCode = $("#SelectedDepartCode").val();
 			$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据
 				url:'<%=basePath%>staffsummy/getPageList.do?SelectedTableNo='+which
+	            +'&SelectedCustCol7='+$("#SelectedCustCol7").val()
 	            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-	            +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),  
+                +'&SelectedOrgUnit='+$("#SelectedOrgUnit").val()
+                +'&SelectedUnitsCode='+$("#SelectedUnitsCode").val(),
 				datatype:'json',
 			      page:1
 			}).trigger("reloadGrid");

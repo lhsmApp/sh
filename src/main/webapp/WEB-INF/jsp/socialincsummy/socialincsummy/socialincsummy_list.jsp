@@ -56,7 +56,7 @@
 									
 										<button id="btnQuery" class="btn btn-white btn-info btn-sm"
 											onclick="showQueryCondi($('#jqGrid'),null,true)">
-											<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
+											<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>隐藏查询</span>
 										</button>
 						<button id="btnSummy" class="btn btn-white btn-info btn-sm"
 							onclick="btnSummyClick()">
@@ -71,15 +71,53 @@
 				
 							<div class="row">
 							<div class="col-xs-12">
-								<div class="widget-box" style="display: none;">
+								<div class="widget-box" style="display: block;">
 									<div class="widget-body">
 										<div class="widget-main">
 											<form class="form-inline">
-											    <span style="margin-right: 5px;">
-												    <div class="selectTree" id="selectTree" multiMode="true"
-												    	allSelectable="false" noGroup="false"></div>
-											    	<input type="text" id="RPT_DEPT" hidden></input>
-											    </span> 
+											    <span class="pull-left" style="margin-right: 5px;">
+												  <select class="chosen-select form-control"
+													name="SelectedCustCol7" id="SelectedCustCol7"
+													data-placeholder="请选择帐套"
+													style="vertical-align: top; height:32px;width: 150px;">
+													<option value="">请选择帐套</option>
+													<c:forEach items="${FMISACC}" var="each">
+														<option value="${each.DICT_CODE}">${each.NAME}</option>
+													</c:forEach>
+												  </select>
+											    </span>
+											<span class="pull-left" id="spanSelectTree" style="margin-right: 5px;" <c:if test="${pd.departTreeSource=='0'}">hidden</c:if>>
+												<div class="selectTree" id="selectTree1" multiMode="true"
+												    allSelectable="false" noGroup="false"></div>
+											    <input type="text" id="SelectedDepartCode" hidden></input>
+											</span>
+											<span class="pull-left" style="margin-right: 5px;">
+												<select class="chosen-select form-control"
+													name="SelectedUserGrop" id="SelectedUserGrop"
+													data-placeholder="请选择员工组"
+													style="vertical-align: top; height:32px;width: 150px;">
+													<option value="">请选择员工组</option>
+													<c:forEach items="${EMPLGRP}" var="each">
+														<option value="${each.DICT_CODE}">${each.NAME}</option>
+													</c:forEach>
+												</select>
+											</span>
+											<span class="pull-left" style="margin-right: 5px;">
+												<select class="chosen-select form-control"
+													name="SelectedUserCatg" id="SelectedUserCatg"
+													data-placeholder="请选择企业特定员工分类"
+													style="vertical-align: top; height:32px;width: 150px;">
+													<option value="">请选择企业特定员工分类</option>
+													<c:forEach items="${PARTUSERTYPE}" var="each">
+														<option value="${each.DICT_CODE}">${each.NAME}</option>
+													</c:forEach>
+												</select>
+											</span>
+											<span class="pull-left" style="margin-right: 5px;">
+												<div class="selectTree" id="selectTree2" multiMode="true"
+												    allSelectable="false" noGroup="false"></div>
+											    <input type="text" id="SelectedUnitsCode" hidden></input>
+											</span>
 												<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
 													<i class="ace-icon fa fa-search bigger-110"></i>
 												</button>
@@ -156,7 +194,12 @@
 		    });
 			
 			$(gridBase_selector).jqGrid({
-				url: '<%=basePath%>socialincsummy/getPageList.do',
+				url: '<%=basePath%>socialincsummy/getPageList.do?'
+		            +'SelectedCustCol7='+$("#SelectedCustCol7").val()
+		            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+		            +'&SelectedUserGrop='+$("#SelectedUserGrop").val()
+	                +'&SelectedUserCatg='+$("#SelectedUserCatg").val()
+	                +'&SelectedUnitsCode='+$("#SelectedUnitsCode").val(),
 				datatype: "json",
 				colModel: jqGridColModel,
 				viewrecords: true, 
@@ -214,7 +257,8 @@
 						$(gridBase_selector).setSelection(curRowId,true);
 	                    for (i = 0; i < ids.length; i++) { 
 	                    	var item=$(gridBase_selector).getRowData(ids[i]);
-	                    	if(item.DEPT_CODE==curRowData.DEPT_CODE)
+	                    	if(item.DEPT_CODE==curRowData.DEPT_CODE
+	                    			&& item.CUST_COL7==curRowData.CUST_COL7)
 	                    		$(gridBase_selector).setSelection(ids[i],true);
 	                    }
 					});
@@ -287,36 +331,30 @@
 
 				//汇总
 				function summary(e) {
-					var transfer_RPT_DEPT = "";
 			    	//获得选中的行ids的方法
 			    	var ids = $(gridBase_selector).getGridParam("selarrrow");  
-
-					if(ids!=null && ids.length>0){
-						//遍历访问这个集合  
-						$(ids).each(function (index, id){  
-				            var rowData = $(gridBase_selector).getRowData(id);
-				        	var DEPT_CODE = rowData.DEPT_CODE__;
-				        	if(transfer_RPT_DEPT!=null && transfer_RPT_DEPT.trim()!=""){
-				        		transfer_RPT_DEPT += ",";
-				        	}
-				        	transfer_RPT_DEPT += DEPT_CODE;
+			    	
+					if(!(ids!=null && ids.length>0)){
+						bootbox.dialog({
+							message: "<span class='bigger-110'>您没有选择任何内容!</span>",
+							buttons: 			
+							{ "button":{ "label":"确定", "className":"btn-sm btn-success"}}
 						});
-					} 
-					if(!(transfer_RPT_DEPT!=null && transfer_RPT_DEPT.trim()!="")){
-					    bootbox.dialog({
-						    message: "<span class='bigger-110'>您没有选择任何列表内容!</span>",
-						    buttons: 			
-						    { "button":{ "label":"确定", "className":"btn-sm btn-success"}}
-					    }); 
-					} else {
+					}else{
 		                var msg = '确定要汇总吗??';
 		                bootbox.confirm(msg, function(result) {
 		    				if(result) {
+		    					var listData =new Array();
+		    					//遍历访问这个集合  
+		    					$(ids).each(function (index, id){  
+		    			            var rowData = $(gridBase_selector).getRowData(id);
+		    			            listData.push(rowData);
+		    					});
 		    					top.jzts();
 		    					$.ajax({
 		    						type: "POST",
 		    						url: '<%=basePath%>socialincsummy/summaryDepartString.do?',
-		    				    	data: {DATA_DEPART:transfer_RPT_DEPT},
+			    				    data: {DataRowSummy:JSON.stringify(listData)},
 		    						dataType:'json',
 		    						cache: false,
 		    						success: function(response){
@@ -382,7 +420,7 @@
 							$.ajax({
 								type: "POST",
 								url: '<%=basePath%>socialincsummy/report.do?',
-	    				    	data: {DATA_ROWS_REPORT:JSON.stringify(listData)},
+	    				    	data: {DataRowsReport:JSON.stringify(listData)},
 	    						dataType:'json',
 	    						cache: false,
 								success: function(response){
@@ -435,7 +473,7 @@
 			$.ajax({
 				type: "GET",
 				url: '<%=basePath%>socialincsummy/getDetailColModel.do?',
-		    	data: {DATA_DEPT_CODE:DEPT_CODE},
+		    	data: {DataDeptCode:DEPT_CODE},
 				dataType:'json',
 				cache: false,
 				success: function(response){
@@ -447,7 +485,7 @@
 			            var childGridID = parentRowID + "_table";
 			            var childGridPagerID = parentRowID + "_pager";
 			            // send the parent row primary key to the server so that we know which grid to show
-			            var childGridURL = '<%=basePath%>socialincsummy/getDetailList.do?BILL_CODE='+BILL_CODE+'';
+			            var childGridURL = '<%=basePath%>socialincsummy/getDetailList.do?DetailListBillCode='+BILL_CODE+''
 			            //childGridURL = childGridURL + "&parentRowID=" + encodeURIComponent(parentRowKey)
 
 			            // add a table and pager HTML elements to the parent grid row - we will render the child grid here
@@ -503,28 +541,46 @@
 		//加载单位树
 		function initComplete(){
 			//下拉树
-			var defaultNodes = {"treeNodes":${zTreeNodes}};
+			var defaultNodes1 = {"treeNodes":${zTreeNodes1}};
+			var defaultNodes2 = {"treeNodes":${zTreeNodes2}};
 			//绑定change事件
-			$("#selectTree").bind("change",function(){
-				$("#RPT_DEPT").val("");
+			$("#selectTree1").bind("change",function(){
+				$("#SelectedDepartCode").val("");
 				if($(this).attr("relValue")){
-					$("#RPT_DEPT").val($(this).attr("relValue"));
+					$("#SelectedDepartCode").val($(this).attr("relValue"));
+					console.log($(this).attr("relValue"));
+			    }
+			});
+			$("#selectTree2").bind("change",function(){
+				$("#SelectedUnitsCode").val("");
+				if($(this).attr("relValue")){
+					$("#SelectedUnitsCode").val($(this).attr("relValue"));
 					console.log($(this).attr("relValue"));
 			    }
 			});
 			//赋给data属性
-			$("#selectTree").data("data",defaultNodes);  
-			$("#selectTree").render();
+			$("#selectTree1").data("data",defaultNodes1);  
+			$("#selectTree1").render();
+			$("#selectTree2").data("data",defaultNodes2);  
+			$("#selectTree2").render();
 			$("#selectTree2_input").val("请选择单位");
 		}
 		
 		//汇总
 		function btnSummyClick(){
-			var transfer_RPT_DEPT = transfer_RPT_DEPT = $("#RPT_DEPT").val();
+			var transferCustCol7 = $("#SelectedCustCol7").val();
+			var transferDepartCode = $("#SelectedDepartCode").val();
+			console.log($("#spanSelectTree").is(":hidden"));
 			
-			if(!(transfer_RPT_DEPT!=null && transfer_RPT_DEPT.trim()!="")){
+			if(!$("#spanSelectTree").is(":hidden") && !(transferDepartCode!=null && transferDepartCode.trim()!="")){
 			    bootbox.dialog({
 				    message: "<span class='bigger-110'>您没有选择任何单位!</span>",
+				    buttons: 			
+				    { "button":{ "label":"确定", "className":"btn-sm btn-success"}}
+			    }); 
+			} else if (!(transferCustCol7!=null && transferCustCol7.trim()!="")){
+			    bootbox.dialog({
+				    message: "<span class='bigger-110'>您没有选择账套信息!</span>",
 				    buttons: 			
 				    { "button":{ "label":"确定", "className":"btn-sm btn-success"}}
 			    }); 
@@ -535,8 +591,10 @@
     					top.jzts();
     					$.ajax({
     						type: "POST",
-    						url: '<%=basePath%>socialincsummy/summaryDepartString.do?',
-    				    	data: {DATA_DEPART:transfer_RPT_DEPT},
+    						url: '<%=basePath%>socialincsummy/summaryDepartString.do?'
+    			                +'SelectedDepartCode='+transferDepartCode
+    			                +'&SelectedCustCol7='+transferCustCol7
+    			                +'&DataRowSummy='+'',
     						dataType:'json',
     						cache: false,
     						success: function(response){
@@ -576,10 +634,13 @@
 		
 		//检索
 		function tosearch() {
-			console.log($("#RPT_DEPT").val());
-			var RPT_DEPT = $("#RPT_DEPT").val();
 			$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据
-				url:'<%=basePath%>socialincsummy/getPageList.do?DEPT_CODE='+RPT_DEPT,  
+				url:'<%=basePath%>socialincsummy/getPageList.do?'
+		            +'SelectedCustCol7='+$("#SelectedCustCol7").val()
+		            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+		            +'&SelectedUserGrop='+$("#SelectedUserGrop").val()
+	                +'&SelectedUserCatg='+$("#SelectedUserCatg").val()
+	                +'&SelectedUnitsCode='+$("#SelectedUnitsCode").val(),  
 				datatype:'json',
 			      page:1
 			}).trigger("reloadGrid");

@@ -958,10 +958,10 @@ public class HouseFundDetailController extends BaseController {
 			strRut += "查询条件中的责任中心不能为空！";
 		}
 		if(isCheckSame){
-			if(!CUST_COL7.equals(getPageListSelectedCustCol7)){
+			if(CUST_COL7 != null && !CUST_COL7.equals(getPageListSelectedCustCol7)){
 				strRut += "查询条件中所选账套与页面显示数据账套不一致，请单击查询再进行操作！";
 			}
-			if(!DEPT_CODE.equals(getPageListSelectedDepartCode)){
+			if(DEPT_CODE != null && !DEPT_CODE.equals(getPageListSelectedDepartCode)){
 				strRut += "查询条件中所选责任中心与页面显示数据责任中心不一致，请单击查询再进行操作！";
 			}
 		}

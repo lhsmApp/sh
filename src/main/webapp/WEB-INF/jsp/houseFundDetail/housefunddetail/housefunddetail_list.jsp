@@ -75,7 +75,7 @@
 								<div class="widget-body">
 									<div class="widget-main">
 										<form class="form-inline">
-											<span style="margin-right: 5px;">
+											<span class="pull-left" style="margin-right: 5px;">
 												<select class="chosen-select form-control"
 													name="SelectedCustCol7" id="SelectedCustCol7"
 													data-placeholder="请选择帐套"
@@ -87,7 +87,7 @@
 													</c:forEach>
 												</select>
 											</span>
-											<span style="margin-right: 5px;" <c:if test="${pd.departTreeSource=='0'}">hidden</c:if>>
+											<span class="pull-left" style="margin-right: 5px;" <c:if test="${pd.departTreeSource=='0'}">hidden</c:if>>
 												<div class="selectTree" id="selectTree" multiMode="false"
 												    allSelectable="false" noGroup="false"></div>
 											    <input type="text" id="SelectedDepartCode" hidden></input>
@@ -224,7 +224,7 @@
 		
 		$(gridBase_selector).jqGrid({
 			url: '<%=basePath%>housefunddetail/getPageList.do?'
-				+ ' SelectedDepartCode='+$("#SelectedDepartCode").val()
+				+ 'SelectedDepartCode='+$("#SelectedDepartCode").val()
                 + '&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 			datatype: "json",
 			colModel: jqGridColModel,
@@ -239,7 +239,7 @@
             sortable: true,
 			altRows: true, //斑马条纹
 			editurl: '<%=basePath%>housefunddetail/edit.do?'
-				+ ' SelectedDepartCode='+$("#SelectedDepartCode").val()
+				+ 'SelectedDepartCode='+$("#SelectedDepartCode").val()
                 + '&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 			
 			pager: pagerBase_selector,
@@ -537,7 +537,7 @@
 					$.ajax({
 						type: "POST",
 						url: '<%=basePath%>housefunddetail/deleteAll.do?'
-							+ ' SelectedDepartCode='+$("#SelectedDepartCode").val()
+							+ 'SelectedDepartCode='+$("#SelectedDepartCode").val()
 			                + '&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 				    	data: {DATA_ROWS:JSON.stringify(listData)},
 						dataType:'json',
@@ -607,7 +607,7 @@ function batchSave(){
 				$.ajax({
 					type: "POST",
 					url: '<%=basePath%>housefunddetail/updateAll.do?'
-						+ ' SelectedDepartCode='+$("#SelectedDepartCode").val()
+						+ 'SelectedDepartCode='+$("#SelectedDepartCode").val()
 		                + '&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 			    	data: {DATA_ROWS:JSON.stringify(listData)},
 					dataType:'json',
@@ -658,7 +658,7 @@ function importItems(){
 	   diag.Drag=true;
 	   diag.Title ="EXCEL 导入到数据库";
 	   diag.URL = '<%=basePath%>housefunddetail/goUploadExcel.do?'
-		+ ' SelectedDepartCode='+$("#SelectedDepartCode").val()
+		+ 'SelectedDepartCode='+$("#SelectedDepartCode").val()
         + '&SelectedCustCol7='+$("#SelectedCustCol7").val();
 	   diag.Width = 300;
 	   diag.Height = 150;
@@ -676,7 +676,7 @@ function importItems(){
  */
 function exportItems(){
 	window.location.href='<%=basePath%>housefunddetail/excel.do?'
-		+ ' SelectedDepartCode='+$("#SelectedDepartCode").val()
+		+ 'SelectedDepartCode='+$("#SelectedDepartCode").val()
         + '&SelectedCustCol7='+$("#SelectedCustCol7").val();
 }
 
@@ -701,7 +701,7 @@ function report(){
 			$.ajax({
 				type: "POST",
 				url: '<%=basePath%>housefunddetail/report.do?'
-					+ ' SelectedDepartCode='+$("#SelectedDepartCode").val()
+					+ 'SelectedDepartCode='+$("#SelectedDepartCode").val()
 	                + '&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 				cache: false,
 				success: function(response){
@@ -748,7 +748,7 @@ function getCheckState(){
 	$.ajax({
 		type: "POST",
 		url: '<%=basePath%>housefunddetail/getState.do?'
-			+ ' SelectedDepartCode='+$("#SelectedDepartCode").val()
+			+ 'SelectedDepartCode='+$("#SelectedDepartCode").val()
             + '&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 		cache: false,
 		success: function(response){
@@ -826,7 +826,7 @@ function getCheckState(){
 		SetStructure();
 		//$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据
 		//	url:'<%=basePath%>housefunddetail/getPageList.do?'
-		//		+ ' SelectedDepartCode='+$("#SelectedDepartCode").val()
+		//		+ 'SelectedDepartCode='+$("#SelectedDepartCode").val()
         //        + '&SelectedCustCol7='+$("#SelectedCustCol7").val(),  
 		//	datatype:'json',
 		//      page:1

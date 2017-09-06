@@ -29,17 +29,20 @@
 		                      where RPT_DUR = '${pd.SystemDateTime}'
 		                      and STATE = '${pd.DurState}'
 		                      and BILL_TYPE = '${pd.TypeCodeSummy}'
+		                      and BILL_OFF = '${pd.SelectedCustCol7}'
 		                      )
 		and DEPT_CODE in (select RPT_DEPT 
 		                      from tb_sys_sealed_info 
 		                      where RPT_DUR = '${pd.SystemDateTime}' 
 		                      and STATE = '${pd.DurState}'
 		                      and BILL_TYPE = '${pd.TypeCodeDetail}'
+		                      and BILL_OFF = '${pd.SelectedCustCol7}'
 		                      )
 		and DEPT_CODE not in (select RPT_DEPT 
 		                      from tb_sys_sealed_info 
 		                      where RPT_DUR = '${pd.SystemDateTime}' 
 		                      and BILL_TYPE = '${pd.TypeCodeListen}'
+		                      and BILL_OFF = '${pd.SelectedCustCol7}'
 		                      )
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
@@ -62,17 +65,20 @@
 		                      where RPT_DUR = '${pd.SystemDateTime}'
 		                      and STATE = '${pd.DurState}'
 		                      and BILL_TYPE = '${pd.TypeCodeSummy}'
+		                      and BILL_OFF = '${pd.SelectedCustCol7}'
 		                      )
 		and DEPT_CODE in (select RPT_DEPT 
 		                      from tb_sys_sealed_info 
 		                      where RPT_DUR = '${pd.SystemDateTime}' 
 		                      and STATE = '${pd.DurState}'
 		                      and BILL_TYPE = '${pd.TypeCodeDetail}'
+		                      and BILL_OFF = '${pd.SelectedCustCol7}'
 		                      )
 		and DEPT_CODE not in (select RPT_DEPT 
 		                      from tb_sys_sealed_info 
 		                      where RPT_DUR = '${pd.SystemDateTime}' 
 		                      and BILL_TYPE = '${pd.TypeCodeListen}'
+		                      and BILL_OFF = '${pd.SelectedCustCol7}'
 		                      )
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
@@ -90,17 +96,20 @@
 		                      where RPT_DUR = '${pd.SystemDateTime}'
 		                      and STATE = '${pd.DurState}'
 		                      and BILL_TYPE = '${pd.TypeCodeSummy}'
+		                      and BILL_OFF = '${pd.SelectedCustCol7}'
 		                      )
 		and DEPT_CODE in (select RPT_DEPT 
 		                      from tb_sys_sealed_info 
 		                      where RPT_DUR = '${pd.SystemDateTime}' 
 		                      and STATE = '${pd.DurState}'
 		                      and BILL_TYPE = '${pd.TypeCodeDetail}'
+		                      and BILL_OFF = '${pd.SelectedCustCol7}'
 		                      )
 		and DEPT_CODE not in (select RPT_DEPT 
 		                      from tb_sys_sealed_info 
 		                      where RPT_DUR = '${pd.SystemDateTime}' 
 		                      and BILL_TYPE = '${pd.TypeCodeListen}'
+		                      and BILL_OFF = '${pd.SelectedCustCol7}'
 		                      )
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
@@ -116,6 +125,7 @@
 		<include refid="tableName"></include>
 		where BUSI_DATE = #{BUSI_DATE}
 	    and DEPT_CODE = #{DEPT_CODE} 
+	    and CUST_COL7 = #{CUST_COL7} 
 	    and BILL_STATE = #{BILL_STATE}
 	</delete>
 	
@@ -125,6 +135,7 @@
 		set BILL_STATE = '0'
 		where BUSI_DATE = #{BUSI_DATE}
 	    and DEPT_CODE = #{DEPT_CODE} 
+	    and CUST_COL7 = #{CUST_COL7} 
 	</delete>
 	
 	<!-- 新增-->
@@ -142,6 +153,7 @@
 		<include refid="tableName"></include>
 		where BUSI_DATE = #{BUSI_DATE}
 	    and DEPT_CODE = #{DEPT_CODE} 
+	    and CUST_COL7 = #{CUST_COL7} 
 	    and BILL_STATE = #{BILL_STATE} 
     </select>
 	

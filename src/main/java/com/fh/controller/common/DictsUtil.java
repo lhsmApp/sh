@@ -42,6 +42,10 @@ public class DictsUtil {
 	 * @return
 	 * @throws Exception
 	 */
+	
+	public static String Id = "id";
+	public static String DepartShowAll = "01001";
+	
 	public static List<Dictionaries> getDictsByParentBianma(DictionariesManager dictionariesService,
 			String parentBianma) throws Exception {
 		List<Dictionaries> listDict = dictionariesService.getSysDictionaries(parentBianma);
@@ -152,7 +156,7 @@ public class DictsUtil {
 		String orgCode = Tools.readTxtFile(Const.ORG_CODE); 
 		String [] orgInfo=orgCode.split(",");
 		
-		if(curUserDepartCode.equals("01001")){//机关
+		if(curUserDepartCode.equals(DepartShowAll)){//机关
 			parentDepartCode=orgInfo[0];
 			parentDepartName=orgInfo[1];
 		}
@@ -162,7 +166,42 @@ public class DictsUtil {
 		}
 		List<PageData> zdepartmentPdList = new ArrayList<PageData>();
 		PageData pd = new PageData();
-		pd.put("id", parentDepartCode);
+		pd.put(DictsUtil.Id, parentDepartCode);
+		pd.put("parentId", "");
+		pd.put("name",parentDepartName);
+		pd.put("icon", "static/images/user.gif");
+		zdepartmentPdList.add(pd);
+		List<PageData> listResult=departmentService.listAllDepartmentAndSelfToSelect(parentDepartCode,zdepartmentPdList);
+		if(zdepartmentPdList.size()==1) return "0";
+		JSONArray arr = JSONArray.fromObject(listResult);
+		return (null == arr ? "" : arr.toString());
+	}
+
+	/**
+	 * 获取组织机构树数据源
+	 * 
+	 * @param departmentService
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getDepartmentSelectTreeSource(DepartmentManager departmentService, String curUserDepartCode) throws Exception {
+		String departName = curUserDepartCode;
+		String parentDepartCode="";
+		String parentDepartName="";
+		String orgCode = Tools.readTxtFile(Const.ORG_CODE); 
+		String [] orgInfo=orgCode.split(",");
+		
+		if(curUserDepartCode.equals(DepartShowAll)){//机关
+			parentDepartCode=orgInfo[0];
+			parentDepartName=orgInfo[1];
+		}
+		else{
+			parentDepartCode=curUserDepartCode;
+			parentDepartName=departName;
+		}
+		List<PageData> zdepartmentPdList = new ArrayList<PageData>();
+		PageData pd = new PageData();
+		pd.put(DictsUtil.Id, parentDepartCode);
 		pd.put("parentId", "");
 		pd.put("name",parentDepartName);
 		pd.put("icon", "static/images/user.gif");
