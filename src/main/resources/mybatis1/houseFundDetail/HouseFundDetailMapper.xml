@@ -70,7 +70,7 @@
 	
 	<!-- 获取数据 验证数据重复 -->
 	<select id="findByModel" parameterType="pd" resultType="String">
-		select * 
+		select USER_CODE
 		from 
 		    <include refid="tableName"></include>
         <where>
