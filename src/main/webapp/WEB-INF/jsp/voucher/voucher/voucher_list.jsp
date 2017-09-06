@@ -109,10 +109,6 @@
 												placeholder="请输入业务区间"> <i
 												class="ace-icon fa fa-calendar blue"></i>
 											</span>
-											<span class="pull-left" style="margin-right: 5px;" <c:if test="${pd.departTreeSource=='0'}">hidden</c:if>>
-												<div class="selectTree" id="selectTree" multiMode="true"
-													allSelectable="false" noGroup="false"></div>
-											</span>
 											<span style="margin-right: 5px;"> 
 												<select
 													class="chosen-select form-control" name="FMISACC"
@@ -121,6 +117,32 @@
 														<option value="0">请选择帐套</option>
 														<c:forEach items="${fmisacc}" var="fmi">
 															<option value="${fmi.DICT_CODE}">${fmi.NAME}</option>
+														</c:forEach>
+												</select>
+											</span>
+											<span class="pull-left" style="margin-right: 5px;" <c:if test="${pd.departTreeSource=='0'}">hidden</c:if>>
+												<div class="selectTree" id="selectTree" multiMode="true"
+													allSelectable="false" noGroup="false"></div>
+											</span>
+											<span style="margin-right: 5px;"> 
+												<select
+													class="chosen-select form-control" name="PARTUSERTYPE"
+													id="PARTUSERTYPE" data-placeholder="请选择企业特定员工分类"
+													style="vertical-align: top; height: 32px; width: 150px;">
+														<option value="">请选择企业特定员工分类</option>
+														<c:forEach items="${partusertype}" var="part">
+															<option value="${part.DICT_CODE}">${part.NAME}</option>
+														</c:forEach>
+												</select>
+											</span>
+											<span style="margin-right: 5px;"> 
+												<select
+													class="chosen-select form-control" name="SALARYRANGE"
+													id="SALARYRANGE" data-placeholder="请选择工资范围"
+													style="vertical-align: top; height: 32px; width: 150px;">
+														<option value="">请选择工资范围</option>
+														<c:forEach items="${salaryrange}" var="salary">
+															<option value="${salary.DICT_CODE}">${salary.NAME}</option>
 														</c:forEach>
 												</select>
 											</span>
@@ -888,8 +910,10 @@
         }
         var busiDate = $("#busiDate").val(); 
 		var deptCode = $("#departCode").val(); 
-		var fmi = $("#FMISACC").val(); 
-		$("#jqGrid").jqGrid("setGridParam",{postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}',"BUSI_DATE":busiDate,"DEPT_CODE":deptCode,"FMISACC":fmi}})
+		var fmi = $("#FMISACC").val();
+		var partUserType = $("#PARTUSERTYPE").val(); 
+		var salaryRange = $("#SALARYRANGE").val(); 
+		$("#jqGrid").jqGrid("setGridParam",{postData:{"VOUCHER_TYPE":voucherType,"TABLE_CODE":'${pd.which}',"BUSI_DATE":busiDate,"DEPT_CODE":deptCode,"FMISACC":fmi,"USER_CATG":partUserType,"SAL_RANGE":salaryRange}})
 		.trigger("reloadGrid");
 	}  
 	

@@ -359,13 +359,17 @@
 			SELECT A.* FROM ${pd.TABLE_CODE} A
 			JOIN
 			(SELECT
-			M.bill_code,M.rpt_dept,m.rpt_dur,m.state,M.bill_off FROM tb_sys_sealed_info M
+			M.bill_code,M.rpt_dept,m.rpt_dur,m.state,M.bill_off FROM
+			tb_sys_sealed_info M
 			LEFT JOIN
-			(SELECT bill_code,rpt_dept,rpt_dur,state,bill_off FROM
-			tb_sys_sealed_info WHERE
+			(SELECT
+			bill_code,rpt_dept,rpt_dur,state,bill_off FROM
+			tb_sys_sealed_info
+			WHERE
 			<!-- bill_type=#{pd.BILL_TYPE1} AND state='1') N -->
 			bill_type=#{pd.BILL_TYPE_TRANSFER}) N
-			ON M.bill_code=N.bill_code AND M.rpt_dept=N.rpt_dept
+			ON M.bill_code=N.bill_code AND
+			M.rpt_dept=N.rpt_dept
 			AND
 			M.rpt_dur=N.rpt_dur
 			AND
@@ -464,14 +468,18 @@
 			SELECT count(*) FROM ${TABLE_CODE} A
 			JOIN
 			(SELECT
-			M.bill_code,M.rpt_dept,m.rpt_dur,m.state,m.bill_off FROM tb_sys_sealed_info M
+			M.bill_code,M.rpt_dept,m.rpt_dur,m.state,m.bill_off FROM
+			tb_sys_sealed_info M
 			LEFT JOIN
-			(SELECT bill_code,rpt_dept,rpt_dur,state,bill_off FROM
-			tb_sys_sealed_info WHERE
+			(SELECT
+			bill_code,rpt_dept,rpt_dur,state,bill_off FROM
+			tb_sys_sealed_info
+			WHERE
 			<!-- bill_type=#{BILL_TYPE1} AND state='1') N -->
 			bill_type=#{BILL_TYPE_TRANSFER}) N
 			ON
-			M.bill_code=N.bill_code AND M.rpt_dept=N.rpt_dept
+			M.bill_code=N.bill_code AND
+			M.rpt_dept=N.rpt_dept
 			AND
 			M.rpt_dur=N.rpt_dur
 			AND
@@ -578,13 +586,15 @@
 			M.bill_code,M.rpt_dept,m.rpt_dur,m.state,m.bill_off FROM
 			tb_sys_sealed_info M
 			LEFT JOIN
-			(SELECT bill_code,rpt_dept,rpt_dur,state,bill_off
+			(SELECT
+			bill_code,rpt_dept,rpt_dur,state,bill_off
 			FROM
 			tb_sys_sealed_info WHERE
 			<!-- bill_type=#{pd.BILL_TYPE1} AND state='1') -->
 			bill_type=#{pd.BILL_TYPE_TRANSFER})
 			N
-			ON M.bill_code=N.bill_code AND M.rpt_dept=N.rpt_dept
+			ON M.bill_code=N.bill_code AND
+			M.rpt_dept=N.rpt_dept
 			AND
 			M.rpt_dur=N.rpt_dur
 			AND
@@ -618,6 +628,12 @@
 				</if>
 				<if test="pd.FMISACC!= null and pd.FMISACC != ''">
 					and CUST_COL7 = #{pd.FMISACC}
+				</if>
+				<if test="pd.USER_CATG!= null and pd.USER_CATG != ''">
+					and USER_CATG = #{pd.USER_CATG}
+				</if>
+				<if test="pd.SAL_RANGE!= null and pd.SAL_RANGE != ''">
+					and SAL_RANGE = #{pd.SAL_RANGE}
 				</if>
 				<if test="pd.DEPT_CODES!= null and pd.DEPT_CODES != ''"><!-- 根据单位检索 -->
 					and DEPT_CODE in
@@ -672,6 +688,12 @@
 			<if test="pd.FMISACC!= null and pd.FMISACC != ''">
 				and CUST_COL7 = #{pd.FMISACC}
 			</if>
+			<if test="pd.USER_CATG!= null and pd.USER_CATG != ''">
+				and USER_CATG = #{pd.USER_CATG}
+			</if>
+			<if test="pd.SAL_RANGE!= null and pd.SAL_RANGE != ''">
+				and SAL_RANGE = #{pd.SAL_RANGE}
+			</if>
 			<if test="pd.DEPT_CODES!= null and pd.DEPT_CODES != ''"><!-- 根据单位检索 -->
 				and DEPT_CODE in
 				<foreach item="item" index="index" collection="pd.DEPT_CODES"
@@ -699,14 +721,16 @@
 			SELECT A.* FROM ${TABLE_CODE} A
 			JOIN
 			(SELECT
-			M.bill_code,M.rpt_dept,m.rpt_dur,m.state,m.bill_off FROM tb_sys_sealed_info M
+			M.bill_code,M.rpt_dept,m.rpt_dur,m.state,m.bill_off FROM
+			tb_sys_sealed_info M
 			LEFT JOIN
-			(SELECT bill_code,rpt_dept,rpt_dur,state,bill_off FROM
-			tb_sys_sealed_info WHERE
+			(SELECT
+			bill_code,rpt_dept,rpt_dur,state,bill_off FROM
+			tb_sys_sealed_info
+			WHERE
 			<!-- bill_type=#{BILL_TYPE1} AND state='1') N -->
 			bill_type=#{BILL_TYPE_TRANSFER}) N
-			ON <!-- 
-				M.bill_code=N.bill_code AND -->
+			ON <!-- M.bill_code=N.bill_code AND -->
 			M.rpt_dept=N.rpt_dept
 			AND
 			M.rpt_dur=N.rpt_dur
@@ -742,7 +766,12 @@
 				<if test="FMISACC!= null and FMISACC != ''">
 					and CUST_COL7 = #{FMISACC}
 				</if>
-
+				<if test="USER_CATG!= null and USER_CATG != ''">
+					and USER_CATG = #{USER_CATG}
+				</if>
+				<if test="SAL_RANGE!= null and SAL_RANGE != ''">
+					and SAL_RANGE = #{SAL_RANGE}
+				</if>
 				<if test="DEPT_CODES!= null and DEPT_CODES != ''"><!-- 根据单位检索 -->
 					and DEPT_CODE in
 					<foreach item="item" index="index" collection="DEPT_CODES"
@@ -773,7 +802,7 @@
 			ON
 			A.BILL_CODE=C.BILL_CODE
 			WHERE A.BILL_STATE='1' and B.STATE='1'
-		    <!-- and A.USER_GROP=#{USER_GROP} -->
+			<!-- and A.USER_GROP=#{USER_GROP} -->
 			AND
 			B.BILL_TYPE=#{BILL_TYPE_TRANSFER}
 			<if test="keywords!= null and keywords != ''"><!-- 关键词检索 -->
@@ -791,6 +820,12 @@
 			</if>
 			<if test="FMISACC!= null and FMISACC != ''">
 				and CUST_COL7 = #{FMISACC}
+			</if>
+			<if test="USER_CATG!= null and USER_CATG != ''">
+				and USER_CATG = #{USER_CATG}
+			</if>
+			<if test="SAL_RANGE!= null and SAL_RANGE != ''">
+				and SAL_RANGE = #{SAL_RANGE}
 			</if>
 			<if test="DEPT_CODES!= null and DEPT_CODES != ''"><!-- 根据单位检索 -->
 				and DEPT_CODE in
@@ -812,10 +847,12 @@
 	<!-- 列表(同步删除) -->
 	<select id="listSyncDelList" parameterType="pd" resultType="pd">
 		SELECT A.* FROM ${TABLE_CODE} A
-		JOIN  TB_SYS_UNLOCK_INFO B
-		ON A.BILL_CODE=B.BILL_CODE
+		JOIN TB_SYS_UNLOCK_INFO B
+		ON
+		A.BILL_CODE=B.BILL_CODE
 		AND A.DEPT_CODE=B.UNLK_DEPT
-		AND A.BUSI_DATE=B.UNLK_DUR
+		AND
+		A.BUSI_DATE=B.UNLK_DUR
 		AND A.CUST_COL7=B.BILL_OFF
 		<where>
 			B.DEL_STATE='0'
@@ -836,7 +873,12 @@
 			<if test="FMISACC!= null and FMISACC != ''">
 				and CUST_COL7 = #{FMISACC}
 			</if>
-
+			<if test="USER_CATG!= null and USER_CATG != ''">
+				and USER_CATG = #{USER_CATG}
+			</if>
+			<if test="SAL_RANGE!= null and SAL_RANGE != ''">
+				and SAL_RANGE = #{SAL_RANGE}
+			</if>
 			<if test="DEPT_CODES!= null and DEPT_CODES != ''"><!-- 根据单位检索 -->
 				and DEPT_CODE in
 				<foreach item="item" index="index" collection="DEPT_CODES"

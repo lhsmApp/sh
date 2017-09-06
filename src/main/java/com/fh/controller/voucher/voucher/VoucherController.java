@@ -109,8 +109,9 @@ public class VoucherController extends BaseController {
 	// 底行显示的求和与平均值字段
 	private StringBuilder SqlUserdata = new StringBuilder();
 
-	//判断当前人员的所在组织机构是否只有自己单位
-	private int departSelf=0;
+	// 判断当前人员的所在组织机构是否只有自己单位
+	private int departSelf = 0;
+
 	/**
 	 * 列表
 	 * 
@@ -119,7 +120,7 @@ public class VoucherController extends BaseController {
 	 */
 	@RequestMapping(value = "/list")
 	public ModelAndView list(Page page) throws Exception {
-		this.departSelf=0;
+		this.departSelf = 0;
 		// if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
 		// //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
 		ModelAndView mv = this.getModelAndView();
@@ -132,10 +133,9 @@ public class VoucherController extends BaseController {
 		// 此处放当前页面初始化时用到的一些数据，例如搜索的下拉列表数据，所需的字典数据、权限数据等等。
 		// mv.addObject("pd", pd);
 		// *********************加载单位树*******************************
-		String departTreeSource=DictsUtil.getDepartmentSelectTreeSource(departmentService);
-		if(departTreeSource.equals("0"))
-		{
-			this.departSelf=1;
+		String departTreeSource = DictsUtil.getDepartmentSelectTreeSource(departmentService);
+		if (departTreeSource.equals("0")) {
+			this.departSelf = 1;
 			pd.put("departTreeSource", departTreeSource);
 		}
 		mv.addObject("zTreeNodes", departTreeSource);
@@ -174,6 +174,10 @@ public class VoucherController extends BaseController {
 
 		// CUST_COL7 FMISACC 帐套字典
 		mv.addObject("fmisacc", DictsUtil.getDictsByParentBianma(dictionariesService, "FMISACC"));
+		// USER_CATG PARTUSERTYPE 特定员工分类字典
+		mv.addObject("partusertype", DictsUtil.getDictsByParentBianma(dictionariesService, "PARTUSERTYPE"));
+		// SAL_RANGE SALARYRANGE 工资范围字典
+		mv.addObject("salaryrange", DictsUtil.getDictsByParentBianma(dictionariesService, "SALARYRANGE"));
 		return mv;
 	}
 
@@ -185,11 +189,11 @@ public class VoucherController extends BaseController {
 	 */
 	@RequestMapping(value = "/voucherSearch")
 	public ModelAndView voucherSearch(Page page) throws Exception {
-		this.departSelf=0;
+		this.departSelf = 0;
 		// if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
 		// //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
 		ModelAndView mv = this.getModelAndView();
-		mv.setViewName("voucher/voucher/voucher_search");	
+		mv.setViewName("voucher/voucher/voucher_search");
 		PageData pd = this.getPageData();
 		String which = pd.getString("TABLE_CODE");
 		if (which == null)
@@ -198,10 +202,9 @@ public class VoucherController extends BaseController {
 		// 此处放当前页面初始化时用到的一些数据，例如搜索的下拉列表数据，所需的字典数据、权限数据等等。
 		// mv.addObject("pd", pd);
 		// *********************加载单位树*******************************
-		String departTreeSource=DictsUtil.getDepartmentSelectTreeSource(departmentService);
-		if(departTreeSource.equals("0"))
-		{
-			this.departSelf=1;
+		String departTreeSource = DictsUtil.getDepartmentSelectTreeSource(departmentService);
+		if (departTreeSource.equals("0")) {
+			this.departSelf = 1;
 			pd.put("departTreeSource", departTreeSource);
 		}
 		mv.addObject("zTreeNodes", departTreeSource);
@@ -238,8 +241,12 @@ public class VoucherController extends BaseController {
 		}
 		mv.addObject("HasUserData", hasUserData);
 
-		mv.addObject("emplgrp", DictsUtil.getDictsByParentBianma(dictionariesService, "EMPLGRP"));
+		//mv.addObject("emplgrp", DictsUtil.getDictsByParentBianma(dictionariesService, "EMPLGRP"));
 		mv.addObject("fmisacc", DictsUtil.getDictsByParentBianma(dictionariesService, "FMISACC"));
+		// USER_CATG PARTUSERTYPE 特定员工分类字典
+		mv.addObject("partusertype", DictsUtil.getDictsByParentBianma(dictionariesService, "PARTUSERTYPE"));
+		// SAL_RANGE SALARYRANGE 工资范围字典
+		mv.addObject("salaryrange", DictsUtil.getDictsByParentBianma(dictionariesService, "SALARYRANGE"));
 		return mv;
 	}
 
@@ -263,12 +270,12 @@ public class VoucherController extends BaseController {
 		pd.put("BILL_TYPE_TRANSFER", sealTypeTransfer);// 接口封存类型
 		pd.put("VOUCHER_TYPE", voucherType);// 接口封存类型
 		pd.put("BILL_TYPE", sealType);// 接口封存类型对应的汇总接口类型
-		//pd.put("USER_GROP", DictsUtil.getEmplGroupType(which));
-		String strDeptCode="";
-		if(departSelf==1)
-			strDeptCode=Jurisdiction.getCurrentDepartmentID();
+		// pd.put("USER_GROP", DictsUtil.getEmplGroupType(which));
+		String strDeptCode = "";
+		if (departSelf == 1)
+			strDeptCode = Jurisdiction.getCurrentDepartmentID();
 		else
-			strDeptCode=pd.getString("DEPT_CODE");// 单位检索条件
+			strDeptCode = pd.getString("DEPT_CODE");// 单位检索条件
 		if (StringUtil.isNotEmpty(strDeptCode)) {
 			String[] strDeptCodes = strDeptCode.split(",");
 			pd.put("DEPT_CODES", strDeptCodes);
@@ -326,12 +333,12 @@ public class VoucherController extends BaseController {
 		String sealType = which == null ? TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey() : which;// 传输接口类型;
 		pd.put("BILL_TYPE", sealType);// 封存类型
 
-		//String strDeptCode = pd.getString("DEPT_CODE");// 单位检索条件
-		String strDeptCode="";
-		if(departSelf==1)
-			strDeptCode=Jurisdiction.getCurrentDepartmentID();
+		// String strDeptCode = pd.getString("DEPT_CODE");// 单位检索条件
+		String strDeptCode = "";
+		if (departSelf == 1)
+			strDeptCode = Jurisdiction.getCurrentDepartmentID();
 		else
-			strDeptCode=pd.getString("DEPT_CODE");// 单位检索条件
+			strDeptCode = pd.getString("DEPT_CODE");// 单位检索条件
 		if (StringUtil.isNotEmpty(strDeptCode)) {
 			String[] strDeptCodes = strDeptCode.split(",");
 			pd.put("DEPT_CODES", strDeptCodes);
@@ -445,15 +452,15 @@ public class VoucherController extends BaseController {
 			String which = pd.getString("TABLE_CODE");
 			String tableCode = getTableCode(which);
 			// String voucherType=pd.getString("VOUCHER_TYPE");
-			//根据表编号和真实表名称获取用于传输的字段列配置信息
-			List<TableColumns> tableColumnsForTransfer=getTableColumnsForTransfer(which,tableCode);
+			// 根据表编号和真实表名称获取用于传输的字段列配置信息
+			List<TableColumns> tableColumnsForTransfer = getTableColumnsForTransfer(which, tableCode);
 			GenerateTransferData generateTransferData = new GenerateTransferData();
 			Map<String, List<PageData>> mapTransferData = new HashMap<String, List<PageData>>();
 			mapTransferData.put(tableCode, listTransferData);
 			PageData pdFirst = listTransferData.get(0);
 			String orgCode = pdFirst.getString("CUST_COL7");
-			String transferData = generateTransferData.generateTransferData(tableColumnsForTransfer, mapTransferData, orgCode,
-					TransferOperType.DELETE);
+			String transferData = generateTransferData.generateTransferData(tableColumnsForTransfer, mapTransferData,
+					orgCode, TransferOperType.DELETE);
 
 			// 执行上传FIMS
 			Service service = new Service();
@@ -467,8 +474,8 @@ public class VoucherController extends BaseController {
 			String message = (String) call.invoke(new Object[] { transferData });
 			System.out.println(message);
 			if (message.equals("TRUE")) {
-				String transferDataInsert = generateTransferData.generateTransferData(tableColumnsForTransfer, mapTransferData,
-						orgCode, TransferOperType.INSERT);
+				String transferDataInsert = generateTransferData.generateTransferData(tableColumnsForTransfer,
+						mapTransferData, orgCode, TransferOperType.INSERT);
 				String messageInsert = (String) call.invoke(new Object[] { transferDataInsert });
 				if (messageInsert.equals("TRUE")) {
 					// 执行上传成功后对数据进行封存
@@ -520,12 +527,13 @@ public class VoucherController extends BaseController {
 
 	/**
 	 * 根据表编号和真实表名称获取用于传输的字段列配置信息
+	 * 
 	 * @param which
 	 * @param tableCode
 	 * @return
-	 * @throws Exception 
+	 * @throws Exception
 	 */
-	private List<TableColumns> getTableColumnsForTransfer(String which,String tableCode) throws Exception {
+	private List<TableColumns> getTableColumnsForTransfer(String which, String tableCode) throws Exception {
 		// 用语句查询出数据库表的所有字段及其属性；拼接成jqgrid全部列
 		List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCode);
 		TmplUtil tmplUtil = new TmplUtil(tmplconfigService, tmplConfigDictService, dictionariesService,
@@ -579,16 +587,17 @@ public class VoucherController extends BaseController {
 			String tableCode = getTableCode(which);
 			// String voucherType=pd.getString("VOUCHER_TYPE");
 
-			//根据表编号和真实表名称获取用于传输的字段列配置信息
-			//List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCode);
-			List<TableColumns> tableColumnsForTransfer=getTableColumnsForTransfer(which,tableCode);
+			// 根据表编号和真实表名称获取用于传输的字段列配置信息
+			// List<TableColumns> tableColumns =
+			// tmplconfigService.getTableColumns(tableCode);
+			List<TableColumns> tableColumnsForTransfer = getTableColumnsForTransfer(which, tableCode);
 			GenerateTransferData generateTransferData = new GenerateTransferData();
 			Map<String, List<PageData>> mapTransferData = new HashMap<String, List<PageData>>();
 			mapTransferData.put(tableCode, listTransferData);
 			PageData pdFirst = listTransferData.get(0);
 			String orgCode = pdFirst.getString("CUST_COL7");
-			String transferData = generateTransferData.generateTransferData(tableColumnsForTransfer, mapTransferData, orgCode,
-					TransferOperType.DELETE);
+			String transferData = generateTransferData.generateTransferData(tableColumnsForTransfer, mapTransferData,
+					orgCode, TransferOperType.DELETE);
 
 			// 执行上传FIMS
 			Service service = new Service();
@@ -657,7 +666,8 @@ public class VoucherController extends BaseController {
 			for (PageData item : listTransferData) {
 				String invoiceNumber = item.getString("BILL_CODE");// 单据编号
 				// String fmisOrg = item.getString("DEPT_CODE");// FMIS组织机构编码
-				//String fmisOrg = Tools.readTxtFile(Const.ORG_CODE); // 读取总部组织机构编码
+				// String fmisOrg = Tools.readTxtFile(Const.ORG_CODE); //
+				// 读取总部组织机构编码
 				String fmisOrg = item.getString("CUST_COL7"); // 读取总部组织机构编码
 				String tableName = "T_" + getTableCode(which);// 在fmis建立的业务表名
 				String result = (String) call.invoke(new Object[] { tableName, invoiceNumber, fmisOrg });// 对应定义参数
@@ -718,7 +728,7 @@ public class VoucherController extends BaseController {
 			User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
 			String userId = user.getUSER_ID();
 			for (PageData item : listTransferData) {
-				//String fmisOrg = item.getString("DEPT_CODE");// FMIS组织机构编码
+				// String fmisOrg = item.getString("DEPT_CODE");// FMIS组织机构编码
 				String fmisOrg = item.getString("CUST_COL7"); // 读取总部组织机构编码
 				String fmisUrl = strUrl;// FMIS应用地址
 				String invoiceNumber = item.getString("BILL_CODE");// 单据编号
