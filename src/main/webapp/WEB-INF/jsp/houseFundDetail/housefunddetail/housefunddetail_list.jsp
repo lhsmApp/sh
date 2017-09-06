@@ -75,23 +75,6 @@
 								<div class="widget-body">
 									<div class="widget-main">
 										<form class="form-inline">
-											<span style="margin-right: 5px;" <c:if test="${pd.departTreeSource=='0'}">hidden</c:if>>
-												<div class="selectTree" id="selectTree" multiMode="false"
-												    allSelectable="false" noGroup="false"></div>
-											    <input type="text" id="SelectedDepartCode" hidden></input>
-											</span>
-											<span style="margin-right: 5px;">
-												<select class="chosen-select form-control"
-													name="SelectedUserGrop" id="SelectedUserGrop"
-													data-placeholder="请选择员工组"
-													style="vertical-align: top; height:32px;width: 150px;">
-													<option value="">请选择员工组</option>
-													<c:forEach items="${EMPLGRP}" var="each">
-														<option value="${each.DICT_CODE}" 
-														    <c:if test="${pd.USER_GROP==each.DICT_CODE}">selected</c:if>>${each.NAME}</option>
-													</c:forEach>
-												</select>
-											</span>
 											<span style="margin-right: 5px;">
 												<select class="chosen-select form-control"
 													name="SelectedCustCol7" id="SelectedCustCol7"
@@ -103,6 +86,11 @@
 														    <c:if test="${pd.SelectedCustCol7==each.DICT_CODE}">selected</c:if>>${each.NAME}</option>
 													</c:forEach>
 												</select>
+											</span>
+											<span style="margin-right: 5px;" <c:if test="${pd.departTreeSource=='0'}">hidden</c:if>>
+												<div class="selectTree" id="selectTree" multiMode="false"
+												    allSelectable="false" noGroup="false"></div>
+											    <input type="text" id="SelectedDepartCode" hidden></input>
 											</span>
 											<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
 												<i class="ace-icon fa fa-search bigger-110"></i>
@@ -236,8 +224,7 @@
 		
 		$(gridBase_selector).jqGrid({
 			url: '<%=basePath%>housefunddetail/getPageList.do?'
-				+ ' SelectedUserGrop='+$("#SelectedUserGrop").val()
-                + '&SelectedDepartCode='+$("#SelectedDepartCode").val()
+				+ ' SelectedDepartCode='+$("#SelectedDepartCode").val()
                 + '&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 			datatype: "json",
 			colModel: jqGridColModel,
@@ -252,8 +239,7 @@
             sortable: true,
 			altRows: true, //斑马条纹
 			editurl: '<%=basePath%>housefunddetail/edit.do?'
-				+ ' SelectedUserGrop='+$("#SelectedUserGrop").val()
-                + '&SelectedDepartCode='+$("#SelectedDepartCode").val()
+				+ ' SelectedDepartCode='+$("#SelectedDepartCode").val()
                 + '&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 			
 			pager: pagerBase_selector,
@@ -551,8 +537,7 @@
 					$.ajax({
 						type: "POST",
 						url: '<%=basePath%>housefunddetail/deleteAll.do?'
-							+ ' SelectedUserGrop='+$("#SelectedUserGrop").val()
-			                + '&SelectedDepartCode='+$("#SelectedDepartCode").val()
+							+ ' SelectedDepartCode='+$("#SelectedDepartCode").val()
 			                + '&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 				    	data: {DATA_ROWS:JSON.stringify(listData)},
 						dataType:'json',
@@ -622,8 +607,7 @@ function batchSave(){
 				$.ajax({
 					type: "POST",
 					url: '<%=basePath%>housefunddetail/updateAll.do?'
-						+ ' SelectedUserGrop='+$("#SelectedUserGrop").val()
-		                + '&SelectedDepartCode='+$("#SelectedDepartCode").val()
+						+ ' SelectedDepartCode='+$("#SelectedDepartCode").val()
 		                + '&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 			    	data: {DATA_ROWS:JSON.stringify(listData)},
 					dataType:'json',
@@ -674,8 +658,7 @@ function importItems(){
 	   diag.Drag=true;
 	   diag.Title ="EXCEL 导入到数据库";
 	   diag.URL = '<%=basePath%>housefunddetail/goUploadExcel.do?'
-		+ ' SelectedUserGrop='+$("#SelectedUserGrop").val()
-        + '&SelectedDepartCode='+$("#SelectedDepartCode").val()
+		+ ' SelectedDepartCode='+$("#SelectedDepartCode").val()
         + '&SelectedCustCol7='+$("#SelectedCustCol7").val();
 	   diag.Width = 300;
 	   diag.Height = 150;
@@ -693,8 +676,7 @@ function importItems(){
  */
 function exportItems(){
 	window.location.href='<%=basePath%>housefunddetail/excel.do?'
-		+ ' SelectedUserGrop='+$("#SelectedUserGrop").val()
-        + '&SelectedDepartCode='+$("#SelectedDepartCode").val()
+		+ ' SelectedDepartCode='+$("#SelectedDepartCode").val()
         + '&SelectedCustCol7='+$("#SelectedCustCol7").val();
 }
 
@@ -719,8 +701,7 @@ function report(){
 			$.ajax({
 				type: "POST",
 				url: '<%=basePath%>housefunddetail/report.do?'
-					+ ' SelectedUserGrop='+$("#SelectedUserGrop").val()
-	                + '&SelectedDepartCode='+$("#SelectedDepartCode").val()
+					+ ' SelectedDepartCode='+$("#SelectedDepartCode").val()
 	                + '&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 				cache: false,
 				success: function(response){
@@ -767,8 +748,7 @@ function getCheckState(){
 	$.ajax({
 		type: "POST",
 		url: '<%=basePath%>housefunddetail/getState.do?'
-			+ ' SelectedUserGrop='+$("#SelectedUserGrop").val()
-            + '&SelectedDepartCode='+$("#SelectedDepartCode").val()
+			+ ' SelectedDepartCode='+$("#SelectedDepartCode").val()
             + '&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 		cache: false,
 		success: function(response){
@@ -846,8 +826,7 @@ function getCheckState(){
 		SetStructure();
 		//$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据
 		//	url:'<%=basePath%>housefunddetail/getPageList.do?'
-		//		+ ' SelectedUserGrop='+$("#SelectedUserGrop").val()
-        //        + '&SelectedDepartCode='+$("#SelectedDepartCode").val()
+		//		+ ' SelectedDepartCode='+$("#SelectedDepartCode").val()
         //        + '&SelectedCustCol7='+$("#SelectedCustCol7").val(),  
 		//	datatype:'json',
 		//      page:1

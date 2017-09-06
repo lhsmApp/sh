@@ -23,7 +23,9 @@
 		from 
 		<include refid="tableName"></include>
 		where BUSI_DATE = '${pd.SystemDateTime}'
-		and DEPT_CODE = '${pd.DepartCode}'
+		<!-- <if test="pd.DepartCode!= null and pd.DepartCode != ''">
+		    and DEPT_CODE = '${pd.DepartCode}'
+		</if> -->
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
@@ -40,7 +42,9 @@
 	<select id="countJqGridExtend" parameterType="jqPage" resultType="int">
 		select count(*) from <include refid="tableName"></include> 
 		where BUSI_DATE = '${pd.SystemDateTime}'
-		and DEPT_CODE = '${pd.DepartCode}'
+		<!-- <if test="pd.DepartCode!= null and pd.DepartCode != ''">
+		    and DEPT_CODE = '${pd.DepartCode}'
+		</if> -->
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
@@ -52,7 +56,9 @@
 		select ${pd.Userdata} 
 		from <include refid="tableName"></include> 
 		where BUSI_DATE = '${pd.SystemDateTime}'
-		and DEPT_CODE = '${pd.DepartCode}'
+		<!-- <if test="pd.DepartCode!= null and pd.DepartCode != ''">
+		    and DEPT_CODE = '${pd.DepartCode}'
+		</if> -->
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
@@ -63,7 +69,7 @@
 	
 	<!-- 获取数据 验证数据重复 -->
 	<select id="findByModel" parameterType="pd" resultType="pd">
-		select * 
+		select USER_CODE
 		from 
 		    <include refid="tableName"></include>
         <where>
@@ -71,6 +77,14 @@
             (BUSI_DATE = #{item.BUSI_DATE} and USER_CODE = #{item.USER_CODE} and USER_CODE != #{item.USER_CODE__} ${item.CanOperate})
 		</foreach>
 		</where>
+	</select>
+	<select id="exportHaveUserCode" parameterType="pd" resultType="String">
+		select USER_CODE
+		from 
+		<include refid="tableName"></include>
+		where BUSI_DATE = '${SystemDateTime}'
+		and (DEPT_CODE != '${SelectedDepartCode}' or CUST_COL7 != '${SelectedCustCol7}')
+		${CanOperate}
 	</select>
 	
 	<!-- 新增 -->
@@ -86,7 +100,11 @@
 		<include refid="tableName"></include>
 		where
 		<foreach item="item" index="index" collection="list" open=" (" separator=" or " close=") ">
-            BUSI_DATE = #{item.BUSI_DATE__} and USER_CODE = #{item.USER_CODE__} ${item.CanOperate}
+                BUSI_DATE = #{item.BUSI_DATE__} 
+            and USER_CODE = #{item.USER_CODE__} 
+	        and DEPT_CODE = #{item.DEPT_CODE__}  
+	        and CUST_COL7 = #{item.CUST_COL7__} 
+	        ${item.CanOperate}
 		</foreach>
 	</delete>
 	
@@ -96,6 +114,7 @@
 		<include refid="tableName"></include>
 		where BUSI_DATE = #{BUSI_DATE}
 	    and DEPT_CODE = #{DEPT_CODE} 
+	    and CUST_COL7 = #{CUST_COL7} 
 	    ${CanOperate}
 	</delete>
 	
@@ -105,7 +124,8 @@
 		from 
 		<include refid="tableName"></include>
 		where BUSI_DATE = '${pd.SystemDateTime}'
-		and DEPT_CODE = '${pd.DepartCode}'
+		and DEPT_CODE = '${pd.SelectedDepartCode}'
+	    and CUST_COL7 = '${pd.SelectedCustCol7}' 
 	    ${pd.CanOperate}
 		<!-- <if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''">
 			and ${pd.filterWhereResult}
@@ -115,11 +135,12 @@
     	</if>
 	</select>
 	<!-- 导出模板 -->
-	<select id="exportModel" parameterType="String" resultType="pd">
+	<select id="exportModel" parameterType="pd" resultType="pd">
 		select * 
 		from 
 		<include refid="tableName"></include>
-		where DEPT_CODE = #{DepartCode}
+		where DEPT_CODE = '${SelectedDepartCode}'
+	    and CUST_COL7 = '${SelectedCustCol7}'
 		order by BUSI_DATE desc
 		limit 1
 	</select>
@@ -165,6 +186,7 @@
 		<include refid="tableName"></include>
 		where BUSI_DATE = '${BUSI_DATE}'
 	    and DEPT_CODE = '${DEPT_CODE}'
+	    and CUST_COL7 = '${CUST_COL7}' 
 		${CanOperate}
 	    group by ${GroupbyFeild}
     </select>

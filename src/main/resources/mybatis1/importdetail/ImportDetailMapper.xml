@@ -15,9 +15,7 @@
 		from ${TableName}
 		where BUSI_DATE = '${SystemDateTime}'
 		and DEPT_CODE = '${DepartCode}'
-		<if test="BILL_OFF!= null and BILL_OFF != ''">
-		    and BILL_OFF = '${BILL_OFF}'
-		</if>
+		and BILL_OFF = '${BILL_OFF}'
 		<if test="USER_GROP!= null and USER_GROP != ''">
 		    and USER_GROP = '${USER_GROP}'
 		</if>

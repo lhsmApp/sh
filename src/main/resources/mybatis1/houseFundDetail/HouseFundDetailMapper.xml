@@ -84,7 +84,7 @@
 		from 
 		<include refid="tableName"></include>
 		where BUSI_DATE = '${SystemDateTime}'
-		and (DEPT_CODE != '${SelectedDepartCode}')
+		and (DEPT_CODE != '${SelectedDepartCode}' or CUST_COL7 != '${SelectedCustCol7}')
 		${CanOperate}
 	</select>
 	
@@ -104,6 +104,7 @@
                 BUSI_DATE = #{item.BUSI_DATE__} 
             and USER_CODE = #{item.USER_CODE__} 
 	        and DEPT_CODE = #{item.DEPT_CODE__}  
+	        and CUST_COL7 = #{item.CUST_COL7__} 
             ${item.CanOperate}
 		</foreach>
 	</delete>
@@ -114,6 +115,7 @@
 		<include refid="tableName"></include>
 		where BUSI_DATE = #{BUSI_DATE}
 	    and DEPT_CODE = #{DEPT_CODE} 
+	    and CUST_COL7 = #{CUST_COL7} 
 	    ${CanOperate}
 	</delete>
 	
@@ -124,6 +126,7 @@
 		<include refid="tableName"></include>
 		where BUSI_DATE = '${pd.SystemDateTime}'
 		and DEPT_CODE = '${pd.SelectedDepartCode}'
+	    and CUST_COL7 = '${pd.SelectedCustCol7}' 
 	    ${pd.CanOperate}
 		<!-- <if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''">
 			and ${pd.filterWhereResult}
@@ -138,6 +141,7 @@
 		from 
 		<include refid="tableName"></include>
 		where DEPT_CODE = '${SelectedDepartCode}'
+	    and CUST_COL7 = '${SelectedCustCol7}'
 		order by BUSI_DATE desc
 		limit 1
 	</select>
@@ -177,6 +181,7 @@
 		<include refid="tableName"></include>
 		where BUSI_DATE = '${BUSI_DATE}'
 	    and DEPT_CODE = '${DEPT_CODE}'
+	    and CUST_COL7 = '${CUST_COL7}' 
 		${CanOperate}
 	    group by ${GroupbyFeild}
     </select>

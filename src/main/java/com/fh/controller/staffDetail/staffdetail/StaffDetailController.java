@@ -851,15 +851,17 @@ public class StaffDetailController extends BaseController {
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+
+		PageData transferPd = this.getPageData();
 		//页面显示数据的二级单位
-		getPd.put("SelectedDepartCode", SelectedDepartCode);
+		transferPd.put("SelectedDepartCode", SelectedDepartCode);
 		//账套
-		getPd.put("SelectedCustCol7", SelectedCustCol7);
+		transferPd.put("SelectedCustCol7", SelectedCustCol7);
 		//员工组
-		getPd.put("emplGroupType", emplGroupType);
+		transferPd.put("emplGroupType", emplGroupType);
 		
 		//页面显示数据的二级单位
-		List<PageData> varOList = staffdetailService.exportModel(getPd);
+		List<PageData> varOList = staffdetailService.exportModel(transferPd);
 		return export(varOList, "StaffDetail"); //工资明细
 	}
 	

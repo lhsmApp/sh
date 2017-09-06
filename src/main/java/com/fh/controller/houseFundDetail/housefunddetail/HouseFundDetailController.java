@@ -108,11 +108,11 @@ public class HouseFundDetailController extends BaseController {
 	Map<String, TmplConfigDetail> map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
 	
 	//界面查询字段
-    List<String> QueryFeildList = Arrays.asList("USER_GROP", "CUST_COL7", "DEPT_CODE");
+    List<String> QueryFeildList = Arrays.asList("CUST_COL7", "DEPT_CODE");
     //设置必定不用编辑的列
-    List<String> MustNotEditList = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE");
+    List<String> MustNotEditList = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7");
 	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
-    List<String> keyListAdd = Arrays.asList("CUST_COL7", "USER_GROP", "USER_CODE");
+    List<String> keyListAdd = Arrays.asList("USER_CODE");
 	List<String> keyListBase = getKeyListBase();
 	private List<String> getKeyListBase(){
 		List<String> list = new ArrayList<String>();
@@ -128,7 +128,8 @@ public class HouseFundDetailController extends BaseController {
 		}
 		return list;
 	}
-	
+
+	String getPageListSelectedCustCol7 = "";
 	String getPageListSelectedDepartCode = "";
 	
 	/**列表
@@ -140,6 +141,7 @@ public class HouseFundDetailController extends BaseController {
 		logBefore(logger, Jurisdiction.getUsername()+"列表HouseFundDetail");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
 
+		getPageListSelectedCustCol7 = "";
 		getPageListSelectedDepartCode = "";
 		
 		PageData getPd = this.getPageData();
@@ -210,14 +212,17 @@ public class HouseFundDetailController extends BaseController {
 		String returnState = DurState.Sealed.getNameKey();
 		
 		PageData getPd = this.getPageData();
+		//账套
+		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
 		if(departSelf == 1){
 			SelectedDepartCode = UserDepartCode;
 		}
 		
-		if(SelectedDepartCode != null && !SelectedDepartCode.trim().equals("")){
+		if(SelectedCustCol7 != null && !SelectedCustCol7.trim().equals("") && SelectedDepartCode != null && !SelectedDepartCode.trim().equals("")){
 			PageData statePd = new PageData();
 			//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
+			statePd.put("BILL_OFF", SelectedCustCol7);
 			statePd.put("RPT_DEPT", SelectedDepartCode);
 			statePd.put("RPT_DUR", SystemDateTime);
 			statePd.put("BILL_TYPE", TypeCodeDetail);
@@ -240,6 +245,7 @@ public class HouseFundDetailController extends BaseController {
 	public @ResponseBody PageResult<PageData> getPageList(JqPage page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"列表HouseFundDetail");
 
+		getPageListSelectedCustCol7 = "";
 		getPageListSelectedDepartCode = "";
 		
 		PageData getPd = this.getPageData();
@@ -250,22 +256,23 @@ public class HouseFundDetailController extends BaseController {
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
-		//员工组
-		String SelectedUserGrop = getPd.getString("SelectedUserGrop");
-		
+
+		getPageListSelectedCustCol7 = SelectedCustCol7;
 		getPageListSelectedDepartCode = SelectedDepartCode;
 
 		PageData getQueryFeildPd = new PageData();
-		getQueryFeildPd.put("USER_GROP", SelectedUserGrop);
 		getQueryFeildPd.put("DEPT_CODE", SelectedDepartCode);
 		getQueryFeildPd.put("CUST_COL7", SelectedCustCol7);
 		String QueryFeild = QueryFeildString.getQueryFeild(getQueryFeildPd, QueryFeildList);
 		if(!(SelectedDepartCode != null && !SelectedDepartCode.trim().equals(""))){
 			QueryFeild += " and 1 != 1 ";
 		}
+		if(!(SelectedCustCol7 != null && !SelectedCustCol7.trim().equals(""))){
+			QueryFeild += " and 1 != 1 ";
+		}
 
 		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-				SelectedDepartCode, SystemDateTime, "",
+				SelectedDepartCode, SystemDateTime, SelectedCustCol7,
 				TypeCodeListen, TypeCodeSummy, TableNameSummy);
 		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 			strHelpful += " and 1 != 1 ";
@@ -325,20 +332,18 @@ public class HouseFundDetailController extends BaseController {
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
-		//员工组
-		String SelectedUserGrop = getPd.getString("SelectedUserGrop");
 		//操作
 		String oper = getPd.getString("oper");
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
 			return commonBase;
 		}
 		
-		String checkState = CheckState(SelectedDepartCode);
+		String checkState = CheckState(SelectedCustCol7, SelectedDepartCode);
 		if(checkState!=null && !checkState.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(checkState);
@@ -348,6 +353,7 @@ public class HouseFundDetailController extends BaseController {
 		getPd.put("BILL_CODE", " ");
 		if(oper.equals("add")){
 			getPd.put("BUSI_DATE", SystemDateTime);
+			getPd.put("CUST_COL7", SelectedCustCol7);
 			getPd.put("DEPT_CODE", SelectedDepartCode);
 		} else {
 			for(String strFeild : MustNotEditList){
@@ -357,12 +363,12 @@ public class HouseFundDetailController extends BaseController {
 		TmplUtil.setModelDefault(getPd, map_HaveColumnsList);
 		
 		FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
-				SelectedDepartCode, SystemDateTime, "", 
+				SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
 				TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
 				"", 
 				map_HaveColumnsList);
 		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-				SelectedDepartCode, SystemDateTime, "",
+				SelectedDepartCode, SystemDateTime, SelectedCustCol7,
 				TypeCodeListen, TypeCodeSummy, TableNameSummy);
 		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 			commonBase.setCode(2);
@@ -403,29 +409,27 @@ public class HouseFundDetailController extends BaseController {
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
-		//员工组
-		String SelectedUserGrop = getPd.getString("SelectedUserGrop");
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
 			return commonBase;
 		}
 		
-		String checkState = CheckState(SelectedDepartCode);
+		String checkState = CheckState(SelectedCustCol7, SelectedDepartCode);
 		if(checkState!=null && !checkState.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(checkState);
 		} else {
 			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
-					SelectedDepartCode, SystemDateTime, "", 
+					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
 					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
 					"", 
 					map_HaveColumnsList);
 			String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-					SelectedDepartCode, SystemDateTime, "",
+					SelectedDepartCode, SystemDateTime, SelectedCustCol7,
 					TypeCodeListen, TypeCodeSummy, TableNameSummy);
 			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 				commonBase.setCode(2);
@@ -483,29 +487,27 @@ public class HouseFundDetailController extends BaseController {
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
-		//员工组
-		String SelectedUserGrop = getPd.getString("SelectedUserGrop");
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
 			return commonBase;
 		}
 		
-		String checkState = CheckState(SelectedDepartCode);
+		String checkState = CheckState(SelectedCustCol7, SelectedDepartCode);
 		if(checkState!=null && !checkState.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(checkState);
 		} else {
 			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
-					SelectedDepartCode, SystemDateTime, "", 
+					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
 					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
 					"", 
 					map_HaveColumnsList);
 			String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-					SelectedDepartCode, SystemDateTime, "",
+					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
 					TypeCodeListen, TypeCodeSummy, TableNameSummy);
 			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 				commonBase.setCode(2);
@@ -545,11 +547,9 @@ public class HouseFundDetailController extends BaseController {
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
-		//员工组
-		String SelectedUserGrop = getPd.getString("SelectedUserGrop");
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
@@ -559,6 +559,9 @@ public class HouseFundDetailController extends BaseController {
 		mv.setViewName("common/uploadExcel");
 		mv.addObject("local", "housefunddetail");
 		mv.addObject("SelectedDepartCode", SelectedDepartCode);
+		mv.addObject("SelectedCustCol7", SelectedCustCol7);
+		mv.addObject("commonBaseCode", commonBase.getCode());
+		mv.addObject("commonMessage", commonBase.getMessage());
 		return mv;
 	}
 
@@ -581,18 +584,16 @@ public class HouseFundDetailController extends BaseController {
 		if(departSelf == 1){
 			SelectedDepartCode = UserDepartCode;
 		}
-		////账套
-		//String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
-		////员工组
-		//String SelectedUserGrop = getPd.getString("SelectedUserGrop");
+		//账套
+		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
 		
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
 		} else {
-			String checkState = CheckState(SelectedDepartCode);
+			String checkState = CheckState(SelectedCustCol7, SelectedDepartCode);
 			if(checkState!=null && !checkState.trim().equals("")){
 				commonBase.setCode(2);
 				commonBase.setMessage(checkState);
@@ -603,12 +604,12 @@ public class HouseFundDetailController extends BaseController {
 					commonBase.setMessage("当前区间和当前单位不能为空！");
 				} else {
 					FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
-							SelectedDepartCode, SystemDateTime, "", 
+							SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
 							TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
 							"", 
 							map_HaveColumnsList);
 					String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-							SelectedDepartCode, SystemDateTime, "",
+							SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
 	    					TypeCodeListen, TypeCodeSummy, TableNameSummy);
 					if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 						commonBase.setCode(2);
@@ -668,6 +669,7 @@ public class HouseFundDetailController extends BaseController {
 									PageData pdHaveFeild = new PageData();
 									pdHaveFeild.put("SystemDateTime", SystemDateTime);
 									pdHaveFeild.put("SelectedDepartCode", SelectedDepartCode);
+									pdHaveFeild.put("SelectedCustCol7", SelectedCustCol7);
 									pdHaveFeild.put("CanOperate", strHelpful);
 									List<String> listUserCode = housefunddetailService.exportHaveUserCode(pdHaveFeild);
 									
@@ -677,6 +679,16 @@ public class HouseFundDetailController extends BaseController {
 										String getBUSI_DATE = (String) uploadAndRead.get(i).get("BUSI_DATE");
 										String getDEPT_CODE = (String) uploadAndRead.get(i).get("DEPT_CODE");
 										String getUSER_CODE = (String) uploadAndRead.get(i).get("USER_CODE");
+										String getCUST_COL7 = (String) uploadAndRead.get(i).get("CUST_COL7");
+										if(!(getCUST_COL7!=null && !getCUST_COL7.trim().equals(""))){
+											uploadAndRead.get(i).put("CUST_COL7", SelectedCustCol7);
+											getCUST_COL7 = SelectedCustCol7;
+										}
+										if(!SelectedCustCol7.equals(getCUST_COL7)){
+											if(!sbRet.contains("导入账套和当前账套必须一致！")){
+												sbRet.add("导入账套和当前账套必须一致！");
+											}
+										}
 										if(!(getBUSI_DATE!=null && !getBUSI_DATE.trim().equals(""))){
 											uploadAndRead.get(i).put("BUSI_DATE", SystemDateTime);
 											getBUSI_DATE = SystemDateTime;
@@ -740,6 +752,7 @@ public class HouseFundDetailController extends BaseController {
 		mv.setViewName("common/uploadExcel");
 		mv.addObject("local", "housefunddetail");
 		mv.addObject("SelectedDepartCode", SelectedDepartCode);
+		mv.addObject("SelectedCustCol7", SelectedCustCol7);
 		mv.addObject("commonBaseCode", commonBase.getCode());
 		mv.addObject("commonMessage", commonBase.getMessage());
 		return mv;
@@ -758,19 +771,18 @@ public class HouseFundDetailController extends BaseController {
 		if(departSelf == 1){
 			SelectedDepartCode = UserDepartCode;
 		}
-		////账套
-		//String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
-		////员工组
-		//String SelectedUserGrop = getPd.getString("SelectedUserGrop");
+		//账套
+		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
 
+		PageData transferPd = this.getPageData();
 		//页面显示数据的二级单位
-		getPd.put("SelectedDepartCode", SelectedDepartCode);
-		////账套
-		//getPd.put("SelectedCustCol7", SelectedCustCol7);
+		transferPd.put("SelectedDepartCode", SelectedDepartCode);
+		//账套
+		transferPd.put("SelectedCustCol7", SelectedCustCol7);
 		////员工组
-		//getPd.put("emplGroupType", emplGroupType);
+		//transferPd.put("emplGroupType", emplGroupType);
 		//页面显示数据的二级单位
-		List<PageData> varOList = housefunddetailService.exportModel(getPd);
+		List<PageData> varOList = housefunddetailService.exportModel(transferPd);
 		return export(varOList, "HouseFundDetail"); //公积金明细
 	}
 	
@@ -791,16 +803,16 @@ public class HouseFundDetailController extends BaseController {
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
-		//员工组
-		String SelectedUserGrop = getPd.getString("SelectedUserGrop");
 
 		//页面显示数据的年月
 		getPd.put("SystemDateTime", SystemDateTime);
+		//账套
+		getPd.put("SelectedCustCol7", SelectedCustCol7);
 		//页面显示数据的二级单位
 		getPd.put("SelectedDepartCode", SelectedDepartCode);
 		
 		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-				SelectedDepartCode, SystemDateTime, "",
+				SelectedDepartCode, SystemDateTime, SelectedCustCol7,
 				TypeCodeListen, TypeCodeSummy, TableNameSummy);
 		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 			ObjectExcelView erv = new ObjectExcelView();
@@ -876,24 +888,22 @@ public class HouseFundDetailController extends BaseController {
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
-		//员工组
-		String SelectedUserGrop = getPd.getString("SelectedUserGrop");
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
 			return commonBase;
 		}
 		
-		String checkState = CheckState(SelectedDepartCode);
+		String checkState = CheckState(SelectedCustCol7, SelectedDepartCode);
 		if(checkState!=null && !checkState.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(checkState);
 		} else {
 			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
-					SelectedDepartCode, SystemDateTime, "", 
+					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
 					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
 					"", 
 					map_HaveColumnsList);
@@ -905,6 +915,7 @@ public class HouseFundDetailController extends BaseController {
 			SysSealed item = new SysSealed();
 			item.setBILL_CODE(" ");
 			item.setRPT_DEPT(SelectedDepartCode);
+			item.setBILL_OFF(SelectedCustCol7);
 			item.setRPT_DUR(SystemDateTime);
 			item.setRPT_USER(userId);
 			item.setRPT_DATE(time);//YYYY-MM-DD HH:MM:SS
@@ -918,13 +929,14 @@ public class HouseFundDetailController extends BaseController {
 		return commonBase;
 	}
 	
-	private String CheckState(String DEPT_CODE) throws Exception{
+	private String CheckState(String CUST_COL7, String DEPT_CODE) throws Exception{
 		String strRut = "封存类型为空！";
 		if(TypeCodeDetail != null && !TypeCodeDetail.trim().equals("")){
 			strRut = "当前期间已封存！";
-			if(DEPT_CODE != null && !DEPT_CODE.trim().equals("")){
+			if(CUST_COL7 != null && !CUST_COL7.trim().equals("") && DEPT_CODE != null && !DEPT_CODE.trim().equals("")){
 				//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
 				PageData statePd = new PageData();
+				statePd.put("BILL_OFF", CUST_COL7);
 				statePd.put("RPT_DEPT", DEPT_CODE);
 				statePd.put("RPT_DUR", SystemDateTime);
 				statePd.put("BILL_TYPE", TypeCodeDetail);
@@ -937,12 +949,18 @@ public class HouseFundDetailController extends BaseController {
 		return strRut;
 	}
 	
-	private String CheckMustSelectedAndSame(String DEPT_CODE, Boolean isCheckSame) throws Exception{
+	private String CheckMustSelectedAndSame(String CUST_COL7, String DEPT_CODE, Boolean isCheckSame) throws Exception{
 		String strRut = "";
+		if(!(CUST_COL7 != null && !CUST_COL7.trim().equals(""))){
+			strRut += "查询条件中的账套必须选择！";
+		}
 		if(!(DEPT_CODE != null && !DEPT_CODE.trim().equals(""))){
 			strRut += "查询条件中的责任中心不能为空！";
 		}
 		if(isCheckSame){
+			if(!CUST_COL7.equals(getPageListSelectedCustCol7)){
+				strRut += "查询条件中所选账套与页面显示数据账套不一致，请单击查询再进行操作！";
+			}
 			if(!DEPT_CODE.equals(getPageListSelectedDepartCode)){
 				strRut += "查询条件中所选责任中心与页面显示数据责任中心不一致，请单击查询再进行操作！";
 			}

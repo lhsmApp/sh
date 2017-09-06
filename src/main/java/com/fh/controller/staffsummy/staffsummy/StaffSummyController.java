@@ -106,11 +106,13 @@ public class StaffSummyController extends BaseController {
 	String TypeCodeDetail = "";
 	String TypeCodeSummy = "";
 	String TypeCodeListen = "";
-	//显示结构的单位
-    String ShowDepartCode = "01001";
 	
 	//页面显示数据的年月
 	String SystemDateTime = "";
+	//页面显示数据的二级单位
+	String UserDepartCode = "";
+	//登录人的二级单位是最末层
+	private int departSelf = 0;
 	//底行显示的求和与平均值字段
 	StringBuilder SqlUserdata = new StringBuilder();
 	//表结构  
@@ -120,7 +122,7 @@ public class StaffSummyController extends BaseController {
 
 	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
 	private List<String> keyListBase = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "USER_CATG", "USER_GROP", "CUST_COL7", "UNITS_CODE");
-    //汇总字段
+    //汇总字段  员工组、组织机构、企业特定员工分类、工资范围、账套
     List<String> SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "USER_CATG", "USER_GROP", "CUST_COL7", "UNITS_CODE");
     String SumFieldToString = QueryFeildString.tranferSumFieldToString(SumField);
 	//界面查询字段
@@ -154,7 +156,7 @@ public class StaffSummyController extends BaseController {
 		mv.addObject("zTreeNodes", DepartmentSelectTreeSource);
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService, keyListBase);
-		String jqGridColModel = tmpl.generateStructureNoEdit(SelectedTableNo, ShowDepartCode);
+		String jqGridColModel = tmpl.generateStructureNoEdit(SelectedTableNo, UserDepartCode);
 
 		//底行显示的求和与平均值字段
 		SqlUserdata = tmpl.getSqlUserdata();

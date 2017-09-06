@@ -119,7 +119,7 @@
 		<include refid="tableName"></include>
 		where
 		<foreach item="item" index="index" collection="list" open=" (" separator=" or " close=") ">
-            USER_CODE = #{item.USER_CODE__}
+                USER_CODE = #{item.USER_CODE__}
             and BUSI_DATE = #{item.BUSI_DATE__} 
 	        and DEPT_CODE = #{item.DEPT_CODE__}  
 	        and CUST_COL7 = #{item.CUST_COL7__} 
