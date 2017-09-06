@@ -161,9 +161,9 @@
 		select * 
 		from 
 		<include refid="tableName"></include>
-		where DEPT_CODE = '${pd.SelectedDepartCode}'
-	    and CUST_COL7 = '${pd.SelectedCustCol7}'
-	    and USER_GROP = '${pd.emplGroupType}' 
+		where DEPT_CODE = '${SelectedDepartCode}'
+	    and CUST_COL7 = '${SelectedCustCol7}'
+	    and USER_GROP = '${emplGroupType}' 
 		order by BUSI_DATE desc
 		limit 1
 	</select>

@@ -180,6 +180,9 @@ public class StaffDetailController extends BaseController {
 		{
 			this.departSelf = 1;
 			getPd.put("departTreeSource", DepartmentSelectTreeSource);
+		} else {
+			departSelf = 0;
+			getPd.put("departTreeSource", 1);
 		}
 		mv.addObject("zTreeNodes", DepartmentSelectTreeSource);
 		// ***********************************************************
@@ -470,6 +473,7 @@ public class StaffDetailController extends BaseController {
 					commonBase.setMessage("此区间内编码重复:" + strUserCode);
 					return commonBase;
 	        	}
+	        	listUserCodeAdd.add(strUserCode);
 	        	if(listStaffIdentAdd.contains(strStaffIdent)){
 					commonBase.setCode(2);
 					commonBase.setMessage("此区间内身份证号重复:" + strStaffIdent);
@@ -1016,7 +1020,7 @@ public class StaffDetailController extends BaseController {
 			strRut += "查询条件中的账套必须选择！";
 		}
 		if(!(DEPT_CODE != null && !DEPT_CODE.trim().equals(""))){
-			strRut += "单位不能为空！";
+			strRut += "查询条件中的责任中心不能为空！";
 		}
 		if(isCheckSame){
 			if(!CUST_COL7.equals(getPageListSelectedCustCol7)){

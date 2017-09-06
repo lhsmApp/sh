@@ -870,6 +870,8 @@
 	
 	//检索
 	function tosearch() {
+		setStateTrue();
+		setNavButtonState();
 		$(gridBase_selector).jqGrid('GridUnload'); 
 		SetStructure();
 		//$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据

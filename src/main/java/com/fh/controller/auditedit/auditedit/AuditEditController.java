@@ -94,7 +94,7 @@ public class AuditEditController extends BaseController {
 	//界面查询字段
     List<String> QueryFeildList = Arrays.asList("DEPT_CODE", "CUST_COL7", "USER_GROP");
 	// 设置必定不用编辑的列
-	List<String> MustNotEditList = Arrays.asList("BILL_CODE", "BUSI_DATE", "CUST_COL7", "USER_GROP");
+	List<String> MustNotEditList = Arrays.asList("BUSI_DATE", "CUST_COL7", "USER_GROP");
 	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
     List<String> keyListAdd = Arrays.asList("USER_CODE");
 	List<String> keyListBase = getKeyListBase();
@@ -253,9 +253,8 @@ public class AuditEditController extends BaseController {
 		        return commonBase;
 			}
 		}
-		// MustNotEditList   Arrays.asList("BILL_CODE", "BUSI_DATE", "CUST_COL7", "USER_GROP");
-		// MustNotEditList   Arrays.asList("BILL_CODE", "BUSI_DATE");
-		getPd.put("BILL_CODE", " ");
+		// MustNotEditList   Arrays.asList("BUSI_DATE", "CUST_COL7", "USER_GROP");
+		// MustNotEditList   Arrays.asList("BUSI_DATE");
 		if(oper.equals("add")){
 			getPd.put("BUSI_DATE", SystemDateTime);
 			if(CheckStaffOrNot(SelectedTableNo)){
@@ -763,11 +762,11 @@ public class AuditEditController extends BaseController {
 					||which.equals(TmplType.TB_STAFF_AUDIT_SYS_LABOR.getNameKey())
 					||which.equals(TmplType.TB_STAFF_AUDIT_OPER_LABOR.getNameKey())
 					||which.equals(TmplType.TB_STAFF_AUDIT_LABOR.getNameKey())) {
-				MustNotEditList = Arrays.asList("BILL_CODE", "BUSI_DATE", "CUST_COL7", "USER_GROP");
+				MustNotEditList = Arrays.asList("BUSI_DATE", "CUST_COL7", "USER_GROP");
 				keyListBase = getKeyListBase();
 			} else if (which.equals(TmplType.TB_SOCIAL_INC_AUDIT.getNameKey())
 					||which.equals(TmplType.TB_HOUSE_FUND_AUDIT.getNameKey())) {
-				MustNotEditList = Arrays.asList("BILL_CODE", "BUSI_DATE");
+				MustNotEditList = Arrays.asList("BUSI_DATE");
 				keyListBase = getKeyListBase();
 			}
 		}

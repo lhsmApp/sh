@@ -20,7 +20,8 @@ public interface HouseFundDetailManager{
 	 * @param pd
 	 * @throws Exception
 	 */
-	public List<PageData> findByModel(List<PageData> listData)throws Exception;
+	public List<String> findByModel(List<PageData> listData)throws Exception;
+	public List<String> exportHaveUserCode(PageData listData)throws Exception;
 
 	/**导出列表
 	 * @param page
@@ -31,7 +32,7 @@ public interface HouseFundDetailManager{
 	 * @param page
 	 * @throws Exception
 	 */
-	public List<PageData> exportModel(String DepartCode)throws Exception;
+	public List<PageData> exportModel(PageData pd)throws Exception;
 	
 	/**列表
 	 * @param page

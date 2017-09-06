@@ -29,8 +29,12 @@ public class HouseFundDetailService implements HouseFundDetailManager{
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	public List<PageData> findByModel(List<PageData> listData)throws Exception{
-		return (List<PageData>)dao.findForList("HouseFundDetailMapper.findByModel", listData);
+	public List<String> findByModel(List<PageData> listData)throws Exception{
+		return (List<String>)dao.findForList("HouseFundDetailMapper.findByModel", listData);
+	}
+	@SuppressWarnings("unchecked")
+	public List<String> exportHaveUserCode(PageData listData)throws Exception{
+		return (List<String>)dao.findForList("HouseFundDetailMapper.exportHaveUserCode", listData);
 	}
 	
 	/**列表
@@ -93,8 +97,8 @@ public class HouseFundDetailService implements HouseFundDetailManager{
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	public List<PageData> exportModel(String DepartCode)throws Exception{
-		return (List<PageData>)dao.findForList("HouseFundDetailMapper.exportModel", DepartCode);
+	public List<PageData> exportModel(PageData pd)throws Exception{
+		return (List<PageData>)dao.findForList("HouseFundDetailMapper.exportModel", pd);
 	}
 
 	
