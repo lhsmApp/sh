@@ -220,8 +220,9 @@
 		$(window).on('resize.jqGrid', function () {
 			$(gridBase_selector).jqGrid( 'setGridWidth', $(".page-content").width());
 			$(gridDetail_selector).jqGrid( 'setGridWidth', $(".page-content").width());
-			resizeGridHeight($(gridBase_selector),423);
-			resizeGridHeight($(gridDetail_selector),398);
+			var gridHeight = 424 + 398;
+			resizeGridHeight($(gridBase_selector), gridHeight * (2.6/5));
+			resizeGridHeight($(gridDetail_selector), gridHeight * (2.4/5));
 	    });
 		
 		//初始化当前选择凭证类型
