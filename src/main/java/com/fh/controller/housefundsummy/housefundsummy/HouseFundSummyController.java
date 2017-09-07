@@ -50,7 +50,6 @@ import com.fh.util.enums.TmplType;
 import net.sf.json.JSONArray;
 
 import com.fh.service.fhoa.department.impl.DepartmentService;
-import com.fh.service.glzrzx.glzrzx.impl.GlZrzxService;
 import com.fh.service.houseFundDetail.housefunddetail.HouseFundDetailManager;
 import com.fh.service.housefundsummy.housefundsummy.HouseFundSummyManager;
 import com.fh.service.importdetail.importdetail.impl.ImportDetailService;
@@ -92,8 +91,6 @@ public class HouseFundSummyController extends BaseController {
 	private SysBillnumManager sysbillnumService;
 	@Resource(name = "userService")
 	private UserManager userService;
-	@Resource(name = "glzrzxService")
-	private GlZrzxService glzrzxService;
 	@Resource(name = "importdetailService")
 	private ImportDetailService importdetailService;
 
@@ -565,13 +562,6 @@ public class HouseFundSummyController extends BaseController {
 			
 			List<PageData> listAdd = getListTo(getHaveDate, getSaveDate);
 
-            ////根据DEPT_CODE从tb_gl_zrzx表里获取ZRZX_CODE，赋值给汇总保存数据
-            //String strZRZC_CODE = "";
-			//List<ZrzxModel> listZRZC_CODE = glzrzxService.findDeptFromZrzx(depart);
-            //if(listZRZC_CODE!=null && listZRZC_CODE.size()>0){
-            //	strZRZC_CODE = listZRZC_CODE.get(0).getZRZX_CODE();
-            //}
-			
 			for(PageData addTo : listAdd){
 				Object getBILL_CODE = addTo.get("BILL_CODE");
 				if(!(getBILL_CODE != null && !getBILL_CODE.toString().trim().equals(""))){
@@ -586,7 +576,6 @@ public class HouseFundSummyController extends BaseController {
         		User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
                 addTo.put("BILL_USER", user.getUSER_ID());
                 addTo.put("BILL_DATE", DateUtil.getTime());
-                addTo.put("ZRZC_CODE", "");
                 addTo.put("ESTB_DEPT", Jurisdiction.getCurrentDepartmentID());
                 
                 //更新明细单号的条件
