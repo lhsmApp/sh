@@ -708,13 +708,14 @@ public class StaffDetailController extends BaseController {
 							commonBase.setCode(2);
 							commonBase.setMessage(message);
 						} else {
-							List<PageData> uploadAndRead = (List<PageData>) uploadAndReadMap.get(2);
-							if (uploadAndRead != null && !"[]".equals(uploadAndRead.toString()) && uploadAndRead.size() >= 1) {
+							List<PageData> listUploadAndRead = (List<PageData>) uploadAndReadMap.get(2);
+							List<PageData> listAdd = new ArrayList<PageData>();
+							if (listUploadAndRead != null && !"[]".equals(listUploadAndRead.toString()) && listUploadAndRead.size() >= 1) {
 								judgement = true;
 							}
 							if (judgement) {
 								List<String> sbRet = new ArrayList<String>();
-								int listSize = uploadAndRead.size();
+								int listSize = listUploadAndRead.size();
 								if(listSize > 0){
 									//获取数据库中不是本部门、员工组和账套中的UserCode、StaffIdent
 									PageData pdHaveFeild = new PageData();
@@ -727,81 +728,85 @@ public class StaffDetailController extends BaseController {
 							        List<String> listStaffIdent = staffdetailService.exportHaveStaffIdent(pdHaveFeild);
 									
 									for(int i=0;i<listSize;i++){
-										uploadAndRead.get(i).put("CanOperate", strHelpful);
-										uploadAndRead.get(i).put("BILL_CODE", " ");
-										String getCUST_COL7 = (String) uploadAndRead.get(i).get("CUST_COL7");
-										String getUSER_GROP = (String) uploadAndRead.get(i).get("USER_GROP");
-										if(!(getCUST_COL7!=null && !getCUST_COL7.trim().equals(""))){
-											uploadAndRead.get(i).put("CUST_COL7", SelectedCustCol7);
-											getCUST_COL7 = SelectedCustCol7;
-										}
-										if(!SelectedCustCol7.equals(getCUST_COL7)){
-											if(!sbRet.contains("导入账套和当前账套必须一致！")){
-												sbRet.add("导入账套和当前账套必须一致！");
+										PageData pdAdd = listUploadAndRead.get(i);
+										String getUSER_CODE = (String) pdAdd.get("USER_CODE");
+										if(getUSER_CODE!=null && !getUSER_CODE.trim().equals("")){
+											pdAdd.put("CanOperate", strHelpful);
+											pdAdd.put("BILL_CODE", " ");
+											String getCUST_COL7 = (String) pdAdd.get("CUST_COL7");
+											String getUSER_GROP = (String) pdAdd.get("USER_GROP");
+											if(!(getCUST_COL7!=null && !getCUST_COL7.trim().equals(""))){
+												pdAdd.put("CUST_COL7", SelectedCustCol7);
+												getCUST_COL7 = SelectedCustCol7;
 											}
-										}
-										if(!(getUSER_GROP!=null && !getUSER_GROP.trim().equals(""))){
-											uploadAndRead.get(i).put("USER_GROP", emplGroupType);
-											getUSER_GROP = emplGroupType;
-										}
-										if(!emplGroupType.equals(getUSER_GROP)){
-											if(!sbRet.contains("导入员工组和当前员工组必须一致！")){
-												sbRet.add("导入员工组和当前员工组必须一致！");
+											if(!SelectedCustCol7.equals(getCUST_COL7)){
+												if(!sbRet.contains("导入账套和当前账套必须一致！")){
+													sbRet.add("导入账套和当前账套必须一致！");
+												}
 											}
-										}
-										String getBUSI_DATE = (String) uploadAndRead.get(i).get("BUSI_DATE");
-										String getDEPT_CODE = (String) uploadAndRead.get(i).get("DEPT_CODE");
-										String getUSER_CODE = (String) uploadAndRead.get(i).get("USER_CODE");
-										String getSTAFF_IDENT = (String) uploadAndRead.get(i).get("STAFF_IDENT");
-										if(!(getBUSI_DATE!=null && !getBUSI_DATE.trim().equals(""))){
-											uploadAndRead.get(i).put("BUSI_DATE", SystemDateTime);
-											getBUSI_DATE = SystemDateTime;
-										}
-										if(!SystemDateTime.equals(getBUSI_DATE)){
-											if(!sbRet.contains("导入区间和当前区间必须一致！")){
-												sbRet.add("导入区间和当前区间必须一致！");
+											if(!(getUSER_GROP!=null && !getUSER_GROP.trim().equals(""))){
+												pdAdd.put("USER_GROP", emplGroupType);
+												getUSER_GROP = emplGroupType;
 											}
-										}
-										if(!(getDEPT_CODE!=null && !getDEPT_CODE.trim().equals(""))){
-											uploadAndRead.get(i).put("DEPT_CODE", SelectedDepartCode);
-											getDEPT_CODE = SelectedDepartCode;
-										}
-										if(!SelectedDepartCode.equals(getDEPT_CODE)){
-											if(!sbRet.contains("导入单位和当前单位必须一致！")){
-												sbRet.add("导入单位和当前单位必须一致！");
+											if(!emplGroupType.equals(getUSER_GROP)){
+												if(!sbRet.contains("导入员工组和当前员工组必须一致！")){
+													sbRet.add("导入员工组和当前员工组必须一致！");
+												}
 											}
-										}
-										if(!(getUSER_CODE!=null && !getUSER_CODE.trim().equals(""))){
-											if(!sbRet.contains("人员编码不能为空！")){
-												sbRet.add("人员编码不能为空！");
+											String getBUSI_DATE = (String) pdAdd.get("BUSI_DATE");
+											String getDEPT_CODE = (String) pdAdd.get("DEPT_CODE");
+											String getSTAFF_IDENT = (String) pdAdd.get("STAFF_IDENT");
+											if(!(getBUSI_DATE!=null && !getBUSI_DATE.trim().equals(""))){
+												pdAdd.put("BUSI_DATE", SystemDateTime);
+												getBUSI_DATE = SystemDateTime;
 											}
-										}
-										if(listUserCode.contains(getUSER_CODE.trim())){
-											String strUserAdd = "人员编码" + getUSER_CODE + "重复！";
-											if(!sbRet.contains(strUserAdd)){
-												sbRet.add(strUserAdd);
+											if(!SystemDateTime.equals(getBUSI_DATE)){
+												if(!sbRet.contains("导入区间和当前区间必须一致！")){
+													sbRet.add("导入区间和当前区间必须一致！");
+												}
 											}
-										} else {
-											listUserCode.add(getUSER_CODE.trim());
-										}
-										if(!(getSTAFF_IDENT!=null && !getSTAFF_IDENT.trim().equals(""))){
-											if(!sbRet.contains("身份证号不能为空！")){
-												sbRet.add("身份证号不能为空！");
+											if(!(getDEPT_CODE!=null && !getDEPT_CODE.trim().equals(""))){
+												pdAdd.put("DEPT_CODE", SelectedDepartCode);
+												getDEPT_CODE = SelectedDepartCode;
 											}
-										}
-										if(listStaffIdent.contains(getSTAFF_IDENT.trim())){
-											String strUserAdd = "身份证号" + getSTAFF_IDENT + "重复！";
-											if(!sbRet.contains(strUserAdd)){
-												sbRet.add(strUserAdd);
+											if(!SelectedDepartCode.equals(getDEPT_CODE)){
+												if(!sbRet.contains("导入单位和当前单位必须一致！")){
+													sbRet.add("导入单位和当前单位必须一致！");
+												}
 											}
-										} else {
-											listStaffIdent.add(getSTAFF_IDENT.trim());
+											if(!(getUSER_CODE!=null && !getUSER_CODE.trim().equals(""))){
+												if(!sbRet.contains("人员编码不能为空！")){
+													sbRet.add("人员编码不能为空！");
+												}
+											}
+											if(listUserCode.contains(getUSER_CODE.trim())){
+												String strUserAdd = "人员编码" + getUSER_CODE + "重复！";
+												if(!sbRet.contains(strUserAdd)){
+													sbRet.add(strUserAdd);
+												}
+											} else {
+												listUserCode.add(getUSER_CODE.trim());
+											}
+											if(!(getSTAFF_IDENT!=null && !getSTAFF_IDENT.trim().equals(""))){
+												if(!sbRet.contains("身份证号不能为空！")){
+													sbRet.add("身份证号不能为空！");
+												}
+											}
+											if(listStaffIdent.contains(getSTAFF_IDENT.trim())){
+												String strUserAdd = "身份证号" + getSTAFF_IDENT + "重复！";
+												if(!sbRet.contains(strUserAdd)){
+													sbRet.add(strUserAdd);
+												}
+											} else {
+												listStaffIdent.add(getSTAFF_IDENT.trim());
+											}
+											String getESTB_DEPT = (String) pdAdd.get("ESTB_DEPT");
+											if(!(getESTB_DEPT!=null && !getESTB_DEPT.trim().equals(""))){
+												pdAdd.put("ESTB_DEPT", SelectedDepartCode);
+											}
+											TmplUtil.setModelDefault(pdAdd, map_HaveColumnsList);
+											listAdd.add(pdAdd);
 										}
-										String getESTB_DEPT = (String) uploadAndRead.get(i).get("ESTB_DEPT");
-										if(!(getESTB_DEPT!=null && !getESTB_DEPT.trim().equals(""))){
-											uploadAndRead.get(i).put("ESTB_DEPT", SelectedDepartCode);
-										}
-										TmplUtil.setModelDefault(uploadAndRead.get(i), map_HaveColumnsList);
 									}
 									if(sbRet.size()>0){
 										StringBuilder sbTitle = new StringBuilder();
@@ -812,7 +817,7 @@ public class StaffDetailController extends BaseController {
 										commonBase.setMessage(sbTitle.toString());
 									} else {
 										//此处执行集合添加 
-										staffdetailService.batchImport(uploadAndRead);
+										staffdetailService.batchImport(listAdd);
 										commonBase.setCode(0);
 									}
 								}
