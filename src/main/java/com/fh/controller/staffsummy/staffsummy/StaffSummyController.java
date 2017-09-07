@@ -238,6 +238,9 @@ public class StaffSummyController extends BaseController {
 		if(!(SelectedCustCol7!=null && !SelectedCustCol7.trim().equals(""))){
 			QueryFeild += " and 1 != 1 ";
 		}
+		if(!(emplGroupType!=null && !emplGroupType.trim().equals(""))){
+			QueryFeild += " and 1 != 1 ";
+		}
 		getPd.put("QueryFeild", QueryFeild);
 		
 		//多条件过滤条件
@@ -340,6 +343,11 @@ public class StaffSummyController extends BaseController {
 		PageData getPd = this.getPageData();
 		//员工组 必须执行，用来设置汇总和传输上报类型
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
+		if(!(TypeCodeSummy!=null && !TypeCodeSummy.trim().equals(""))){
+			commonBase.setCode(2);
+			commonBase.setMessage("工资对应的上报类型为空！");
+			return commonBase;
+		}
 		
 		Object DATA_ROWS_REPORT = getPd.get("DataRowsReport");
 		String json = DATA_ROWS_REPORT.toString();  
@@ -403,6 +411,13 @@ public class StaffSummyController extends BaseController {
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+
+		if(!(emplGroupType!=null && !emplGroupType.trim().equals(""))){
+			commonBase.setCode(2);
+			commonBase.setMessage("工资对应的员工组编码为空！");
+			return commonBase;
+		}
+		
 		//传输的列
 		String json = getPd.getString("DataRowSummy");
         
@@ -491,7 +506,7 @@ public class StaffSummyController extends BaseController {
     			if(checkStateLast!=null && !checkStateLast.trim().equals("")){
     				commonBase.setCode(2);
     				commonBase.setMessage(checkStateLast);
-    				break;
+    				return commonBase;
     			}
     			//判断明细信息为已上报
     			SysSealed itemBefore = new SysSealed();
@@ -503,7 +518,7 @@ public class StaffSummyController extends BaseController {
     			if(checkStateBefore!=null && !checkStateBefore.trim().equals("")){
     				commonBase.setCode(2);
     				commonBase.setMessage(checkStateBefore);
-    				break;
+    				return commonBase;
     			}
 
     			TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);

@@ -64,7 +64,9 @@
 		and ( 
 		     DEPT_CODE != '${SelectedDepartCode}' 
 		     or CUST_COL7 != '${SelectedCustCol7}' 
-		     or USER_GROP != '${emplGroupType}'
+		     <if test="StaffOrNot!= null and StaffOrNot != ''">
+		         or USER_GROP != '${emplGroupType}'
+		     </if>
 		     )
 	</select>
 	
@@ -79,10 +81,11 @@
 		delete from ${TableName}
 		where BUSI_DATE = #{BUSI_DATE__} 
 		and USER_CODE = #{USER_CODE__} 
+	    <!-- and DEPT_CODE = #{DEPT_CODE__} 
+	    and CUST_COL7 = #{CUST_COL7__} 
 		<if test="StaffOrNot!= null and StaffOrNot != ''">
-	        and CUST_COL7 = #{CUST_COL7__} 
 	        and USER_GROP = #{USER_GROP__} 
-		</if>
+		</if> -->
 	</delete>
 	
 	<!-- 批量删除 -->
@@ -91,10 +94,12 @@
 		where
 		<foreach item="item" index="index" collection="ListData" open=" (" separator=" or " close=") ">
             BUSI_DATE = #{item.BUSI_DATE__} and USER_CODE = #{item.USER_CODE__} 
-		    <if test="StaffOrNot!= null and StaffOrNot != ''">
+		    <!-- 
+	            and DEPT_CODE = #{DEPT_CODE__} 
 	            and CUST_COL7 = #{CUST_COL7__} 
+	            <if test="StaffOrNot!= null and StaffOrNot != ''">
 	            and USER_GROP = #{USER_GROP__} 
-		    </if>
+		    </if> -->
 		</foreach>
 	</delete>
 	
@@ -103,8 +108,8 @@
 		delete from ${TableName}
 		where BUSI_DATE = #{BUSI_DATE}
 	    and DEPT_CODE = #{DEPT_CODE} 
+	    and CUST_COL7 = #{CUST_COL7} 
 		<if test="StaffOrNot!= null and StaffOrNot != ''">
-	        and CUST_COL7 = #{CUST_COL7} 
 	        and USER_GROP = #{USER_GROP} 
 		</if>
 	</delete>

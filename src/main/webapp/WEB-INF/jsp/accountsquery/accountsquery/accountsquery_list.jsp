@@ -58,7 +58,7 @@
 								
 						<button id="btnQuery" class="btn btn-white btn-info btn-sm"
 							onclick="showQueryCondi($('#jqGridBase'),$('#jqGridDetail'),null,true)">
-							<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
+							<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>隐藏查询</span>
 						</button>
 						
 						<div class="pull-right">
@@ -67,19 +67,25 @@
 							<div class="btn-toolbar inline middle no-margin">
 								<div data-toggle="buttons" class="btn-group no-margin">
 									<label class="btn btn-sm btn-primary active"> <span
-										class="bigger-110">合同化、市场化</span> <input type="radio" value="1" />
+									    class="bigger-110">合同化</span> <input type="radio" value="11" />
 									</label> 
 									<label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">运行人员</span> <input type="radio" value="2" />
+									     class="bigger-110">市场化</span> <input type="radio" value="12" />
 									</label> 
 									<label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">外雇劳务</span> <input type="radio" value="3" />
+									      class="bigger-110">系统内劳务</span> <input type="radio" value="13" />
 									</label>
 									<label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">社保</span> <input type="radio" value="4" />
+									    class="bigger-110">运行人员</span> <input type="radio" value="14" />
 									</label>
 									<label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">公积金</span> <input type="radio" value="5" />
+										  class="bigger-110">劳务派遣</span> <input type="radio" value="15" />
+									</label>
+									<label class="btn btn-sm btn-primary"> <span
+										class="bigger-110">社保</span> <input type="radio" value="23" />
+									</label>
+									<label class="btn btn-sm btn-primary"> <span
+										class="bigger-110">公积金</span> <input type="radio" value="27" />
 									</label>
 								</div>
 							</div>
@@ -88,19 +94,30 @@
 			
 					<div class="row">
 						<div class="col-xs-12">
-							<div class="widget-box" style="display: none;">
+							<div class="widget-box" style="display: block;">
 								<div class="widget-body">
 									<div class="widget-main">
 										<form class="form-inline">
 											<span class="input-icon pull-left" style="margin-right: 5px;">
-												<input id="BUSI_DATE" class="input-mask-date" type="text"
+												<input id="SelectedBusiDate" class="input-mask-date" type="text"
 												placeholder="请输入业务区间"> <i
 												class="ace-icon fa fa-calendar blue"></i>
 											</span>
 											<span class="pull-left" style="margin-right: 5px;">
+												<select class="chosen-select form-control"
+													name="SelectedCustCol7" id="SelectedCustCol7"
+													data-placeholder="请选择帐套"
+													style="vertical-align: top; height:32px;width: 150px;">
+													<option value="">请选择帐套</option>
+													<c:forEach items="${FMISACC}" var="each">
+														<option value="${each.DICT_CODE}">${each.NAME}</option>
+													</c:forEach>
+												</select>
+											</span>
+											<span class="pull-left" style="margin-right: 5px;" <c:if test="${pd.departTreeSource=='0'}">hidden</c:if>>
 												<div class="selectTree" id="selectTree" multiMode="true"
 												    allSelectable="false" noGroup="false"></div>
-											    <input type="text" id="DEPT_CODE" hidden></input>
+											    <input type="text" id="SelectedDepartCode" hidden></input>
 											</span>
 
 											<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
@@ -188,7 +205,7 @@
     var gridDetail_selector = "#jqGridDetail";  
     var pagerDetail_selector = "#jqGridPagerDetail";  
 
-	var which='1';
+	var which;
 	var jqGridColModel;
 	var TabType = 1;
 

@@ -111,8 +111,8 @@
 													</c:forEach>
 												</select>
 											</span>
-											<span class="pull-left" id="spanSelectTree" style="margin-right: 5px;">
-												<div class="selectTree" id="selectTree" multiMode="true"
+											<span class="pull-left" id="spanSelectTree" style="margin-right: 5px;" <c:if test="${pd.departTreeSource=='0'}">hidden</c:if>>
+												<div class="selectTree" id="selectTree" multiMode="false"
 												    allSelectable="false" noGroup="false"></div>
 											    <input type="text" id="SelectedDepartCode" hidden></input>
 											</span>
@@ -496,7 +496,7 @@
 						url: '<%=basePath%>auditedit/deleteAll.do?SelectedTableNo='+which
 		                +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
 		                +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
-				    	data: {DATA_ROWS:JSON.stringify(listData)},
+				    	data: {DataRows:JSON.stringify(listData)},
 						dataType:'json',
 						cache: false,
 						success: function(response){
@@ -566,7 +566,7 @@ function batchSave(){
 					url: '<%=basePath%>auditedit/updateAll.do?SelectedTableNo='+which
 	                +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
 	                +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
-			    	data: {DATA_ROWS:JSON.stringify(listData)},
+			    	data: {DataRows:JSON.stringify(listData)},
 					dataType:'json',
 					cache: false,
 					success: function(response){

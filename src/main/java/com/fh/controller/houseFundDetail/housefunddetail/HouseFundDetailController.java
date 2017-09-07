@@ -437,7 +437,7 @@ public class HouseFundDetailController extends BaseController {
 				return commonBase;
 			}
 			
-			Object DATA_ROWS = getPd.get("DATA_ROWS");
+			Object DATA_ROWS = getPd.get("DataRows");
 			String json = DATA_ROWS.toString();  
 	        JSONArray array = JSONArray.fromObject(json);  
 	        List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);
@@ -515,7 +515,7 @@ public class HouseFundDetailController extends BaseController {
 				return commonBase;
 			}
 			
-			Object DATA_ROWS = getPd.get("DATA_ROWS");
+			Object DATA_ROWS = getPd.get("DataRows");
 			String json = DATA_ROWS.toString();  
 	        JSONArray array = JSONArray.fromObject(json);  
 	        List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);

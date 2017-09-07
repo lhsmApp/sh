@@ -45,31 +45,74 @@
 							id="subTitle" style="margin-left: 2px;">财务对账</span> 
 						<span style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
 								
+						<button id="btnQuery" class="btn btn-white btn-info btn-sm"
+								onclick="showQueryCondi($('#jqGridBase'),$('#jqGridDetail'),null,true)">
+							<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>隐藏查询</span>
+						</button>
+								
 						<div class="pull-right">
 							<span class="green middle bolder">类型: &nbsp;</span>
 
 							<div class="btn-toolbar inline middle no-margin">
 								<div data-toggle="buttons" class="btn-group no-margin">
 									<label class="btn btn-sm btn-primary active"> <span
-										class="bigger-110">合同化、市场化</span> <input type="radio" value="1" />
+									    class="bigger-110">合同化</span> <input type="radio" value="11" />
 									</label> 
 									<label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">运行人员</span> <input type="radio" value="2" />
+									     class="bigger-110">市场化</span> <input type="radio" value="12" />
 									</label> 
 									<label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">外雇劳务</span> <input type="radio" value="3" />
+									      class="bigger-110">系统内劳务</span> <input type="radio" value="13" />
 									</label>
 									<label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">社保</span> <input type="radio" value="4" />
+									    class="bigger-110">运行人员</span> <input type="radio" value="14" />
 									</label>
 									<label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">公积金</span> <input type="radio" value="5" />
+										  class="bigger-110">劳务派遣</span> <input type="radio" value="15" />
+									</label>
+									<label class="btn btn-sm btn-primary"> <span
+										class="bigger-110">社保</span> <input type="radio" value="23" />
+									</label>
+									<label class="btn btn-sm btn-primary"> <span
+										class="bigger-110">公积金</span> <input type="radio" value="27" />
 									</label>
 								</div>
 							</div>
 						</div>
 					</div>
 					<!-- /.page-header -->
+
+						<div class="row">
+						<div class="col-xs-12">
+							<div class="widget-box" style="display: block;">
+								<div class="widget-body">
+									<div class="widget-main">
+										<form class="form-inline">
+											<span class="pull-left" style="margin-right: 5px;">
+												<select class="chosen-select form-control"
+													name="SelectedCustCol7" id="SelectedCustCol7"
+													data-placeholder="请选择帐套"
+													style="vertical-align: top; height:32px;width: 150px;">
+													<option value="">请选择帐套</option>
+													<c:forEach items="${FMISACC}" var="each">
+														<option value="${each.DICT_CODE}">${each.NAME}</option>
+													</c:forEach>
+												</select>
+											</span>
+											<span class="pull-left" id="spanSelectTree" style="margin-right: 5px;" <c:if test="${pd.departTreeSource=='0'}">hidden</c:if>>
+												<div class="selectTree" id="selectTree" multiMode="true"
+												    allSelectable="false" noGroup="false"></div>
+											    <input type="text" id="SelectedDepartCode" hidden></input>
+											</span>
+											<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
+												<i class="ace-icon fa fa-search bigger-110"></i>
+											</button>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 
 					<div class="row">
 						<div class="col-xs-12">
@@ -142,9 +185,30 @@
     var gridDetail_selector = "#jqGridDetail";  
     var pagerDetail_selector = "#jqGridPagerDetail";  
 
-	var which='1';
+	var which;
 	var jqGridColModel;
 	var TabType = 1;
+
+	//显示隐藏查询 标准高度统一定为192（含底行），如果不含底行高度定为155.
+	function showQueryCondi(jqGridBase, jqGridDetail, gridHeight,withBottom) {
+		if (gridHeight=="undefined"||gridHeight == null || gridHeight == "" || gridHeight == 0) {
+			gridHeight = 279;
+		}
+		if ($(".widget-box").css("display") == "block") {
+			$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass(
+					'fa-chevron-down');
+			$("#btnQuery").find("span").text("显示查询");
+			$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight) * (2/5));
+			$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight) * (3/5));
+		} else {
+			$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass(
+					'fa-chevron-up');
+			$("#btnQuery").find("span").text("隐藏查询");
+			$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (2/5));
+			$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (3/5));
+		}
+		$(".widget-box").toggle("fast");
+	}
 	
 	$(document).ready(function () {
 		$(top.hangge());//关闭加载状态

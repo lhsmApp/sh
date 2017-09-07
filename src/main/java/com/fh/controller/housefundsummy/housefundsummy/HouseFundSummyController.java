@@ -121,10 +121,10 @@ public class HouseFundSummyController extends BaseController {
 	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
 	private List<String> keyListBase = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7");
     //汇总字段
-    List<String> SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "USER_CATG", "USER_GROP", "CUST_COL7", "UNITS_CODE");
+    List<String> SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "USER_CATG", "USER_GROP", "CUST_COL7", "UNITS_CODE", "ORG_UNIT");
     String SumFieldToString = QueryFeildString.tranferListStringToGroupbyString(SumField);
 	//界面查询字段
-    List<String> QueryFeildList = Arrays.asList("DEPT_CODE", "USER_CATG", "USER_GROP", "CUST_COL7", "UNITS_CODE");
+    List<String> QueryFeildList = Arrays.asList("DEPT_CODE", "USER_CATG", "USER_GROP", "CUST_COL7", "UNITS_CODE", "ORG_UNIT");
     //查询的所有可操作的责任中心
     List<String> AllDeptCode = new ArrayList<String>();
 
@@ -180,6 +180,8 @@ public class HouseFundSummyController extends BaseController {
 		//二级单位oa_department:"UNITS_CODE"
 		String UnitsCodeSelectTreeSource=DictsUtil.getDepartmentSelectTreeSource(departmentService, DictsUtil.DepartShowAll);
 		mv.addObject("zTreeNodes2", UnitsCodeSelectTreeSource);
+		//组织单元文本字典ORGUNIT:"ORG_UNIT"
+		mv.addObject("ORGUNIT", DictsUtil.getDictsByParentCode(dictionariesService, "ORGUNIT"));
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService, keyListBase);
 		String jqGridColModel = tmpl.generateStructureNoEdit(TypeCodeSummy, UserDepartCode);
@@ -215,6 +217,8 @@ public class HouseFundSummyController extends BaseController {
 		String SelectedUserGrop = getPd.getString("SelectedUserGrop");
 		//企业特定员工分类PARTUSERTYPE:"USER_CATG"
 		String SelectedUserCatg = getPd.getString("SelectedUserCatg");
+		//组织单元文本字典ORGUNIT:"ORG_UNIT"
+		String SelectedOrgUnit = getPd.getString("SelectedOrgUnit");
 		//二级单位oa_department:"UNITS_CODE"
 		String SelectedUnitsCode = getPd.getString("SelectedUnitsCode");
 		
@@ -223,6 +227,7 @@ public class HouseFundSummyController extends BaseController {
 		getQueryFeildPd.put("CUST_COL7", SelectedCustCol7);
 		getQueryFeildPd.put("DEPT_CODE", SelectedDepartCode);
 		getQueryFeildPd.put("USER_GROP", SelectedUserGrop);
+		getQueryFeildPd.put("ORG_UNIT", SelectedOrgUnit);
 		getQueryFeildPd.put("USER_CATG", SelectedUserCatg);
 		getQueryFeildPd.put("UNITS_CODE", SelectedUnitsCode);
 		String QueryFeild = QueryFeildString.getQueryFeild(getQueryFeildPd, QueryFeildList);
@@ -322,6 +327,12 @@ public class HouseFundSummyController extends BaseController {
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "report")){return null;} //校验权限	
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
+
+		if(!(TypeCodeSummy!=null && !TypeCodeSummy.trim().equals(""))){
+			commonBase.setCode(2);
+			commonBase.setMessage("工资对应的上报类型为空！");
+			return commonBase;
+		}
 
 		User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
 		String userId = user.getUSER_ID();

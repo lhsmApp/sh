@@ -539,7 +539,7 @@
 						url: '<%=basePath%>housefunddetail/deleteAll.do?'
 							+ 'SelectedDepartCode='+$("#SelectedDepartCode").val()
 			                + '&SelectedCustCol7='+$("#SelectedCustCol7").val(),
-				    	data: {DATA_ROWS:JSON.stringify(listData)},
+				    	data: {DataRows:JSON.stringify(listData)},
 						dataType:'json',
 						cache: false,
 						success: function(response){
@@ -609,7 +609,7 @@ function batchSave(){
 					url: '<%=basePath%>housefunddetail/updateAll.do?'
 						+ 'SelectedDepartCode='+$("#SelectedDepartCode").val()
 		                + '&SelectedCustCol7='+$("#SelectedCustCol7").val(),
-			    	data: {DATA_ROWS:JSON.stringify(listData)},
+			    	data: {DataRows:JSON.stringify(listData)},
 					dataType:'json',
 					cache: false,
 					success: function(response){

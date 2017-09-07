@@ -114,6 +114,17 @@
 												</select>
 											</span>
 											<span class="pull-left" style="margin-right: 5px;">
+												<select class="chosen-select form-control"
+													name="SelectedOrgUnit" id="SelectedOrgUnit"
+													data-placeholder="请选择组织单元文本"
+													style="vertical-align: top; height:32px;width: 150px;">
+													<option value="">请选择组织单元文本</option>
+													<c:forEach items="${ORGUNIT}" var="each">
+														<option value="${each.DICT_CODE}">${each.NAME}</option>
+													</c:forEach>
+												</select>
+											</span>
+											<span class="pull-left" style="margin-right: 5px;">
 												<div class="selectTree" id="selectTree2" multiMode="true"
 												    allSelectable="false" noGroup="false"></div>
 											    <input type="text" id="SelectedUnitsCode" hidden></input>
@@ -199,6 +210,7 @@
 		            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
 		            +'&SelectedUserGrop='+$("#SelectedUserGrop").val()
 	                +'&SelectedUserCatg='+$("#SelectedUserCatg").val()
+	                +'&SelectedOrgUnit='+$("#SelectedOrgUnit").val()
 	                +'&SelectedUnitsCode='+$("#SelectedUnitsCode").val(),
 				datatype: "json",
 				colModel: jqGridColModel,
@@ -640,6 +652,7 @@
 		            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
 		            +'&SelectedUserGrop='+$("#SelectedUserGrop").val()
 	                +'&SelectedUserCatg='+$("#SelectedUserCatg").val()
+	                +'&SelectedOrgUnit='+$("#SelectedOrgUnit").val()
 	                +'&SelectedUnitsCode='+$("#SelectedUnitsCode").val(),  
 				datatype:'json',
 			      page:1

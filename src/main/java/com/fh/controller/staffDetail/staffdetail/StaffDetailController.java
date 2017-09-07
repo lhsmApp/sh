@@ -279,6 +279,9 @@ public class StaffDetailController extends BaseController {
 		if(!(SelectedCustCol7 != null && !SelectedCustCol7.trim().equals(""))){
 			QueryFeild += " and 1 != 1 ";
 		}
+		if(!(emplGroupType!=null && !emplGroupType.trim().equals(""))){
+			QueryFeild += " and 1 != 1 ";
+		}
 		//根据凭证上报情况判断当前显示信息
 		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
 				SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
@@ -347,7 +350,7 @@ public class StaffDetailController extends BaseController {
 		String oper = getPd.getString("oper");
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(emplGroupType, SelectedCustCol7, SelectedDepartCode, true);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
@@ -433,7 +436,7 @@ public class StaffDetailController extends BaseController {
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(emplGroupType, SelectedCustCol7, SelectedDepartCode, true);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
@@ -459,7 +462,7 @@ public class StaffDetailController extends BaseController {
 				return commonBase;
 			}
 			
-			Object DATA_ROWS = getPd.get("DATA_ROWS");
+			Object DATA_ROWS = getPd.get("DataRows");
 			String json = DATA_ROWS.toString();  
 	        JSONArray array = JSONArray.fromObject(json);  
 	        List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);
@@ -530,7 +533,7 @@ public class StaffDetailController extends BaseController {
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(emplGroupType, SelectedCustCol7, SelectedDepartCode, true);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
@@ -556,7 +559,7 @@ public class StaffDetailController extends BaseController {
 				return commonBase;
 			}
 			
-			Object DATA_ROWS = getPd.get("DATA_ROWS");
+			Object DATA_ROWS = getPd.get("DataRows");
 			String json = DATA_ROWS.toString();  
 	        JSONArray array = JSONArray.fromObject(json);  
 	        List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);
@@ -584,6 +587,7 @@ public class StaffDetailController extends BaseController {
 		PageData getPd = this.getPageData();
 		//员工组
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
+		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
 		if(departSelf == 1){
@@ -593,7 +597,7 @@ public class StaffDetailController extends BaseController {
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(emplGroupType, SelectedCustCol7, SelectedDepartCode, true);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
@@ -635,7 +639,7 @@ public class StaffDetailController extends BaseController {
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(emplGroupType, SelectedCustCol7, SelectedDepartCode, true);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
@@ -977,7 +981,7 @@ public class StaffDetailController extends BaseController {
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(emplGroupType, SelectedCustCol7, SelectedDepartCode, true);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
@@ -1016,7 +1020,7 @@ public class StaffDetailController extends BaseController {
 		return commonBase;
 	}
 	
-	private String CheckMustSelectedAndSame(String CUST_COL7, String DEPT_CODE, Boolean isCheckSame) throws Exception{
+	private String CheckMustSelectedAndSame(String emplGroupType, String CUST_COL7, String DEPT_CODE, Boolean isCheckSame) throws Exception{
 		String strRut = "";
 		if(!(CUST_COL7 != null && !CUST_COL7.trim().equals(""))){
 			strRut += "查询条件中的账套必须选择！";
@@ -1031,6 +1035,9 @@ public class StaffDetailController extends BaseController {
 			if(DEPT_CODE != null && !DEPT_CODE.equals(getPageListSelectedDepartCode)){
 				strRut += "查询条件中所选责任中心与页面显示数据责任中心不一致，请单击查询再进行操作！";
 			}
+		}
+		if(!(emplGroupType!=null && !emplGroupType.trim().equals(""))){
+			strRut += "工资对应的员工组编码为空！";
 		}
 		return strRut;
 	}

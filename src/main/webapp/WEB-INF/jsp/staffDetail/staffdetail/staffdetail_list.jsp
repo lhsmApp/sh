@@ -590,7 +590,7 @@
 						url: '<%=basePath%>staffdetail/deleteAll.do?SelectedTableNo='+which
 		                    +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
 		                    +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
-				    	data: {DATA_ROWS:JSON.stringify(listData)},
+				    	data: {DataRows:JSON.stringify(listData)},
 						dataType:'json',
 						cache: false,
 						success: function(response){
@@ -659,7 +659,7 @@
 					    url: '<%=basePath%>staffdetail/updateAll.do?SelectedTableNo='+which
 	                        +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
 	                        +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
-			    	    data: {DATA_ROWS:JSON.stringify(listData)},
+			    	    data: {DataRows:JSON.stringify(listData)},
 					    dataType:'json',
 					    cache: false,
 					    success: function(response){
