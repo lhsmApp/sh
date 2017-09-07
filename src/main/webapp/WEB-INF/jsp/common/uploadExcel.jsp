@@ -70,6 +70,7 @@
 	    var which = '${which}';
 	    var SelectedDepartCode = '${SelectedDepartCode}';
 	    var SelectedCustCol7 = '${SelectedCustCol7}';
+	    var tipfiles = "请选择xls格式的文件";
 	    
 		$(document).ready(function () {
 			$(top.hangge());
@@ -123,7 +124,7 @@
 		}
 		//保存
 		function save(){
-			if($("#excel").val() == "" || document.getElementById("excel").files[0] == '请选择xls格式的文件'){
+			if($("#excel").val() == "" || document.getElementById("excel").files[0] == tipfiles){
 				$("#excel").tips({
 					side:3,
 		            msg:'请选择文件',
@@ -138,15 +139,15 @@
 		}
 		function fileType(obj){
 			var fileType=obj.value.substr(obj.value.lastIndexOf(".")).toLowerCase();//获得文件后缀名
-		    if(fileType != '.xls'){
+		    if(fileType != '.xls' && fileType != '.xlsx' ){
 		    	$("#excel").tips({
 					side:3,
-		            msg:'请上传xls格式的文件',
+		            msg:tipfiles,
 		            bg:'#AE81FF',
 		            time:3
 		        });
 		    	$("#excel").val('');
-		    	document.getElementById("excel").files[0] = '请选择xls格式的文件';
+		    	document.getElementById("excel").files[0] = tipfiles;
 		    }
 		}
 	</script>

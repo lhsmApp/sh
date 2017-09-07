@@ -190,7 +190,8 @@ public class SocialIncSummyController extends BaseController {
 		map_HaveColumnsList = tmpl.getHaveColumnsList();
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 		map_SetColumnsList = tmpl.getSetColumnsList();
-		
+
+		mv.addObject("pd", getPd);
 		mv.addObject("jqGridColModel", jqGridColModel);
 		return mv;
 	}
