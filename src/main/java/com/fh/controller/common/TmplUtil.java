@@ -124,8 +124,6 @@ public class TmplUtil {
 		map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
 		// 底行显示的求和与平均值字段
 		m_sqlUserdata = new StringBuilder();
-		// 拼接真正设置的jqGrid的ColModel
-		StringBuilder jqGridColModelAll = new StringBuilder();
 		
 		PageData pd=new PageData();
 		pd.put("TABLE_NO", tableNo);
@@ -211,8 +209,6 @@ public class TmplUtil {
 							}
 						}
 					}
-					
-					
 					//if (notedit != null && !notedit.trim().equals("")) {
 					//	jqGridColModelCustom.append(notedit).append(", ");
 					//}
@@ -276,16 +272,18 @@ public class TmplUtil {
 				}
 			}
 		}
-		jqGridColModelAll.append("[");
-		jqGridColModelAll.append(jqGridColModelCustom);
+		// 拼接真正设置的jqGrid的ColModel
+		StringBuilder sbJqGridColModelAll = new StringBuilder();
+		sbJqGridColModelAll.append("[");
+		sbJqGridColModelAll.append(jqGridColModelCustom);
 		if (jqGridColModelCustom!=null && !jqGridColModelCustom.toString().trim().equals("")) {
 			if (jqGridColModelKey!=null && !jqGridColModelKey.toString().trim().equals("")) {
-				jqGridColModelAll.append(", ");
-				jqGridColModelAll.append(jqGridColModelKey);
+				sbJqGridColModelAll.append(", ");
+				sbJqGridColModelAll.append(jqGridColModelKey);
 			}
 		}
-		jqGridColModelAll.append("]");
-		return jqGridColModelAll.toString();
+		sbJqGridColModelAll.append("]");
+		return sbJqGridColModelAll.toString();
 	}
 
 	/**
@@ -375,30 +373,21 @@ public class TmplUtil {
 		Map<String, Map<String, Object>> listColModelAll = jqGridColModelAllNoEdit(tableColumns);
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 		List<TmplConfigDetail> m_columnsList = getShowColumnList(tableCodeTmpl, departCode);
-		// 拼接真正设置的jqGrid的ColModel
-		StringBuilder jqGridColModel = new StringBuilder();
-
-		jqGridColModel.append("[");
-		// 添加关键字的保存列
-		if (keyList != null && keyList.size() > 0) {
-			for (int i = 0; i < keyList.size(); i++) {
-				String key = keyList.get(i);
-				if (i != 0) {
-					jqGridColModel.append(", ");
-				}
-				jqGridColModel.append(" {name: '").append(key.toUpperCase()).append(keyExtra).append("', hidden: true, editable: false} ");
-			}
-		}
+		
+		StringBuilder jqGridColModelCustom = new StringBuilder();
 		// 添加配置表设置列，字典（未设置就使用表默认，text或number）、隐藏、表头显示
 		if (m_columnsList != null && m_columnsList.size() > 0) {
 			for (int i = 0; i < m_columnsList.size(); i++) {
 				map_SetColumnsList.put(m_columnsList.get(i).getCOL_CODE(), m_columnsList.get(i));
 				if (listColModelAll.containsKey(m_columnsList.get(i).getCOL_CODE().toUpperCase())) {
 					Map<String, Object> itemColModel = listColModelAll.get(m_columnsList.get(i).getCOL_CODE());
-					jqGridColModel.append(", {");
 					String name = (String) itemColModel.get("name");
 					if (name != null && !name.trim().equals("")) {
-						jqGridColModel.append(name).append(", ").append(" editable: false, ");
+						if (jqGridColModelCustom!=null && !jqGridColModelCustom.toString().trim().equals("")) {
+							jqGridColModelCustom.append(", ");
+						}
+						jqGridColModelCustom.append("{");
+						jqGridColModelCustom.append(name).append(", ").append(" editable: false, ");
 					} else {
 						continue;
 					}
@@ -412,18 +401,18 @@ public class TmplUtil {
 							strSelectValue += ";" + strDicValue;
 						}
 						// 选择
-						jqGridColModel.append(" edittype:'select', ");
-						jqGridColModel.append(" editoptions:{value:'" + strSelectValue + "'}, ");
+						jqGridColModelCustom.append(" edittype:'select', ");
+						jqGridColModelCustom.append(" editoptions:{value:'" + strSelectValue + "'}, ");
 						// 翻译
-						jqGridColModel.append(" formatter: 'select', ");
-						jqGridColModel.append(" formatoptions: {value: '" + strDicValue + "'}, ");
+						jqGridColModelCustom.append(" formatter: 'select', ");
+						jqGridColModelCustom.append(" formatoptions: {value: '" + strDicValue + "'}, ");
 						// 查询
-						jqGridColModel.append(" stype: 'select', ");
-						jqGridColModel.append(" searchoptions: {value: ':[All];" + strDicValue + "'}, ");
+						jqGridColModelCustom.append(" stype: 'select', ");
+						jqGridColModelCustom.append(" searchoptions: {value: ':[All];" + strDicValue + "'}, ");
 					}
 					// 配置表中的隐藏
 					int intHide = Integer.parseInt(m_columnsList.get(i).getCOL_HIDE());
-					jqGridColModel.append(" hidden: ").append(intHide == 1 ? "false" : "true").append(", ");
+					jqGridColModelCustom.append(" hidden: ").append(intHide == 1 ? "false" : "true").append(", ");
 					// intHide != 1 隐藏
 					if(intHide != 1){
 						if(jqGridGroupColumn!=null){
@@ -443,7 +432,7 @@ public class TmplUtil {
 						}
 						m_sqlUserdata.append(" sum(" + m_columnsList.get(i).getCOL_CODE() + ") "
 								+ m_columnsList.get(i).getCOL_CODE());
-						jqGridColModel.append(" summaryType:'sum', summaryTpl:'<b>sum:{0}</b>', ");
+						jqGridColModelCustom.append(" summaryType:'sum', summaryTpl:'<b>sum:{0}</b>', ");
 					}
 					// 0不计算 1计算 默认0
 					else if (Integer.parseInt(m_columnsList.get(i).getCOL_AVE()) == 1) {
@@ -452,17 +441,39 @@ public class TmplUtil {
 						}
 						m_sqlUserdata.append(" round(avg(" + m_columnsList.get(i).getCOL_CODE() + "), 2) "
 								+ m_columnsList.get(i).getCOL_CODE());
-						jqGridColModel.append(" summaryType:'avg', summaryTpl:'<b>avg:{0}</b>', ");
+						jqGridColModelCustom.append(" summaryType:'avg', summaryTpl:'<b>avg:{0}</b>', ");
 					}
 					// 配置表中的表头显示
-					jqGridColModel.append(" label: '").append(m_columnsList.get(i).getCOL_NAME()).append("' ");
+					jqGridColModelCustom.append(" label: '").append(m_columnsList.get(i).getCOL_NAME()).append("' ");
 
-					jqGridColModel.append("}");
+					jqGridColModelCustom.append("}");
 				}
 			}
 		}
-		jqGridColModel.append("]");
-		return jqGridColModel.toString();
+
+		StringBuilder jqGridColModelKey = new StringBuilder();
+		// 添加关键字的保存列
+		if (keyList != null && keyList.size() > 0) {
+			for (int i = 0; i < keyList.size(); i++) {
+				String key = keyList.get(i);
+				if (jqGridColModelKey!=null && !jqGridColModelKey.toString().trim().equals("")) {
+					jqGridColModelKey.append(", ");
+				}
+				jqGridColModelKey.append(" {name: '").append(key.toUpperCase()).append(keyExtra).append("', hidden: true, editable: false} ");
+			}
+		}
+		// 拼接真正设置的jqGrid的ColModel
+		StringBuilder sbJqGridColModelAll = new StringBuilder();
+		sbJqGridColModelAll.append("[");
+		sbJqGridColModelAll.append(jqGridColModelCustom);
+		if (jqGridColModelCustom!=null && !jqGridColModelCustom.toString().trim().equals("")) {
+			if (jqGridColModelKey!=null && !jqGridColModelKey.toString().trim().equals("")) {
+				sbJqGridColModelAll.append(", ");
+				sbJqGridColModelAll.append(jqGridColModelKey);
+			}
+		}
+		sbJqGridColModelAll.append("]");
+		return sbJqGridColModelAll.toString();
 	}
 
 	/**
@@ -649,30 +660,21 @@ public class TmplUtil {
 		Map<String, Map<String, Object>> listColModelAll = jqGridColModelAccount(tableColumns);
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 		List<TmplConfigDetail> m_columnsList = getShowColumnList(tableCodeTmpl, departCode);
-		// 拼接真正设置的jqGrid的ColModel
-		StringBuilder jqGridColModel = new StringBuilder();
-
-		jqGridColModel.append("[");
-		// 添加关键字的保存列
-		if (keyList != null && keyList.size() > 0) {
-			for (int i = 0; i < keyList.size(); i++) {
-				String key = keyList.get(i);
-				if (i != 0) {
-					jqGridColModel.append(", ");
-				}
-				jqGridColModel.append(" {name: '").append(key.toUpperCase()).append(keyExtra).append("', hidden: true, editable: false} ");
-			}
-		}
+		
+		StringBuilder jqGridColModelCustom = new StringBuilder();
 		// 添加配置表设置列，字典（未设置就使用表默认，text或number）、隐藏、表头显示
 		if (m_columnsList != null && m_columnsList.size() > 0) {
 			for (int i = 0; i < m_columnsList.size(); i++) {
 				map_SetColumnsList.put(m_columnsList.get(i).getCOL_CODE(), m_columnsList.get(i));
 				if (listColModelAll.containsKey(m_columnsList.get(i).getCOL_CODE().toUpperCase())) {
 					Map<String, Object> itemColModel = listColModelAll.get(m_columnsList.get(i).getCOL_CODE());
-					jqGridColModel.append(", {");
 					String name = (String) itemColModel.get("name");
 					if (name != null && !name.trim().equals("")) {
-						jqGridColModel.append(name).append(", ");
+						if (jqGridColModelCustom!=null && !jqGridColModelCustom.toString().trim().equals("")) {
+							jqGridColModelCustom.append(", ");
+						}
+						jqGridColModelCustom.append("{");
+						jqGridColModelCustom.append(name).append(", ");
 					} else {
 						continue;
 					}
@@ -686,18 +688,18 @@ public class TmplUtil {
 							strSelectValue += ";" + strDicValue;
 						}
 						// 选择
-						jqGridColModel.append(" edittype:'select', ");
-						jqGridColModel.append(" editoptions:{value:'" + strSelectValue + "'}, ");
+						jqGridColModelCustom.append(" edittype:'select', ");
+						jqGridColModelCustom.append(" editoptions:{value:'" + strSelectValue + "'}, ");
 						// 翻译
-						jqGridColModel.append(" formatter: 'select', ");
-						jqGridColModel.append(" formatoptions: {value: '" + strDicValue + "'}, ");
+						jqGridColModelCustom.append(" formatter: 'select', ");
+						jqGridColModelCustom.append(" formatoptions: {value: '" + strDicValue + "'}, ");
 						// 查询
-						jqGridColModel.append(" stype: 'select', ");
-						jqGridColModel.append(" searchoptions: {value: ':[All];" + strDicValue + "'}, ");
+						jqGridColModelCustom.append(" stype: 'select', ");
+						jqGridColModelCustom.append(" searchoptions: {value: ':[All];" + strDicValue + "'}, ");
 					}
 					// 配置表中的隐藏
 					int intHide = Integer.parseInt(m_columnsList.get(i).getCOL_HIDE());
-					jqGridColModel.append(" hidden: ").append(intHide == 1 ? "false" : "true").append(", ");
+					jqGridColModelCustom.append(" hidden: ").append(intHide == 1 ? "false" : "true").append(", ");
 					// intHide != 1 隐藏
 					if(intHide != 1){
 						if(jqGridGroupColumn!=null){
@@ -711,14 +713,35 @@ public class TmplUtil {
 					}
 					
 					// 配置表中的表头显示
-					jqGridColModel.append(" label: '").append(m_columnsList.get(i).getCOL_NAME()).append("' ");
+					jqGridColModelCustom.append(" label: '").append(m_columnsList.get(i).getCOL_NAME()).append("' ");
 
-					jqGridColModel.append("}");
+					jqGridColModelCustom.append("}");
 				}
 			}
 		}
-		jqGridColModel.append("]");
-		return jqGridColModel.toString();
+		StringBuilder jqGridColModelKey = new StringBuilder();
+		// 添加关键字的保存列
+		if (keyList != null && keyList.size() > 0) {
+			for (int i = 0; i < keyList.size(); i++) {
+				String key = keyList.get(i);
+				if (jqGridColModelKey!=null && !jqGridColModelKey.toString().trim().equals("")) {
+					jqGridColModelKey.append(", ");
+				}
+				jqGridColModelKey.append(" {name: '").append(key.toUpperCase()).append(keyExtra).append("', hidden: true, editable: false} ");
+			}
+		}
+		// 拼接真正设置的jqGrid的ColModel
+		StringBuilder sbJqGridColModelAll = new StringBuilder();
+		sbJqGridColModelAll.append("[");
+		sbJqGridColModelAll.append(jqGridColModelCustom);
+		if (jqGridColModelCustom!=null && !jqGridColModelCustom.toString().trim().equals("")) {
+			if (jqGridColModelKey!=null && !jqGridColModelKey.toString().trim().equals("")) {
+				sbJqGridColModelAll.append(", ");
+				sbJqGridColModelAll.append(jqGridColModelKey);
+			}
+		}
+		sbJqGridColModelAll.append("]");
+		return sbJqGridColModelAll.toString();
 	}
 
 	/**

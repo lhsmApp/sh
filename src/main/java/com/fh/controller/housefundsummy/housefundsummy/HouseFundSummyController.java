@@ -299,7 +299,8 @@ public class HouseFundSummyController extends BaseController {
 		
 		PageData getPd = this.getPageData();
 		String DEPT_CODE = (String) getPd.get("DataDeptCode");
-		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, 
+				departmentService,userService);
 		String detailColModel = tmpl.generateStructureNoEdit(TypeCodeDetail, DEPT_CODE);
 		
 		commonBase.setCode(0);
@@ -510,7 +511,8 @@ public class HouseFundSummyController extends BaseController {
 				break;
 			}
 			
-			TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
+			TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, 
+					departmentService,userService);
 			tmpl.generateStructureNoEdit(TypeCodeDetail, strDepartCode);
 			Map<String, TableColumns> setColumnsList = tmpl.getHaveColumnsList();
 			

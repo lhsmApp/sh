@@ -116,7 +116,8 @@ public class DetailImportQueryController extends BaseController {
 		//CUST_COL7 FMISACC 帐套字典
 		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));
 		
-		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, 
+				departmentService,userService);
 		String jqGridColModel = tmpl.generateStructureNoEdit(tableName, ShowDepartCode);
 		mv.addObject("jqGridColModel", jqGridColModel);
 

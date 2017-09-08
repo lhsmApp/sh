@@ -211,7 +211,8 @@ public class DetailSummyQueryController extends BaseController {
 		String which = getWhileValue(pd.getString("TABLE_CODE"));
 		String detailTableName = getDetailTableCode(which);
 		
-		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, 
+				departmentService,userService);
 		String detailColModel = tmpl.generateStructureNoEdit(detailTableName, DEPT_CODE);
 		
 		commonBase.setCode(0);
