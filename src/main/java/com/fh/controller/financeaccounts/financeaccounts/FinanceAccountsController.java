@@ -34,6 +34,7 @@ import com.fh.util.ObjectExcelView;
 import com.fh.util.enums.BillType;
 import com.fh.util.enums.DurState;
 import com.fh.util.enums.SysConfigKeyCode;
+import com.fh.util.enums.TmplType;
 
 import net.sf.json.JSONArray;
 
@@ -74,12 +75,14 @@ public class FinanceAccountsController extends BaseController {
 	private UserManager userService;
 	
 	//默认的which值
-	String DefaultWhile = "1";
-	//显示结构的单位
-    String ShowDepartCode = "01001";
+	String DefaultWhile = TmplType.TB_STAFF_AUDIT_CONTRACT.getNameKey();
 
 	//页面显示数据的年月
 	String SystemDateTime = "";
+	//页面显示数据的二级单位
+	String UserDepartCode = "";
+	//登录人的二级单位是最末层
+	private int departSelf = 0;
 
 	String HouseFundSummy = "tb_house_fund_summy";
 	String SocialIncSummy = "tb_social_inc_summy";
@@ -95,6 +98,10 @@ public class FinanceAccountsController extends BaseController {
 	String TypeCodeStaffDetail = BillType.SALLARY_DETAIL.getNameKey();
 	String TypeCodeStaffSummy = BillType.SALLARY_SUMMARY.getNameKey();
 	String TypeCodeStaffListen = BillType.SALLARY_LISTEN.getNameKey();
+
+	//界面查询字段
+    List<String> QueryFeildList = Arrays.asList("DEPT_CODE", "CUST_COL7");
+	List<String> keyListBase = Arrays.asList("BUSI_DATE", "DEPT_CODE", "CUST_COL7");
 	
 	/**列表
 	 * @param page
@@ -105,23 +112,26 @@ public class FinanceAccountsController extends BaseController {
 		logBefore(logger, Jurisdiction.getUsername()+"列表FinanceAccounts");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
 
-		PageData pd = this.getPageData();
-		String which = getWhileValue(pd.getString("TABLE_CODE"));
-		String summyTableName = getSummyTableCode(which);
+		PageData getPd = this.getPageData();
+		//员工组
+		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
+		String summyTableName = getSummyTableCode(SelectedTableNo);
         //分组字段
-		String groupbyFeild = getGroupbyFeild(which);
+		String groupbyFeild = getGroupbyFeild(SelectedTableNo);
 		List<String> listGroupbyFeild = getFeildStringToList(groupbyFeild);
 		
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("financeaccounts/financeaccounts/financeaccounts_list");
 		//while
-		pd.put("which", which);
-		mv.addObject("pd", pd);
+		getPd.put("which", SelectedTableNo);
+		mv.addObject("pd", getPd);
 		//当前期间,取自tb_system_config的SystemDateTime字段
-		SystemDateTime = sysConfigManager.currentSection(pd);
+		SystemDateTime = sysConfigManager.currentSection(getPd);
+		//当前登录人所在二级单位
+		UserDepartCode = Jurisdiction.getCurrentDepartmentID();//
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService, listGroupbyFeild);
-		String jqGridColModel = tmpl.generateStructureAccount(summyTableName, ShowDepartCode);
+		String jqGridColModel = tmpl.generateStructureAccount(summyTableName, UserDepartCode);
 		mv.addObject("jqGridColModel", jqGridColModel);
 
 		return mv;

@@ -293,9 +293,9 @@
     			colModel: jqGridColModel,
     			viewrecords: true, 
     			shrinkToFit: false,
-    			rowNum: 10,
+    			rowNum: 100,
     			//scroll: 1,
-    			rowList: [10,20,30],
+    			rowList: [100,200,500],
                 sortable: true,
     			altRows: true, //斑马条纹
     			

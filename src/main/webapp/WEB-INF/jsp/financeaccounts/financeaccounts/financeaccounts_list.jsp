@@ -56,25 +56,25 @@
 							<div class="btn-toolbar inline middle no-margin">
 								<div data-toggle="buttons" class="btn-group no-margin">
 									<label class="btn btn-sm btn-primary active"> <span
-									    class="bigger-110">合同化</span> <input type="radio" value="11" />
+									    class="bigger-110">合同化</span> <input type="radio" value="1" />
 									</label> 
 									<label class="btn btn-sm btn-primary"> <span
-									     class="bigger-110">市场化</span> <input type="radio" value="12" />
+									     class="bigger-110">市场化</span> <input type="radio" value="2" />
 									</label> 
 									<label class="btn btn-sm btn-primary"> <span
-									      class="bigger-110">系统内劳务</span> <input type="radio" value="13" />
+									      class="bigger-110">系统内劳务</span> <input type="radio" value="3" />
 									</label>
 									<label class="btn btn-sm btn-primary"> <span
-									    class="bigger-110">运行人员</span> <input type="radio" value="14" />
+									    class="bigger-110">运行人员</span> <input type="radio" value="4" />
 									</label>
 									<label class="btn btn-sm btn-primary"> <span
-										  class="bigger-110">劳务派遣</span> <input type="radio" value="15" />
+										  class="bigger-110">劳务派遣</span> <input type="radio" value="5" />
 									</label>
 									<label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">社保</span> <input type="radio" value="23" />
+										class="bigger-110">社保</span> <input type="radio" value="21" />
 									</label>
 									<label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">公积金</span> <input type="radio" value="27" />
+										class="bigger-110">公积金</span> <input type="radio" value="25" />
 									</label>
 								</div>
 							</div>
@@ -266,9 +266,9 @@
 			colModel: jqGridColModel,
 			viewrecords: true, 
 			shrinkToFit: false,
-			rowNum: 10,
+			rowNum: 100,
 			//scroll: 1,
-			rowList: [10,20,30],
+			rowList: [100,200,500],
             sortable: true,
 			altRows: true, //斑马条纹
 			
@@ -331,8 +331,6 @@
 			var id=$(gridBase_selector).getGridParam('selrow');
             var rowData = $(gridBase_selector).getRowData(id);
             
-			var deptcode = rowData.DEPT_CODE__;
-
 			var listData =new Array();
             listData.push(rowData);
 
@@ -340,7 +338,7 @@
 			$.ajax({
 				type: "GET",
 				url: '<%=basePath%>financeaccounts/getDetailColModel.do?TABLE_CODE='+which+'&TabType='+TabType,
-		    	data: {DATA_DEPT_CODE:deptcode},
+		    	data: {GetDetailTransferList:JSON.stringify(listData)},
 				dataType:'json',
 				cache: false,
 				success: function(response){
@@ -453,7 +451,7 @@
 	            var rowData = $(gridBase_selector).getRowData(id);
 				var deptcode = rowData.DEPT_CODE__;
 				
-		    	window.location.href='<%=basePath%>financeaccounts/excel.do?TABLE_CODE='+which+'&TabType='+TabType+'&DEPT_CODE='+deptcode+'&DATA_ROWS='+ window.encodeURIComponent(JSON.stringify(listData));
+		    	window.location.href='<%=basePath%>financeaccounts/excel.do?DATA_ROWS='+ window.encodeURIComponent(JSON.stringify(listData));
 				
 			}
 	    }

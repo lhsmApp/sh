@@ -217,7 +217,7 @@
 				viewrecords: true, 
 				shrinkToFit: false,
 				rowNum: 0,
-				//rowList: [10,20,30],
+				//rowList: [100,200,500],
 	            multiselect: true,
 	            multiboxonly: true,
 				altRows: true, //斑马条纹
