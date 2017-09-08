@@ -38,7 +38,7 @@ public class PageResult<T> extends CommonBase{
 			try {
 				this.rowNum = Integer.parseInt(Tools.readTxtFile(Const.PAGE));
 			} catch (Exception e) {
-				this.rowNum = 15;
+				this.rowNum = 100;
 			}
 		}
 	}
