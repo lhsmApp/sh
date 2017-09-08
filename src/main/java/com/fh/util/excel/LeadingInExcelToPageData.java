@@ -313,16 +313,17 @@ public class LeadingInExcelToPageData<T> {
         //获取标题行列数
         int titleCellNum = sheet.getRow(0).getLastCellNum();
         // 获取值
-        for (int rowIndex = 1; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+        int LastRowNum = sheet.getLastRowNum();
+        for (int rowIndex = 1; rowIndex <= LastRowNum; rowIndex++) {
             Row row = sheet.getRow(rowIndex);
             if(row == null) continue;  
 //            logger.debug("第--" + rowIndex);
             
-            //    1.若当前行的列数不等于标题行列数就放弃整行数据(若想放弃此功能注释4个步骤即可)
-            int lastCellNum = row.getLastCellNum();
-            if(titleCellNum !=  lastCellNum){
-                continue;
-            }
+            ////    1.若当前行的列数不等于标题行列数就放弃整行数据(若想放弃此功能注释4个步骤即可)
+            //int lastCellNum = row.getLastCellNum();
+            //if(titleCellNum !=  lastCellNum){
+            //    continue;
+            //}
             
             // 2.标记
             boolean judge = true;
