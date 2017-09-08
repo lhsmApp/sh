@@ -124,11 +124,11 @@
 													</c:forEach>
 												</select>
 											</span>
-											<span class="pull-left" style="margin-right: 5px;">
+											<!-- <span class="pull-left" style="margin-right: 5px;">
 												<div class="selectTree" id="selectTree2" multiMode="true"
 												    allSelectable="false" noGroup="false"></div>
 											    <input type="text" id="SelectedUnitsCode" hidden></input>
-											</span>
+											</span> -->
 												<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
 													<i class="ace-icon fa fa-search bigger-110"></i>
 												</button>
@@ -210,8 +210,8 @@
 		            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
 		            +'&SelectedUserGrop='+$("#SelectedUserGrop").val()
 	                +'&SelectedUserCatg='+$("#SelectedUserCatg").val()
-	                +'&SelectedOrgUnit='+$("#SelectedOrgUnit").val()
-	                +'&SelectedUnitsCode='+$("#SelectedUnitsCode").val(),
+	                //+'&SelectedUnitsCode='+$("#SelectedUnitsCode").val()
+	                +'&SelectedOrgUnit='+$("#SelectedOrgUnit").val(),
 				datatype: "json",
 				colModel: jqGridColModel,
 				viewrecords: true, 
@@ -563,18 +563,18 @@
 					console.log($(this).attr("relValue"));
 			    }
 			});
-			$("#selectTree2").bind("change",function(){
-				$("#SelectedUnitsCode").val("");
-				if($(this).attr("relValue")){
-					$("#SelectedUnitsCode").val($(this).attr("relValue"));
-					console.log($(this).attr("relValue"));
-			    }
-			});
+			//$("#selectTree2").bind("change",function(){
+			//	$("#SelectedUnitsCode").val("");
+			//	if($(this).attr("relValue")){
+			//		$("#SelectedUnitsCode").val($(this).attr("relValue"));
+			//		console.log($(this).attr("relValue"));
+			//    }
+			//});
 			//赋给data属性
 			$("#selectTree1").data("data",defaultNodes1);  
 			$("#selectTree1").render();
-			$("#selectTree2").data("data",defaultNodes2);  
-			$("#selectTree2").render();
+			//$("#selectTree2").data("data",defaultNodes2);  
+			//$("#selectTree2").render();
 			$("#selectTree2_input").val("请选择单位");
 		}
 		
@@ -654,8 +654,8 @@
 		            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
 		            +'&SelectedUserGrop='+$("#SelectedUserGrop").val()
 	                +'&SelectedUserCatg='+$("#SelectedUserCatg").val()
-	                +'&SelectedOrgUnit='+$("#SelectedOrgUnit").val()
-	                +'&SelectedUnitsCode='+$("#SelectedUnitsCode").val(),  
+	                //+'&SelectedUnitsCode='+$("#SelectedUnitsCode").val()
+	                +'&SelectedOrgUnit='+$("#SelectedOrgUnit").val(),  
 				datatype:'json',
 			      page:1
 			}).trigger("reloadGrid");

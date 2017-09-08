@@ -356,14 +356,6 @@
 	        			sepclass : "ui-separator",
 	        			sepcontent: ""
 	        		});
-					//$(gridBase_selector).navButtonAdd(pagerBase_selector, {
-			        //     caption : "",
-			        //     buttonicon : "ace-icon fa fa-cloud-download",
-			        //     onClickButton : exportItems,
-			        //     position : "last",
-			        //     title : "导出",
-			        //     cursor : "pointer"
-			        // });
 					
 					function getDetail(){
 						$(gridDetail_selector).GridUnload();
