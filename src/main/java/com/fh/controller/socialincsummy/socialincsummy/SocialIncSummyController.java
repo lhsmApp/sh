@@ -114,6 +114,9 @@ public class SocialIncSummyController extends BaseController {
 	Map<String, TableColumns> map_HaveColumnsList = new HashMap<String, TableColumns>();
 	// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 	Map<String, TmplConfigDetail> map_SetColumnsList = new HashMap<String, TmplConfigDetail>();
+	
+	//界面分组字段
+	List<String> jqGridGroupColumn = Arrays.asList("DEPT_CODE");
 
 	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
 	private List<String> keyListBase = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7");
@@ -181,9 +184,12 @@ public class SocialIncSummyController extends BaseController {
 		//组织单元文本字典ORGUNIT:"ORG_UNIT"
 		mv.addObject("ORGUNIT", DictsUtil.getDictsByParentCode(dictionariesService, "ORGUNIT"));
 		
-		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService, userService,keyListBase);
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, 
+				departmentService, userService,keyListBase, jqGridGroupColumn);
 		String jqGridColModel = tmpl.generateStructureNoEdit(TypeCodeSummy, UserDepartCode);
 
+		//分组字段是否显示在表中
+		List<String> m_jqGridGroupColumnShow = tmpl.getJqGridGroupColumnShow();
 		//底行显示的求和与平均值字段
 		SqlUserdata = tmpl.getSqlUserdata();
 		//表结构  
@@ -193,6 +199,12 @@ public class SocialIncSummyController extends BaseController {
 
 		mv.addObject("pd", getPd);
 		mv.addObject("jqGridColModel", jqGridColModel);
+        //分组字段  格式：groupField: ['DEPT_CODE'],
+		String jqGridGroupField = QueryFeildString.tranferListValueToSqlInString(jqGridGroupColumn);
+		mv.addObject("jqGridGroupField", jqGridGroupField);
+        //分组字段是否显示在表中  格式：groupColumnShow: [true],
+		String jqGridGroupColumnShow = QueryFeildString.tranferListStringToGroupbyString(m_jqGridGroupColumnShow);
+		mv.addObject("jqGridGroupColumnShow", jqGridGroupColumnShow);
 		return mv;
 	}
 	

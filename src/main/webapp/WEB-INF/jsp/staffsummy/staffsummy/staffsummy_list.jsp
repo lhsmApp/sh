@@ -193,6 +193,10 @@
 		    
 			//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 		    var jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
+		    //分组字段
+		    var jqGridGroupField = ${jqGridGroupField};
+		    //分组字段是否显示在表中
+		    var jqGridGroupColumnShow = ${jqGridGroupColumnShow};
 		    
 			//resize to fit page size
 			$(window).on('resize.jqGrid', function () {
@@ -251,9 +255,8 @@
 
 				grouping: true,
 				groupingView: {
-					groupField: ['DEPT_CODE'],
-					groupOrder: ['asc'],
-					groupColumnShow: [true],
+					groupField: [jqGridGroupField],
+					groupColumnShow: [jqGridGroupColumnShow],
 					groupText: ['<b>{0}</b>'],
 					groupSummary: [true],
 					groupSummaryPos: ['footer'], //header

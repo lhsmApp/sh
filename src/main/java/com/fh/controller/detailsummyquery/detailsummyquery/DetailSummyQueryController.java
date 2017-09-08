@@ -76,6 +76,9 @@ public class DetailSummyQueryController extends BaseController {
 
 	//页面显示数据的年月
 	//String SystemDateTime = "";
+	
+	//界面分组字段
+	List<String> jqGridGroupColumn = Arrays.asList("DEPT_CODE");
     
 	//底行显示的求和与平均值字段
 	StringBuilder SqlUserdata = new StringBuilder();
@@ -108,7 +111,6 @@ public class DetailSummyQueryController extends BaseController {
 		mv.addObject("SystemDateTime", SystemDateTime);
 		//while
 		pd.put("which", which);
-		mv.addObject("pd", pd);
 		//"BUSI_DATE", "DEPT_CODE", "USER_CATG", "USER_GROP", "CUST_COL7"
 		//DEPT_CODE
 		mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService));
@@ -119,10 +121,13 @@ public class DetailSummyQueryController extends BaseController {
 		//CUST_COL7 FMISACC 帐套字典
 		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));
 		
-		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService, keyListBase);
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, 
+				departmentService,userService, keyListBase, jqGridGroupColumn);
 		String jqGridColModel = tmpl.generateStructureNoEdit(summyTableName, ShowDepartCode);
-		mv.addObject("jqGridColModel", jqGridColModel);
 
+		//分组字段是否显示在表中
+		List<String> m_jqGridGroupColumnShow = tmpl.getJqGridGroupColumnShow();
+		//底行显示的求和与平均值字段
 		SqlUserdata = tmpl.getSqlUserdata();
 		//字典
 		DicList = tmpl.getDicList();
@@ -130,6 +135,15 @@ public class DetailSummyQueryController extends BaseController {
 		map_HaveColumnsList = tmpl.getHaveColumnsList();
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 		map_SetColumnsList = tmpl.getSetColumnsList();
+
+		mv.addObject("pd", pd);
+		mv.addObject("jqGridColModel", jqGridColModel);
+        //分组字段  格式：groupField: ['DEPT_CODE'],
+		String jqGridGroupField = QueryFeildString.tranferListValueToSqlInString(jqGridGroupColumn);
+		mv.addObject("jqGridGroupField", jqGridGroupField);
+        //分组字段是否显示在表中  格式：groupColumnShow: [true],
+		String jqGridGroupColumnShow = QueryFeildString.tranferListStringToGroupbyString(m_jqGridGroupColumnShow);
+		mv.addObject("jqGridGroupColumnShow", jqGridGroupColumnShow);
 		
 		return mv;
 	}

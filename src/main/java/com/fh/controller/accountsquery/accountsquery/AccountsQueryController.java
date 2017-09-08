@@ -120,7 +120,8 @@ public class AccountsQueryController extends BaseController {
 		//DEPT_CODE
 		mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService));
 		
-		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService, listGroupbyFeild);
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService,
+				departmentService,userService, listGroupbyFeild, null);
 		String jqGridColModel = tmpl.generateStructureAccount(summyTableName, ShowDepartCode);
 		mv.addObject("jqGridColModel", jqGridColModel);
 
@@ -235,7 +236,8 @@ public class AccountsQueryController extends BaseController {
 		String tableNameDetail = getDetailTableCode(which, TabType, true);
 		String DEPT_CODE = (String) pd.get("DATA_DEPT_CODE");
 		List<String> resetList = Arrays.asList("USER_CODE");
-		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService,resetList);
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, 
+				dictionariesService, departmentService,userService,resetList, null);
 		String detailColModel = tmpl.generateStructureAccount(tableNameDetail, DEPT_CODE);
 
 		// 字典

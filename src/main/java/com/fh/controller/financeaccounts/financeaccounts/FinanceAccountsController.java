@@ -130,7 +130,8 @@ public class FinanceAccountsController extends BaseController {
 		getPd.put("which", SelectedTableNo);
 		mv.addObject("pd", getPd);
 		
-		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService, listGroupbyFeild);
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, 
+				departmentService,userService, listGroupbyFeild, null);
 		String jqGridColModel = tmpl.generateStructureAccount(summyTableName, UserDepartCode);
 		mv.addObject("jqGridColModel", jqGridColModel);
 
@@ -237,7 +238,8 @@ public class FinanceAccountsController extends BaseController {
 		String tableNameDetail = getDetailTableCode(which, TabType, true);
 		String DEPT_CODE = (String) pd.get("DATA_DEPT_CODE");
 		List<String> resetList = Arrays.asList("USER_CODE");
-		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService,resetList);
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, 
+				departmentService,userService,resetList, null);
 		String detailColModel = tmpl.generateStructureAccount(tableNameDetail, DEPT_CODE);
 
 		// 字典

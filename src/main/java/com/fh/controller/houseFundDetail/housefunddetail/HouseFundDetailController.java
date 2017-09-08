@@ -185,7 +185,8 @@ public class HouseFundDetailController extends BaseController {
 		mv.addObject("zTreeNodes", DepartmentSelectTreeSource);
 		// ***********************************************************
 		
-		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService, keyListBase);
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, 
+				departmentService,userService, keyListBase, null);
 		//tmpl.setMustNotEditFeildList(MustNotEditList);
 		String jqGridColModel = tmpl.generateStructure(TypeCodeDetail, UserDepartCode, 3, MustNotEditList);
 		

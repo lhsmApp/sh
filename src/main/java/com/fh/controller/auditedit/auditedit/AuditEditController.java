@@ -158,7 +158,8 @@ public class AuditEditController extends BaseController {
 		mv.addObject("zTreeNodes", DepartmentSelectTreeSource);
 		// ***********************************************************
 		
-		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService, keyListBase);
+		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, 
+				departmentService,userService, keyListBase, null);
 		String jqGridColModel = tmpl.generateStructure(SelectedTableNo, UserDepartCode, 3, MustNotEditList);
 		
 		SqlUserdata = tmpl.getSqlUserdata();

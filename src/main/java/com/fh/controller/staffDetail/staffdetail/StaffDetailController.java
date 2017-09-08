@@ -187,8 +187,7 @@ public class StaffDetailController extends BaseController {
 		// ***********************************************************
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, 
-				departmentService,userService,keyListBase);//
-		//tmpl.setMustNotEditFeildList(MustNotEditList);
+				departmentService,userService,keyListBase, null);//
 		String jqGridColModel = tmpl.generateStructure(SelectedTableNo, UserDepartCode, 3, MustNotEditList);
 		
 		SqlUserdata = tmpl.getSqlUserdata();

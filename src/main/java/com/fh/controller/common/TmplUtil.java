@@ -1,5 +1,6 @@
 package com.fh.controller.common;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashMap;
@@ -46,11 +47,13 @@ public class TmplUtil {
 	public StringBuilder getSqlUserdata() {
 		return m_sqlUserdata;
 	}
-	// 设置必定不用编辑的列
-	//private List<String> MustNotEditFeildList = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE");
-	//public void setMustNotEditFeildList(List<String> list){
-	//	MustNotEditFeildList = list;
-	//}
+	//界面分组字段
+	private List<String> jqGridGroupColumn = new ArrayList<String>();
+	//分组字段是否显示在表中
+	List<String> m_jqGridGroupColumnShow = new ArrayList<String>();
+	public List<String> getJqGridGroupColumnShow() {
+		return m_jqGridGroupColumnShow;
+	}
 
 	// 字典
 	private Map<String, Object> m_dicList = new LinkedHashMap<String, Object>();
@@ -82,13 +85,26 @@ public class TmplUtil {
 
 	public TmplUtil(TmplConfigManager tmplconfigService, TmplConfigDictManager tmplConfigDictService,
 			DictionariesManager dictionariesService, DepartmentManager departmentService,UserManager userService,
-			List<String> keyList) {
+			List<String> keyList, List<String> jqGridGroupColumn) {
 		TmplUtil.tmplconfigService = tmplconfigService;
 		this.tmplConfigDictService = tmplConfigDictService;
 		this.dictionariesService = dictionariesService;
 		this.departmentService = departmentService;
 		this.userService=userService;
 		this.keyList = keyList;
+		this.jqGridGroupColumn = jqGridGroupColumn;
+		InitJqGridGroupColumnShow();
+	}
+
+	//分组字段是否显示在表中
+	private void InitJqGridGroupColumnShow(){
+		m_jqGridGroupColumnShow = new ArrayList<String>();
+		if(jqGridGroupColumn!=null){
+			int size = jqGridGroupColumn.size();
+			for(int i = 0; i < size; i++){
+				m_jqGridGroupColumnShow.add(String.valueOf(true));
+			}
+		}
 	}
 	
 	
@@ -98,6 +114,8 @@ public class TmplUtil {
 	 * @throws Exception
 	 */
 	public String generateStructure(String tableNo, String departCode, int columnCount, List<String> MustNotEditFeildList) throws Exception {
+		//分组字段是否显示在表中
+		InitJqGridGroupColumnShow();
 		// 字典
 		m_dicList = new LinkedHashMap<String, Object>();
 		//表结构
@@ -169,8 +187,17 @@ public class TmplUtil {
 					// 配置表中的隐藏
 					int intHide = Integer.parseInt(m_columnsList.get(i).getCOL_HIDE());
 					jqGridColModelCustom.append(" hidden: ").append(intHide == 1 ? "false" : "true").append(", ");
+					// intHide != 1 隐藏
 					if (intHide != 1) {
 						jqGridColModelCustom.append(" editable:true, editrules: {edithidden: false}, ");
+						if(jqGridGroupColumn!=null){
+							int groupColumnSize = jqGridGroupColumn.size();
+							for(int intGroupColumn = 0; intGroupColumn < groupColumnSize; intGroupColumn++){
+								if(jqGridGroupColumn.get(intGroupColumn).toUpperCase().equals(m_columnsList.get(i).getCOL_CODE().toUpperCase())){
+									m_jqGridGroupColumnShow.set(intGroupColumn, String.valueOf(false));
+								}
+							}
+						}
 					} else {
 						if (MustNotEditFeildList.contains(getCOL_CODE)) {
 							jqGridColModelCustom.append(" editable: false, editrules: {edithidden: false}, ");
@@ -329,6 +356,8 @@ public class TmplUtil {
 	 * @throws Exception
 	 */
 	public String generateStructureNoEdit(String tableNo, String departCode) throws Exception {
+		//分组字段是否显示在表中
+		InitJqGridGroupColumnShow();
 		// 底行显示的求和与平均值字段
 		m_sqlUserdata = new StringBuilder();
 		//表结构
@@ -395,6 +424,17 @@ public class TmplUtil {
 					// 配置表中的隐藏
 					int intHide = Integer.parseInt(m_columnsList.get(i).getCOL_HIDE());
 					jqGridColModel.append(" hidden: ").append(intHide == 1 ? "false" : "true").append(", ");
+					// intHide != 1 隐藏
+					if(intHide != 1){
+						if(jqGridGroupColumn!=null){
+							int groupColumnSize = jqGridGroupColumn.size();
+							for(int intGroupColumn = 0; intGroupColumn < groupColumnSize; intGroupColumn++){
+								if(jqGridGroupColumn.get(intGroupColumn).toUpperCase().equals(m_columnsList.get(i).getCOL_CODE().toUpperCase())){
+									m_jqGridGroupColumnShow.set(intGroupColumn, String.valueOf(false));
+								}
+							}
+						}
+					}
 					// 底行显示的求和与平均值字段
 					// 1汇总 0不汇总,默认0
 					if (Integer.parseInt(m_columnsList.get(i).getCOL_SUM()) == 1) {
@@ -587,6 +627,8 @@ public class TmplUtil {
 	 * @throws Exception
 	 */
 	public String generateStructureAccount(String tableNo, String departCode) throws Exception {
+		//分组字段是否显示在表中
+		InitJqGridGroupColumnShow();
 		// 底行显示的求和与平均值字段
 		m_sqlUserdata = new StringBuilder();
 		// 字典
@@ -656,6 +698,17 @@ public class TmplUtil {
 					// 配置表中的隐藏
 					int intHide = Integer.parseInt(m_columnsList.get(i).getCOL_HIDE());
 					jqGridColModel.append(" hidden: ").append(intHide == 1 ? "false" : "true").append(", ");
+					// intHide != 1 隐藏
+					if(intHide != 1){
+						if(jqGridGroupColumn!=null){
+							int groupColumnSize = jqGridGroupColumn.size();
+							for(int intGroupColumn = 0; intGroupColumn < groupColumnSize; intGroupColumn++){
+								if(jqGridGroupColumn.get(intGroupColumn).toUpperCase().equals(m_columnsList.get(i).getCOL_CODE().toUpperCase())){
+									m_jqGridGroupColumnShow.set(intGroupColumn, String.valueOf(false));
+								}
+							}
+						}
+					}
 					
 					// 配置表中的表头显示
 					jqGridColModel.append(" label: '").append(m_columnsList.get(i).getCOL_NAME()).append("' ");
