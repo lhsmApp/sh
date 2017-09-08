@@ -371,7 +371,7 @@
 	        		});
 	        			$(gridBase_selector).navButtonAdd(pagerBase_selector, {
 	        				id : "importItems",
-	        	             caption : "",
+	        	             caption : "导入",
 	        	             buttonicon : "ace-icon fa fa-cloud-upload",
 	        	             onClickButton : importItems,
 	        	             position : "last",
@@ -379,7 +379,7 @@
 	        	             cursor : "pointer"
 	        	         });
 					$(gridBase_selector).navButtonAdd(pagerBase_selector, {
-			             caption : "",
+			             caption : "导出",
 			             buttonicon : "ace-icon fa fa-cloud-download",
 			             onClickButton : exportItems,
 			             position : "last",
@@ -388,7 +388,7 @@
 			         });
     					$(gridBase_selector).navButtonAdd(pagerBase_selector, {
             				id : "report",
-    			             caption : "",
+    			             caption : "上报",
     			             buttonicon : "ace-icon fa fa-check-square-o green",
     			             onClickButton : report,
     			             position : "last",

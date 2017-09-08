@@ -328,7 +328,7 @@
 	        $(gridBase_selector).navButtonAdd(pagerBase_selector, {
 				id : "batchEdit",
 	            title: "汇总",
-	            caption: "",
+	            caption: "汇总",
 	        	buttonicon: "ace-icon fa fa-pencil-square-o purple",
 	            position: "last",
 	            onClickButton: summary,
@@ -336,7 +336,7 @@
 	        });
 			$(gridBase_selector).navButtonAdd(pagerBase_selector, {
 				id : "report",
-	             caption : "",
+	             caption : "上报",
 	             buttonicon : "ace-icon fa fa-check-square-o green",
 	             onClickButton : report,
 	             position : "last",
