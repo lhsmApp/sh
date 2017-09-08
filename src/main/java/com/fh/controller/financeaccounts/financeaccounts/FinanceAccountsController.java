@@ -119,16 +119,16 @@ public class FinanceAccountsController extends BaseController {
         //分组字段
 		String groupbyFeild = getGroupbyFeild(SelectedTableNo);
 		List<String> listGroupbyFeild = getFeildStringToList(groupbyFeild);
+		//当前期间,取自tb_system_config的SystemDateTime字段
+		SystemDateTime = sysConfigManager.currentSection(getPd);
+		//当前登录人所在二级单位
+		UserDepartCode = Jurisdiction.getCurrentDepartmentID();//
 		
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("financeaccounts/financeaccounts/financeaccounts_list");
 		//while
 		getPd.put("which", SelectedTableNo);
 		mv.addObject("pd", getPd);
-		//当前期间,取自tb_system_config的SystemDateTime字段
-		SystemDateTime = sysConfigManager.currentSection(getPd);
-		//当前登录人所在二级单位
-		UserDepartCode = Jurisdiction.getCurrentDepartmentID();//
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService, listGroupbyFeild);
 		String jqGridColModel = tmpl.generateStructureAccount(summyTableName, UserDepartCode);

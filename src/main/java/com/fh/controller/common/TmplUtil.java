@@ -368,9 +368,8 @@ public class TmplUtil {
 					Map<String, Object> itemColModel = listColModelAll.get(m_columnsList.get(i).getCOL_CODE());
 					jqGridColModel.append(", {");
 					String name = (String) itemColModel.get("name");
-					String notedit = (String) itemColModel.get("notedit");
 					if (name != null && !name.trim().equals("")) {
-						jqGridColModel.append(name).append(", ");
+						jqGridColModel.append(name).append(", ").append(" editable: false, ");
 					} else {
 						continue;
 					}
@@ -396,9 +395,6 @@ public class TmplUtil {
 					// 配置表中的隐藏
 					int intHide = Integer.parseInt(m_columnsList.get(i).getCOL_HIDE());
 					jqGridColModel.append(" hidden: ").append(intHide == 1 ? "false" : "true").append(", ");
-					if (notedit != null && !notedit.trim().equals("")) {
-						jqGridColModel.append(notedit).append(", ");
-					}
 					// 底行显示的求和与平均值字段
 					// 1汇总 0不汇总,默认0
 					if (Integer.parseInt(m_columnsList.get(i).getCOL_SUM()) == 1) {
@@ -440,9 +436,6 @@ public class TmplUtil {
 		Map<String, Map<String, Object>> list = new LinkedHashMap<String, Map<String, Object>>();
 
 		for (TableColumns col : columns) {
-			//m_defaultValueList.put(col.getColumn_name(), col.getColumn_default());
-			// 表全部 类型
-			//m_typeList.put(col.getColumn_name(), col.getData_type());
 			//表结构
 			map_HaveColumnsList.put(col.getColumn_name(), col);
 			
@@ -450,8 +443,6 @@ public class TmplUtil {
 			Map<String, Object> MapAdd = new LinkedHashMap<String, Object>();
 
 			StringBuilder model_name = new StringBuilder();
-			StringBuilder model_notedit = new StringBuilder();
-			model_notedit.append(" editable: false ");
 
 			int intLength = getColumnLength(col.getColumn_type(), col.getData_type());
 			if (col.getData_type() != null && IsNumFeild(col.getData_type())) {
@@ -466,7 +457,6 @@ public class TmplUtil {
 			}
 			model_name.append(" name: '" + col.getColumn_name() + "' ");
 			MapAdd.put("name", model_name.toString());
-			MapAdd.put("notedit", model_notedit.toString());
 			list.put(col.getColumn_name(), MapAdd);
 		}
 		return list;
