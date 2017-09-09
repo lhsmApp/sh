@@ -305,7 +305,7 @@
 			    	   /* bigger-150 */
 			           buttonicon: "ace-icon fa fa-book purple",
 			           title: "获取凭证号",
-			           caption: "",
+			           caption: "获取凭证号",
 			           position: "last",
 			           onClickButton: batchVoucher
 			       });
@@ -317,7 +317,7 @@
 			    	   /* bigger-150 */
 			           buttonicon: "ace-icon fa fa-bookmark orange",
 			           title: "获取冲销凭证号",
-			           caption: "",
+			           caption: "获取冲销凭证号",
 			           position: "last",
 			           onClickButton: batchWriteOffVoucher
 			       });
@@ -341,7 +341,7 @@
 			    	   /* bigger-150 */
 			           buttonicon: "ace-icon fa fa-exchange red",
 			           title: "同步删除",
-			           caption: "",
+			           caption: "同步删除",
 			           position: "last",
 			           onClickButton: syncDel
 			       });
@@ -486,7 +486,7 @@
        {
            buttonicon: "ace-icon fa fa-cloud-upload green",
            title: "上传",
-           caption: "",
+           caption: "上传",
            position: "last",
            onClickButton: batchSave
        });
@@ -495,7 +495,7 @@
        {
            buttonicon: "ace-icon fa fa-book purple",
            title: "获取凭证号",
-           caption: "",
+           caption: "获取凭证号",
            position: "last",
            onClickButton: batchVoucher
        }); */

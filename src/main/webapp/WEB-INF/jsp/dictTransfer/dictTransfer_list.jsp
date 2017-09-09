@@ -62,6 +62,17 @@
 														</c:forEach>
 												</select>
 											</span>
+											<span style="margin-right: 5px;"> 
+												<select
+													class="chosen-select form-control" name="FMISACC"
+													id="FMISACC" data-placeholder="请选择帐套"
+													style="vertical-align: top; height: 32px; width: 150px;">
+														<option value="">请选择帐套</option>
+														<c:forEach items="${fmisacc}" var="fmi">
+															<option value="${fmi.DICT_CODE}">${fmi.NAME}</option>
+														</c:forEach>
+												</select>
+											</span>
 											<button type="button" class="btn btn-info btn-sm"
 												onclick="tosearch();">
 												<i class="ace-icon fa fa-search bigger-110"></i>
@@ -107,8 +118,11 @@
 	<script src="static/ace/js/chosen.jquery.js"></script>
 	<!--提示框-->
 	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
+	<!-- 删除时确认窗口 -->
+	<script src="static/ace/js/bootbox.js"></script>
 	<!-- JqGrid统一样式统一操作 -->
 	<script type="text/javascript" src="static/js/common/jqgrid_style.js"></script>
+	
 
 	<script type="text/javascript"> 
 	//var gridHeight=155;
@@ -213,7 +227,7 @@
      	   /* bigger-150 */
             buttonicon: "ace-icon fa fa-cloud-upload green",
             title: "上传",
-            caption: "",
+            caption: "上传",
             position: "last",
             onClickButton: batchSave
         });
@@ -221,6 +235,15 @@
 	
 	//批量传输
 	function batchSave(e) {
+		if($("#FMISACC").val()==""){
+			bootbox.dialog({
+				message: "<span class='bigger-110'>请您先选择帐套,然后再进行上传!</span>",
+				buttons: 			
+				{ "button":{ "label":"确定", "className":"btn-sm btn-success"}}
+			});
+	        return;
+		}
+		
 		var listData =new Array();
 		//var ids = $("#jqGrid").jqGrid('getGridParam','selarrrow');
 		var ids = $("#jqGrid").jqGrid('getDataIDs');
@@ -238,7 +261,7 @@
 			url: '<%=basePath%>dictTransfer/dictTransfer.do?',
 	    	//data: rowData,//可以单独传入一个对象，后台可以直接通过对应模型接受参数。但是传入Array（listData）就不好用了，所以传list方式需将List转为Json字符窜。
 			//data: '{"rows":listData}',
-			data:{DATA_ROWS:JSON.stringify(listData)},
+			data:{BILL_OFF:$("#FMISACC").val(),DATA_ROWS:JSON.stringify(listData)},
 	    	dataType:'json',
 			cache: false,
 			success: function(response){
