@@ -45,6 +45,7 @@ import com.fh.util.date.DateUtils;
 import com.fh.util.enums.BillNumType;
 import com.fh.util.enums.BillState;
 import com.fh.util.enums.DurState;
+import com.fh.util.enums.SysConfigKeyCode;
 import com.fh.util.enums.TmplType;
 
 import net.sf.json.JSONArray;
@@ -121,8 +122,8 @@ public class HouseFundSummyController extends BaseController {
 	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
 	private List<String> keyListBase = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7");
     //汇总字段
-    List<String> SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "USER_CATG", "USER_GROP", "CUST_COL7", "UNITS_CODE", "ORG_UNIT");
-    String SumFieldToString = QueryFeildString.tranferListStringToGroupbyString(SumField);
+    List<String> SumField = new ArrayList<String>();//Arrays.asList("BUSI_DATE", "DEPT_CODE", "USER_CATG", "USER_GROP", "CUST_COL7", "UNITS_CODE", "ORG_UNIT");
+    String SumFieldToString = "";//QueryFeildString.tranferListStringToGroupbyString(SumField);
 	//界面查询字段
     List<String> QueryFeildList = Arrays.asList("DEPT_CODE", "USER_CATG", "USER_GROP", "CUST_COL7", "UNITS_CODE", "ORG_UNIT");
     //查询的所有可操作的责任中心
@@ -138,6 +139,11 @@ public class HouseFundSummyController extends BaseController {
 		logBefore(logger, Jurisdiction.getUsername()+"列表housefundFundSummy");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
 
+		PageData pdSysConfig = new PageData();
+		pdSysConfig.put("KEY_CODE", SysConfigKeyCode.HouseFundGRPCond);
+		SumFieldToString = sysConfigManager.getSysConfigByKey(pdSysConfig);
+		SumField = QueryFeildString.tranferStringToList(SumFieldToString);
+		
 		//查询的所有可操作的责任中心
 	    AllDeptCode = new ArrayList<String>();
 		

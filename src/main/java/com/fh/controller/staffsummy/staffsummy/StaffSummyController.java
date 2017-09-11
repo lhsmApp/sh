@@ -44,6 +44,7 @@ import com.fh.util.date.DateUtils;
 import com.fh.util.enums.BillNumType;
 import com.fh.util.enums.BillState;
 import com.fh.util.enums.DurState;
+import com.fh.util.enums.SysConfigKeyCode;
 import com.fh.util.enums.TmplType;
 
 import net.sf.json.JSONArray;
@@ -125,7 +126,7 @@ public class StaffSummyController extends BaseController {
 	//1、合同化、市场化、运行人员、系统内运行按6列汇总：业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本、企业特定员工分类、工资范围编码
 	//2、劳务派遣运行按4列汇总：                                                      业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本
     List<String> SumField = new ArrayList<String>();
-    String SumFieldToString = QueryFeildString.tranferListStringToGroupbyString(SumField);
+    String SumFieldToString = "";//QueryFeildString.tranferListStringToGroupbyString(SumField);
 	//界面查询字段   员工组、账套、组织机构（特殊处理）、所属二级单位、组织单元文本
     List<String> QueryFeildList = Arrays.asList("USER_GROP", "CUST_COL7", "DEPT_CODE", "UNITS_CODE", "ORG_UNIT");
     //查询的所有可操作的责任中心
@@ -705,7 +706,7 @@ public class StaffSummyController extends BaseController {
 		return strRut;
 	}
 
-	private String getWhileValue(String value){
+	private String getWhileValue(String value) throws Exception{
         String which = DefaultWhile;
 		if(value != null && !value.trim().equals("")){
 			which = value;
@@ -717,7 +718,7 @@ public class StaffSummyController extends BaseController {
 		//1、合同化、市场化、运行人员、系统内运行按6列汇总：业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本、企业特定员工分类、工资范围编码
 		//2、劳务派遣运行按4列汇总：                                                      业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本
 	    SumField = new ArrayList<String>();
-	    SumFieldToString = QueryFeildString.tranferListStringToGroupbyString(SumField);
+	    SumFieldToString = "";//QueryFeildString.tranferListStringToGroupbyString(SumField);
 		if(which.equals(TmplType.TB_STAFF_SUMMY_CONTRACT.getNameKey())){
 			//合同化
 			TypeCodeDetail = TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey();
@@ -725,8 +726,13 @@ public class StaffSummyController extends BaseController {
 			TypeCodeListen = TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey();
 			//1、合同化、市场化、运行人员、系统内运行按6列汇总：业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本、企业特定员工分类、工资范围编码
 			//2、劳务派遣运行按4列汇总：                                                      业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本
-		    SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP", "UNITS_CODE", "ORG_UNIT", "USER_CATG", "SAL_RANGE");
-		    SumFieldToString = QueryFeildString.tranferListStringToGroupbyString(SumField);
+		    //SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP", "UNITS_CODE", "ORG_UNIT", "USER_CATG", "SAL_RANGE");
+		    //SumFieldToString = QueryFeildString.tranferListStringToGroupbyString(SumField);
+			
+			PageData pdSysConfig = new PageData();
+			pdSysConfig.put("KEY_CODE", SysConfigKeyCode.ContractGRPCond);
+			SumFieldToString = sysConfigManager.getSysConfigByKey(pdSysConfig);
+			SumField = QueryFeildString.tranferStringToList(SumFieldToString);
 		}
 		if(which.equals(TmplType.TB_STAFF_SUMMY_MARKET.getNameKey())){
 			//市场化
@@ -735,8 +741,13 @@ public class StaffSummyController extends BaseController {
 			TypeCodeListen = TmplType.TB_STAFF_TRANSFER_MARKET.getNameKey();
 			//1、合同化、市场化、运行人员、系统内运行按6列汇总：业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本、企业特定员工分类、工资范围编码
 			//2、劳务派遣运行按4列汇总：                                                      业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本
-		    SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP", "UNITS_CODE", "ORG_UNIT", "USER_CATG", "SAL_RANGE");
-		    SumFieldToString = QueryFeildString.tranferListStringToGroupbyString(SumField);
+		    //SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP", "UNITS_CODE", "ORG_UNIT", "USER_CATG", "SAL_RANGE");
+		    //SumFieldToString = QueryFeildString.tranferListStringToGroupbyString(SumField);
+			
+			PageData pdSysConfig = new PageData();
+			pdSysConfig.put("KEY_CODE", SysConfigKeyCode.MarketGRPCond);
+			SumFieldToString = sysConfigManager.getSysConfigByKey(pdSysConfig);
+			SumField = QueryFeildString.tranferStringToList(SumFieldToString);
 		}
 		if(which.equals(TmplType.TB_STAFF_SUMMY_SYS_LABOR.getNameKey())){
 			//系统内劳务
@@ -745,8 +756,13 @@ public class StaffSummyController extends BaseController {
 			TypeCodeListen = TmplType.TB_STAFF_TRANSFER_SYS_LABOR.getNameKey();
 			//1、合同化、市场化、运行人员、系统内运行按6列汇总：业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本、企业特定员工分类、工资范围编码
 			//2、劳务派遣运行按4列汇总：                                                      业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本
-		    SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP", "UNITS_CODE", "ORG_UNIT", "USER_CATG", "SAL_RANGE");
-		    SumFieldToString = QueryFeildString.tranferListStringToGroupbyString(SumField);
+		    //SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP", "UNITS_CODE", "ORG_UNIT", "USER_CATG", "SAL_RANGE");
+		    //SumFieldToString = QueryFeildString.tranferListStringToGroupbyString(SumField);
+			
+			PageData pdSysConfig = new PageData();
+			pdSysConfig.put("KEY_CODE", SysConfigKeyCode.SysLaborGRPCond);
+			SumFieldToString = sysConfigManager.getSysConfigByKey(pdSysConfig);
+			SumField = QueryFeildString.tranferStringToList(SumFieldToString);
 		}
 		if(which.equals(TmplType.TB_STAFF_SUMMY_OPER_LABOR.getNameKey())){
 			//运行人员
@@ -755,8 +771,13 @@ public class StaffSummyController extends BaseController {
 			TypeCodeListen = TmplType.TB_STAFF_TRANSFER_OPER_LABOR.getNameKey();
 			//1、合同化、市场化、运行人员、系统内运行按6列汇总：业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本、企业特定员工分类、工资范围编码
 			//2、劳务派遣运行按4列汇总：                                                      业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本
-		    SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP", "UNITS_CODE", "ORG_UNIT", "USER_CATG", "SAL_RANGE");
-		    SumFieldToString = QueryFeildString.tranferListStringToGroupbyString(SumField);
+		    //SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP", "UNITS_CODE", "ORG_UNIT", "USER_CATG", "SAL_RANGE");
+		    //SumFieldToString = QueryFeildString.tranferListStringToGroupbyString(SumField);
+			
+			PageData pdSysConfig = new PageData();
+			pdSysConfig.put("KEY_CODE", SysConfigKeyCode.OperLaborGRPCond);
+			SumFieldToString = sysConfigManager.getSysConfigByKey(pdSysConfig);
+			SumField = QueryFeildString.tranferStringToList(SumFieldToString);
 		}
 		if(which.equals(TmplType.TB_STAFF_SUMMY_LABOR.getNameKey())){
 			//劳务派遣工资
@@ -765,8 +786,13 @@ public class StaffSummyController extends BaseController {
 			TypeCodeListen = TmplType.TB_STAFF_TRANSFER_LABOR.getNameKey();
 			//1、合同化、市场化、运行人员、系统内运行按6列汇总：业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本、企业特定员工分类、工资范围编码
 			//2、劳务派遣运行按4列汇总：                                                      业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本
-		    SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP", "UNITS_CODE", "ORG_UNIT");
-		    SumFieldToString = QueryFeildString.tranferListStringToGroupbyString(SumField);
+		    //SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP", "UNITS_CODE", "ORG_UNIT");
+		    //SumFieldToString = QueryFeildString.tranferListStringToGroupbyString(SumField);
+			
+			PageData pdSysConfig = new PageData();
+			pdSysConfig.put("KEY_CODE", SysConfigKeyCode.LaborGRPCond);
+			SumFieldToString = sysConfigManager.getSysConfigByKey(pdSysConfig);
+			SumField = QueryFeildString.tranferStringToList(SumFieldToString);
 		}
 		return which;
 	}

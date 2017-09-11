@@ -62,7 +62,7 @@
 									     class="bigger-110">市场化</span> <input type="radio" value="2" />
 									</label> 
 									<label class="btn btn-sm btn-primary"> <span
-									      class="bigger-110">系统内劳务</span> <input type="radio" value="3" />
+									      class="bigger-110">劳务人员在建</span> <input type="radio" value="3" />
 									</label>
 									<label class="btn btn-sm btn-primary"> <span
 									    class="bigger-110">运行人员</span> <input type="radio" value="4" />
@@ -88,17 +88,6 @@
 								<div class="widget-body">
 									<div class="widget-main">
 										<form class="form-inline">
-											<span class="pull-left" style="margin-right: 5px;">
-												<select class="chosen-select form-control"
-													name="SelectedCustCol7" id="SelectedCustCol7"
-													data-placeholder="请选择帐套"
-													style="vertical-align: top; height:32px;width: 150px;">
-													<option value="">请选择帐套</option>
-													<c:forEach items="${FMISACC}" var="each">
-														<option value="${each.DICT_CODE}">${each.NAME}</option>
-													</c:forEach>
-												</select>
-											</span>
 											<span class="pull-left" id="spanSelectTree" style="margin-right: 5px;" <c:if test="${pd.departTreeSource=='0'}">hidden</c:if>>
 												<div class="selectTree" id="selectTree" multiMode="true"
 												    allSelectable="false" noGroup="false"></div>
@@ -243,7 +232,7 @@
 			var target = $(this).find('input[type=radio]');
 			which = parseInt(target.val());
 			if(which!='${pd.which}'){
-				window.location.href="<%=basePath%>financeaccounts/list.do?TABLE_CODE="+which;
+				window.location.href='<%=basePath%>financeaccounts/list.do?SelectedTableNo='+which;
 			}
 		});
 		
@@ -261,7 +250,8 @@
 		});
 
 		$(gridBase_selector).jqGrid({
-			url: '<%=basePath%>financeaccounts/getPageList.do?TABLE_CODE='+which,
+			url: '<%=basePath%>financeaccounts/getPageList.do?SelectedTableNo='+which
+            +'&SelectedDepartCode='+$("#SelectedDepartCode").val(),
 			datatype: "json",
 			colModel: jqGridColModel,
 			viewrecords: true, 
@@ -337,7 +327,7 @@
             var detailColModel = "[]";
 			$.ajax({
 				type: "GET",
-				url: '<%=basePath%>financeaccounts/getDetailColModel.do?TABLE_CODE='+which+'&TabType='+TabType,
+				url: '<%=basePath%>financeaccounts/getDetailColModel.do?SelectedTableNo='+which+'&SelectedTabType='+TabType,
 		    	data: {GetDetailTransferList:JSON.stringify(listData)},
 				dataType:'json',
 				cache: false,
@@ -347,11 +337,11 @@
 						detailColModel = response.message;
 
 			            detailColModel = eval(detailColModel);
-			            var childGridURL = '<%=basePath%>financeaccounts/getDetailList.do?TABLE_CODE='+which+'&TabType='+TabType;
+			            var childGridURL = '<%=basePath%>financeaccounts/getDetailList.do?SelectedTableNo='+which+'&SelectedTabType='+TabType;
 			            
 			            $(gridDetail_selector).jqGrid({
 			                url: childGridURL,
-			                postData: {DATA_ROWS:JSON.stringify(listData)},
+			                postData: {GetDetailListTransferList:JSON.stringify(listData)},
 			                mtype: "GET",
 			                datatype: "json",
 			                colModel: detailColModel,
@@ -456,5 +446,33 @@
 			}
 	    }
 	});
+	
+	//检索
+	function tosearch() {
+		$(gridDetail_selector).GridUnload();
+		$(gridBase_selector).setGridParam({  // 重新加载数据 
+			url:'<%=basePath%>accountsquery/getPageList.do?SelectedTableNo='+which
+            +'&SelectedDepartCode='+$("#SelectedDepartCode").val(),  
+			datatype:'json',
+		      page:1
+		}).trigger("reloadGrid");
+	}  
+	
+	//加载单位树
+	function initComplete(){
+		//下拉树
+		var defaultNodes = {"treeNodes":${zTreeNodes}};
+		//绑定change事件
+		$("#selectTree").bind("change",function(){
+			$("#SelectedDepartCode").val("");
+			if($(this).attr("relValue")){
+				$("#SelectedDepartCode").val($(this).attr("relValue"));
+		    }
+		});
+		//赋给data属性
+		$("#selectTree").data("data",defaultNodes);  
+		$("#selectTree").render();
+		$("#selectTree2_input").val("请选择");
+	}
 </script>
 </html>
