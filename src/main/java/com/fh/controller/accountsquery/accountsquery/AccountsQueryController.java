@@ -484,11 +484,11 @@ public class AccountsQueryController extends BaseController {
 	private String getSallaryType(String which) throws Exception {
 		String strKeyCode = "";
 		if (which != null && which.equals("1")) {
-			strKeyCode = SysConfigKeyCode.ChkMktGRPCOND;
+			//strKeyCode = SysConfigKeyCode.ChkMktGRPCOND;
 		} else if (which != null && which.equals("2")) {
-			strKeyCode = SysConfigKeyCode.ChkRunGRPCOND;
+			//strKeyCode = SysConfigKeyCode.ChkRunGRPCOND;
 		} else if (which != null && which.equals("3")) {
-			strKeyCode = SysConfigKeyCode.ChkEmployGRPCOND;
+			//strKeyCode = SysConfigKeyCode.ChkEmployGRPCOND;
 		}
 		String sallaryType = "";
 		if(strKeyCode != null && !strKeyCode.trim().equals("")){

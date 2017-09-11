@@ -76,7 +76,7 @@
 									            	class="bigger-110">市场化</span> <input type="radio" value="2" />
 									            </label> 
 									            <label class="btn btn-sm btn-primary"> <span
-									            	class="bigger-110">系统内劳务</span> <input type="radio" value="3" />
+									            	class="bigger-110">劳务人员在建</span> <input type="radio" value="3" />
 									            </label>
 									            <label class="btn btn-sm btn-primary"> <span
 									    	        class="bigger-110">运行人员</span> <input type="radio" value="4" />

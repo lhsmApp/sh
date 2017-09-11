@@ -12,9 +12,7 @@
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''">
 			${pd.filterWhereResult}
 		</if>
-		<if test="pd.SallaryType!= null and pd.SallaryType != ''">
-		    and ${pd.SallaryType}
-		</if>
+		${pd.QueryFeild}
 	    group by ${pd.GroupbyFeild}
 		<if test="sidx != null and sidx.trim() != ''" >
 			order by ${sidx} ${sord} 

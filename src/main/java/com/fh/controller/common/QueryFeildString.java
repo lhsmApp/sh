@@ -1,6 +1,8 @@
 package com.fh.controller.common;
 
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.fh.util.PageData;
@@ -160,4 +162,12 @@ public class QueryFeildString {
 		}
 		return ret.toString();
 	}
+    public static List<String> tranferStringToList(String strFeild){
+        List<String> list = new ArrayList<String>();
+        if(strFeild != null && !strFeild.trim().equals("")){
+            list = Arrays.asList(strFeild.replace(" ", "").toUpperCase().split(","));
+        }
+        return list;
+    }
+
 }
