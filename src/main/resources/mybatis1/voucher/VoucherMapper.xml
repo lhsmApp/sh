@@ -577,7 +577,7 @@
 	</select>
 
 	<select id="getFooterSummary" parameterType="jqPage" resultType="pd">
-		<if test='VOUCHER_TYPE=="1"'>
+		<if test='pd.VOUCHER_TYPE=="1"'>
 			SELECT ${pd.Userdata} from
 			(SELECT A.*
 			FROM ${pd.TABLE_CODE} A
@@ -654,7 +654,7 @@
 			) T
 		</if>
 
-		<if test='VOUCHER_TYPE=="2"'>
+		<if test='pd.VOUCHER_TYPE=="2"'>
 			SELECT ${pd.Userdata} from
 			(select A.*
 			from ${pd.TABLE_CODE}
@@ -926,6 +926,16 @@
 		where B.RPT_DEPT IS
 		NULL) T
 		<where>
+			<if test="FMISACC!= null and FMISACC != ''">
+				and CUST_COL7 = #{FMISACC}
+			</if>
+			<if test="DEPT_CODES!= null and DEPT_CODES != ''"><!-- 根据单位检索 -->
+				and DEPT_CODE in
+				<foreach item="item" index="index" collection="DEPT_CODES"
+					open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
 			<if test="filterWhereResult != null">
 				${filterWhereResult}
 			</if>

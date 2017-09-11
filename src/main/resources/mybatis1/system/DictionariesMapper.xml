@@ -209,17 +209,19 @@
 		B
 		ON A.PARENT_CODE=B.DICT_CODE
 		<where>
-			A.PARENT_CODE!='0' AND B.DICT_CODE!='ZRZX' AND
-			B.PARENT_CODE!='ZRZX'
-		</where>
+			<!-- A.PARENT_CODE!='0' AND B.DICT_CODE!='ZRZX' AND
+			B.PARENT_CODE!='ZRZX' -->
+			A.PARENT_CODE!='0' AND B.DICT_CODE!='FMISACC' AND
+			B.PARENT_CODE!='FMISACC'
+		</where>		
 		UNION
 		SELECT NAME,NAME_EN,DEPARTMENT_CODE AS DICT_CODE,'' AS ORDER_BY,'oa_department' AS
 		PARENT_CODE,BZ,DEPARTMENT_ID AS DICTIONARIES_ID,'组织机构字典'
 		AS PARENT_NAME FROM oa_department
-		UNION
+		<!-- UNION
 		SELECT NAME, '' AS NAME_EN,USER_ID AS DICT_CODE,'' AS ORDER_BY,'sys_user' AS
 		PARENT_CODE,BZ,USER_ID AS DICTIONARIES_ID,'系统用户字典' AS
-		PARENT_NAME FROM sys_user
+		PARENT_NAME FROM sys_user -->
 		
 		order by PARENT_CODE
 		<if test="sidx != null">
@@ -282,7 +284,7 @@
 		from
 		<include refid="tableName"></include>
 		where
-		DICT_CODE != 'ZRZX' and
+		DICT_CODE != 'FMISACC' and
 		PARENT_CODE = '0' order by ORDER_BY
 	</select>
 

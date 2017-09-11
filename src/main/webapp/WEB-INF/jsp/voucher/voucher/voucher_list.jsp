@@ -71,7 +71,7 @@
 										class="bigger-110">市场化</span> <input type="radio" value="17" />
 									</label>
 									<label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">系统内劳务</span> <input type="radio" value="18" />
+										class="bigger-110">劳务人员在建</span> <input type="radio" value="18" />
 									</label>
 									<label class="btn btn-sm btn-primary"> <span
 										class="bigger-110">运行人员</span> <input type="radio" value="19" />
@@ -879,11 +879,21 @@
 	
 	//上传校验
 	function transferValidate(){
+		if($("#FMISACC").val()=="0"){
+	        bootbox.dialog({
+				message: "<span class='bigger-110'>请您先选择帐套,然后再进行上传校验!</span>",
+				buttons: 			
+				{ "button":{ "label":"确定", "className":"btn-sm btn-success"}}
+			});
+	        return;
+        }
 		 top.jzts();
+		 var deptCode = $("#departCode").val(); 
+		 var fmi = $("#FMISACC").val();
 		 var diag = new top.Dialog();
 		 diag.Drag=true;
 		 diag.Title ="汇总数据未上报单位校验";
-		 diag.URL = "<%=basePath%>voucher/transferValidate.do?TABLE_CODE="+which;
+		 diag.URL = "<%=basePath%>voucher/transferValidate.do?TABLE_CODE="+which+"&DEPT_CODE="+deptCode+"&FMISACC="+fmi;
 		 diag.Width = 800;
 		 diag.Height = 480;
 		 diag.Modal = true;				//有无遮罩窗口

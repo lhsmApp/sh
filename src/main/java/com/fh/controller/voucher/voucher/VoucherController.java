@@ -924,6 +924,17 @@ public class VoucherController extends BaseController {
 		pd.put("TABLE_CODE", tableCode);
 		String sealType = getSealType(which);
 		pd.put("BILL_TYPE", sealType);// 汇总封存类型
+		
+		String strDeptCode = "";
+		if (departSelf == 1)
+			strDeptCode = Jurisdiction.getCurrentDepartmentID();
+		else
+			strDeptCode = pd.getString("DEPT_CODE");// 单位检索条件
+		if (StringUtil.isNotEmpty(strDeptCode)) {
+			String[] strDeptCodes = strDeptCode.split(",");
+			pd.put("DEPT_CODES", strDeptCodes);
+		}
+		
 		String filters = pd.getString("filters"); // 多条件过滤条件
 		if (null != filters && !"".equals(filters)) {
 			pd.put("filterWhereResult", SqlTools.constructWhere(filters, null));

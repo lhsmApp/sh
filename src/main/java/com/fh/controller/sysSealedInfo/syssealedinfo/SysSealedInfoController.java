@@ -21,11 +21,13 @@ import com.fh.entity.CommonBase;
 import com.fh.entity.JqPage;
 import com.fh.entity.Page;
 import com.fh.entity.PageResult;
+import com.fh.entity.system.User;
 import com.fh.service.fhoa.department.DepartmentManager;
 import com.fh.service.sysSealedInfo.syssealedinfo.SysSealedInfoManager;
 import com.fh.service.sysUnlockInfo.sysunlockinfo.SysUnlockInfoManager;
 import com.fh.service.system.dictionaries.DictionariesManager;
 import com.fh.service.system.user.UserManager;
+import com.fh.util.Const;
 import com.fh.util.Jurisdiction;
 import com.fh.util.PageData;
 import com.fh.util.SqlTools;
@@ -168,6 +170,9 @@ public class SysSealedInfoController extends BaseController {
 						tableCode = "TB_STAFF_SUMMY";
 					}
 					pd.put("TABLE_CODE", tableCode);
+					User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
+					String userId = user.getUSER_ID();
+					pd.put("USER", userId);
 					List<PageData> listSysUnlockInfo = sysUnlockInfoService.listSyncDelUnlock(pd); // 获取当前接口类型，当前二级单位当前期间当前封存状态为封存的的传输列表
 					if (listSysUnlockInfo != null && listSysUnlockInfo.size() > 0) {
 						PageData pdItem0 = listSysUnlockInfo.get(0);// 如果包含其中一条带有凭证号的记录，就可以证明此二级单位所有记录已经生成凭证号，不能再进行解封操作。
