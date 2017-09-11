@@ -446,5 +446,33 @@
 			}
 	    }
 	});
+	
+	//检索
+	function tosearch() {
+		$(gridDetail_selector).GridUnload();
+		$(gridBase_selector).setGridParam({  // 重新加载数据 
+			url:'<%=basePath%>accountsquery/getPageList.do?SelectedTableNo='+which
+            +'&SelectedDepartCode='+$("#SelectedDepartCode").val(),  
+			datatype:'json',
+		      page:1
+		}).trigger("reloadGrid");
+	}  
+	
+	//加载单位树
+	function initComplete(){
+		//下拉树
+		var defaultNodes = {"treeNodes":${zTreeNodes}};
+		//绑定change事件
+		$("#selectTree").bind("change",function(){
+			$("#SelectedDepartCode").val("");
+			if($(this).attr("relValue")){
+				$("#SelectedDepartCode").val($(this).attr("relValue"));
+		    }
+		});
+		//赋给data属性
+		$("#selectTree").data("data",defaultNodes);  
+		$("#selectTree").render();
+		$("#selectTree2_input").val("请选择");
+	}
 </script>
 </html>

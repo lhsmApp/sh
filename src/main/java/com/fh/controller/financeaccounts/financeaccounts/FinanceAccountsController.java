@@ -209,8 +209,8 @@ public class FinanceAccountsController extends BaseController {
 		//表名
 		getPd.put("TableName", detailTableName);
 		//上报
-		String detailReport = " and (BUSI_DATE, DEPT_CODE) in (";
-		detailReport += "                                      select RPT_DUR, RPT_DEPT ";
+		String detailReport = " and (BUSI_DATE, DEPT_CODE, CUST_COL7) in (";
+		detailReport += "                                      select RPT_DUR, RPT_DEPT, BILL_OFF ";
 		detailReport += "                                      from tb_sys_sealed_info ";
 		detailReport += "                                      where STATE = '" + DurState.Sealed.getNameKey() + "' ";
 		detailReport += "                                      and BILL_TYPE = '" + getDetailTypeCode(SelectedTableNo) + "' ";

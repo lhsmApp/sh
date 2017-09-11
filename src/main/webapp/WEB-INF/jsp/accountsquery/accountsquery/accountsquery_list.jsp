@@ -67,25 +67,25 @@
 							<div class="btn-toolbar inline middle no-margin">
 								<div data-toggle="buttons" class="btn-group no-margin">
 									<label class="btn btn-sm btn-primary active"> <span
-									    class="bigger-110">合同化</span> <input type="radio" value="11" />
+									    class="bigger-110">合同化</span> <input type="radio" value="1" />
 									</label> 
 									<label class="btn btn-sm btn-primary"> <span
-									     class="bigger-110">市场化</span> <input type="radio" value="12" />
+									     class="bigger-110">市场化</span> <input type="radio" value="2" />
 									</label> 
 									<label class="btn btn-sm btn-primary"> <span
-									      class="bigger-110">劳务人员在建</span> <input type="radio" value="13" />
+									      class="bigger-110">劳务人员在建</span> <input type="radio" value="3" />
 									</label>
 									<label class="btn btn-sm btn-primary"> <span
-									    class="bigger-110">运行人员</span> <input type="radio" value="14" />
+									    class="bigger-110">运行人员</span> <input type="radio" value="4" />
 									</label>
 									<label class="btn btn-sm btn-primary"> <span
-										  class="bigger-110">劳务派遣</span> <input type="radio" value="15" />
+										  class="bigger-110">劳务派遣</span> <input type="radio" value="5" />
 									</label>
 									<label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">社保</span> <input type="radio" value="23" />
+										class="bigger-110">社保</span> <input type="radio" value="21" />
 									</label>
 									<label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">公积金</span> <input type="radio" value="27" />
+										class="bigger-110">公积金</span> <input type="radio" value="25" />
 									</label>
 								</div>
 							</div>
@@ -102,17 +102,6 @@
 												<input id="SelectedBusiDate" class="input-mask-date" type="text"
 												placeholder="请输入业务区间"> <i
 												class="ace-icon fa fa-calendar blue"></i>
-											</span>
-											<span class="pull-left" style="margin-right: 5px;">
-												<select class="chosen-select form-control"
-													name="SelectedCustCol7" id="SelectedCustCol7"
-													data-placeholder="请选择帐套"
-													style="vertical-align: top; height:32px;width: 150px;">
-													<option value="">请选择帐套</option>
-													<c:forEach items="${FMISACC}" var="each">
-														<option value="${each.DICT_CODE}">${each.NAME}</option>
-													</c:forEach>
-												</select>
 											</span>
 											<span class="pull-left" style="margin-right: 5px;" <c:if test="${pd.departTreeSource=='0'}">hidden</c:if>>
 												<div class="selectTree" id="selectTree" multiMode="true"
@@ -268,7 +257,7 @@
 			var target = $(this).find('input[type=radio]');
 			which = parseInt(target.val());
 			if(which!='${pd.which}'){
-				window.location.href="<%=basePath%>accountsquery/list.do?TABLE_CODE="+which;
+				window.location.href="<%=basePath%>accountsquery/list.do?SelectedTableNo="+which;
 			}
 		});
 		
@@ -286,9 +275,9 @@
 		});
 		
 		$(gridBase_selector).jqGrid({
-			url: '<%=basePath%>accountsquery/getPageList.do?TABLE_CODE='+which
-                 +'&BUSI_DATE='+$("#BUSI_DATE").val()
-                 +'&DEPT_CODE='+$("#DEPT_CODE").val(),
+			url: '<%=basePath%>accountsquery/getPageList.do?SelectedTableNo='+which
+            +'&SelectedBusiDate='+$("#SelectedBusiDate").val()
+            +'&SelectedDepartCode='+$("#SelectedDepartCode").val(),
      			datatype: "json",
     			colModel: jqGridColModel,
     			viewrecords: true, 
@@ -363,7 +352,7 @@
 						var id=$(gridBase_selector).getGridParam('selrow');
 			            var rowData = $(gridBase_selector).getRowData(id);
 			            
-						var deptcode = rowData.DEPT_CODE__;
+						//var deptcode = rowData.DEPT_CODE__;
 
 						var listData =new Array();
 			            listData.push(rowData);
@@ -371,8 +360,8 @@
 			            var detailColModel = "[]";
 						$.ajax({
 							type: "GET",
-							url: '<%=basePath%>accountsquery/getDetailColModel.do?TABLE_CODE='+which+'&TabType='+TabType,
-					    	data: {DATA_DEPT_CODE:deptcode},
+							url: '<%=basePath%>accountsquery/getDetailColModel.do?SelectedTableNo='+which+'&SelectedTabType='+TabType,
+					    	data: {GetDetailTransferList:JSON.stringify(listData)},
 							dataType:'json',
 							cache: false,
 							success: function(response){
@@ -381,11 +370,11 @@
 									detailColModel = response.message;
 
 						            detailColModel = eval(detailColModel);
-						            var childGridURL = '<%=basePath%>accountsquery/getDetailList.do?TABLE_CODE='+which+'&TabType='+TabType;
+						            var childGridURL = '<%=basePath%>accountsquery/getDetailList.do?SelectedTableNo='+which+'&SelectedTabType='+TabType;
 						            
 						            $(gridDetail_selector).jqGrid({
 						                url: childGridURL,
-						                postData: {DATA_ROWS:JSON.stringify(listData)},
+						                postData: {GetDetailListTransferList:JSON.stringify(listData)},
 						                mtype: "GET",
 						                datatype: "json",
 						                colModel: detailColModel,
@@ -485,7 +474,7 @@
 				            var rowData = $(gridBase_selector).getRowData(id);
 							var deptcode = rowData.DEPT_CODE__;
 							
-					    	window.location.href='<%=basePath%>accountsquery/excel.do?TABLE_CODE='+which+'&TabType='+TabType+'&DEPT_CODE='+deptcode+'&DATA_ROWS='+ window.encodeURIComponent(JSON.stringify(listData));
+					    	window.location.href='<%=basePath%>accountsquery/excel.do';
 							
 						}
 				    }
@@ -494,14 +483,10 @@
 	//检索
 	function tosearch() {
 		$(gridDetail_selector).GridUnload();
-		console.log("tosearch");
-		console.log(which);
-		console.log($("#BUSI_DATE").val());
-		console.log($("#DEPT_CODE").val());
 		$(gridBase_selector).setGridParam({  // 重新加载数据 
-			url:'<%=basePath%>accountsquery/getPageList.do?TABLE_CODE='+which
-			    +'&BUSI_DATE='+$("#BUSI_DATE").val()
-			    +'&DEPT_CODE='+$("#DEPT_CODE").val(),  
+			url:'<%=basePath%>accountsquery/getPageList.do?SelectedTableNo='+which
+            +'&SelectedBusiDate='+$("#SelectedBusiDate").val()
+            +'&SelectedDepartCode='+$("#SelectedDepartCode").val(),  
 			datatype:'json',
 		      page:1
 		}).trigger("reloadGrid");
@@ -513,9 +498,9 @@
 		var defaultNodes = {"treeNodes":${zTreeNodes}};
 		//绑定change事件
 		$("#selectTree").bind("change",function(){
-			$("#DEPT_CODE").val("");
+			$("#SelectedDepartCode").val("");
 			if($(this).attr("relValue")){
-				$("#DEPT_CODE").val($(this).attr("relValue"));
+				$("#SelectedDepartCode").val($(this).attr("relValue"));
 		    }
 		});
 		//赋给data属性
