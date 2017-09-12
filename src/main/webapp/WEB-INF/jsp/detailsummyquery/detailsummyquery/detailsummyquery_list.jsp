@@ -352,6 +352,7 @@
 		 * 导出
 		 */
 	    function exportItems(){
+			console.log("excel");
 	    	window.location.href='<%=basePath%>detailsummyquery/excel.do?SelectedTableNo='+which
             +'&SelectedBusiDate='+$("#SelectedBusiDate").val()
             +'&SelectedDepartCode='+$("#SelectedDepartCode").val()

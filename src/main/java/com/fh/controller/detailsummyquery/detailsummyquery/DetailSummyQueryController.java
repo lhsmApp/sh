@@ -343,8 +343,8 @@ public class DetailSummyQueryController extends BaseController {
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/excel")
 	public ModelAndView exportExcel(JqPage page) throws Exception{
-		logBefore(logger, Jurisdiction.getUsername()+"导出HouseFundDetail到excel");
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
+		//logBefore(logger, Jurisdiction.getUsername()+"导出HouseFundDetail到excel");
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
 
 		PageData pd = setPutPd(this.getPageData());
 		page.setPd(pd);
