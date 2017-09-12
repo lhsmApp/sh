@@ -82,7 +82,7 @@
 					</div>
 					<!-- /.page-header -->
 
-						<div class="row">
+					<div class="row">
 						<div class="col-xs-12">
 							<div class="widget-box" style="display: block;">
 								<div class="widget-body">
@@ -204,6 +204,12 @@
 		
 		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 	    jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
+	    var departTreeSource = '${pd.departTreeSource}';
+	    
+	    if(departTreeSource == '0'){
+	    	//$("#btnQuery").addClass('hidden');
+			//$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass('fa-chevron-down');
+	    }
 
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {

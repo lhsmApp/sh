@@ -101,15 +101,21 @@ public class AccountsQueryController extends BaseController {
 	String GroupbyFeild = new String();
 	//分组字段list  查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
     List<String> keyListBase = new ArrayList<String>();
+    //查询的所有可操作的责任中心
+    List<String> AllDeptCode = new ArrayList<String>();
 
 	/**列表
 	 * @param page
 	 * @throws Exception
 	 */
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/list")
 	public ModelAndView list(Page page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"列表AccountsQuery");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
+		
+		//查询的所有可操作的责任中心
+	    AllDeptCode = new ArrayList<String>();
 
 		PageData getPd = this.getPageData();
 		//员工组
@@ -133,9 +139,17 @@ public class AccountsQueryController extends BaseController {
 		{
 			this.departSelf = 1;
 			getPd.put("departTreeSource", DepartmentSelectTreeSource);
+			AllDeptCode.add(UserDepartCode);
 		} else {
 			departSelf = 0;
 			getPd.put("departTreeSource", 1);
+	        JSONArray jsonArray = JSONArray.fromObject(DepartmentSelectTreeSource);  
+			List<PageData> listDepart = (List<PageData>) JSONArray.toCollection(jsonArray, PageData.class);
+			if(listDepart!=null && listDepart.size()>0){
+				for(PageData pdDept : listDepart){
+					AllDeptCode.add(pdDept.getString(DictsUtil.Id));
+				}
+			}
 		}
 		mv.addObject("zTreeNodes", DepartmentSelectTreeSource);
 		// ***********************************************************
@@ -179,6 +193,7 @@ public class AccountsQueryController extends BaseController {
 				QueryFeild += " and 1 != 1 ";
 			}
 		}
+		QueryFeild += " and DEPT_CODE in (" + QueryFeildString.tranferListValueToSqlInString(AllDeptCode) + ") ";
 		getPd.put("QueryFeild", QueryFeild);
 
 		String summyTableName = getSummyTableCode(SelectedTableNo);
@@ -264,12 +279,13 @@ public class AccountsQueryController extends BaseController {
 		//导出数据
 		excelListData = new ArrayList<PageData>();
 
-
 		PageData getPd = this.getPageData();
 		//员工组
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
 		String SelectedTabType = getWhileValue(getPd.getString("SelectedTabType"));
+		
+		String strTapTypeCode = getDetailTypeCode(SelectedTableNo, SelectedTabType);
 
 		Object DATA_ROWS = getPd.get("GetDetailTransferList");
 		String json = DATA_ROWS.toString();  
@@ -283,7 +299,7 @@ public class AccountsQueryController extends BaseController {
 		List<String> resetList = Arrays.asList("USER_CODE");
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, 
 				dictionariesService, departmentService,userService,resetList, null);
-		String detailColModel = tmpl.generateStructureAccount(SelectedTableNo, DEPT_CODE);
+		String detailColModel = tmpl.generateStructureAccount(strTapTypeCode, DEPT_CODE);
 
 		// 字典
 		excel_dicList = tmpl.getDicList();
@@ -651,6 +667,56 @@ public class AccountsQueryController extends BaseController {
 		}
 		return tableCode;
 	}
+    private String getDetailTypeCode(String which, String tabType) {
+		String typeCode = "";
+		if (which != null){
+			if(which.equals(TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey())) {
+				if("1".equals(tabType)){
+					typeCode = TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey();
+				} else if("2".equals(tabType)){
+					typeCode = TmplType.TB_STAFF_AUDIT_CONTRACT.getNameKey();
+				}
+			} else if (which.equals(TmplType.TB_STAFF_DETAIL_MARKET.getNameKey())) {
+				if("1".equals(tabType)){
+					typeCode = TmplType.TB_STAFF_DETAIL_MARKET.getNameKey();
+				} else if("2".equals(tabType)){
+					typeCode = TmplType.TB_STAFF_AUDIT_MARKET.getNameKey();
+				}
+			} else if (which.equals(TmplType.TB_STAFF_DETAIL_SYS_LABOR.getNameKey())) {
+				if("1".equals(tabType)){
+					typeCode = TmplType.TB_STAFF_DETAIL_SYS_LABOR.getNameKey();
+				} else if("2".equals(tabType)){
+					typeCode = TmplType.TB_STAFF_AUDIT_SYS_LABOR.getNameKey();
+				}
+			} else if (which.equals(TmplType.TB_STAFF_DETAIL_OPER_LABOR.getNameKey())) {
+				if("1".equals(tabType)){
+					typeCode = TmplType.TB_STAFF_DETAIL_OPER_LABOR.getNameKey();
+				} else if("2".equals(tabType)){
+					typeCode = TmplType.TB_STAFF_AUDIT_OPER_LABOR.getNameKey();
+				}
+			} else if (which.equals(TmplType.TB_STAFF_DETAIL_LABOR.getNameKey())) {
+				if("1".equals(tabType)){
+					typeCode = TmplType.TB_STAFF_DETAIL_LABOR.getNameKey();
+				} else if("2".equals(tabType)){
+					typeCode = TmplType.TB_STAFF_AUDIT_LABOR.getNameKey();
+				}
+			} else if (which.equals(TmplType.TB_SOCIAL_INC_DETAIL.getNameKey())) {
+				if("1".equals(tabType)){
+					typeCode = TmplType.TB_SOCIAL_INC_DETAIL.getNameKey();
+				} else if("2".equals(tabType)){
+					typeCode = TmplType.TB_SOCIAL_INC_AUDIT.getNameKey();
+				}
+			} else if (which.equals(TmplType.TB_HOUSE_FUND_DETAIL.getNameKey())) {
+				if("1".equals(tabType)){
+					typeCode = TmplType.TB_HOUSE_FUND_DETAIL.getNameKey();
+				} else if("2".equals(tabType)){
+					typeCode = TmplType.TB_HOUSE_FUND_AUDIT.getNameKey();
+				}
+			}
+		}
+		return typeCode;
+	}
+    
     private String getDetailHelpful(String tabType, Boolean bolFirst) {
 		String detailReport = "";
 		if("1".equals(tabType)){

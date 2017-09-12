@@ -10,9 +10,6 @@
 		    <if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			    ${pd.filterWhereResult}
 		    </if>
-		    <if test="pd.SallaryType!= null and pd.SallaryType != ''">
-		        and ${pd.SallaryType}
-		    </if>
 		    <if test="pd.QueryFeild!= null and pd.QueryFeild != ''">
 		        ${pd.QueryFeild}
 		    </if>
@@ -31,9 +28,6 @@
 		    <if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			    ${pd.filterWhereResult}
 		    </if>
-		    <if test="pd.SallaryType!= null and pd.SallaryType != ''">
-		        and ${pd.SallaryType}
-		    </if>
 		    <if test="pd.QueryFeild!= null and pd.QueryFeild != ''">
 		        ${pd.QueryFeild}
 		    </if>
@@ -45,9 +39,6 @@
 		<where>
 		    <if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			    ${pd.filterWhereResult}
-		    </if>
-		    <if test="pd.SallaryType!= null and pd.SallaryType != ''">
-		        and ${pd.SallaryType}
 		    </if>
 		    <if test="pd.QueryFeild!= null and pd.QueryFeild != ''">
 		        ${pd.QueryFeild}
@@ -62,9 +53,6 @@
 		<where>
 		    <if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			    ${pd.filterWhereResult}
-		    </if>
-		    <if test="pd.SallaryType!= null and pd.SallaryType != ''">
-		        and ${pd.SallaryType}
 		    </if>
 		    <if test="pd.QueryFeild!= null and pd.QueryFeild != ''">
 		        ${pd.QueryFeild}

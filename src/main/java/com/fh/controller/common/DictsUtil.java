@@ -44,6 +44,7 @@ public class DictsUtil {
 	 */
 	
 	public static String Id = "id";
+	//机关编码
 	public static String DepartShowAll = "01001";
 	
 	public static List<Dictionaries> getDictsByParentBianma(DictionariesManager dictionariesService,

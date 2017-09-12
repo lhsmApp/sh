@@ -65,20 +65,26 @@
 
 							<div class="btn-toolbar inline middle no-margin">
 								<div data-toggle="buttons" class="btn-group no-margin">
-									<label class="btn btn-sm btn-primary active"> <span
-										class="bigger-110">合同化、市场化</span> <input type="radio" value="1" />
-									</label> 
+									            <label class="btn btn-sm btn-primary active"> <span
+									    	        class="bigger-110">合同化</span> <input type="radio" value="6" />
+									            </label> 
+									            <label class="btn btn-sm btn-primary"> <span
+									            	class="bigger-110">市场化</span> <input type="radio" value="7" />
+									            </label> 
+									            <label class="btn btn-sm btn-primary"> <span
+									            	class="bigger-110">劳务人员在建</span> <input type="radio" value="8" />
+									            </label>
+									            <label class="btn btn-sm btn-primary"> <span
+									    	        class="bigger-110">运行人员</span> <input type="radio" value="9" />
+									            </label>
+									            <label class="btn btn-sm btn-primary"> <span
+										            class="bigger-110">劳务派遣</span> <input type="radio" value="10" />
+									            </label>
 									<label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">运行人员</span> <input type="radio" value="2" />
-									</label> 
-									<label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">外雇劳务</span> <input type="radio" value="3" />
+										class="bigger-110">社保</span> <input type="radio" value="22" />
 									</label>
 									<label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">社保</span> <input type="radio" value="4" />
-									</label>
-									<label class="btn btn-sm btn-primary"> <span
-										class="bigger-110">公积金</span> <input type="radio" value="5" />
+										class="bigger-110">公积金</span> <input type="radio" value="26" />
 									</label>
 								</div>
 							</div>
@@ -92,17 +98,29 @@
 									<div class="widget-main">
 										<form class="form-inline">
 											<span class="input-icon pull-left" style="margin-right: 5px;">
-												<input id="BUSI_DATE" class="input-mask-date" type="text"
+												<input id="SelectedBusiDate" class="input-mask-date" type="text"
 												placeholder="请输入业务区间"> <i
 												class="ace-icon fa fa-calendar blue"></i>
 											</span>
 											<span class="pull-left" style="margin-right: 5px;">
-												<div class="selectTree" id="selectTreeDEPT_CODE" multiMode="true"
+												<select class="chosen-select form-control"
+													name="SelectedCustCol7" id="SelectedCustCol7"
+													data-placeholder="请选择帐套"
+													style="vertical-align: top; height:32px;width: 150px;">
+													<option value="">请选择帐套</option>
+													<c:forEach items="${FMISACC}" var="each">
+														<option value="${each.DICT_CODE}">${each.NAME}</option>
+														    <!-- <c:if test="${pd.SelectedCustCol7==each.DICT_CODE}">selected</c:if> -->
+													</c:forEach>
+												</select>
+											</span>
+											<span class="pull-left" style="margin-right: 5px;">
+												<div class="selectTree" id="selectTree" multiMode="true"
 												    allSelectable="false" noGroup="false"></div>
-											    <input type="text" id="DEPT_CODE" hidden></input>
+											    <input type="text" id="SelectedDepartCode" hidden></input>
 											</span>
 											
-											<span>
+											<!-- <span>
 												<select class="chosen-select form-control"
 													name="USER_CATG" id="USER_CATG"
 													data-placeholder="请选择特定员工分类"
@@ -125,19 +143,7 @@
 														    <c:if test="${pd.USER_GROP==each.DICT_CODE}">selected</c:if>>${each.NAME}</option>
 													</c:forEach>
 												</select>
-											</span>
-											<span>
-												<select class="chosen-select form-control"
-													name="CUST_COL7" id="CUST_COL7"
-													data-placeholder="请选择帐套"
-													style="vertical-align: top; height:32px;width: 150px;">
-													<option value="">请选择帐套</option>
-													<c:forEach items="${FMISACC}" var="each">
-														<option value="${each.DICT_CODE}" 
-														    <c:if test="${pd.CUST_COL7==each.DICT_CODE}">selected</c:if>>${each.NAME}</option>
-													</c:forEach>
-												</select>
-											</span>
+											</span> -->
 											<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
 												<i class="ace-icon fa fa-search bigger-110"></i>
 											</button>
@@ -200,7 +206,7 @@
     var gridBase_selector = "#jqGridBase";  
     var pagerBase_selector = "#jqGridBasePager";  
 
-	var which='1';
+	var which;
 	
 	$(document).ready(function () {
 		$(top.hangge());//关闭加载状态
@@ -208,7 +214,7 @@
 	    
 		//当前期间,取自tb_system_config的SystemDateTime字段
 	    var SystemDateTime = '${SystemDateTime}';
-		$("#BUSI_DATE").val(SystemDateTime);
+		$("#SelectedBusiDate").val(SystemDateTime);
 		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 	    var jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
 	    //分组字段
@@ -241,17 +247,15 @@
 			var target = $(this).find('input[type=radio]');
 			which = parseInt(target.val());
 			if(which!='${pd.which}'){
-				window.location.href='<%=basePath%>detailsummyquery/list.do?TABLE_CODE='+which;
+				window.location.href='<%=basePath%>detailsummyquery/list.do?SelectedTableNo='+which;
 			}
 		});
 		
 		$(gridBase_selector).jqGrid({
-			url: '<%=basePath%>detailsummyquery/getPageList.do?TABLE_CODE='+which
-                    +'&BUSI_DATE='+$("#BUSI_DATE").val()
-                    +'&DEPT_CODE='+$("#DEPT_CODE").val()
-                    +'&USER_CATG='+$("#USER_CATG").val()
-                    +'&USER_GROP='+$("#USER_GROP").val()
-                    +'&CUST_COL7='+$("#CUST_COL7").val(),
+			url: '<%=basePath%>detailsummyquery/getPageList.do?SelectedTableNo='+which
+            +'&SelectedBusiDate='+$("#SelectedBusiDate").val()
+            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+            +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),
 			datatype: "json",
 			colModel: jqGridColModel,
 			viewrecords: true, 
@@ -337,7 +341,7 @@
 	        			sepcontent: ""
 	        		});
 					$(gridBase_selector).navButtonAdd(pagerBase_selector, {
-			             caption : "",
+			             caption : "导出",
 			             buttonicon : "ace-icon fa fa-cloud-download",
 			             onClickButton : exportItems,
 			             position : "last",
@@ -348,7 +352,10 @@
 		 * 导出
 		 */
 	    function exportItems(){
-	    	window.location.href='<%=basePath%>detailsummyquery/excel.do?TABLE_CODE='+which;
+	    	window.location.href='<%=basePath%>detailsummyquery/excel.do?SelectedTableNo='+which
+            +'&SelectedBusiDate='+$("#SelectedBusiDate").val()
+            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+            +'&SelectedCustCol7='+$("#SelectedCustCol7").val();
 	    }
 	});  
 
@@ -365,8 +372,8 @@
         var detailColModel = "[]";
 		$.ajax({
 			type: "GET",
-			url: '<%=basePath%>detailsummyquery/getDetailColModel.do?TABLE_CODE='+which,
-	    	data: {DATA_DEPT_CODE:DEPT_CODE},
+			url: '<%=basePath%>detailsummyquery/getDetailColModel.do?SelectedTableNo='+which,
+	    	data: {DataDeptCode:DEPT_CODE},
 			dataType:'json',
 			cache: false,
 			success: function(response){
@@ -378,7 +385,7 @@
 		            var childGridID = parentRowID + "_table";
 		            var childGridPagerID = parentRowID + "_pager";
 		            // send the parent row primary key to the server so that we know which grid to show
-		            var childGridURL = '<%=basePath%>detailsummyquery/getDetailList.do?TABLE_CODE='+which+'&BILL_CODE='+BILL_CODE;
+		            var childGridURL = '<%=basePath%>detailsummyquery/getDetailList.do?SelectedTableNo='+which+'&DetailListBillCode='+BILL_CODE;
 		            //childGridURL = childGridURL + "&parentRowID=" + encodeURIComponent(parentRowKey)
 
 		            // add a table and pager HTML elements to the parent grid row - we will render the child grid here
@@ -436,31 +443,25 @@
 		//下拉树
 		var defaultNodes = {"treeNodes":${zTreeNodes}};
 		//绑定change事件
-		$("#selectTreeDEPT_CODE").bind("change",function(){
-			$("#DEPT_CODE").val("");
+		$("#selectTree").bind("change",function(){
+			$("#SelectedDepartCode").val("");
 			if($(this).attr("relValue")){
-				$("#DEPT_CODE").val($(this).attr("relValue"));
+				$("#SelectedDepartCode").val($(this).attr("relValue"));
 		    }
 		});
 		//赋给data属性
-		$("#selectTreeDEPT_CODE").data("data",defaultNodes);  
-		$("#selectTreeDEPT_CODE").render();
+		$("#selectTree").data("data",defaultNodes);  
+		$("#selectTree").render();
+		$("#selectTree2_input").val("请选择");
 	}
 	
 	//检索
 	function tosearch() {
-		var BUSI_DATE = $("#BUSI_DATE").val(); 
-		var DEPT_CODE = $("#DEPT_CODE").val(); 
-		var USER_CATG = $("#USER_CATG").val(); 
-		var USER_GROP = $("#USER_GROP").val(); 
-		var CUST_COL7 = $("#CUST_COL7").val(); 
 		$(gridBase_selector).jqGrid('setGridParam',{  // 重新加载数据  
-			url:'<%=basePath%>detailsummyquery/getPageList.do?TABLE_CODE='+which
-					+'&BUSI_DATE='+BUSI_DATE
-					+'&DEPT_CODE='+DEPT_CODE
-					+'&USER_CATG='+USER_CATG
-					+'&USER_GROP='+USER_GROP
-					+'&CUST_COL7='+CUST_COL7,  
+			url:'<%=basePath%>detailsummyquery/getPageList.do?SelectedTableNo='+which
+            +'&SelectedBusiDate='+$("#SelectedBusiDate").val()
+            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+            +'&SelectedCustCol7='+$("#SelectedCustCol7").val(),  
 			datatype:'json',
 		      page:1
 		}).trigger("reloadGrid");

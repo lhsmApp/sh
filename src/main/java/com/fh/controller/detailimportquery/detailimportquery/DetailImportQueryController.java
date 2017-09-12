@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
 import com.fh.controller.common.DictsUtil;
-import com.fh.controller.common.FilterBillCode;
 import com.fh.controller.common.QueryFeildString;
 import com.fh.controller.common.TmplUtil;
 import com.fh.entity.JqPage;
@@ -29,8 +28,7 @@ import com.fh.entity.TmplConfigDetail;
 import com.fh.util.ObjectExcelView;
 import com.fh.util.PageData;
 import com.fh.util.SqlTools;
-import com.fh.util.enums.BillState;
-import com.fh.util.enums.SysConfigKeyCode;
+import com.fh.util.enums.TmplType;
 import com.fh.util.Jurisdiction;
 import com.fh.service.detailimportquery.detailimportquery.DetailImportQueryManager;
 import com.fh.service.fhoa.department.impl.DepartmentService;
@@ -67,12 +65,9 @@ public class DetailImportQueryController extends BaseController {
 	private SysConfigManager sysConfigManager;
 
 	//默认的which值
-	String DefaultWhile = "1";
+	String DefaultWhile =  TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey();
 	//显示结构的单位
-    String ShowDepartCode = "01001";
-
-	//页面显示数据的年月
-	//String SystemDateTime = "";
+    String ShowDepartCode = DictsUtil.DepartShowAll;
     
 	//底行显示的求和与平均值字段
 	StringBuilder SqlUserdata = new StringBuilder();
@@ -83,7 +78,7 @@ public class DetailImportQueryController extends BaseController {
 	// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 	Map<String, TmplConfigDetail> map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
 	//界面查询字段
-    List<String> QueryFeildList = Arrays.asList("BUSI_DATE", "DEPT_CODE", "USER_CATG", "USER_GROP", "CUST_COL7");
+    List<String> QueryFeildList = Arrays.asList("BUSI_DATE", "DEPT_CODE", "USER_GROP", "CUST_COL7");
 
 	/**列表
 	 * @param page
@@ -94,31 +89,28 @@ public class DetailImportQueryController extends BaseController {
 		logBefore(logger, Jurisdiction.getUsername()+"列表DetailImportQuery");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
 
-		PageData pd = this.getPageData();
-		String which = getWhileValue(pd.getString("TABLE_CODE"));
-		String tableName = getDetailTableCode(which);
+		PageData getPd = this.getPageData();
+		//员工组
+		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
 		
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("detailimportquery/detailimportquery/detailimportquery_list");
 		//当前期间,取自tb_system_config的SystemDateTime字段
-		String SystemDateTime = sysConfigManager.currentSection(pd);
+		String SystemDateTime = sysConfigManager.currentSection(getPd);
 		mv.addObject("SystemDateTime", SystemDateTime);
 		//while
-		pd.put("which", which);
-		mv.addObject("pd", pd);
+		getPd.put("which", SelectedTableNo);
+		mv.addObject("pd", getPd);
+		
 		//"BUSI_DATE", "DEPT_CODE", "USER_CATG", "USER_GROP", "CUST_COL7"
 		//DEPT_CODE
-		mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService));
-		//USER_CATG PARTUSERTYPE 企业特定员工分类字典
-		mv.addObject("PARTUSERTYPE", DictsUtil.getDictsByParentCode(dictionariesService, "PARTUSERTYPE"));
-		//USER_GROP EMPLGRP 员工组字典
-		mv.addObject("EMPLGRP", DictsUtil.getDictsByParentCode(dictionariesService, "EMPLGRP"));
+		mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService, DictsUtil.DepartShowAll));
 		//CUST_COL7 FMISACC 帐套字典
 		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, 
 				departmentService,userService);
-		String jqGridColModel = tmpl.generateStructureNoEdit(tableName, ShowDepartCode);
+		String jqGridColModel = tmpl.generateStructureNoEdit(SelectedTableNo, ShowDepartCode);
 		mv.addObject("jqGridColModel", jqGridColModel);
 
 		SqlUserdata = tmpl.getSqlUserdata();
@@ -139,15 +131,17 @@ public class DetailImportQueryController extends BaseController {
 	@RequestMapping(value="/getPageList")
 	public @ResponseBody PageResult<PageData> getPageList(JqPage page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"列表FinanceAccounts");
+
+		PageData getPd = this.getPageData();
 		
-		PageData pd = setPutPd(this.getPageData());
-		page.setPd(pd);
+		PageData pdTransfer = setPutPd(getPd);
+		page.setPd(pdTransfer);
 		List<PageData> varList = detailimportqueryService.JqPage(page);	//列出Betting列表
 		int records = detailimportqueryService.countJqGridExtend(page);
 		PageData userdata = null;
 		if(SqlUserdata!=null && !SqlUserdata.toString().trim().equals("")){
 			//底行显示的求和与平均值字段
-			pd.put("Userdata", SqlUserdata.toString());
+			pdTransfer.put("Userdata", SqlUserdata.toString());
 		    userdata = detailimportqueryService.getFooterSummary(page);
 		}
 		
@@ -168,76 +162,78 @@ public class DetailImportQueryController extends BaseController {
 		}
 		return which;
 	}
+	/**
+	 * 根据前端业务表索引获取表名称
+	 * 
+	 * @param which
+	 * @return
+	 */
 	private String getDetailTableCode(String which) {
 		String tableCode = "";
-		if (which != null && which.equals("1")) {
-			tableCode = "tb_staff_detail";
-		} else if (which != null && which.equals("2")) {
-			tableCode = "tb_staff_detail";
-		} else if (which != null && which.equals("3")) {
-			tableCode = "tb_staff_detail";
-		} else if (which != null && which.equals("4")) {
-			tableCode = "tb_social_inc_detail";
-		} else if (which != null && which.equals("5")) {
-			tableCode = "tb_house_fund_detail";
+		if (which != null){
+			if(which.equals(TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey())
+					||which.equals(TmplType.TB_STAFF_DETAIL_MARKET.getNameKey())
+					||which.equals(TmplType.TB_STAFF_DETAIL_SYS_LABOR.getNameKey())
+					||which.equals(TmplType.TB_STAFF_DETAIL_OPER_LABOR.getNameKey())
+					||which.equals(TmplType.TB_STAFF_DETAIL_LABOR.getNameKey())) {
+				tableCode = "tb_staff_detail";
+			} else if (which.equals(TmplType.TB_SOCIAL_INC_DETAIL.getNameKey())) {
+				tableCode = "tb_social_inc_detail";
+			} else if (which.equals(TmplType.TB_HOUSE_FUND_DETAIL.getNameKey())) {
+				tableCode = "tb_house_fund_detail";
+			}
 		}
 		return tableCode;
 	}
 	private String getSummyTableCode(String which) {
 		String tableCode = "";
-		if (which != null && which.equals("1")) {
-			tableCode = "tb_staff_summy";
-		} else if (which != null && which.equals("2")) {
-			tableCode = "tb_staff_summy";
-		} else if (which != null && which.equals("3")) {
-			tableCode = "tb_staff_summy";
-		} else if (which != null && which.equals("4")) {
-			tableCode = "tb_social_inc_summy";
-		} else if (which != null && which.equals("5")) {
-			tableCode = "tb_house_fund_summy";
+		if (which != null){
+			if(which.equals(TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey())
+					||which.equals(TmplType.TB_STAFF_DETAIL_MARKET.getNameKey())
+					||which.equals(TmplType.TB_STAFF_DETAIL_SYS_LABOR.getNameKey())
+					||which.equals(TmplType.TB_STAFF_DETAIL_OPER_LABOR.getNameKey())
+					||which.equals(TmplType.TB_STAFF_DETAIL_LABOR.getNameKey())) {
+				tableCode = "tb_staff_summy";
+			} else if (which.equals(TmplType.TB_SOCIAL_INC_DETAIL.getNameKey())) {
+				tableCode = "tb_social_inc_summy";
+			} else if (which.equals(TmplType.TB_HOUSE_FUND_DETAIL.getNameKey())) {
+				tableCode = "tb_house_fund_summy";
+			}
 		}
 		return tableCode;
 	}
-	private String getSallaryType(String which) throws Exception {
-		String strKeyCode = "";
-		if (which != null && which.equals("1")) {
-			//strKeyCode = SysConfigKeyCode.ChkMktGRPCOND;
-		} else if (which != null && which.equals("2")) {
-			//strKeyCode = SysConfigKeyCode.ChkRunGRPCOND;
-		} else if (which != null && which.equals("3")) {
-			//strKeyCode = SysConfigKeyCode.ChkEmployGRPCOND;
-		}
-		String sallaryType = "";
-		if(strKeyCode != null && !strKeyCode.trim().equals("")){
-			PageData pd = new PageData();
-			pd.put("KEY_CODE", strKeyCode);
-			sallaryType = sysConfigManager.getSysConfigByKey(pd);
-		}
-		return sallaryType;
-	}
 	
-	private PageData setPutPd(PageData pd) throws Exception{
-		String which = getWhileValue(pd.getString("TABLE_CODE"));
-		String tableNameDetail = getDetailTableCode(which);
-		String tableNameSummy = getSummyTableCode(which);
-		String sallaryType = getSallaryType(which);
-
-		//表名
-		pd.put("TableName", tableNameDetail);
-		//多条件过滤条件
-		String filters = pd.getString("filters");
-		if(null != filters && !"".equals(filters)){
-			pd.put("filterWhereResult", SqlTools.constructWhere(filters,null));
-		}
-		if(sallaryType!=null && !sallaryType.trim().equals("")){
-			//工资分的类型
-			pd.put("SallaryType", sallaryType);
-		}
-		String QueryFeild = QueryFeildString.getQueryFeild(pd, QueryFeildList);
-		//QueryFeild += FilterBillCode.getHelpfulBillCode(tableNameSummy);
-		pd.put("QueryFeild", QueryFeild);
+	private PageData setPutPd(PageData getPd) throws Exception{
+		//员工组
+		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
+		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
+		//单位
+		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		//账套
+		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		//日期
+		String SelectedBusiDate = getPd.getString("SelectedBusiDate");
 		
-		return pd;
+		String tableNameDetail = getDetailTableCode(SelectedTableNo);
+		String tableNameSummy = getSummyTableCode(SelectedTableNo);
+		
+		PageData getQueryFeildPd = new PageData();
+		getQueryFeildPd.put("USER_GROP", emplGroupType);
+		getQueryFeildPd.put("DEPT_CODE", SelectedDepartCode);
+		getQueryFeildPd.put("CUST_COL7", SelectedCustCol7);
+		getQueryFeildPd.put("BUSI_DATE", SelectedBusiDate);
+		String QueryFeild = QueryFeildString.getQueryFeild(getQueryFeildPd, QueryFeildList);
+		//QueryFeild += FilterBillCode.getHelpfulBillCode(tableNameSummy);
+		getPd.put("QueryFeild", QueryFeild);
+		
+		//表名
+		getPd.put("TableName", tableNameDetail);
+		//多条件过滤条件
+		String filters = getPd.getString("filters");
+		if(null != filters && !"".equals(filters)){
+			getPd.put("filterWhereResult", SqlTools.constructWhere(filters,null));
+		}
+		return getPd;
 	}
 	
 	 /**导出到excel
@@ -249,6 +245,7 @@ public class DetailImportQueryController extends BaseController {
 	public ModelAndView exportExcel(JqPage page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"导出HouseFundDetail到excel");
 		if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
+		
 		PageData pd = setPutPd(this.getPageData());
 		page.setPd(pd);
 		List<PageData> varOList = detailimportqueryService.datalistExport(page);

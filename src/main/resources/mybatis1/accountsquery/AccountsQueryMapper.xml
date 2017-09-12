@@ -8,14 +8,9 @@
 		select ${pd.SelectFeild}
 		from ${pd.TableName}
 		<where>
-		    <if test="pd.CheckReport!= null and pd.CheckReport != ''">
-		    	${pd.CheckReport}
-		    </if>
+		    ${pd.CheckReport}
 		    <if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''">
 		    	${pd.filterWhereResult}
-		    </if>
-		    <if test="pd.SallaryType!= null and pd.SallaryType != ''">
-		        and ${pd.SallaryType}
 		    </if>
 		    <if test="pd.QueryFeild!= null and pd.QueryFeild != ''">
 		        ${pd.QueryFeild}

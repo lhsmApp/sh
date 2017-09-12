@@ -2,21 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="DetailSummyQueryMapper">
 	
-	<!-- 字段 -->
-	<sql id="FieldSelectKey">
-		BILL_CODE BILL_CODE__, DEPT_CODE DEPT_CODE__
-	</sql>
-	
 	<!-- 列表 -->
 	<select id="datalistJqPage" parameterType="jqPage" resultType="pd">
-		select *, <include refid="FieldSelectKey"></include> 
+		select 
+		    * 
+		    <if test="pd.FieldSelectKey!= null and pd.FieldSelectKey != ''">
+		        ${pd.FieldSelectKey}
+		    </if>
 		from ${pd.TableName}
 		<where>
 		    <if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			    ${pd.filterWhereResult}
-		    </if>
-		    <if test="pd.SallaryType!= null and pd.SallaryType != ''">
-		        and ${pd.SallaryType}
 		    </if>
 		    <if test="pd.QueryFeild!= null and pd.QueryFeild != ''">
 		        ${pd.QueryFeild}
@@ -36,9 +32,6 @@
 		    <if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			    ${pd.filterWhereResult}
 		    </if>
-		    <if test="pd.SallaryType!= null and pd.SallaryType != ''">
-		        and ${pd.SallaryType}
-		    </if>
 		    <if test="pd.QueryFeild!= null and pd.QueryFeild != ''">
 		        ${pd.QueryFeild}
 		    </if>
@@ -50,9 +43,6 @@
 		<where>
 		    <if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			    ${pd.filterWhereResult}
-		    </if>
-		    <if test="pd.SallaryType!= null and pd.SallaryType != ''">
-		        and ${pd.SallaryType}
 		    </if>
 		    <if test="pd.QueryFeild!= null and pd.QueryFeild != ''">
 		        ${pd.QueryFeild}
@@ -75,9 +65,6 @@
 		<where>
 		    <if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			    ${pd.filterWhereResult}
-		    </if>
-		    <if test="pd.SallaryType!= null and pd.SallaryType != ''">
-		        and ${pd.SallaryType}
 		    </if>
 		    <if test="pd.QueryFeild!= null and pd.QueryFeild != ''">
 		        ${pd.QueryFeild}
