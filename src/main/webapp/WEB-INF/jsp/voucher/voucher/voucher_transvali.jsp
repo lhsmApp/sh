@@ -75,6 +75,8 @@
 	$(document).ready(function () {
 		$(top.hangge());//关闭加载状态
 		console.log('${pd.TABLE_CODE}');
+		var deptCode="${pd.DEPT_CODE}";
+		var fmi="${pd.FMISACC}";
 		//resize to fit page size
 		$(window).on('resize.jqGrid', function () {
 			$("#jqGrid").jqGrid( 'setGridWidth', $(".page-content").width());
@@ -84,12 +86,12 @@
 		
 		$("#jqGrid").jqGrid({
 			<%-- url: '<%=basePath%>static/data/data.json', --%>
-			url: '<%=basePath%>voucher/getTransferValidate.do?TABLE_CODE='+${pd.TABLE_CODE},
+			url: "<%=basePath%>voucher/getTransferValidate.do?TABLE_CODE="+${pd.TABLE_CODE}+"&DEPT_CODE="+deptCode+"&FMISACC="+fmi,
 			datatype: "json",
 			 colModel: [
 				{ label: '单据编号', name: 'BILL_CODE', width: 75,editable: false},
 				{ label: '业务区间', name: 'BUSI_DATE', width: 90,editable: false},
-				{ label: '二级单位', name: 'DEPT_CODE', width: 100,editable: false,edittype: 'select',editoptions:{value:"${pd.strDict}"},formatter:'select',formatoptions:{value:"${pd.strDict}"},stype: 'select',searchoptions:{value:"${pd.strDict}"},}, 
+				{ label: '责任中心', name: 'DEPT_CODE', width: 100,editable: false,edittype: 'select',editoptions:{value:"${pd.strDict}"},formatter:'select',formatoptions:{value:"${pd.strDict}"},stype: 'select',searchoptions:{value:"${pd.strDict}"},}, 
 				{ label: '帐套', name: 'CUST_COL7', width: 100,editable: false,edittype: 'select',editoptions:{value:"${pd.strBillOff}"},formatter:'select',formatoptions:{value:"${pd.strBillOff}"},stype: 'select',searchoptions:{value:"${pd.strBillOff}"},},
 				/* { label: '封存状态', name: 'STATE', width: 90,editable: false,align:'center',formatter: customFmatterState} */
 			],

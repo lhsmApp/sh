@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fh.controller.base.BaseController;
+import com.fh.controller.common.DictsUtil;
 import com.fh.controller.common.GenerateTransferData;
 import com.fh.entity.CommonBase;
 import com.fh.entity.Page;
@@ -76,11 +77,14 @@ public class DictTransferController extends BaseController {
 		dictDepartment.setDICT_CODE("oa_department");
 		dictDepartment.setNAME("组织机构字典");
 		listDict.add(dictDepartment);
-		Dictionaries dictSysUser=new Dictionaries();
+		
+		/*Dictionaries dictSysUser=new Dictionaries();
 		dictSysUser.setDICT_CODE("sys_user");
 		dictSysUser.setNAME("系统用户字典");
-		listDict.add(dictSysUser);
+		listDict.add(dictSysUser);*/
 		mv.addObject("dicTypeList", listDict);
+		
+		mv.addObject("fmisacc", DictsUtil.getDictsByParentBianma(dictionariesService, "FMISACC"));
 		return mv;
 	}
 
@@ -124,10 +128,11 @@ public class DictTransferController extends BaseController {
 	@RequestMapping(value = "/dictTransfer")
 	public @ResponseBody CommonBase dictTransfer() throws Exception {
 		logBefore(logger, Jurisdiction.getUsername() + "字典传输");
-		String orgCode = Tools.readTxtFile(Const.ORG_CODE); // 读取总部组织机构编码
+		//String orgCode = Tools.readTxtFile(Const.ORG_CODE); // 读取总部组织机构编码
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
 		PageData pd = this.getPageData();
+		String billOff=pd.getString("BILL_OFF");
 		String strDataRows = pd.getString("DATA_ROWS");
 		JSONArray array = JSONArray.fromObject(strDataRows);
 		@SuppressWarnings("unchecked")
@@ -171,7 +176,7 @@ public class DictTransferController extends BaseController {
 			// 获取上传XML数据
 			GenerateTransferData generateTransferData = new GenerateTransferData();
 			// 3630100020
-			String transferData = generateTransferData.generateTransferData(tableColumns, mapTransferData, orgCode,
+			String transferData = generateTransferData.generateTransferData(tableColumns, mapTransferData, billOff,
 					TransferOperType.DELETE);
 			// 执行上传FIMS
 			Service service = new Service();
@@ -185,7 +190,7 @@ public class DictTransferController extends BaseController {
 			String message = (String) call.invoke(new Object[] { transferData });
 			System.out.println(message);
 			if (message.equals("TRUE")) {//删除成功
-				String transferDataInsert = generateTransferData.generateTransferData(tableColumns, mapTransferData, orgCode,
+				String transferDataInsert = generateTransferData.generateTransferData(tableColumns, mapTransferData, billOff,
 						TransferOperType.INSERT);
 				String messageInsert = (String) call.invoke(new Object[] { transferDataInsert });
 				/******************************************************/
