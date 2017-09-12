@@ -352,7 +352,6 @@ public class HouseFundDetailController extends BaseController {
 			return commonBase;
 		}
 		//必定不用编辑的列  MustNotEditList Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE");
-		getPd.put("BILL_CODE", " ");
 		if(oper.equals("add")){
 			getPd.put("BUSI_DATE", SystemDateTime);
 			getPd.put("CUST_COL7", SelectedCustCol7);
@@ -362,6 +361,7 @@ public class HouseFundDetailController extends BaseController {
 				getPd.put(strFeild, getPd.get(strFeild + TmplUtil.keyExtra));
 			}
 		}
+		getPd.put("BILL_CODE", " ");
 		TmplUtil.setModelDefault(getPd, map_HaveColumnsList);
 		
 		FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 

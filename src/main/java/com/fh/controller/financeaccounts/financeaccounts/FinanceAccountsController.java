@@ -273,11 +273,6 @@ public class FinanceAccountsController extends BaseController {
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
 		String SelectedTabType = getWhileValue(getPd.getString("SelectedTabType"));
-		//单位
-		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
-		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
-		}
 
 		Object DATA_ROWS = getPd.get("GetDetailTransferList");
 		String json = DATA_ROWS.toString();  
@@ -320,16 +315,20 @@ public class FinanceAccountsController extends BaseController {
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
 		String SelectedTabType = getWhileValue(getPd.getString("SelectedTabType"));
-		//单位
-		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
-		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
-		}
+		////单位
+		//String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		//if(departSelf == 1){
+		//	SelectedDepartCode = UserDepartCode;
+		//}
 
 		Object DATA_ROWS = getPd.get("GetDetailListTransferList");
 		String json = DATA_ROWS.toString();  
         JSONArray array = JSONArray.fromObject(json); 
 		List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);
+		String DEPT_CODE = "";
+		if(listData!=null && listData.size()>0){
+			listData.get(0).getString("DEPT_CODE__");
+		}
 		
 		String whereSql = "";
 		String whereSqlFirst = "";
@@ -339,9 +338,9 @@ public class FinanceAccountsController extends BaseController {
 		PageData getQueryFeildPd = new PageData();
 		//工资分的类型, 只有工资返回值
 		getQueryFeildPd.put("USER_GROP", emplGroupType);
-		getQueryFeildPd.put("DEPT_CODE", SelectedDepartCode);
+		getQueryFeildPd.put("DEPT_CODE", DEPT_CODE);
 		String QueryFeild = QueryFeildString.getQueryFeild(getQueryFeildPd, QueryFeildList);
-		if(!(SelectedDepartCode != null && !SelectedDepartCode.trim().equals(""))){
+		if(!(DEPT_CODE != null && !DEPT_CODE.trim().equals(""))){
 			QueryFeild += " and 1 != 1 ";
 		}
 		if(CheckStaffOrNot(SelectedTableNo)){

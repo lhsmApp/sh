@@ -219,7 +219,7 @@
 		where RPT_DUR = '${BUSI_DATE}'
 		and RPT_DEPT = '${DEPT_CODE}'
 		and BILL_TYPE = '${TypeCodeSummy}'
-		and BILL_OFF = '${BILL_OFF}'
+		and BILL_OFF = '${CUST_COL7}'
 	</insert>
 
 

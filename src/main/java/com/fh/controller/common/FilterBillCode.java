@@ -123,8 +123,8 @@ public class FilterBillCode {
     //
 	public static String getReportListenNotSummy(String tableNameSummy, String TypeCodeSummy, String TypeCodeListen){
 		String strReturn = " and BILL_CODE not in (select BILL_CODE from " + tableNameSummy;
-		strReturn += "                             where (BUSI_DATE, DEPT_CODE) not in (select RPT_DUR, RPT_DEPT from tb_sys_sealed_info where BILL_TYPE = '" + TypeCodeSummy + "') ";
-		strReturn += "                             and (BUSI_DATE, DEPT_CODE) in (select RPT_DUR, RPT_DEPT from tb_sys_sealed_info where BILL_TYPE = '" + TypeCodeListen + "') ";
+		strReturn += "                             where (BUSI_DATE, DEPT_CODE, CUST_COL7) not in (select RPT_DUR, RPT_DEPT, BILL_OFF from tb_sys_sealed_info where BILL_TYPE = '" + TypeCodeSummy + "') ";
+		strReturn += "                             and (BUSI_DATE, DEPT_CODE, CUST_COL7) in (select RPT_DUR, RPT_DEPT, BILL_OFF from tb_sys_sealed_info where BILL_TYPE = '" + TypeCodeListen + "') ";
 		strReturn += "                             ) ";
 		return strReturn;
 	}

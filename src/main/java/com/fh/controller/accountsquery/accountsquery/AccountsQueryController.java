@@ -270,11 +270,6 @@ public class AccountsQueryController extends BaseController {
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
 		String SelectedTabType = getWhileValue(getPd.getString("SelectedTabType"));
-		//单位
-		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
-		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
-		}
 
 		Object DATA_ROWS = getPd.get("GetDetailTransferList");
 		String json = DATA_ROWS.toString();  
@@ -317,27 +312,27 @@ public class AccountsQueryController extends BaseController {
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
 		String SelectedTabType = getWhileValue(getPd.getString("SelectedTabType"));
-		//单位
-		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
-		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
-		}
 
 		Object DATA_ROWS = getPd.get("GetDetailListTransferList");
 		String json = DATA_ROWS.toString();  
         JSONArray array = JSONArray.fromObject(json); 
 		List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);
+		String BUSI_DATE = "";
+		String DEPT_CODE = "";
+		if(listData!=null && listData.size()>0){
+			listData.get(0).getString("BUSI_DATE__");
+			listData.get(0).getString("DEPT_CODE__");
+		}
 		
 		String whereSql = "";
 		String whereSqlFirst = "";
 		String whereSqlSecond = "";
-		//whereSql += " where BUSI_DATE = '" + SystemDateTime + "' ";
 
 		PageData getQueryFeildPd = new PageData();
 		//工资分的类型, 只有工资返回值
 		getQueryFeildPd.put("USER_GROP", emplGroupType);
-		getQueryFeildPd.put("DEPT_CODE", SelectedDepartCode);
-		//getQueryFeildPd.put("BUSI_DATE", SelectedBusiDate);
+		getQueryFeildPd.put("DEPT_CODE", DEPT_CODE);
+		getQueryFeildPd.put("BUSI_DATE", BUSI_DATE);
 		String QueryFeild = QueryFeildString.getQueryFeild(getQueryFeildPd, QueryFeildList);
 		if(CheckStaffOrNot(SelectedTableNo)){
 			if(!(emplGroupType!=null && !emplGroupType.trim().equals(""))){

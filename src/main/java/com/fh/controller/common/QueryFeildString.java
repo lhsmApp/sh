@@ -165,7 +165,9 @@ public class QueryFeildString {
     public static List<String> tranferStringToList(String strFeild){
         List<String> list = new ArrayList<String>();
         if(strFeild != null && !strFeild.trim().equals("")){
-            list = Arrays.asList(strFeild.replace(" ", "").toUpperCase().split(","));
+            for(String t : strFeild.replace(" ", "").toUpperCase().split(",")){  
+            	list.add(t);  
+            } 
         }
         return list;
     }

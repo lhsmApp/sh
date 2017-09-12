@@ -363,7 +363,6 @@ public class StaffDetailController extends BaseController {
 			return commonBase;
 		}
 		//必定不用编辑的列  MustNotEditList Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP");
-		getPd.put("BILL_CODE", " ");
 		if(oper.equals("add")){
 			getPd.put("BUSI_DATE", SystemDateTime);
 			getPd.put("DEPT_CODE", SelectedDepartCode);
@@ -374,6 +373,7 @@ public class StaffDetailController extends BaseController {
 				getPd.put(strFeild, getPd.get(strFeild + TmplUtil.keyExtra));
 			}
 		}
+		getPd.put("BILL_CODE", " ");
 		TmplUtil.setModelDefault(getPd, map_HaveColumnsList);
 		
 		FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
