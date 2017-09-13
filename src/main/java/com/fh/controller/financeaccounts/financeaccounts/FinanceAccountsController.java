@@ -483,12 +483,16 @@ public class FinanceAccountsController extends BaseController {
 
 		String strKeyCode = "";
 		if (which != null){
-			if(which.equals(TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey())
-					||which.equals(TmplType.TB_STAFF_DETAIL_MARKET.getNameKey())
-					||which.equals(TmplType.TB_STAFF_DETAIL_SYS_LABOR.getNameKey())
-					||which.equals(TmplType.TB_STAFF_DETAIL_OPER_LABOR.getNameKey())
-					||which.equals(TmplType.TB_STAFF_DETAIL_LABOR.getNameKey())) {
-				strKeyCode = SysConfigKeyCode.ChkStaffGRP;
+			if(which.equals(TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey())) {
+				strKeyCode = SysConfigKeyCode.ChkStaffContractGRP;
+			} else if(which.equals(TmplType.TB_STAFF_DETAIL_MARKET.getNameKey())) {
+				strKeyCode = SysConfigKeyCode.ChkStaffMarketGRP;
+			} else if(which.equals(TmplType.TB_STAFF_DETAIL_SYS_LABOR.getNameKey())) {
+				strKeyCode = SysConfigKeyCode.ChkStaffSysLaborGRP;
+			} else if(which.equals(TmplType.TB_STAFF_DETAIL_OPER_LABOR.getNameKey())) {
+				strKeyCode = SysConfigKeyCode.ChkStaffOperLaborGRP;
+			} else if(which.equals(TmplType.TB_STAFF_DETAIL_LABOR.getNameKey())) {
+				strKeyCode = SysConfigKeyCode.ChkStaffLaborGRP;
 			} else if (which.equals(TmplType.TB_SOCIAL_INC_DETAIL.getNameKey())) {
 				strKeyCode = SysConfigKeyCode.ChkSocialGRP;
 			} else if (which.equals(TmplType.TB_HOUSE_FUND_DETAIL.getNameKey())) {

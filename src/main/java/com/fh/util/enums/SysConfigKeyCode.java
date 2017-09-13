@@ -11,21 +11,25 @@ package com.fh.util.enums;
 public class SysConfigKeyCode {
 	//定义系统区间
 	public static final String SystemDataTime = "SystemDataTime";
-	//定义工资数据的显示条件
-	//public static final String ChkMktGRPCOND = "ChkMktGRPCOND";
-	//public static final String ChkRunGRPCOND = "ChkRunGRPCOND";
-	//public static final String ChkEmployGRPCOND = "ChkEmployGRPCOND";
 	
-	//定义汇总字段
-	//工资核算分组字段，所属单位、员工组分组
-	public static final String ChkStaffGRP = "ChkStaffGRP";
-	//社保核算分组字典，所属单位
+	//定义核算汇总字段
+	//核算合同化工资汇总
+	public static final String ChkStaffContractGRP = "ChkStaffContractGRP";
+	//核算市场化工资汇总
+	public static final String ChkStaffMarketGRP = "ChkStaffMarketGRP";
+	//核算运行人员工资汇总
+	public static final String ChkStaffOperLaborGRP = "ChkStaffOperLaborGRP";
+	//核算系统内工资汇总
+	public static final String ChkStaffSysLaborGRP = "ChkStaffSysLaborGRP";
+	//核算劳务派遣工资汇总
+	public static final String ChkStaffLaborGRP = "ChkStaffLaborGRP";
+	//社保核算汇总
 	public static final String ChkSocialGRP = "ChkSocialGRP";
-	//公积金核算分组字典，所属单位
+	//公积金核算汇总
 	public static final String ChkHouseGRP = "ChkHouseGRP";
 	
 
-	//定义汇总字段
+	//定义导入汇总字段
 	//合同化工资汇总
 	public static final String ContractGRPCond = "ContractGRPCond";
 	//市场化工资汇总
