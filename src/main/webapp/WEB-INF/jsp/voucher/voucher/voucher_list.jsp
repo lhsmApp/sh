@@ -363,7 +363,7 @@
 			//autowidth:true,
 			shrinkToFit:false,
 			viewrecords: false,
-			rowNum: 10,
+			rowNum: -1,
 			//rowList:[10,20,30,10000],
 			pgbuttons: false,//上下按钮 
 			pginput:false,//输入框
