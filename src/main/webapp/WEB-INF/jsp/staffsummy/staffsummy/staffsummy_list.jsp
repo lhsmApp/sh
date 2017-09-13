@@ -64,8 +64,6 @@
 						</button>
 								
 						            <div class="pull-right">
-									    <!-- <span class="label label-xlg label-blue arrowed-left"
-									        id = "showDur" style="background:#428bca; margin-right: 2px;"></span> -->
 								        <div data-toggle="buttons" class="btn-group no-margin">
 									            <label class="btn btn-sm btn-primary active"> <span
 									    	        class="bigger-110">合同化</span> <input type="radio" value="6" />
@@ -127,6 +125,9 @@
 												<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
 													<i class="ace-icon fa fa-search bigger-110"></i>
 												</button>
+												
+									            <span class="pull-right label label-xlg label-blue arrowed-left"
+									                id = "showDur" style="background:#428bca; margin-right: 2px;"></span>
 											</form>
 										</div>
 									</div>
@@ -188,8 +189,10 @@
 			$(top.hangge());//关闭加载状态
 		    
 			//当前期间,取自tb_system_config的SystemDateTime字段
-		    //var SystemDateTime = '${SystemDateTime}';
-		    //$("#showDur").text('当前期间：' + SystemDateTime);
+		    var SystemDateTime = '${SystemDateTime}';
+			//当前登录人所在二级单位
+		    var DepartName = '${DepartName}';
+		    $("#showDur").text('当前期间：' + SystemDateTime + ' 登录人责任中心：' + DepartName);
 		    
 			//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 		    var jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array

@@ -164,8 +164,10 @@ public class StaffDetailController extends BaseController {
 		mv.setViewName("staffDetail/staffdetail/staffdetail_list");
 		//while
 		getPd.put("which", SelectedTableNo);
-		//mv.addObject("SystemDateTime", SystemDateTime);
-		//mv.addObject("DepartName", DepartName);
+		mv.addObject("SystemDateTime", SystemDateTime);
+		User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
+		String DepartName = user.getDEPARTMENT_NAME();
+		mv.addObject("DepartName", DepartName);
 		
 		// 枚举  1封存,0解封
 		String State = DurState.Sealed.getNameKey();

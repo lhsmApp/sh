@@ -156,6 +156,9 @@ public class HouseFundSummyController extends BaseController {
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("housefundsummy/housefundsummy/housefundsummy_list");
 		mv.addObject("SystemDateTime", SystemDateTime);
+		User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
+		String DepartName = user.getDEPARTMENT_NAME();
+		mv.addObject("DepartName", DepartName);
 
 		//CUST_COL7 FMISACC 帐套字典
 		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));

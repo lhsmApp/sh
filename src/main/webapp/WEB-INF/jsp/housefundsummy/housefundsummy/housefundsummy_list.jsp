@@ -192,7 +192,9 @@
 		    
 			//当前期间,取自tb_system_config的SystemDateTime字段
 		    var SystemDateTime = '${SystemDateTime}';
-		    $("#showDur").text('当前期间：' + SystemDateTime); 
+			//当前登录人所在二级单位
+		    var DepartName = '${DepartName}';
+		    $("#showDur").text('当前期间：' + SystemDateTime + ' 登录人责任中心：' + DepartName); 
 		    
 			//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 		    var jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array

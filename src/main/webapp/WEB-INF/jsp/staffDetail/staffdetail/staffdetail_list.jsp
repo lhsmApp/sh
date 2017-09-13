@@ -62,11 +62,6 @@
 									</button>
 								
 						            <div class="pull-right">
-									    <!-- <span class="label label-xlg label-blue arrowed-left"
-									        id = "showDur" style="background:#428bca; margin-right: 2px;"></span>  -->
-								        <!-- <span class="label label-xlg label-blue arrowed-left"
-								            id = "showDept" style="background:#428bca"></span> -->
-									    
 							            <div class="btn-toolbar inline middle no-margin">
 								            <div data-toggle="buttons" class="btn-group no-margin">
 									            <label class="btn btn-sm btn-primary active"> <span
@@ -115,6 +110,12 @@
 											<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
 												<i class="ace-icon fa fa-search bigger-110"></i>
 											</button>
+										    
+									        <span class="pull-right label label-xlg label-blue arrowed-left"
+									            id = "showDur" style="background:#428bca; margin-right: 2px;"></span>
+								        <!-- <span class="label label-xlg label-blue arrowed-left"
+								            id = "showDept" style="background:#428bca"></span> -->
+									    
 										</form>
 									</div>
 								</div>
@@ -442,10 +443,10 @@
 		$(top.hangge());//关闭加载状态
 	    
 		//当前期间,取自tb_system_config的SystemDateTime字段
-	    //var SystemDateTime = '${SystemDateTime}';
+	    var SystemDateTime = '${SystemDateTime}';
 		//当前登录人所在二级单位
-	    //var DepartName = '${DepartName}';
-	    //$("#showDur").text('当前期间：' + SystemDateTime + ' 当前单位：' + DepartName);
+	    var DepartName = '${DepartName}';
+	    $("#showDur").text('当前期间：' + SystemDateTime + ' 登录人责任中心：' + DepartName);
 	    //$("#showDept").text('当前单位：' + DepartName);
 		//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
 	    // 枚举  1封存,0解封

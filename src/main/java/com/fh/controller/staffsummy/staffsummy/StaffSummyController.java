@@ -158,7 +158,10 @@ public class StaffSummyController extends BaseController {
 		//while
 		getPd.put("which", SelectedTableNo);
 		mv.addObject("pd", getPd);
-		//mv.addObject("SystemDateTime", SystemDateTime);
+		mv.addObject("SystemDateTime", SystemDateTime);
+		User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
+		String DepartName = user.getDEPARTMENT_NAME();
+		mv.addObject("DepartName", DepartName);
 
 		//CUST_COL7 FMISACC 帐套字典
 		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));
