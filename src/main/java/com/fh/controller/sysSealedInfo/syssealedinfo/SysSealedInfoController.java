@@ -104,41 +104,41 @@ public class SysSealedInfoController extends BaseController {
 					valiType = TmplType.TB_STAFF_SUMMY_LABOR.getNameKey();
 					message = "当前记录的【劳务派遣工资汇总】业务还没有进行解封,请先对对应的【劳务派遣工资汇总】业务进行解封.";
 				} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_SUMMY_CONTRACT.getNameKey())) {// 合同化工资汇总
-					// 验证合同化工资接口
+					// 验证合同化工资传输
 					valiType = TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey();
-					message = "当前记录的【合同化工资接口】业务还没有进行解封,请先对对应的【合同化工资接口】业务进行解封.";
+					message = "当前记录的【合同化工资传输】业务还没有进行解封,请先对对应的【合同化工资传输】业务进行解封.";
 				} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_SUMMY_MARKET.getNameKey())) {// 市场化工资汇总
-					// 验证市场化工资接口
+					// 验证市场化工资传输
 					valiType = TmplType.TB_STAFF_TRANSFER_MARKET.getNameKey();
-					message = "当前记录的【市场化工资接口】业务还没有进行解封,请先对对应的【市场化工资接口】业务进行解封.";
+					message = "当前记录的【市场化工资传输】业务还没有进行解封,请先对对应的【市场化工资传输】业务进行解封.";
 				} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_SUMMY_SYS_LABOR.getNameKey())) {// 系统内工资汇总
-					// 验证系统内工资接口
+					// 验证系统内工资传输
 					valiType = TmplType.TB_STAFF_TRANSFER_SYS_LABOR.getNameKey();
-					message = "当前记录的【系统内工资接口】业务还没有进行解封,请先对对应的【系统内工资接口】业务进行解封.";
+					message = "当前记录的【系统内工资传输】业务还没有进行解封,请先对对应的【系统内工资传输】业务进行解封.";
 				} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_SUMMY_OPER_LABOR.getNameKey())) {// 运行人员工资汇总
-					// 验证运行人员工资接口
+					// 验证运行人员工资传输
 					valiType = TmplType.TB_STAFF_TRANSFER_OPER_LABOR.getNameKey();
-					message = "当前记录的【运行人员工资接口】业务还没有进行解封,请先对对应的【运行人员工资接口】业务进行解封.";
+					message = "当前记录的【运行人员工资传输】业务还没有进行解封,请先对对应的【运行人员工资传输】业务进行解封.";
 				} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_SUMMY_LABOR.getNameKey())) {// 劳务派遣工资汇总
-					// 验证劳务派遣工资接口
+					// 验证劳务派遣工资传输
 					valiType = TmplType.TB_STAFF_TRANSFER_LABOR.getNameKey();
-					message = "当前记录的【劳务派遣工资接口】业务还没有进行解封,请先对对应的【劳务派遣工资接口】业务进行解封.";
+					message = "当前记录的【劳务派遣工资传输】业务还没有进行解封,请先对对应的【劳务派遣工资传输】业务进行解封.";
 				} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_HOUSE_FUND_DETAIL.getNameKey())) {// 公积金明细
 					// 验证公积金汇总
 					valiType = TmplType.TB_HOUSE_FUND_SUMMY.getNameKey();
 					message = "当前记录的【公积金汇总】业务还没有进行解封,请先对对应的【公积金汇总】业务进行解封.";
 				} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_HOUSE_FUND_SUMMY.getNameKey())) {// 公积金汇总
-					// 验证公积金接口
+					// 验证公积金传输
 					valiType = TmplType.TB_HOUSE_FUND_TRANSFER.getNameKey();
-					message = "当前记录的【公积金接口】业务还没有进行解封,请先对对应的【公积金接口】业务进行解封.";
+					message = "当前记录的【公积金传输】业务还没有进行解封,请先对对应的【公积金传输】业务进行解封.";
 				} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_SOCIAL_INC_DETAIL.getNameKey())) {// 社保明细
 					// 验证社保汇总
 					valiType = TmplType.TB_SOCIAL_INC_SUMMY.getNameKey();
 					message = "当前记录的【社保汇总】业务还没有进行解封,请先对对应的【社保汇总】业务进行解封.";
 				} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_SOCIAL_INC_SUMMY.getNameKey())) {// 社保汇总
-					// 验证社保接口
+					// 验证社保传输
 					valiType = TmplType.TB_SOCIAL_INC_TRANSFER.getNameKey();
-					message = "当前记录的【社保接口】业务还没有进行解封,请先对对应的【社保接口】业务进行解封.";
+					message = "当前记录的【社保传输】业务还没有进行解封,请先对对应的【社保传输】业务进行解封.";
 				}
 				pd.put("VALI_TYPE", valiType);
 				String valiState = syssealedinfoService.valiState(pd);
@@ -147,7 +147,7 @@ public class SysSealedInfoController extends BaseController {
 					commonBase.setMessage(message);
 					return commonBase;
 				}
-				//针对解封接口类型的封存信息需要判断是否已经生成了凭证号
+				//针对解封传输类型的封存信息需要判断是否已经生成了凭证号
 				if (pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey())
 						||pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_MARKET.getNameKey())
 						||pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_SYS_LABOR.getNameKey())
@@ -173,7 +173,7 @@ public class SysSealedInfoController extends BaseController {
 					User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
 					String userId = user.getUSER_ID();
 					pd.put("USER", userId);
-					List<PageData> listSysUnlockInfo = sysUnlockInfoService.listSyncDelUnlock(pd); // 获取当前接口类型，当前二级单位当前期间当前封存状态为封存的的传输列表
+					List<PageData> listSysUnlockInfo = sysUnlockInfoService.listSyncDelUnlock(pd); // 获取当前传输类型，当前二级单位当前期间当前封存状态为封存的的传输列表
 					if (listSysUnlockInfo != null && listSysUnlockInfo.size() > 0) {
 						PageData pdItem0 = listSysUnlockInfo.get(0);// 如果包含其中一条带有凭证号的记录，就可以证明此二级单位所有记录已经生成凭证号，不能再进行解封操作。
 						if (StringUtil.isNotEmpty(pdItem0.getString("CERT_CODE"))) {

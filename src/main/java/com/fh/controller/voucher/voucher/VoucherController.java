@@ -241,7 +241,8 @@ public class VoucherController extends BaseController {
 		}
 		mv.addObject("HasUserData", hasUserData);
 
-		//mv.addObject("emplgrp", DictsUtil.getDictsByParentBianma(dictionariesService, "EMPLGRP"));
+		// mv.addObject("emplgrp",
+		// DictsUtil.getDictsByParentBianma(dictionariesService, "EMPLGRP"));
 		mv.addObject("fmisacc", DictsUtil.getDictsByParentBianma(dictionariesService, "FMISACC"));
 		// USER_CATG PARTUSERTYPE 特定员工分类字典
 		mv.addObject("partusertype", DictsUtil.getDictsByParentBianma(dictionariesService, "PARTUSERTYPE"));
@@ -270,7 +271,7 @@ public class VoucherController extends BaseController {
 		pd.put("BILL_TYPE_TRANSFER", sealTypeTransfer);// 接口封存类型
 		pd.put("VOUCHER_TYPE", voucherType);// 接口封存类型
 		pd.put("BILL_TYPE", sealType);// 接口封存类型对应的汇总接口类型
-		// pd.put("USER_GROP", DictsUtil.getEmplGroupType(which));
+		pd.put("USER_GROP", DictsUtil.getEmplGroupType(which));
 		String strDeptCode = "";
 		if (departSelf == 1)
 			strDeptCode = Jurisdiction.getCurrentDepartmentID();
@@ -451,12 +452,13 @@ public class VoucherController extends BaseController {
 			/********************** 生成传输数据 ************************/
 			String which = pd.getString("TABLE_CODE");
 			String tableCode = getTableCode(which);
+			String tableCodeOnFmis = getTableCodeOnFmis(which);
 			// String voucherType=pd.getString("VOUCHER_TYPE");
 			// 根据表编号和真实表名称获取用于传输的字段列配置信息
 			List<TableColumns> tableColumnsForTransfer = getTableColumnsForTransfer(which, tableCode);
 			GenerateTransferData generateTransferData = new GenerateTransferData();
 			Map<String, List<PageData>> mapTransferData = new HashMap<String, List<PageData>>();
-			mapTransferData.put(tableCode, listTransferData);
+			mapTransferData.put(tableCodeOnFmis, listTransferData);
 			PageData pdFirst = listTransferData.get(0);
 			String orgCode = pdFirst.getString("CUST_COL7");
 			String transferData = generateTransferData.generateTransferData(tableColumnsForTransfer, mapTransferData,
@@ -585,6 +587,7 @@ public class VoucherController extends BaseController {
 			/********************** 生成传输数据 ************************/
 			String which = pd.getString("TABLE_CODE");
 			String tableCode = getTableCode(which);
+			String tableCodeOnFmis = getTableCodeOnFmis(which);
 			// String voucherType=pd.getString("VOUCHER_TYPE");
 
 			// 根据表编号和真实表名称获取用于传输的字段列配置信息
@@ -593,7 +596,7 @@ public class VoucherController extends BaseController {
 			List<TableColumns> tableColumnsForTransfer = getTableColumnsForTransfer(which, tableCode);
 			GenerateTransferData generateTransferData = new GenerateTransferData();
 			Map<String, List<PageData>> mapTransferData = new HashMap<String, List<PageData>>();
-			mapTransferData.put(tableCode, listTransferData);
+			mapTransferData.put(tableCodeOnFmis, listTransferData);
 			PageData pdFirst = listTransferData.get(0);
 			String orgCode = pdFirst.getString("CUST_COL7");
 			String transferData = generateTransferData.generateTransferData(tableColumnsForTransfer, mapTransferData,
@@ -669,7 +672,8 @@ public class VoucherController extends BaseController {
 				// String fmisOrg = Tools.readTxtFile(Const.ORG_CODE); //
 				// 读取总部组织机构编码
 				String fmisOrg = item.getString("CUST_COL7"); // 读取总部组织机构编码
-				String tableName = "T_" + getTableCode(which);// 在fmis建立的业务表名
+				// String tableName = "T_" + getTableCode(which);// 在fmis建立的业务表名
+				String tableName = "T_" + getTableCodeOnFmis(which);// 在fmis建立的业务表名
 				String result = (String) call.invoke(new Object[] { tableName, invoiceNumber, fmisOrg });// 对应定义参数
 				if (result.length() > 0) {
 					String[] stringArr = result.split(";");
@@ -735,7 +739,8 @@ public class VoucherController extends BaseController {
 				String invoiceState = item.getString("BILL_STATE");// 单据状态
 				String voucherDate = item.getString("CERT_BILL_DATE");// 凭证日期
 				String voucherNumber = item.getString("CERT_CODE");// 凭证编号
-				String tableName = "T" + getTableCode(which);// 在fmis建立的业务表名
+				// String tableName = "T_" + getTableCode(which);// 在fmis建立的业务表名
+				String tableName = "T_" + getTableCodeOnFmis(which);// 在fmis建立的业务表名
 				String workDate = DateUtils.getCurrentTime(DateFormatUtils.DATE_NOFUll_FORMAT);// 当前工作日期格式20170602
 
 				String result = (String) call
@@ -799,6 +804,43 @@ public class VoucherController extends BaseController {
 		 * "TB_HOUSE_FUND_SUMMY"; } else { tableCode = "TB_STAFF_SUMMY"; }
 		 * return tableCode;
 		 */
+	}
+
+	/**
+	 * 根据前端业务表索引获取定义在Fmis系统上定义的表名称
+	 * 
+	 * @param which
+	 *            1、合同化工资 2、社保 3、公积金 4、市场化工资 5、系统内劳务工资 6、运行人员工资 7、劳务派遣工资
+	 * @return
+	 * @throws Exception
+	 */
+	private String getTableCodeOnFmis(String which) throws Exception {
+		PageData pd = new PageData();
+		String tableCodeOri = "";// 数据库真实业务数据表
+		if (which.equals(TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey())) {
+			pd.put("KEY_CODE", "StaffTransferHT");
+			tableCodeOri = sysConfigManager.getSysConfigByKey(pd);
+		} else if (which.equals(TmplType.TB_STAFF_TRANSFER_MARKET.getNameKey())) {
+			pd.put("KEY_CODE", "StaffTransferSC");
+			tableCodeOri = sysConfigManager.getSysConfigByKey(pd);
+		} else if (which.equals(TmplType.TB_STAFF_TRANSFER_SYS_LABOR.getNameKey())) {
+			pd.put("KEY_CODE", "StaffTransferXT");
+			tableCodeOri = sysConfigManager.getSysConfigByKey(pd);
+		} else if (which.equals(TmplType.TB_STAFF_TRANSFER_OPER_LABOR.getNameKey())) {
+			pd.put("KEY_CODE", "StaffTransferYX");
+			tableCodeOri = sysConfigManager.getSysConfigByKey(pd);
+		} else if (which.equals(TmplType.TB_STAFF_TRANSFER_LABOR.getNameKey())) {
+			pd.put("KEY_CODE", "StaffTransferLW");
+			tableCodeOri = sysConfigManager.getSysConfigByKey(pd);
+		} else if (which.equals(TmplType.TB_SOCIAL_INC_TRANSFER.getNameKey())) {
+			tableCodeOri = "TB_SOCIAL_INC_SUMMY";
+		} else if (which.equals(TmplType.TB_HOUSE_FUND_TRANSFER.getNameKey())) {
+			tableCodeOri = "TB_HOUSE_FUND_SUMMY";
+		} else {
+			pd.put("KEY_CODE", "StaffTransferHT");
+			tableCodeOri = sysConfigManager.getSysConfigByKey(pd);
+		}
+		return tableCodeOri;
 	}
 
 	/**
@@ -924,7 +966,7 @@ public class VoucherController extends BaseController {
 		pd.put("TABLE_CODE", tableCode);
 		String sealType = getSealType(which);
 		pd.put("BILL_TYPE", sealType);// 汇总封存类型
-		
+
 		String strDeptCode = "";
 		if (departSelf == 1)
 			strDeptCode = Jurisdiction.getCurrentDepartmentID();
@@ -934,7 +976,7 @@ public class VoucherController extends BaseController {
 			String[] strDeptCodes = strDeptCode.split(",");
 			pd.put("DEPT_CODES", strDeptCodes);
 		}
-		
+
 		String filters = pd.getString("filters"); // 多条件过滤条件
 		if (null != filters && !"".equals(filters)) {
 			pd.put("filterWhereResult", SqlTools.constructWhere(filters, null));
