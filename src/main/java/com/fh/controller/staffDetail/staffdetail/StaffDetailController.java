@@ -393,7 +393,7 @@ public class StaffDetailController extends BaseController {
 		
 		List<PageData> listData = new ArrayList<PageData>();
 		listData.add(getPd);
-		List<String> repeatList = staffdetailService.findByUserCodeModel(listData);
+		List<String> repeatList = staffdetailService.findUserCodeByModel(listData);
 		if(repeatList!=null && repeatList.size()>0){
 			commonBase.setCode(2);
 			commonBase.setMessage("此区间内编码已存在！");
@@ -487,7 +487,7 @@ public class StaffDetailController extends BaseController {
 				TmplUtil.setModelDefault(item, map_HaveColumnsList);
 	        }
 			if(null != listData && listData.size() > 0){
-				List<String> repeatList = staffdetailService.findByUserCodeModel(listData);
+				List<String> repeatList = staffdetailService.findUserCodeByModel(listData);
 				if(repeatList!=null && repeatList.size()>0){
 					commonBase.setCode(2);
 					commonBase.setMessage("此区间内编码已存在！");
@@ -625,6 +625,8 @@ public class StaffDetailController extends BaseController {
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;}//校验权限
+		
+		String strErrorMessage = "";
 
 		PageData getPd = this.getPageData();
 		//员工组
@@ -697,17 +699,17 @@ public class StaffDetailController extends BaseController {
 							throw new CustomException("读取Excel文件错误",false);
 						}
 						boolean judgement = false;
-						if(uploadAndReadMap.get(1).equals(false)){
+
 							Map<String, Object> returnError =  (Map<String, Object>) uploadAndReadMap.get(2);
-							String message = "字典无此翻译： "; // \n
-							for (String k : returnError.keySet())  
-						    {
-								message += k + " : " + returnError.get(k);
-						    }
-							commonBase.setCode(2);
-							commonBase.setMessage(message);
-						} else {
-							List<PageData> listUploadAndRead = (List<PageData>) uploadAndReadMap.get(2);
+							if(returnError != null && returnError.size()>0){
+								strErrorMessage += "字典无此翻译： "; // \n
+								for (String k : returnError.keySet())  
+							    {
+									strErrorMessage += k + " : " + returnError.get(k);
+							    }
+							}
+
+							List<PageData> listUploadAndRead = (List<PageData>) uploadAndReadMap.get(1);
 							List<PageData> listAdd = new ArrayList<PageData>();
 							if (listUploadAndRead != null && !"[]".equals(listUploadAndRead.toString()) && listUploadAndRead.size() >= 1) {
 								judgement = true;
@@ -779,7 +781,7 @@ public class StaffDetailController extends BaseController {
 												}
 											}
 											if(listUserCode.contains(getUSER_CODE.trim())){
-												String strUserAdd = "人员编码" + getUSER_CODE + "重复！";
+												String strUserAdd = "人员编码:" + getUSER_CODE + "重复！";
 												if(!sbRet.contains(strUserAdd)){
 													sbRet.add(strUserAdd);
 												}
@@ -792,7 +794,8 @@ public class StaffDetailController extends BaseController {
 												}
 											}
 											if(listStaffIdent.contains(getSTAFF_IDENT.trim())){
-												String strUserAdd = "身份证号" + getSTAFF_IDENT + "重复！";
+												String getUSER_NAME = (String) pdAdd.get("USER_NAME");
+												String strUserAdd = "编号：" + getUSER_CODE + " 姓名：" + getUSER_NAME + " 身份证号：" + getSTAFF_IDENT + " 导入数据重复！";
 												if(!sbRet.contains(strUserAdd)){
 													sbRet.add(strUserAdd);
 												}
@@ -818,6 +821,7 @@ public class StaffDetailController extends BaseController {
 										//此处执行集合添加 
 										staffdetailService.batchImport(listAdd);
 										commonBase.setCode(0);
+										commonBase.setMessage(strErrorMessage);
 									}
 								}
 							} else {
@@ -825,7 +829,7 @@ public class StaffDetailController extends BaseController {
 								commonBase.setMessage("TranslateUtil");
 							}
 						}
-					}
+					
 				}
 			}
 		}

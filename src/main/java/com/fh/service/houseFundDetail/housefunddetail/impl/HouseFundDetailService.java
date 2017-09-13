@@ -29,8 +29,8 @@ public class HouseFundDetailService implements HouseFundDetailManager{
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	public List<String> findByModel(List<PageData> listData)throws Exception{
-		return (List<String>)dao.findForList("HouseFundDetailMapper.findByModel", listData);
+	public List<String> findUserCodeByModel(List<PageData> listData)throws Exception{
+		return (List<String>)dao.findForList("HouseFundDetailMapper.findUserCodeByModel", listData);
 	}
 	@SuppressWarnings("unchecked")
 	public List<String> exportHaveUserCode(PageData listData)throws Exception{

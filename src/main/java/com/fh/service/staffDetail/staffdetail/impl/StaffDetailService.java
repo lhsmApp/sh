@@ -28,8 +28,8 @@ public class StaffDetailService implements StaffDetailManager{
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	public List<String> findByUserCodeModel(List<PageData> listData)throws Exception{
-		return (List<String>)dao.findForList("StaffDetailMapper.findByUserCodeModel", listData);
+	public List<String> findUserCodeByModel(List<PageData> listData)throws Exception{
+		return (List<String>)dao.findForList("StaffDetailMapper.findUserCodeByModel", listData);
 	}
 	@SuppressWarnings("unchecked")
 	public List<String> exportHaveUserCode(PageData listData)throws Exception{

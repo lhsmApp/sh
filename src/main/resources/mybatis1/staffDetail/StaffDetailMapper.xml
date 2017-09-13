@@ -69,7 +69,7 @@
 	</select>
     
 	<!-- 获取数据 验证数据重复 -->
-	<select id="findByUserCodeModel" parameterType="pd" resultType="String">
+	<select id="findUserCodeByModel" parameterType="pd" resultType="String">
 		select USER_CODE
 		from 
 		    <include refid="tableName"></include>

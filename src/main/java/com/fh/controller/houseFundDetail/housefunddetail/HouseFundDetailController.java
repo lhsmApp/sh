@@ -381,7 +381,7 @@ public class HouseFundDetailController extends BaseController {
 
 		List<PageData> listData = new ArrayList<PageData>();
 		listData.add(getPd);
-		List<String> repeatList = housefunddetailService.findByModel(listData);
+		List<String> repeatList = housefunddetailService.findUserCodeByModel(listData);
 		if(repeatList!=null && repeatList.size()>0){
 			commonBase.setCode(2);
 			commonBase.setMessage("此区间内编码已存在！");
@@ -457,7 +457,7 @@ public class HouseFundDetailController extends BaseController {
 				TmplUtil.setModelDefault(item, map_HaveColumnsList);
 	        }
 			if(null != listData && listData.size() > 0){
-				List<String> repeatList = housefunddetailService.findByModel(listData);
+				List<String> repeatList = housefunddetailService.findUserCodeByModel(listData);
 				if(repeatList!=null && repeatList.size()>0){
 					commonBase.setCode(2);
 					commonBase.setMessage("此区间内编码已存在！");
@@ -579,6 +579,8 @@ public class HouseFundDetailController extends BaseController {
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;}//校验权限
+		
+		String strErrorMessage = "";
 
 		PageData getPd = this.getPageData();
 		//单位
@@ -649,17 +651,17 @@ public class HouseFundDetailController extends BaseController {
 							throw new CustomException("读取Excel文件错误",false);
 						}
 						boolean judgement = false;
-						if(uploadAndReadMap.get(1).equals(false)){
+
 							Map<String, Object> returnError =  (Map<String, Object>) uploadAndReadMap.get(2);
-							String message = "字典无此翻译： "; // \n
-							for (String k : returnError.keySet())  
-						    {
-								message += k + " : " + returnError.get(k);
-						    }
-							commonBase.setCode(2);
-							commonBase.setMessage(message);
-						} else {
-							List<PageData> listUploadAndRead = (List<PageData>) uploadAndReadMap.get(2);
+							if(returnError != null && returnError.size()>0){
+								strErrorMessage += "字典无此翻译： "; // \n
+								for (String k : returnError.keySet())  
+							    {
+									strErrorMessage += k + " : " + returnError.get(k);
+							    }
+							}
+
+							List<PageData> listUploadAndRead = (List<PageData>) uploadAndReadMap.get(1);
 							List<PageData> listAdd = new ArrayList<PageData>();
 							if (listUploadAndRead != null && !"[]".equals(listUploadAndRead.toString()) && listUploadAndRead.size() >= 1) {
 								judgement = true;
@@ -668,7 +670,7 @@ public class HouseFundDetailController extends BaseController {
 								List<String> sbRet = new ArrayList<String>();
 								int listSize = listUploadAndRead.size();
 								if(listSize > 0){
-									//获取数据库中不是本部门、员工组和账套中的UserCode、StaffIdent
+									//获取数据库中不是本部门、员工组和账套中的UserCode
 									PageData pdHaveFeild = new PageData();
 									pdHaveFeild.put("SystemDateTime", SystemDateTime);
 									pdHaveFeild.put("SelectedDepartCode", SelectedDepartCode);
@@ -744,6 +746,7 @@ public class HouseFundDetailController extends BaseController {
 										//此处执行集合添加 
 										housefunddetailService.batchImport(listAdd);
 										commonBase.setCode(0);
+										commonBase.setMessage(strErrorMessage);
 									}
 								}
 							} else {
@@ -751,7 +754,7 @@ public class HouseFundDetailController extends BaseController {
 								commonBase.setMessage("TranslateUtil");
 							}
 						}
-					}
+					
 				}
 			}
 		}

@@ -379,7 +379,6 @@ public class LeadingInExcelToPageData<T> {
             			    }  
             				if(!(getKey != null && !getKey.trim().equals(""))){
             					returnError.put(itemCol.getCOL_NAME(), value);
-            					break;
             				}
             				value = getKey;
             			}
@@ -403,12 +402,9 @@ public class LeadingInExcelToPageData<T> {
             // 4. if
             if(judge)info.add(obj);
         }
+        returnMap.put(1, info);
         if(returnError!=null && returnError.size() > 0){
-            returnMap.put(1, false);
             returnMap.put(2, returnError);
-        } else {
-            returnMap.put(1, true);
-            returnMap.put(2, info);
         }
         return returnMap;
     }

@@ -84,7 +84,7 @@
 		        if($.trim(commonBaseCode) == 0){
 		            $("#excel").tips({
 		                side:3,
-		                msg:'导入成功',
+		                msg:'导入成功! ' + commonMessage,
 		                bg:'#AE81FF',
 		                time:3
 		            });

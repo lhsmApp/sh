@@ -506,6 +506,8 @@ public class AuditEditController extends BaseController {
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "add")){return null;}//校验权限
+		
+		String strErrorMessage = "";
 	    
 		PageData getPd = this.getPageData();
 		//员工组
@@ -563,17 +565,17 @@ public class AuditEditController extends BaseController {
 					throw new CustomException("读取Excel文件错误",false);
 				}
 				boolean judgement = false;
-				if(uploadAndReadMap.get(1).equals(false)){
+
 					Map<String, Object> returnError =  (Map<String, Object>) uploadAndReadMap.get(2);
-					String message = "字典无此翻译： "; // \n
-					for (String k : returnError.keySet())  
-				    {
-						message += k + " : " + returnError.get(k);
-				    }
-					commonBase.setCode(2);
-					commonBase.setMessage(message);
-				} else {
-					List<PageData> listUploadAndRead = (List<PageData>) uploadAndReadMap.get(2);
+					if(returnError != null && returnError.size()>0){
+						strErrorMessage += "字典无此翻译： "; // \n
+						for (String k : returnError.keySet())  
+					    {
+							strErrorMessage += k + " : " + returnError.get(k);
+					    }
+					}
+
+					List<PageData> listUploadAndRead = (List<PageData>) uploadAndReadMap.get(1);
 					List<PageData> listAdd = new ArrayList<PageData>();
 					if (listUploadAndRead != null && !"[]".equals(listUploadAndRead.toString()) && listUploadAndRead.size() >= 1) {
 						judgement = true;
@@ -679,13 +681,14 @@ public class AuditEditController extends BaseController {
 								//此处执行集合添加 
 								auditeditService.batchImport(listAdd);
 								commonBase.setCode(0);
+								commonBase.setMessage(strErrorMessage);
 							}
 						}
 					} else {
 						commonBase.setCode(-1);
 						commonBase.setMessage("TranslateUtil");
 					}
-				}
+				
 			}
 		}
 		ModelAndView mv = this.getModelAndView();

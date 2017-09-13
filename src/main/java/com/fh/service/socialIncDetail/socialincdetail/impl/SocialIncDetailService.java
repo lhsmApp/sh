@@ -29,12 +29,12 @@ public class SocialIncDetailService implements SocialIncDetailManager{
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	public List<String> findByModel(List<PageData> listData)throws Exception{
-		return (List<String>)dao.findForList("SocialIncDetailMapper.findByModel", listData);
+	public List<String> findUserCodeByModel(List<PageData> listData)throws Exception{
+		return (List<String>)dao.findForList("SocialIncDetailMapper.findUserCodeByModel", listData);
 	}
 	@SuppressWarnings("unchecked")
 	public List<String> exportHaveUserCode(PageData listData)throws Exception{
-		return (List<String>)dao.findForList("HouseFundDetailMapper.exportHaveUserCode", listData);
+		return (List<String>)dao.findForList("SocialIncDetailMapper.exportHaveUserCode", listData);
 	}
 	
 	/**列表
