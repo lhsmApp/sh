@@ -21,6 +21,16 @@
 	<!-- 最新版的Jqgrid Css，如果旧版本（Ace）某些方法不好用，尝试用此版本Css，替换旧版本Css -->
 	<!-- <link rel="stylesheet" type="text/css" media="screen" href="static/ace/css/ui.jqgrid-bootstrap.css" /> -->
 	
+	<script type="text/javascript" src="static/js/jquery-1.7.2.js"></script>
+	<!-- 树形下拉框start -->
+	<script type="text/javascript" src="plugins/selectZtree/selectTree.js"></script>
+	<script type="text/javascript" src="plugins/selectZtree/framework.js"></script>
+	<link rel="stylesheet" type="text/css"
+		href="plugins/selectZtree/import_fh.css" />
+	<script type="text/javascript" src="plugins/selectZtree/ztree/ztree.js"></script>
+	<link type="text/css" rel="stylesheet"
+		href="plugins/selectZtree/ztree/ztree.css"></link>
+	<!-- 树形下拉框end -->
     <!-- 标准页面统一样式 -->
     <link rel="stylesheet" href="static/css/normal.css" />
 	
@@ -88,7 +98,7 @@
 								<div class="widget-body">
 									<div class="widget-main">
 										<form class="form-inline">
-											<span class="pull-left" id="spanSelectTree" style="margin-right: 5px;" <c:if test="${pd.departTreeSource=='0'}">hidden</c:if>>
+											<span class="pull-left" style="margin-right: 5px;" <c:if test="${pd.departTreeSource=='0'}">hidden</c:if>>
 												<div class="selectTree" id="selectTree" multiMode="true"
 												    allSelectable="false" noGroup="false"></div>
 											    <input type="text" id="SelectedDepartCode" hidden></input>
@@ -177,21 +187,22 @@
 	var which;
 	var jqGridColModel;
 	var TabType = 1;
+	var departTreeSourceNum;
 
 	//显示隐藏查询 标准高度统一定为192（含底行），如果不含底行高度定为155.
 	function showQueryCondi(jqGridBase, jqGridDetail, gridHeight,withBottom) {
 		if (gridHeight=="undefined"||gridHeight == null || gridHeight == "" || gridHeight == 0) {
 			gridHeight = 279;
 		}
+		$(jqGridBase).jqGrid( 'setGridWidth', $(".page-content").width());
+		$(jqGridDetail).jqGrid( 'setGridWidth', $(".page-content").width());
 		if ($(".widget-box").css("display") == "block") {
-			$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass(
-					'fa-chevron-down');
+			$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass('fa-chevron-down');
 			$("#btnQuery").find("span").text("显示查询");
 			$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight) * (2/5));
 			$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight) * (3/5));
 		} else {
-			$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass(
-					'fa-chevron-up');
+			$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass('fa-chevron-up');
 			$("#btnQuery").find("span").text("隐藏查询");
 			$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (2/5));
 			$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (3/5));
@@ -199,26 +210,44 @@
 		$(".widget-box").toggle("fast");
 	}
 	
+	function setGridHeight(jqGridBase, jqGridDetail, gridHeight,withBottom){
+		if (gridHeight=="undefined"||gridHeight == null || gridHeight == "" || gridHeight == 0) {
+			gridHeight = 279;
+		}
+		$(jqGridBase).jqGrid( 'setGridWidth', $(".page-content").width());
+		$(jqGridDetail).jqGrid( 'setGridWidth', $(".page-content").width());
+		if ($(".widget-box").css("display") == "block") {
+			$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (2/5));
+			$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (3/5));
+		} else {
+			$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight) * (2/5));
+			$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight) * (3/5));
+		}
+	}
+	
 	$(document).ready(function () {
 		$(top.hangge());//关闭加载状态
+		console.log("ready");
 		
 		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 	    jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
-	    var departTreeSource = '${pd.departTreeSource}';
+	    departTreeSourceNum = '${pd.departTreeSource}';
 	    
-	    if(departTreeSource == '0'){
-	    	//$("#btnQuery").addClass('hidden');
-			//$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass('fa-chevron-down');
-	    }
+		if ($(".widget-box").css("display") == "block") {
+		    if(departTreeSourceNum == '0'){
+				showQueryCondi($(gridBase_selector),$(gridDetail_selector),null,true);
+		    	$("#btnQuery").addClass('hidden');
+		    }
+		}
 
 		//resize to fit page size
-		$(window).on('resize.jqGrid', function () {
-			$(gridBase_selector).jqGrid( 'setGridWidth', $(".page-content").width());
-			$(gridDetail_selector).jqGrid( 'setGridWidth', $(".page-content").width());
-			var gridHeight = 424 + 398;
-			resizeGridHeight($(gridBase_selector), gridHeight * (2.6/5));
-			resizeGridHeight($(gridDetail_selector), gridHeight * (2.4/5));
-	    });
+		//$(window).on('resize.jqGrid', function () {
+		//	$(gridBase_selector).jqGrid( 'setGridWidth', $(".page-content").width());
+		//	$(gridDetail_selector).jqGrid( 'setGridWidth', $(".page-content").width());
+		//	var gridHeight = 424 + 398;
+		//	resizeGridHeight($(gridBase_selector), gridHeight * (2.6/5));
+		//	resizeGridHeight($(gridDetail_selector), gridHeight * (2.4/5));
+	    //});
 		
 		//初始化当前选择凭证类型
 		if('${pd.which}'!=""){
@@ -226,7 +255,6 @@
 				var target = $(this).find('input[type=radio]');
 				$(this).removeClass('active');
 				var whichCur = parseInt(target.val());
-				console.log(which);
 				if(whichCur=='${pd.which}'){
 					$(this).addClass('active');
 					which=whichCur;
@@ -290,8 +318,6 @@
 				}
 			},
 		});
-	    
-		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
 
 		$(gridBase_selector).navGrid(pagerBase_selector, 
 				{
@@ -374,8 +400,8 @@
 			    				}, 0);
 			    			},
 			            });
-			            
-			    		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
+			    	    
+			    		setGridHeight($(gridBase_selector),$(gridDetail_selector),null,true);
 
 			    		$(gridDetail_selector).navGrid(pagerDetail_selector, 
 			    				{

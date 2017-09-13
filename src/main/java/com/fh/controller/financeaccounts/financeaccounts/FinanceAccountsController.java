@@ -344,7 +344,7 @@ public class FinanceAccountsController extends BaseController {
 		List<PageData> listData = (List<PageData>) JSONArray.toCollection(array,PageData.class);
 		String DEPT_CODE = "";
 		if(listData!=null && listData.size()>0){
-			listData.get(0).getString("DEPT_CODE__");
+			DEPT_CODE = listData.get(0).getString("DEPT_CODE__");
 		}
 		
 		String whereSql = "";

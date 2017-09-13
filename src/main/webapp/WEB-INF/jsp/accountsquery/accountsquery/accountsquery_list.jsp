@@ -58,7 +58,7 @@
 								
 						<button id="btnQuery" class="btn btn-white btn-info btn-sm"
 							onclick="showQueryCondi($('#jqGridBase'),$('#jqGridDetail'),null,true)">
-							<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>隐藏查询</span>
+							<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
 						</button>
 						
 						<div class="pull-right">
@@ -94,7 +94,7 @@
 			
 					<div class="row">
 						<div class="col-xs-12">
-							<div class="widget-box" style="display: block;">
+							<div class="widget-box" style="display: none;">
 								<div class="widget-body">
 									<div class="widget-main">
 										<form class="form-inline">
@@ -103,7 +103,7 @@
 												placeholder="请输入业务区间"> <i
 												class="ace-icon fa fa-calendar blue"></i>
 											</span>
-											<span class="pull-left" style="margin-right: 5px;" <c:if test="${pd.departTreeSource=='0'}">hidden</c:if>>
+											<span class="pull-left" style="margin-right: 5px;">
 												<div class="selectTree" id="selectTree" multiMode="true"
 												    allSelectable="false" noGroup="false"></div>
 											    <input type="text" id="SelectedDepartCode" hidden></input>
@@ -203,20 +203,35 @@
 		if (gridHeight=="undefined"||gridHeight == null || gridHeight == "" || gridHeight == 0) {
 			gridHeight = 279;
 		}
+		$(jqGridBase).jqGrid( 'setGridWidth', $(".page-content").width());
+		$(jqGridDetail).jqGrid( 'setGridWidth', $(".page-content").width());
 		if ($(".widget-box").css("display") == "block") {
-			$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass(
-					'fa-chevron-down');
+			$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass('fa-chevron-down');
 			$("#btnQuery").find("span").text("显示查询");
 			$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight) * (2/5));
 			$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight) * (3/5));
 		} else {
-			$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass(
-					'fa-chevron-up');
+			$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass('fa-chevron-up');
 			$("#btnQuery").find("span").text("隐藏查询");
 			$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (2/5));
 			$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (3/5));
 		}
 		$(".widget-box").toggle("fast");
+	}
+	
+	function setGridHeight(jqGridBase, jqGridDetail, gridHeight,withBottom){
+		if (gridHeight=="undefined"||gridHeight == null || gridHeight == "" || gridHeight == 0) {
+			gridHeight = 279;
+		}
+		$(jqGridBase).jqGrid( 'setGridWidth', $(".page-content").width());
+		$(jqGridDetail).jqGrid( 'setGridWidth', $(".page-content").width());
+		if ($(".widget-box").css("display") == "block") {
+			$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (2/5));
+			$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (3/5));
+		} else {
+			$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight) * (2/5));
+			$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight) * (3/5));
+		}
 	}
 	
 	$(document).ready(function () {
@@ -225,18 +240,18 @@
 	    
 		//当前期间,取自tb_system_config的SystemDateTime字段
 	    var SystemDateTime = '${SystemDateTime}';
-		$("#BUSI_DATE").val(SystemDateTime);
+		$("#SelectedBusiDate").val(SystemDateTime);
 		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 	    jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
 	    
 		//resize to fit page size
-		$(window).on('resize.jqGrid', function () {
-			$(gridBase_selector).jqGrid( 'setGridWidth', $(".page-content").width());
-			$(gridDetail_selector).jqGrid( 'setGridWidth', $(".page-content").width());
-			var gridHeight = 424 + 398;
-			resizeGridHeight($(gridBase_selector), gridHeight * (2.6/5));
-			resizeGridHeight($(gridDetail_selector), gridHeight * (2.4/5));
-	    });
+		//$(window).on('resize.jqGrid', function () {
+		//	$(gridBase_selector).jqGrid( 'setGridWidth', $(".page-content").width());
+		//	$(gridDetail_selector).jqGrid( 'setGridWidth', $(".page-content").width());
+		//	var gridHeight = 424 + 398;
+		//	resizeGridHeight($(gridBase_selector), gridHeight * (2.6/5));
+		//	resizeGridHeight($(gridDetail_selector), gridHeight * (2.4/5));
+	    //});
 		
 		//初始化当前选择凭证类型
 		if('${pd.which}'!=""){
@@ -310,8 +325,6 @@
     				}
     			},
 		});
-	    
-		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
 		
 			$(gridBase_selector).navGrid(pagerBase_selector, 
 					{
@@ -401,8 +414,8 @@
 						    				}, 0);
 						    			},
 						            });
-						            
-						    		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
+						    	    
+						    		setGridHeight($(gridBase_selector),$(gridDetail_selector),null,true);
 
 						    		$(gridDetail_selector).navGrid(pagerDetail_selector, 
 						    				{

@@ -77,8 +77,6 @@ public class AccountsQueryController extends BaseController {
 	String DefaultWhile = TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey();
 	//页面显示数据的二级单位
 	String UserDepartCode = "";
-	//登录人的二级单位是最末层
-	private int departSelf = 0;
 
 	String tbHouseFundSummy = "tb_house_fund_summy";
 	String tbSocialIncSummy = "tb_social_inc_summy";
@@ -101,8 +99,6 @@ public class AccountsQueryController extends BaseController {
 	String GroupbyFeild = new String();
 	//分组字段list  查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
     List<String> keyListBase = new ArrayList<String>();
-    //查询的所有可操作的责任中心
-    List<String> AllDeptCode = new ArrayList<String>();
 
 	/**列表
 	 * @param page
@@ -114,9 +110,6 @@ public class AccountsQueryController extends BaseController {
 		logBefore(logger, Jurisdiction.getUsername()+"列表AccountsQuery");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
 		
-		//查询的所有可操作的责任中心
-	    AllDeptCode = new ArrayList<String>();
-
 		PageData getPd = this.getPageData();
 		//员工组
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
@@ -134,23 +127,7 @@ public class AccountsQueryController extends BaseController {
 		mv.addObject("SystemDateTime", SystemDateTime);
 		
 		// *********************加载单位树  DEPT_CODE*******************************
-		String DepartmentSelectTreeSource=DictsUtil.getDepartmentSelectTreeSource(departmentService);
-		if(DepartmentSelectTreeSource.equals("0"))
-		{
-			this.departSelf = 1;
-			getPd.put("departTreeSource", DepartmentSelectTreeSource);
-			AllDeptCode.add(UserDepartCode);
-		} else {
-			departSelf = 0;
-			getPd.put("departTreeSource", 1);
-	        JSONArray jsonArray = JSONArray.fromObject(DepartmentSelectTreeSource);  
-			List<PageData> listDepart = (List<PageData>) JSONArray.toCollection(jsonArray, PageData.class);
-			if(listDepart!=null && listDepart.size()>0){
-				for(PageData pdDept : listDepart){
-					AllDeptCode.add(pdDept.getString(DictsUtil.Id));
-				}
-			}
-		}
+		String DepartmentSelectTreeSource=DictsUtil.getDepartmentSelectTreeSource(departmentService, DictsUtil.DepartShowAll);
 		mv.addObject("zTreeNodes", DepartmentSelectTreeSource);
 		// ***********************************************************
 		
@@ -176,9 +153,6 @@ public class AccountsQueryController extends BaseController {
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
-		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
-		}
 		//日期
 		String SelectedBusiDate = getPd.getString("SelectedBusiDate");
 
@@ -193,7 +167,6 @@ public class AccountsQueryController extends BaseController {
 				QueryFeild += " and 1 != 1 ";
 			}
 		}
-		QueryFeild += " and DEPT_CODE in (" + QueryFeildString.tranferListValueToSqlInString(AllDeptCode) + ") ";
 		getPd.put("QueryFeild", QueryFeild);
 
 		String summyTableName = getSummyTableCode(SelectedTableNo);
@@ -336,8 +309,8 @@ public class AccountsQueryController extends BaseController {
 		String BUSI_DATE = "";
 		String DEPT_CODE = "";
 		if(listData!=null && listData.size()>0){
-			listData.get(0).getString("BUSI_DATE__");
-			listData.get(0).getString("DEPT_CODE__");
+			BUSI_DATE = listData.get(0).getString("BUSI_DATE__");
+			DEPT_CODE = listData.get(0).getString("DEPT_CODE__");
 		}
 		
 		String whereSql = "";
