@@ -37,6 +37,7 @@ import com.fh.entity.TableColumns;
 import com.fh.entity.TmplConfigDetail;
 import com.fh.entity.system.User;
 import com.fh.service.fhoa.department.DepartmentManager;
+import com.fh.service.glZrzxFx.glZrzxFx.GlZrzxFxManager;
 import com.fh.service.sysConfig.sysconfig.SysConfigManager;
 import com.fh.service.sysSealedInfo.syssealedinfo.SysSealedInfoManager;
 import com.fh.service.sysUnlockInfo.sysunlockinfo.SysUnlockInfoManager;
@@ -105,6 +106,9 @@ public class VoucherController extends BaseController {
 
 	@Resource(name = "sysunlockinfoService")
 	private SysUnlockInfoManager sysUnlockInfoService;
+
+	@Resource(name = "glZrzxFxService")
+	private GlZrzxFxManager glZrzxFxService;
 
 	// 底行显示的求和与平均值字段
 	private StringBuilder SqlUserdata = new StringBuilder();
@@ -451,6 +455,7 @@ public class VoucherController extends BaseController {
 		if (null != listTransferData && listTransferData.size() > 0) {
 			/********************** 生成传输数据 ************************/
 			String which = pd.getString("TABLE_CODE");
+			addLineNumForTransferData(which, listTransferData);
 			String tableCode = getTableCode(which);
 			String tableCodeOnFmis = getTableCodeOnFmis(which);
 			// String voucherType=pd.getString("VOUCHER_TYPE");
@@ -561,7 +566,32 @@ public class VoucherController extends BaseController {
 				tableColumnsMerge.add(tableColumnMergeItem);
 			}
 		}
+		// 增加F_LINE_NO 分线编号 字符型
+		TableColumns tableColumnLineNo = new TableColumns();
+		tableColumnLineNo.setColumn_name("LINE_NO");
+		tableColumnLineNo.setColumn_type("VARCHAR");
+		tableColumnsMerge.add(tableColumnLineNo);
 		return tableColumnsMerge;
+	}
+
+	/**
+	 * 根据表编号和真实表名称获取用于传输的字段列配置信息
+	 * 
+	 * @param which
+	 * @param tableCode
+	 * @return
+	 * @throws Exception
+	 */
+	private void addLineNumForTransferData(String which, List<PageData> listTransferData) throws Exception {
+		// 用语句查询出数据库表的所有字段及其属性；拼接成jqgrid全部列
+		List<PageData> listGlZrzxfx = glZrzxFxService.listAll();
+		for (PageData pdSource : listTransferData) {
+			for (PageData pdGl : listGlZrzxfx) {
+				if (pdSource.getString("DEPT_CODE").equals(pdGl.getString("DEPT_CODE"))) {
+					pdSource.put("LINE_NO", pdGl.getString("LINE_NO"));
+				}
+			}
+		}
 	}
 
 	/**

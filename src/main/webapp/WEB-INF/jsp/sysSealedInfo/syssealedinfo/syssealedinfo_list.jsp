@@ -233,7 +233,8 @@
 			],
 			reloadAfterSubmit: true, 
 			viewrecords: true, // show the current page, data rang and total records on the toolbar
-			rowNum: 10,
+			rowNum: 100,
+			rowList: [100,200,500],
 			sortname: 'BILL_CODE',
 			pager: "#jqGridPager",
 			loadComplete : function() {

@@ -36,5 +36,10 @@ public interface GlZrzxFxManager{
 	 */
 	public PageData findById(PageData pd)throws Exception;
 	
+	/**列表(全部)
+	 * @param pd
+	 * @throws Exception
+	 */
+	public List<PageData> listAll()throws Exception;
 }
 

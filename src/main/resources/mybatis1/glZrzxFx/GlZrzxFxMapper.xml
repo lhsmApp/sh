@@ -69,4 +69,12 @@
 		</if>
 	</select>
 	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where state='1'
+	</select>
 </mapper>

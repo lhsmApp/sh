@@ -53,5 +53,14 @@ public class GlZrzxFxService implements GlZrzxFxManager{
 		return (PageData)dao.findForObject("GlZrzxFxMapper.findById", pd);
 	}
 	
+	/**列表(全部)
+	 * @param pd
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PageData> listAll()throws Exception{
+		return (List<PageData>)dao.findForList("GlZrzxFxMapper.listAll", null);
+	}
+	
 }
 
