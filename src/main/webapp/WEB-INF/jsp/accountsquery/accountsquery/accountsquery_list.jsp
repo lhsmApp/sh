@@ -396,7 +396,7 @@
 						                rowNum: 0,	
 						    			scroll: 1,
 						    			sortable: true,
-						    			sortname: 'USER_CODE__',
+						    			sortname: 'USER_CODE',
 						                //width: '100%',
 						                //height: '100%',
 										//pgbuttons: false, // 分页按钮是否显示 

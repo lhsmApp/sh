@@ -287,7 +287,7 @@ public class FinanceAccountsController extends BaseController {
 		//员工组
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
-		String SelectedTabType = getWhileValue(getPd.getString("SelectedTabType"));
+		String SelectedTabType = getPd.getString("SelectedTabType");
 		
 		String strTapTypeCode = getDetailTypeCode(SelectedTableNo, SelectedTabType);
 
@@ -331,7 +331,7 @@ public class FinanceAccountsController extends BaseController {
 		//员工组
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
-		String SelectedTabType = getWhileValue(getPd.getString("SelectedTabType"));
+		String SelectedTabType = getPd.getString("SelectedTabType");
 		////单位
 		//String SelectedDepartCode = getPd.getString("SelectedDepartCode");
 		//if(departSelf == 1){

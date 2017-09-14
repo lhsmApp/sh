@@ -256,7 +256,7 @@ public class AccountsQueryController extends BaseController {
 		//员工组
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
-		String SelectedTabType = getWhileValue(getPd.getString("SelectedTabType"));
+		String SelectedTabType = getPd.getString("SelectedTabType");
 		
 		String strTapTypeCode = getDetailTypeCode(SelectedTableNo, SelectedTabType);
 
@@ -300,7 +300,7 @@ public class AccountsQueryController extends BaseController {
 		//员工组
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
-		String SelectedTabType = getWhileValue(getPd.getString("SelectedTabType"));
+		String SelectedTabType = getPd.getString("SelectedTabType");
 
 		Object DATA_ROWS = getPd.get("GetDetailListTransferList");
 		String json = DATA_ROWS.toString();  
