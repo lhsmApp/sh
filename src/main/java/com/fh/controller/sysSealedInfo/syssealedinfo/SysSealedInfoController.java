@@ -39,11 +39,12 @@ import net.sf.json.JSONArray;
 
 /**
  * 业务封存信息
-* @ClassName: SysSealedInfoController
-* @Description: TODO(这里用一句话描述这个类的作用)
-* @author jiachao
-* @date 2017年6月6日
-*
+ * 
+ * @ClassName: SysSealedInfoController
+ * @Description: TODO(这里用一句话描述这个类的作用)
+ * @author jiachao
+ * @date 2017年6月6日
+ *
  */
 @Controller
 @RequestMapping(value = "/syssealedinfo")
@@ -65,6 +66,8 @@ public class SysSealedInfoController extends BaseController {
 	@Resource(name = "dictionariesService")
 	private DictionariesManager dictionariesService;
 
+	// 判断当前人员的所在组织机构是否只有自己单位
+		private int departSelf = 0;
 	/**
 	 * 修改
 	 * 
@@ -147,20 +150,20 @@ public class SysSealedInfoController extends BaseController {
 					commonBase.setMessage(message);
 					return commonBase;
 				}
-				//针对解封传输类型的封存信息需要判断是否已经生成了凭证号
+				// 针对解封传输类型的封存信息需要判断是否已经生成了凭证号
 				if (pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey())
-						||pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_MARKET.getNameKey())
-						||pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_SYS_LABOR.getNameKey())
-						||pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_OPER_LABOR.getNameKey())
-						||pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_LABOR.getNameKey())
+						|| pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_MARKET.getNameKey())
+						|| pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_SYS_LABOR.getNameKey())
+						|| pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_OPER_LABOR.getNameKey())
+						|| pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_LABOR.getNameKey())
 						|| pd.getString("BILL_TYPE").equals(TmplType.TB_SOCIAL_INC_TRANSFER.getNameKey())
 						|| pd.getString("BILL_TYPE").equals(TmplType.TB_HOUSE_FUND_TRANSFER.getNameKey())) {
 					String tableCode = "";
 					if (pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey())
-							||pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_MARKET.getNameKey())
-							||pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_SYS_LABOR.getNameKey())
-							||pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_OPER_LABOR.getNameKey())
-							||pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_LABOR.getNameKey())) {
+							|| pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_MARKET.getNameKey())
+							|| pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_SYS_LABOR.getNameKey())
+							|| pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_OPER_LABOR.getNameKey())
+							|| pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_LABOR.getNameKey())) {
 						tableCode = "TB_STAFF_SUMMY";
 					} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_HOUSE_FUND_TRANSFER.getNameKey())) {
 						tableCode = "TB_HOUSE_FUND_SUMMY";
@@ -208,11 +211,23 @@ public class SysSealedInfoController extends BaseController {
 	@RequestMapping(value = "/list")
 	public ModelAndView list(Page page) throws Exception {
 		logBefore(logger, Jurisdiction.getUsername() + "列表SysSealedInfo");
+		this.departSelf = 0;
 		// if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
 		// //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("sysSealedInfo/syssealedinfo/syssealedinfo_list");
-		mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService));
+
+		// mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService));
+		// *********************加载单位树*******************************
+		PageData pageData=new PageData();
+		String departTreeSource = DictsUtil.getDepartmentSelectTreeSource(departmentService);
+		if (departTreeSource.equals("0")) {
+			this.departSelf = 1;
+			pageData.put("departTreeSource", departTreeSource);
+			mv.addObject("pd", pageData);
+		}
+		mv.addObject("zTreeNodes", departTreeSource);
+		// ***********************************************************
 		mv.addObject("billTypeList", TmplType.values());
 
 		// CUST_COL7 FMISACC 帐套字典
@@ -256,12 +271,21 @@ public class SysSealedInfoController extends BaseController {
 		 * keywords && !"".equals(keywords)){ pd.put("keywords",
 		 * keywords.trim()); }
 		 */
-
-		String strRptDept = pd.getString("RPT_DEPT"); // 单位检索条件
+		String strDeptCode = "";
+		if (departSelf == 1)
+			strDeptCode = Jurisdiction.getCurrentDepartmentID();
+		else
+			strDeptCode = pd.getString("RPT_DEPT");// 单位检索条件
+		if (StringUtil.isNotEmpty(strDeptCode)) {
+			String[] strDeptCodes = strDeptCode.split(",");
+			pd.put("RPT_DEPTS", strDeptCodes);
+		}
+		
+		/*String strRptDept = pd.getString("RPT_DEPT"); // 单位检索条件
 		if (null != strRptDept && !"".equals(strRptDept)) {
 			String RPT_DEPTS[] = strRptDept.split(",");
 			pd.put("RPT_DEPTS", RPT_DEPTS);
-		}
+		}*/
 		String filters = pd.getString("filters"); // 多条件过滤条件
 		if (null != filters && !"".equals(filters)) {
 			pd.put("filterWhereResult", SqlTools.constructWhere(filters, null));

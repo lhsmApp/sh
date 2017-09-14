@@ -62,7 +62,7 @@
 									<div class="widget-main">
 										<!-- <p class="alert alert-info">Nunc aliquam enim ut arcu.</p> -->
 										<form class="form-inline">
-											<span style="margin-right: 5px;">
+											<span style="margin-right: 5px;" <c:if test="${pd.departTreeSource=='0'}">hidden</c:if>>
 												<div class="selectTree" id="selectTree" multiMode="true"
 													allSelectable="false" noGroup="false"></div>
 												<input type="text" id="RPT_DEPT" hidden></input>
