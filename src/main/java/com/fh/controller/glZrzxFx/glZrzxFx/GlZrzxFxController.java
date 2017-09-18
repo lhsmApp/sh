@@ -148,13 +148,23 @@ public class GlZrzxFxController extends BaseController {
 		commonBase.setCode(-1);
 		
 		PageData pd = this.getPageData();
+		String oper = pd.getString("oper");
 		List<PageData> listData = new ArrayList<PageData>();
 		listData.add(pd);
-		
-		
-		
-		glZrzxFxService.save(listData);
-		commonBase.setCode(0);
+		List<PageData> repeatList = glZrzxFxService.findById(listData);
+		if(repeatList!=null && repeatList.size()>0){
+			commonBase.setCode(2);
+			commonBase.setMessage("关系已存在，请在原有记录基础上修改！");
+		} else {
+			if(oper.equals("add")){
+				glZrzxFxService.save(listData);
+				commonBase.setCode(0);
+			}
+			if(oper.equals("edit")){
+				glZrzxFxService.edit(listData);
+				commonBase.setCode(0);
+			}
+		}
 		return commonBase;
 	}
 
@@ -178,7 +188,7 @@ public class GlZrzxFxController extends BaseController {
 		List<PageData> listData = (List<PageData>) JSONArray.toCollection(array, PageData.class);// 过时方法
 
 		if (null != listData && listData.size() > 0) {
-			glZrzxFxService.save(listData);
+			glZrzxFxService.edit(listData);
 			commonBase.setCode(0);
 		}
 		return commonBase;

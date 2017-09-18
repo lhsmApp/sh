@@ -27,7 +27,7 @@
 	</sql>
 	
 	<!-- 列表 -->
-	<select id="datalistPage" parameterType="jqPage" resultType="pd">
+	<select id="datalistJqPage" parameterType="jqPage" resultType="pd">
 		select
         <include refid="Field"></include>
 		<include refid="FieldSelected"></include>
@@ -68,8 +68,12 @@
 		<include refid="Field"></include>
 		from 
 		<include refid="tableName"></include>
-		where DEPT_CODE = #{DEPT_CODE}
-		and LINE_NO = #{LINE_NO}
+        <where>
+		<foreach item="item" index="index" collection="list" open=" " separator=" or " close=" ">
+            ((DEPT_CODE = #{item.DEPT_CODE} and LINE_NO = #{item.LINE_NO})
+             and (DEPT_CODE != #{item.DEPT_CODE__} or LINE_NO != #{item.LINE_NO__}))
+		</foreach>
+		</where>
 	</select>
 	
 	<!-- 新增-->
@@ -87,9 +91,21 @@
 	<delete id="delete" parameterType="pd">
 		delete from
 		<include refid="tableName"></include>
-		where DEPT_CODE = #{DEPT_CODE}
-		and LINE_NO = #{LINE_NO}
+		where DEPT_CODE = #{DEPT_CODE__}
+		and LINE_NO = #{LINE_NO__}
 	</delete>
+
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set
+		DEPT_CODE = #{DEPT_CODE},
+		LINE_NO = #{LINE_NO},
+		STATE = #{STATE}
+		where DEPT_CODE = #{DEPT_CODE__}
+		and LINE_NO = #{LINE_NO__}
+	</update>
 	
 	<!-- 列表(全部) -->
 	<select id="listAll" parameterType="pd" resultType="pd">

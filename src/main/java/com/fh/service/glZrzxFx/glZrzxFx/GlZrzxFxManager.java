@@ -29,13 +29,19 @@ public interface GlZrzxFxManager{
 	 * @param pd
 	 * @throws Exception
 	 */
-	public PageData findById(PageData pd)throws Exception;
+	public List<PageData> findById(List<PageData> listData)throws Exception;
 
 	/**新增
 	 * @param pd
 	 * @throws Exception
 	 */
 	public void save(List<PageData> listData)throws Exception;
+	
+	/**修改
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void edit(List<PageData> listData)throws Exception;
 	
 	/**列表(全部)
 	 * @param pd

@@ -27,7 +27,7 @@ public class GlZrzxFxService implements GlZrzxFxManager{
 	 */
 	@SuppressWarnings("unchecked")
 	public List<PageData> JqPage(JqPage page)throws Exception{
-		return (List<PageData>)dao.findForList("GlZrzxFxMapper.datalistPage", page);
+		return (List<PageData>)dao.findForList("GlZrzxFxMapper.datalistJqPage", page);
 	}
 	/**获取记录数量
 	 * @param pd
@@ -41,8 +41,9 @@ public class GlZrzxFxService implements GlZrzxFxManager{
 	 * @param pd
 	 * @throws Exception
 	 */
-	public PageData findById(PageData pd)throws Exception{
-		return (PageData)dao.findForObject("GlZrzxFxMapper.findById", pd);
+	@SuppressWarnings("unchecked")
+	public List<PageData> findById(List<PageData> listData)throws Exception{
+		return (List<PageData>)dao.findForList("GlZrzxFxMapper.findById", listData);
 	}
 	
 	/**新增
@@ -50,7 +51,15 @@ public class GlZrzxFxService implements GlZrzxFxManager{
 	 * @throws Exception
 	 */
 	public void save(List<PageData> listData)throws Exception{
-		dao.batchDeleteOneUpdate("GlZrzxFxMapper.delete", "GlZrzxFxMapper.save", listData);
+		dao.batchUpdate("GlZrzxFxMapper.save", listData);
+	}
+	
+	/**修改
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void edit(List<PageData> listData)throws Exception{
+		dao.batchUpdate("GlZrzxFxMapper.edit", listData);
 	}
 	
 	/**列表(全部)

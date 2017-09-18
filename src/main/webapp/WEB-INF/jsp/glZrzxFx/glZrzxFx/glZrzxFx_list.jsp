@@ -262,7 +262,7 @@
 					console.log("onclickSubmit");
                     //console.log(posdata	);
                 } , 
-                afterSubmit: fn_addSubmit
+                afterSubmit: fn_addSubmit_extend
 			},
 			{
 				//删除
@@ -368,6 +368,36 @@
 				}
 			});
 		}
+
+    /**
+     * 增加成功
+     * 
+     * @param response
+     * @param postdata
+     * @returns
+     */
+    function fn_addSubmit_extend(response, postdata) {
+        var responseJSON = JSON.parse(response.responseText);
+    	if (responseJSON.code == 0) {
+    		// console.log("Add Success");
+    		$("#subTitle").tips({
+    			side : 3,
+    			msg : '保存成功',
+    			bg : '#009933',
+    			time : 3
+    		});
+    		return [ true ];
+    	} else {
+    		// console.log("Add Failed"+response.responseJSON.message);
+    		$("#subTitle").tips({
+    			side : 3,
+    			msg : '保存失败,' + responseJSON.message,
+    			bg : '#cc0033',
+    			time : 3
+    		});
+    		return [ false, responseJSON.message ];
+    	}
+    }
 	
 		//检索
 		function tosearch() {
