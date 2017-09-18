@@ -1,7 +1,8 @@
 package com.fh.service.glZrzxFx.glZrzxFx;
 
 import java.util.List;
-import com.fh.entity.Page;
+
+import com.fh.entity.JqPage;
 import com.fh.util.PageData;
 
 /** 
@@ -11,30 +12,30 @@ import com.fh.util.PageData;
  * @version
  */
 public interface GlZrzxFxManager{
-
-	/**新增
-	 * @param pd
-	 * @throws Exception
-	 */
-	public void save(PageData pd)throws Exception;
-	
-	/**删除
-	 * @param pd
-	 * @throws Exception
-	 */
-	public void delete(PageData pd)throws Exception;
 	
 	/**列表
 	 * @param page
 	 * @throws Exception
 	 */
-	public List<PageData> list(Page page)throws Exception;
+	public List<PageData> JqPage(JqPage page)throws Exception;
+	
+	/**获取记录数量
+	 * @param pd
+	 * @throws Exception
+	 */
+	public int countJqGridExtend(JqPage page)throws Exception;
 	
 	/**通过id获取数据
 	 * @param pd
 	 * @throws Exception
 	 */
 	public PageData findById(PageData pd)throws Exception;
+
+	/**新增
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void save(List<PageData> listData)throws Exception;
 	
 	/**列表(全部)
 	 * @param pd

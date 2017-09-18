@@ -4,8 +4,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%
 	String path = request.getContextPath();
-	String basePath = request.getScheme() + "://"
-			+ request.getServerName() + ":" + request.getServerPort()
+	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
 			+ path + "/";
 %>
 <!DOCTYPE html>
@@ -14,231 +13,119 @@
 <base href="<%=basePath%>">
 <!-- 下拉框 -->
 <link rel="stylesheet" href="static/ace/css/chosen.css" />
-<!-- jsp文件头和头部 -->
-<%@ include file="../../system/index/top.jsp"%>
+<!-- jsp文件头和头部 ，其中包含旧版本（Ace）Jqgrid Css-->
+<%@ include file="../../system/index/topWithJqgrid.jsp"%>
 <!-- 日期框 -->
 <link rel="stylesheet" href="static/ace/css/datepicker.css" />
+
+<!-- 最新版的Jqgrid Css，如果旧版本（Ace）某些方法不好用，尝试用此版本Css，替换旧版本Css -->
+<!-- <link rel="stylesheet" type="text/css" media="screen" href="static/ace/css/ui.jqgrid-bootstrap.css" /> -->
+<script type="text/javascript" src="static/js/jquery-1.7.2.js"></script>
+<!-- <script type="text/javascript" src="static/ace/js/jquery.js"></script> -->
+<!-- 树形下拉框start -->
+<script type="text/javascript" src="plugins/selectZtree/selectTree.js"></script>
+<script type="text/javascript" src="plugins/selectZtree/framework.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="plugins/selectZtree/import_fh.css" />
+<script type="text/javascript" src="plugins/selectZtree/ztree/ztree.js"></script>
+<link type="text/css" rel="stylesheet"
+	href="plugins/selectZtree/ztree/ztree.css"></link>
+<!-- 树形下拉框end -->
+<!-- 标准页面统一样式 -->
+<link rel="stylesheet" href="static/css/normal.css" />
+
 </head>
 <body class="no-skin">
-
-	<!-- /section:basics/navbar.layout -->
 	<div class="main-container" id="main-container">
-		<!-- /section:basics/sidebar -->
 		<div class="main-content">
 			<div class="main-content-inner">
 				<div class="page-content">
+					<!-- /section:settings.box -->
+					<div class="page-header">
+						<span class="label label-xlg label-success arrowed-right">东部管道</span>
+						<!-- arrowed-in-right -->
+						<span
+							class="label label-xlg label-yellow arrowed-in arrowed-right"
+							id="subTitle" style="margin-left: 2px;">组织机构分线关系 </span> <span
+							style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
+						<button id="btnQuery" class="btn btn-white btn-info btn-sm"
+							onclick="showQueryCondi($('#jqGrid'),null,true)">
+							<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
+						</button>
+					</div>
+					<!-- /.page-header -->
+
 					<div class="row">
 						<div class="col-xs-12">
-							
-						<!-- 检索  -->
-						<form action="housefundsummy/list.do" method="post" name="Form" id="Form">
-						<table style="margin-top:5px;">
-							<tr>
-								<td>
-									<div class="nav-search">
-										<span class="input-icon">
-											<input type="text" placeholder="这里输入关键词" class="nav-search-input" id="nav-search-input" autocomplete="off" name="keywords" value="${pd.keywords }" placeholder="这里输入关键词"/>
-											<i class="ace-icon fa fa-search nav-search-icon"></i>
-										</span>
+							<div class="widget-box" style="display: none;">
+								<div class="widget-body">
+									<div class="widget-main">
+										<form class="form-inline">
+											<span style="margin-right: 5px;">
+												<div class="selectTree" id="selectTree" multiMode="true"
+													allSelectable="false" noGroup="true"></div>
+												<input type="text" id="SelectedDepartCode" hidden></input>
+											 </span> 
+											<span style="margin-right: 5px;"> 
+												<select
+													class="chosen-select form-control" name="SelectedfxCode"
+													id="SelectedfxCode" data-placeholder="请选择分线"
+													style="vertical-align: top; height: 32px; width: 150px;">
+														<option value="">请选择分线</option>
+														<c:forEach items="${fxList}" var="fx">
+															<option value="${fx.DICT_CODE}"
+														        <c:if test="${pd.SelectedfxCode==each.DICT_CODE}">selected</c:if>>${fx.NAME}</option>
+														</c:forEach>
+												</select>
+											</span>
+											<span style="margin-right: 5px;"> 
+												<select class="chosen-select form-control"
+													name="SelectedstateCode" id="SelectedstateCode" data-placeholder="请选状态"
+													style="vertical-align: top; height: 32px; width: 150px;">
+														<option value="">请选择状态</option>
+														<option value="0">停用</option>
+														<option value="1">启用</option>
+												</select>
+											</span>
+											<button type="button" class="btn btn-info btn-sm"
+												onclick="tosearch();">
+												<i class="ace-icon fa fa-search bigger-110"></i>
+											</button>
+										</form>
 									</div>
-								</td>
-								<td style="padding-left:2px;"><input class="span10 date-picker" name="lastStart" id="lastStart"  value="" type="text" data-date-format="yyyy-mm-dd" readonly="readonly" style="width:88px;" placeholder="开始日期" title="开始日期"/></td>
-								<td style="padding-left:2px;"><input class="span10 date-picker" name="lastEnd" name="lastEnd"  value="" type="text" data-date-format="yyyy-mm-dd" readonly="readonly" style="width:88px;" placeholder="结束日期" title="结束日期"/></td>
-								<td style="vertical-align:top;padding-left:2px;">
-								 	<select class="chosen-select form-control" name="name" id="id" data-placeholder="请选择" style="vertical-align:top;width: 120px;">
-									<option value=""></option>
-									<option value="">全部</option>
-									<option value="">1</option>
-									<option value="">2</option>
-								  	</select>
-								</td>
-								<c:if test="${QX.cha == 1 }">
-								<td style="vertical-align:top;padding-left:2px"><a class="btn btn-light btn-xs" onclick="tosearch();"  title="检索"><i id="nav-search-icon" class="ace-icon fa fa-search bigger-110 nav-search-icon blue"></i></a></td>
-								</c:if>
-								<c:if test="${QX.toExcel == 1 }"><td style="vertical-align:top;padding-left:2px;"><a class="btn btn-light btn-xs" onclick="toExcel();" title="导出到EXCEL"><i id="nav-search-icon" class="ace-icon fa fa-download bigger-110 nav-search-icon blue"></i></a></td></c:if>
-							</tr>
-						</table>
-						<!-- 检索  -->
-					
-						<table id="simple-table" class="table table-striped table-bordered table-hover" style="margin-top:5px;">	
-							<thead>
-								<tr>
-									<th class="center" style="width:35px;">
-									<label class="pos-rel"><input type="checkbox" class="ace" id="zcheckbox" /><span class="lbl"></span></label>
-									</th>
-									<th class="center" style="width:50px;">序号</th>
-									<th class="center">备注1</th>
-									<th class="center">备注2</th>
-									<th class="center">备注3</th>
-									<th class="center">备注4</th>
-									<th class="center">备注5</th>
-									<th class="center">备注6</th>
-									<th class="center">备注7</th>
-									<th class="center">备注8</th>
-									<th class="center">备注9</th>
-									<th class="center">备注10</th>
-									<th class="center">备注11</th>
-									<th class="center">备注12</th>
-									<th class="center">备注13</th>
-									<th class="center">备注14</th>
-									<th class="center">备注15</th>
-									<th class="center">备注16</th>
-									<th class="center">备注17</th>
-									<th class="center">备注18</th>
-									<th class="center">备注19</th>
-									<th class="center">备注20</th>
-									<th class="center">备注21</th>
-									<th class="center">备注22</th>
-									<th class="center">备注23</th>
-									<th class="center">备注24</th>
-									<th class="center">备注25</th>
-									<th class="center">备注26</th>
-									<th class="center">备注27</th>
-									<th class="center">备注28</th>
-									<th class="center">操作</th>
-								</tr>
-							</thead>
-													
-							<tbody>
-							<!-- 开始循环 -->	
-							<c:choose>
-								<c:when test="${not empty varList}">
-									<c:if test="${QX.cha == 1 }">
-									<c:forEach items="${varList}" var="var" varStatus="vs">
-										<tr>
-											<td class='center'>
-												<label class="pos-rel"><input type='checkbox' name='ids' value="${var.HOUSEFUNDSUMMY_ID}" class="ace" /><span class="lbl"></span></label>
-											</td>
-											<td class='center' style="width: 30px;">${vs.index+1}</td>
-											<td class='center'>${var.BILL_CODE}</td>
-											<td class='center'>${var.BUSI_DATE}</td>
-											<td class='center'>${var.ESTB_DEPT}</td>
-											<td class='center'>${var.USER_GROP}</td>
-											<td class='center'>${var.SOC_INC_BASE}</td>
-											<td class='center'>${var.PER_BASIC_FUND}</td>
-											<td class='center'>${var.PER_SUPP_FUND}</td>
-											<td class='center'>${var.PER_TOTAL}</td>
-											<td class='center'>${var.DEPT_BASIC_FUND}</td>
-											<td class='center'>${var.DEPT_SUPP_FUND}</td>
-											<td class='center'>${var.DEPT_TOTAL}</td>
-											<td class='center'>${var.DEPT_CODE}</td>
-											<td class='center'>${var.USER_CATG}</td>
-											<td class='center'>${var.PMT_PLACE}</td>
-											<td class='center'>${var.CUST_COL1}</td>
-											<td class='center'>${var.CUST_COL2}</td>
-											<td class='center'>${var.CUST_COL3}</td>
-											<td class='center'>${var.CUST_COL4}</td>
-											<td class='center'>${var.CUST_COL5}</td>
-											<td class='center'>${var.CUST_COL6}</td>
-											<td class='center'>${var.CUST_COL7}</td>
-											<td class='center'>${var.CUST_COL8}</td>
-											<td class='center'>${var.CUST_COL9}</td>
-											<td class='center'>${var.CUST_COL10}</td>
-											<td class='center'>${var.ZRZC_CODE}</td>
-											<td class='center'>${var.BILL_STATE}</td>
-											<td class='center'>${var.BILL_USER}</td>
-											<td class='center'>${var.BILL_DATE}</td>
-											<td class="center">
-												<c:if test="${QX.edit != 1 && QX.del != 1 }">
-												<span class="label label-large label-grey arrowed-in-right arrowed-in"><i class="ace-icon fa fa-lock" title="无权限"></i></span>
-												</c:if>
-												<div class="hidden-sm hidden-xs btn-group">
-													<c:if test="${QX.edit == 1 }">
-													<a class="btn btn-xs btn-success" title="编辑" onclick="edit('${var.HOUSEFUNDSUMMY_ID}');">
-														<i class="ace-icon fa fa-pencil-square-o bigger-120" title="编辑"></i>
-													</a>
-													</c:if>
-													<c:if test="${QX.del == 1 }">
-													<a class="btn btn-xs btn-danger" onclick="del('${var.HOUSEFUNDSUMMY_ID}');">
-														<i class="ace-icon fa fa-trash-o bigger-120" title="删除"></i>
-													</a>
-													</c:if>
-												</div>
-												<div class="hidden-md hidden-lg">
-													<div class="inline pos-rel">
-														<button class="btn btn-minier btn-primary dropdown-toggle" data-toggle="dropdown" data-position="auto">
-															<i class="ace-icon fa fa-cog icon-only bigger-110"></i>
-														</button>
-			
-														<ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
-															<c:if test="${QX.edit == 1 }">
-															<li>
-																<a style="cursor:pointer;" onclick="edit('${var.HOUSEFUNDSUMMY_ID}');" class="tooltip-success" data-rel="tooltip" title="修改">
-																	<span class="green">
-																		<i class="ace-icon fa fa-pencil-square-o bigger-120"></i>
-																	</span>
-																</a>
-															</li>
-															</c:if>
-															<c:if test="${QX.del == 1 }">
-															<li>
-																<a style="cursor:pointer;" onclick="del('${var.HOUSEFUNDSUMMY_ID}');" class="tooltip-error" data-rel="tooltip" title="删除">
-																	<span class="red">
-																		<i class="ace-icon fa fa-trash-o bigger-120"></i>
-																	</span>
-																</a>
-															</li>
-															</c:if>
-														</ul>
-													</div>
-												</div>
-											</td>
-										</tr>
-									
-									</c:forEach>
-									</c:if>
-									<c:if test="${QX.cha == 0 }">
-										<tr>
-											<td colspan="100" class="center">您无权查看</td>
-										</tr>
-									</c:if>
-								</c:when>
-								<c:otherwise>
-									<tr class="main_info">
-										<td colspan="100" class="center" >没有相关数据</td>
-									</tr>
-								</c:otherwise>
-							</c:choose>
-							</tbody>
-						</table>
-						<div class="page-header position-relative">
-						<table style="width:100%;">
-							<tr>
-								<td style="vertical-align:top;">
-									<c:if test="${QX.add == 1 }">
-									<a class="btn btn-mini btn-success" onclick="add();">新增</a>
-									</c:if>
-									<c:if test="${QX.del == 1 }">
-									<a class="btn btn-mini btn-danger" onclick="makeAll('确定要删除选中的数据吗?');" title="批量删除" ><i class='ace-icon fa fa-trash-o bigger-120'></i></a>
-									</c:if>
-								</td>
-								<td style="vertical-align:top;"><div class="pagination" style="float: right;padding-top: 0px;margin-top: 0px;">${page.pageStr}</div></td>
-							</tr>
-						</table>
+								</div>
+							</div>
 						</div>
-						</form>
-					
-						</div>
-						<!-- /.col -->
 					</div>
-					<!-- /.row -->
+
+					<div class="row">
+						<div class="col-xs-12">
+							<table id="jqGrid"></table>
+							<div id="jqGridPager"></div>
+						</div>
+					</div>
 				</div>
-				<!-- /.page-content -->
 			</div>
 		</div>
-		<!-- /.main-content -->
 
-		<!-- 返回顶部 -->
-		<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
-			<i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
+		<a href="#" id="btn-scroll-up"
+			class="btn-scroll-up btn btn-sm btn-inverse"> <i
+			class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
 		</a>
-
 	</div>
-	<!-- /.main-container -->
+
 
 	<!-- basic scripts -->
 	<!-- 页面底部js¨ -->
 	<%@ include file="../../system/index/foot.jsp"%>
+
+	<!-- 最新版的Jqgrid Js，如果旧版本（Ace）某些方法不好用，尝试用此版本Js，替换旧版本JS -->
+	<!-- <script src="static/ace/js/jquery.jqGrid.min.js" type="text/javascript"></script>
+	<script src="static/ace/js/grid.locale-cn.js" type="text/javascript"></script> -->
+
+	<!-- 旧版本（Ace）Jqgrid Js -->
+	<script src="static/ace/js/jqGrid/jquery.jqGrid.src.js"></script>
+	<script src="static/ace/js/jqGrid/i18n/grid.locale-cn.js"></script>
 	<!-- 删除时确认窗口 -->
 	<script src="static/ace/js/bootbox.js"></script>
 	<!-- ace scripts -->
@@ -249,172 +136,275 @@
 	<script src="static/ace/js/date-time/bootstrap-datepicker.js"></script>
 	<!--提示框-->
 	<script type="text/javascript" src="static/js/jquery.tips.js"></script>
-	<script type="text/javascript">
+	<!-- JqGrid统一样式统一操作 -->
+	<script type="text/javascript" src="static/js/common/jqgrid_style.js"></script>
+
+	<script type="text/javascript"> 
+	$(document).ready(function () { 
 		$(top.hangge());//关闭加载状态
-		//检索
-		function tosearch(){
-			top.jzts();
-			$("#Form").submit();
-		}
-		$(function() {
+		 
+		//resize to fit page size
+		$(window).on('resize.jqGrid', function () {
+			$("#jqGrid").jqGrid( 'setGridWidth', $(".page-content").width());
+			resizeGridHeight($("#jqGrid"),null,true);
+	    })
 		
-			//日期框
-			$('.date-picker').datepicker({
-				autoclose: true,
-				todayHighlight: true
-			});
+		$("#jqGrid").jqGrid({
+			url: '<%=basePath%>glZrzxFx/getPageList.do?SelectedDepartCode=' + $("#SelectedDepartCode").val()
+		        	+ '&SelectedfxCode=' + $("#SelectedfxCode").val()
+			        + '&SelectedstateCode=' + $("#SelectedstateCode").val(),
+			datatype: "json",
+			 colModel: [
+				{label: ' ',name:'myac',index:'', width:70, fixed:true, sortable:false, resize:false,
+					formatter:'actions', 
+					formatoptions:{ 
+					 onEdit:function(rowid){
+							 //var curRow= $("tr[id="+rowid+"]");
+							 //var curCol=curRow.find("td[aria-describedby='jqGrid_STATE']");
+							 //if(curCol.attr('title')=='停用'){
+							 //	 var cur=$("#jSaveButton_"+rowid);
+							 //	 cur.find("span").css('display','none');
+							 //}
+						},
+                        onSuccess: function(response) {
+                        	var code=JSON.parse(response.responseText);
+							if(code.code==0){
+								return [true];
+							}else{
+								$("#subTitle").tips({
+									side : 3,
+									msg : '保存失败,' + code.message,
+									bg : '#cc0033',
+									time : 3
+								});
+								return [false, code.message];
+							}                
+                        },
+                        onError :function(rowid, res, stat, err) {
+                        	if(err!=null)
+                        		console.log(err);
+                        },
+                        afterSave:function(rowid, res){
+                        	$(".tooltip").remove();
+                        	/* $("#jqGrid").trigger("reloadGrid"); */
+                        	
+                        },
+						keys:true,
+					    delbutton: false,//disable delete button
+					}
+				},
+				
+				{ label: '责任中心',name:'DEPT_CODE__', width:90,hidden : true,editable: true},
+				{ label: '分线', name: 'LINE_NO__', width: 60,hidden : true,editable: true,},
+				
+				{ label: '责任中心', name: 'DEPT_CODE', width: 90,editable: true,edittype: 'select',formatter:'select',formatoptions:{value:"${departmentStrAll}"},editoptions:{value:"${departmentStrSelect}"},stype: 'select',searchoptions:{value:"${departmentStrAll}"}},
+				{ label: '分线', name: 'LINE_NO', width: 60,editable: true,edittype: 'select',formatter:'select',formatoptions:{value:"${lineNoStrAll}"},editoptions:{value:"${lineNoStrSelect}"},stype: 'select',searchoptions:{value:"${lineNoStrAll}"}},
+				{ label: '状态', name: 'STATE', width: 80, editable: true,align:'center',formatter: customFmatterState,edittype:"checkbox",editoptions: {value:"0:1"},unformat: aceSwitch,search:false}                   
+			],
+			reloadAfterSubmit: true, 
+			viewrecords: true,
+			rowNum: 100,
+			rowList: [100,200,500],
+			sortname: 'DEPT_CODE',
+			pager: "#jqGridPager",
+			loadComplete : function() {
+				var table = this;
+				setTimeout(function(){
+					styleCheckbox(table);
+					updateActionIcons(table);
+					updatePagerIcons(table);
+					enableTooltips(table);
+				}, 0);
+			},
 			
-			//下拉框
-			if(!ace.vars['touch']) {
-				$('.chosen-select').chosen({allow_single_deselect:true}); 
-				$(window)
-				.off('resize.chosen')
-				.on('resize.chosen', function() {
-					$('.chosen-select').each(function() {
-						 var $this = $(this);
-						 $this.next().css({'width': $this.parent().width()});
-					});
-				}).trigger('resize.chosen');
-				$(document).on('settings.ace.chosen', function(e, event_name, event_val) {
-					if(event_name != 'sidebar_collapsed') return;
-					$('.chosen-select').each(function() {
-						 var $this = $(this);
-						 $this.next().css({'width': $this.parent().width()});
-					});
-				});
-				$('#chosen-multiple-style .btn').on('click', function(e){
-					var target = $(this).find('input[type=radio]');
-					var which = parseInt(target.val());
-					if(which == 2) $('#form-field-select-4').addClass('tag-input-style');
-					 else $('#form-field-select-4').removeClass('tag-input-style');
-				});
-			}
-			
-			
-			//复选框全选控制
-			var active_class = 'active';
-			$('#simple-table > thead > tr > th input[type=checkbox]').eq(0).on('click', function(){
-				var th_checked = this.checked;//checkbox inside "TH" table header
-				$(this).closest('table').find('tbody > tr').each(function(){
-					var row = this;
-					if(th_checked) $(row).addClass(active_class).find('input[type=checkbox]').eq(0).prop('checked', true);
-					else $(row).removeClass(active_class).find('input[type=checkbox]').eq(0).prop('checked', false);
-				});
-			});
+			altRows: true,
+			rownumbers: true, 
+            rownumWidth: 35,		
+			/* multiselect: true,
+	        multiboxonly: true, */
+	        editurl: "<%=basePath%>glZrzxFx/save.do?SelectedDepartCode=" + $("#SelectedDepartCode").val()
+        	+ '&SelectedfxCode=' + $("#SelectedfxCode").val()
+	        + '&SelectedstateCode=' + $("#SelectedstateCode").val(),
 		});
 		
-		//新增
-		function add(){
-			 top.jzts();
-			 var diag = new top.Dialog();
-			 diag.Drag=true;
-			 diag.Title ="新增";
-			 diag.URL = '<%=basePath%>housefundsummy/goAdd.do';
-			 diag.Width = 450;
-			 diag.Height = 355;
-			 diag.Modal = true;				//有无遮罩窗口
-			 diag. ShowMaxButton = true;	//最大化按钮
-		     diag.ShowMinButton = true;		//最小化按钮
-			 diag.CancelEvent = function(){ //关闭事件
-				 if(diag.innerFrame.contentWindow.document.getElementById('zhongxin').style.display == 'none'){
-					 if('${page.currentPage}' == '0'){
-						 top.jzts();
-						 setTimeout("self.location=self.location",100);
-					 }else{
-						 nextPage(${page.currentPage});
-					 }
-				}
-				diag.close();
-			 };
-			 diag.show();
-		}
-		
-		//删除
-		function del(Id){
-			bootbox.confirm("确定要删除吗?", function(result) {
-				if(result) {
-					top.jzts();
-					var url = "<%=basePath%>housefundsummy/delete.do?HOUSEFUNDSUMMY_ID="+Id+"&tm="+new Date().getTime();
-					$.get(url,function(data){
-						nextPage(${page.currentPage});
-					});
-				}
-			});
-		}
-		
-		//修改
-		function edit(Id){
-			 top.jzts();
-			 var diag = new top.Dialog();
-			 diag.Drag=true;
-			 diag.Title ="编辑";
-			 diag.URL = '<%=basePath%>housefundsummy/goEdit.do?HOUSEFUNDSUMMY_ID='+Id;
-			 diag.Width = 450;
-			 diag.Height = 355;
-			 diag.Modal = true;				//有无遮罩窗口
-			 diag. ShowMaxButton = true;	//最大化按钮
-		     diag.ShowMinButton = true;		//最小化按钮 
-			 diag.CancelEvent = function(){ //关闭事件
-				 if(diag.innerFrame.contentWindow.document.getElementById('zhongxin').style.display == 'none'){
-					 nextPage(${page.currentPage});
-				}
-				diag.close();
-			 };
-			 diag.show();
-		}
-		
-		//批量操作
-		function makeAll(msg){
-			bootbox.confirm(msg, function(result) {
-				if(result) {
-					var str = '';
-					for(var i=0;i < document.getElementsByName('ids').length;i++){
-					  if(document.getElementsByName('ids')[i].checked){
-					  	if(str=='') str += document.getElementsByName('ids')[i].value;
-					  	else str += ',' + document.getElementsByName('ids')[i].value;
-					  }
-					}
-					if(str==''){
-						bootbox.dialog({
-							message: "<span class='bigger-110'>您没有选择任何内容!</span>",
-							buttons: 			
-							{ "button":{ "label":"确定", "className":"btn-sm btn-success"}}
+		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
+	
+		//navButtons
+		jQuery("#jqGrid").jqGrid('navGrid',"#jqGridPager",
+			{ 	//navbar options
+				edit: false,
+				editicon : 'ace-icon fa fa-pencil blue',
+				add: true,
+				addicon : 'ace-icon fa fa-plus-circle purple',
+				del: false,
+				delicon : 'ace-icon fa fa-trash-o red', 
+				search: true,
+				searchicon : 'ace-icon fa fa-search orange',
+				refresh: true,
+				refreshicon : 'ace-icon fa fa-refresh green',
+				view: false,
+				viewicon : 'ace-icon fa fa-search-plus grey',
+			},
+			{
+				recreateForm: true,
+				beforeShowForm :beforeEditOrAddCallback
+			},
+			 {
+				//new record form
+			    id: "add",
+				//width: 700,
+				closeAfterAdd: true,
+				recreateForm: true,
+				viewPagerButtons: false,
+				//reloadAfterSubmit: true,
+				beforeShowForm : beforeEditOrAddCallback,
+			    onclickSubmit: function(params, posdata) {
+					console.log("onclickSubmit");
+                    //console.log(posdata	);
+                } , 
+                afterSubmit: fn_addSubmit
+			},
+			{
+				//删除
+			},
+			{
+				//search form
+				recreateForm: true,
+				afterShowSearch: beforeSearchCallback,
+				afterRedraw: function(){
+					style_search_filters($(this));
+				},
+				multipleSearch: true,
+				
+				//multipleGroup:true,
+				showQuery: false
+				
+			}
+		);
+ 	});
+
+	//switch element when editing inline
+	function aceSwitch( cellvalue, options, cell ) {
+		setTimeout(function(){
+			 $(cell).find('input[type=checkbox]')
+				.addClass('ace ace-switch ace-switch-5')
+				.after('<span class="lbl" data-lbl="启用        停用"></span>'); 
+			 if (cellvalue=="停用") {	
+				$(cell).find('input[type=checkbox]').attr('checked','checked');
+				$(cell).find('input[type=checkbox]').attr('disabled','true');
+			 }else{
+			 	$(cell).find('input[type=checkbox]').removeAttr('checked');
+			 	$(cell).find('input[type=checkbox]').attr('disabled');
+			 }
+		}, 0);
+		if (cellvalue=="启用") {
+			return 1;
+		} else {
+			return 0;
+		} 
+	}
+	
+	 //批量编辑
+	function batchEdit(e) {
+		var grid = $("#jqGrid");
+        var ids = grid.jqGrid('getDataIDs');
+        for (var i = 0; i < ids.length; i++) {
+            grid.jqGrid('editRow',ids[i]);
+       	}
+   	}
+	
+	//取消批量编辑
+	function batchCancelEdit(e) {
+		var grid = $("#jqGrid");
+        var ids = grid.jqGrid('getDataIDs');
+        for (var i = 0; i < ids.length; i++) {
+            grid.jqGrid('restoreRow',ids[i]);
+        }
+    }
+	
+	//批量保存
+	function batchSave(e) {
+		var listData =new Array();
+		var ids = $("#jqGrid").jqGrid('getDataIDs');
+		console.log(ids);
+		//遍历访问这个集合  
+		var rowData;
+		$(ids).each(function (index, id){  
+            $("#jqGrid").saveRow(id, false, 'clientArray');
+             rowData = $("#jqGrid").getRowData(id);
+            listData.push(rowData);
+		});
+		top.jzts();
+		$.ajax({
+			type: "POST",
+			url: '<%=basePath%>glZrzxFx/updateAll.do?SelectedDepartCode=' + $("#SelectedDepartCode").val()
+        	+ '&SelectedfxCode=' + $("#SelectedfxCode").val()
+	        + '&SelectedstateCode=' + $("#SelectedstateCode").val(),
+				data:{UpdataDataRows : JSON.stringify(listData)},
+				dataType : 'json',
+				cache : false,
+				success : function(response) {
+					if (response.code == 0) {
+						$("#jqGrid").trigger("reloadGrid");
+						$(top.hangge());//关闭加载状态
+						$("#subTitle").tips({
+							side : 3,
+							msg : '保存成功',
+							bg : '#009933',
+							time : 3
 						});
-						$("#zcheckbox").tips({
-							side:1,
-				            msg:'点这里全选',
-				            bg:'#AE81FF',
-				            time:8
-				        });
-						return;
-					}else{
-						if(msg == '确定要删除选中的数据吗?'){
-							top.jzts();
-							$.ajax({
-								type: "POST",
-								url: '<%=basePath%>housefundsummy/deleteAll.do?tm='+new Date().getTime(),
-						    	data: {DATA_IDS:str},
-								dataType:'json',
-								//beforeSend: validateData,
-								cache: false,
-								success: function(data){
-									 $.each(data.list, function(i, list){
-											nextPage(${page.currentPage});
-									 });
-								}
-							});
-						}
+					} else {
+						$(top.hangge());//关闭加载状态
+						$("#subTitle").tips({
+							side : 3,
+							msg : '保存失败,' + response.message,
+							bg : '#cc0033',
+							time : 3
+						});
 					}
+				},
+				error : function(e) {
+					$(top.hangge());//关闭加载状态
 				}
 			});
+		}
+	
+		//检索
+		function tosearch() {
+			$("#jqGrid").jqGrid('setGridParam',{  // 重新加载数据
+				url:'<%=basePath%>glZrzxFx/getPageList.do?SelectedDepartCode=' + $("#SelectedDepartCode").val()
+										+ '&SelectedfxCode=' + $("#SelectedfxCode").val()
+										+ '&SelectedstateCode=' + $("#SelectedstateCode").val(),
+								datatype : 'json',
+								page : 1
+							}).trigger("reloadGrid");
+		}
+
+		function customFmatterState(cellvalue, options, rowObject) {
+			if (cellvalue == 1) {
+				return '<span class="label label-important arrowed-in">启用</span>';
+			} else {
+				return '<span class="label label-success arrowed">停用</span>';
+			}
 		};
 		
-		//导出excel
-		function toExcel(){
-			window.location.href='<%=basePath%>housefundsummy/excel.do';
+		//加载单位树
+		function initComplete(){
+			//下拉树
+			var defaultNodes = {"treeNodes":${zTreeNodes}};
+			//绑定change事件
+			$("#selectTree").bind("change",function(){
+				if($(this).attr("relValue")){
+					$("#SelectedDepartCode").val($(this).attr("relValue"));
+			    }else{
+			    	$("#SelectedDepartCode").val("");
+			    }
+			});
+			//赋给data属性
+			$("#selectTree").data("data",defaultNodes);  
+			$("#selectTree").render();
+			$("#selectTree2_input").val("请选择单位");
 		}
 	</script>
-
-
 </body>
 </html>

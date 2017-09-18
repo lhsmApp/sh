@@ -4,6 +4,7 @@ import java.util.List;
 import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import com.fh.dao.DaoSupport;
+import com.fh.entity.JqPage;
 import com.fh.entity.Page;
 import com.fh.util.PageData;
 import com.fh.service.glZrzxFx.glZrzxFx.GlZrzxFxManager;
@@ -20,29 +21,20 @@ public class GlZrzxFxService implements GlZrzxFxManager{
 	@Resource(name = "daoSupport")
 	private DaoSupport dao;
 	
-	/**新增
-	 * @param pd
-	 * @throws Exception
-	 */
-	public void save(PageData pd)throws Exception{
-		dao.save("GlZrzxFxMapper.save", pd);
-	}
-	
-	/**删除
-	 * @param pd
-	 * @throws Exception
-	 */
-	public void delete(PageData pd)throws Exception{
-		dao.delete("GlZrzxFxMapper.delete", pd);
-	}
-	
 	/**列表
 	 * @param page
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	public List<PageData> list(Page page)throws Exception{
+	public List<PageData> JqPage(JqPage page)throws Exception{
 		return (List<PageData>)dao.findForList("GlZrzxFxMapper.datalistPage", page);
+	}
+	/**获取记录数量
+	 * @param pd
+	 * @throws Exception
+	 */
+	public int countJqGridExtend(JqPage page)throws Exception{
+		return (int)dao.findForObject("GlZrzxFxMapper.countJqGridExtend", page);
 	}
 	
 	/**通过id获取数据
@@ -51,6 +43,14 @@ public class GlZrzxFxService implements GlZrzxFxManager{
 	 */
 	public PageData findById(PageData pd)throws Exception{
 		return (PageData)dao.findForObject("GlZrzxFxMapper.findById", pd);
+	}
+	
+	/**新增
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void save(List<PageData> listData)throws Exception{
+		dao.batchDeleteOneUpdate("GlZrzxFxMapper.delete", "GlZrzxFxMapper.save", listData);
 	}
 	
 	/**列表(全部)
