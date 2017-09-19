@@ -31,6 +31,9 @@ import com.fh.util.PageData;
 import com.fh.util.SqlTools;
 import com.fh.util.Jurisdiction;
 import com.fh.util.enums.TmplType;
+
+import net.sf.json.JSONArray;
+
 import com.fh.service.detailsummyquery.detailsummyquery.DetailSummyQueryManager;
 import com.fh.service.fhoa.department.impl.DepartmentService;
 import com.fh.service.sysConfig.sysconfig.SysConfigManager;
@@ -67,8 +70,8 @@ public class DetailSummyQueryController extends BaseController {
 
 	//默认的which值
 	String DefaultWhile = TmplType.TB_STAFF_SUMMY_CONTRACT.getNameKey();
-	//显示结构的单位
-    String ShowDepartCode = DictsUtil.DepartShowAll;
+	//页面显示数据的二级单位
+	String UserDepartCode = "";
 	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
 	private List<String> keyListBase = Arrays.asList("BILL_CODE", "DEPT_CODE");
 
@@ -85,19 +88,28 @@ public class DetailSummyQueryController extends BaseController {
 	Map<String, TmplConfigDetail> map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
 	//界面查询字段
     List<String> QueryFeildList = Arrays.asList("BUSI_DATE", "DEPT_CODE", "USER_GROP", "CUST_COL7");
+    //查询的所有可操作的责任中心
+    List<String> AllDeptCode = new ArrayList<String>();
 
 	/**列表
 	 * @param page
 	 * @throws Exception
 	 */
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/list")
 	public ModelAndView list(Page page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"列表detailsummyquery");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
 
+		//查询的所有可操作的责任中心
+	    AllDeptCode = new ArrayList<String>();
+
 		PageData getPd = this.getPageData();
 		//员工组
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
+
+		//当前登录人所在二级单位
+		UserDepartCode = Jurisdiction.getCurrentDepartmentID();//
 		
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("detailsummyquery/detailsummyquery/detailsummyquery_list");
@@ -108,18 +120,34 @@ public class DetailSummyQueryController extends BaseController {
 		getPd.put("which", SelectedTableNo);
 		
 		//"BUSI_DATE", "DEPT_CODE", "USER_CATG", "USER_GROP", "CUST_COL7"
-		//DEPT_CODE
-		mv.addObject("zTreeNodes", DictsUtil.getDepartmentSelectTreeSource(departmentService, DictsUtil.DepartShowAll));
 		////USER_CATG PARTUSERTYPE 企业特定员工分类字典
 		//mv.addObject("PARTUSERTYPE", DictsUtil.getDictsByParentCode(dictionariesService, "PARTUSERTYPE"));
 		////USER_GROP EMPLGRP 员工组字典
 		//mv.addObject("EMPLGRP", DictsUtil.getDictsByParentCode(dictionariesService, "EMPLGRP"));
 		//CUST_COL7 FMISACC 帐套字典
 		mv.addObject("FMISACC", DictsUtil.getDictsByParentCode(dictionariesService, "FMISACC"));
+		// *********************加载单位树  DEPT_CODE*******************************
+		String DepartmentSelectTreeSource=DictsUtil.getDepartmentSelectTreeSource(departmentService);
+		if(DepartmentSelectTreeSource.equals("0"))
+		{
+			getPd.put("departTreeSource", DepartmentSelectTreeSource);
+			AllDeptCode.add(UserDepartCode);
+		} else {
+			getPd.put("departTreeSource", 1);
+	        JSONArray jsonArray = JSONArray.fromObject(DepartmentSelectTreeSource);  
+			List<PageData> listDepart = (List<PageData>) JSONArray.toCollection(jsonArray, PageData.class);
+			if(listDepart!=null && listDepart.size()>0){
+				for(PageData pdDept : listDepart){
+					AllDeptCode.add(pdDept.getString(DictsUtil.Id));
+				}
+			}
+		}
+		mv.addObject("zTreeNodes", DepartmentSelectTreeSource);
+		// ***********************************************************
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, 
 				departmentService,userService, keyListBase, jqGridGroupColumn);
-		String jqGridColModel = tmpl.generateStructureNoEdit(SelectedTableNo, ShowDepartCode);
+		String jqGridColModel = tmpl.generateStructureNoEdit(SelectedTableNo, UserDepartCode);
 
 		//分组字段是否显示在表中
 		List<String> m_jqGridGroupColumnShow = tmpl.getJqGridGroupColumnShow();
@@ -320,6 +348,7 @@ public class DetailSummyQueryController extends BaseController {
 		getQueryFeildPd.put("CUST_COL7", SelectedCustCol7);
 		getQueryFeildPd.put("BUSI_DATE", SelectedBusiDate);
 		String QueryFeild = QueryFeildString.getQueryFeild(getQueryFeildPd, QueryFeildList);
+		QueryFeild += " and DEPT_CODE in (" + QueryFeildString.tranferListValueToSqlInString(AllDeptCode) + ") ";
 		getPd.put("QueryFeild", QueryFeild);
 		
 		//表名

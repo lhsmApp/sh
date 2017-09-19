@@ -99,6 +99,8 @@ public class AccountsQueryController extends BaseController {
 	String GroupbyFeild = new String();
 	//分组字段list  查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
     List<String> keyListBase = new ArrayList<String>();
+    //查询的所有可操作的责任中心
+    List<String> AllDeptCode = new ArrayList<String>();
 
 	/**列表
 	 * @param page
@@ -109,7 +111,10 @@ public class AccountsQueryController extends BaseController {
 	public ModelAndView list(Page page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"列表AccountsQuery");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
-		
+
+		//查询的所有可操作的责任中心
+	    AllDeptCode = new ArrayList<String>();
+
 		PageData getPd = this.getPageData();
 		//员工组
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
@@ -125,12 +130,26 @@ public class AccountsQueryController extends BaseController {
 		//当前期间,取自tb_system_config的SystemDateTime字段
 		String SystemDateTime = sysConfigManager.currentSection(getPd);
 		mv.addObject("SystemDateTime", SystemDateTime);
+
 		
 		// *********************加载单位树  DEPT_CODE*******************************
-		String DepartmentSelectTreeSource=DictsUtil.getDepartmentSelectTreeSource(departmentService, DictsUtil.DepartShowAll);
+		String DepartmentSelectTreeSource=DictsUtil.getDepartmentSelectTreeSource(departmentService);
+		if(DepartmentSelectTreeSource.equals("0"))
+		{
+			getPd.put("departTreeSource", DepartmentSelectTreeSource);
+			AllDeptCode.add(UserDepartCode);
+		} else {
+			getPd.put("departTreeSource", 1);
+	        JSONArray jsonArray = JSONArray.fromObject(DepartmentSelectTreeSource);  
+			List<PageData> listDepart = (List<PageData>) JSONArray.toCollection(jsonArray, PageData.class);
+			if(listDepart!=null && listDepart.size()>0){
+				for(PageData pdDept : listDepart){
+					AllDeptCode.add(pdDept.getString(DictsUtil.Id));
+				}
+			}
+		}
 		mv.addObject("zTreeNodes", DepartmentSelectTreeSource);
 		// ***********************************************************
-		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService,
 				departmentService,userService, keyListBase, null);
 		String jqGridColModel = tmpl.generateStructureAccount(SelectedTableNo, UserDepartCode);
@@ -167,6 +186,7 @@ public class AccountsQueryController extends BaseController {
 				QueryFeild += " and 1 != 1 ";
 			}
 		}
+		QueryFeild += " and DEPT_CODE in (" + QueryFeildString.tranferListValueToSqlInString(AllDeptCode) + ") ";
 		getPd.put("QueryFeild", QueryFeild);
 
 		String summyTableName = getSummyTableCode(SelectedTableNo);
