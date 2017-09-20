@@ -386,11 +386,11 @@ public class SocialIncDetailController extends BaseController {
 		List<String> repeatList = socialincdetailService.findUserCodeByModel(listData);
 		if(repeatList!=null && repeatList.size()>0){
 			commonBase.setCode(2);
-			commonBase.setMessage("此区间内编码已存在！");
-		} else {
-			socialincdetailService.deleteUpdateAll(listData);
-			commonBase.setCode(0);
+			//commonBase.setMessage("此区间内编码已存在！");
+			//return commonBase;
 		}
+		socialincdetailService.deleteUpdateAll(listData);
+		commonBase.setCode(0);
 	
 		return commonBase;
 	}
@@ -451,8 +451,8 @@ public class SocialIncDetailController extends BaseController {
 	        	String strUserCode = item.getString("USER_CODE__");
 	        	if(listUserCodeAdd.contains(strUserCode)){
 					commonBase.setCode(2);
-					commonBase.setMessage("此区间内编码重复:" + strUserCode);
-					return commonBase;
+					//commonBase.setMessage("此区间内编码重复:" + strUserCode);
+					//return commonBase;
 	        	}
 	        	listUserCodeAdd.add(strUserCode);
 	        	item.put("BILL_CODE", " ");
@@ -463,11 +463,11 @@ public class SocialIncDetailController extends BaseController {
 				List<String> repeatList = socialincdetailService.findUserCodeByModel(listData);
 				if(repeatList!=null && repeatList.size()>0){
 					commonBase.setCode(2);
-					commonBase.setMessage("此区间内编码已存在！");
-				} else {
+					//commonBase.setMessage("此区间内编码已存在！");
+					//return commonBase;
+				}
 					socialincdetailService.deleteUpdateAll(listData);
 					commonBase.setCode(0);
-				}
 			}
 		}
 		return commonBase;
@@ -723,10 +723,10 @@ public class SocialIncDetailController extends BaseController {
 												}
 											} else {
 												if(listUserCode.contains(getUSER_CODE.trim())){
-													String strUserAdd = "编码" + getUSER_CODE + "重复！";
-													if(!sbRet.contains(strUserAdd)){
-														sbRet.add(strUserAdd);
-													}
+													//String strUserAdd = "编码" + getUSER_CODE + "重复！";
+													//if(!sbRet.contains(strUserAdd)){
+													//	sbRet.add(strUserAdd);
+													//}
 												} else {
 													listUserCode.add(getUSER_CODE.trim());
 												}

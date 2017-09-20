@@ -319,11 +319,11 @@ public class AuditEditController extends BaseController {
 		List<PageData> repeatList = auditeditService.findByModel(pdFindByModel);
 		if(repeatList!=null && repeatList.size()>0){
 			commonBase.setCode(2);
-			commonBase.setMessage("此区间内编码已存在！");
-		} else {
+			//commonBase.setMessage("此区间内编码已存在！");
+			//return commonBase;
+		} 
             auditeditService.deleteUpdateAll(listData);
 			commonBase.setCode(0);
-		}
 		return commonBase;
 	}
 	
@@ -390,11 +390,11 @@ public class AuditEditController extends BaseController {
 			List<PageData> repeatList = auditeditService.findByModel(pdFindByModel);
 			if(repeatList!=null && repeatList.size()>0){
 				commonBase.setCode(2);
-				commonBase.setMessage("此区间内编码已存在！");
-			} else {
+				//commonBase.setMessage("此区间内编码已存在！");
+				//return commonBase;
+			}
 				auditeditService.deleteUpdateAll(listData);
 				commonBase.setCode(0);
-			}
 		}
 		return commonBase;
 	}
@@ -653,10 +653,10 @@ public class AuditEditController extends BaseController {
 										}
 									} else {
 										if(listUserCode.contains(getUSER_CODE.trim())){
-											String strUserAdd = "编码" + getUSER_CODE + "重复！";
-											if(!sbRet.contains(strUserAdd)){
-												sbRet.add(strUserAdd);
-											}
+											//String strUserAdd = "编码" + getUSER_CODE + "重复！";
+											//if(!sbRet.contains(strUserAdd)){
+											//	sbRet.add(strUserAdd);
+											//}
 										} else {
 											listUserCode.add(getUSER_CODE.trim());
 										}

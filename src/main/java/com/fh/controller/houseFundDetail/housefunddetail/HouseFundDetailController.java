@@ -385,11 +385,11 @@ public class HouseFundDetailController extends BaseController {
 		List<String> repeatList = housefunddetailService.findUserCodeByModel(listData);
 		if(repeatList!=null && repeatList.size()>0){
 			commonBase.setCode(2);
-			commonBase.setMessage("此区间内编码已存在！");
-		} else {
+			//commonBase.setMessage("此区间内编码已存在！");
+			//return commonBase;
+		}
 			housefunddetailService.deleteUpdateAll(listData);
 			commonBase.setCode(0);
-		}
 		return commonBase;
 	}
 	
@@ -461,11 +461,11 @@ public class HouseFundDetailController extends BaseController {
 				List<String> repeatList = housefunddetailService.findUserCodeByModel(listData);
 				if(repeatList!=null && repeatList.size()>0){
 					commonBase.setCode(2);
-					commonBase.setMessage("此区间内编码已存在！");
-				} else {
+					//commonBase.setMessage("此区间内编码已存在！");
+					//return commonBase;
+				}
 					housefunddetailService.deleteUpdateAll(listData);
 					commonBase.setCode(0);
-				}
 			}
 		}
 		return commonBase;
@@ -721,10 +721,10 @@ public class HouseFundDetailController extends BaseController {
 												}
 											} else {
 												if(listUserCode.contains(getUSER_CODE.trim())){
-													String strUserAdd = "编码" + getUSER_CODE + "重复！";
-													if(!sbRet.contains(strUserAdd)){
-														sbRet.add(strUserAdd);
-													}
+													//String strUserAdd = "编码" + getUSER_CODE + "重复！";
+													//if(!sbRet.contains(strUserAdd)){
+													//	sbRet.add(strUserAdd);
+													//}
 												} else {
 													listUserCode.add(getUSER_CODE.trim());
 												}
