@@ -406,7 +406,7 @@ public class HouseFundSummyController extends BaseController {
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/summaryDepartString")
 	public @ResponseBody CommonBase summaryDepartString() throws Exception{
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "delete")){return null;} //校验权限	
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "delete")){return null;} //校验权限	
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
 

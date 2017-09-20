@@ -420,7 +420,7 @@ public class StaffDetailController extends BaseController {
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/updateAll")
 	public @ResponseBody CommonBase updateAll() throws Exception{
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限	
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限	
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
 		
@@ -517,7 +517,7 @@ public class StaffDetailController extends BaseController {
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/deleteAll")
 	public @ResponseBody CommonBase deleteAll() throws Exception{
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "delete")){return null;} //校验权限	
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "delete")){return null;} //校验权限	
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
 		
@@ -887,7 +887,7 @@ public class StaffDetailController extends BaseController {
 	@RequestMapping(value="/excel")
 	public ModelAndView exportExcel(JqPage page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"导出StaffDetail到excel");
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
 		PageData getPd = this.getPageData();
 		//员工组
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
