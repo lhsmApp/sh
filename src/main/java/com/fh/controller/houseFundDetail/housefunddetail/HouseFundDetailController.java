@@ -21,6 +21,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
 import com.fh.controller.common.DictsUtil;
 import com.fh.controller.common.FilterBillCode;
+import com.fh.controller.common.Message;
 import com.fh.controller.common.QueryFeildString;
 import com.fh.controller.common.TmplUtil;
 import com.fh.entity.CommonBase;
@@ -374,7 +375,7 @@ public class HouseFundDetailController extends BaseController {
 				TypeCodeListen, TypeCodeSummy, TableNameSummy);
 		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 			commonBase.setCode(2);
-			commonBase.setMessage("获取可操作的数据的条件失败！");
+			commonBase.setMessage(Message.GetHelpfulDetailFalue);
 			return commonBase;
 		}
 		getPd.put("CanOperate", strHelpful);
@@ -435,7 +436,7 @@ public class HouseFundDetailController extends BaseController {
 					TypeCodeListen, TypeCodeSummy, TableNameSummy);
 			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 				commonBase.setCode(2);
-				commonBase.setMessage("获取可操作的数据的条件失败！");
+				commonBase.setMessage(Message.GetHelpfulDetailFalue);
 				return commonBase;
 			}
 			
@@ -513,7 +514,7 @@ public class HouseFundDetailController extends BaseController {
 					TypeCodeListen, TypeCodeSummy, TableNameSummy);
 			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 				commonBase.setCode(2);
-				commonBase.setMessage("获取可操作的数据的条件失败！");
+				commonBase.setMessage(Message.GetHelpfulDetailFalue);
 				return commonBase;
 			}
 			
@@ -617,7 +618,7 @@ public class HouseFundDetailController extends BaseController {
 	    					TypeCodeListen, TypeCodeSummy, TableNameSummy);
 					if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 						commonBase.setCode(2);
-						commonBase.setMessage("获取可操作的数据的条件失败！");
+						commonBase.setMessage(Message.GetHelpfulDetailFalue);
 					} else {
 						// 局部变量
 						LeadingInExcelToPageData<PageData> testExcel = null;
@@ -898,6 +899,11 @@ public class HouseFundDetailController extends BaseController {
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		if(!(TypeCodeDetail!=null && !TypeCodeDetail.trim().equals(""))){
+			commonBase.setCode(2);
+			commonBase.setMessage(Message.ReportTypeIsNull);
+			return commonBase;
+		}
 
 		//判断选择为必须选择的
 		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
@@ -940,9 +946,9 @@ public class HouseFundDetailController extends BaseController {
 	}
 	
 	private String CheckState(String CUST_COL7, String DEPT_CODE) throws Exception{
-		String strRut = "封存类型为空！";
+		String strRut = Message.ReportTypeIsNull;
 		if(TypeCodeDetail != null && !TypeCodeDetail.trim().equals("")){
-			strRut = "当前期间已封存！";
+			strRut = Message.CurrentDurationBeSealed;
 			if(CUST_COL7 != null && !CUST_COL7.trim().equals("") && DEPT_CODE != null && !DEPT_CODE.trim().equals("")){
 				//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
 				PageData statePd = new PageData();
