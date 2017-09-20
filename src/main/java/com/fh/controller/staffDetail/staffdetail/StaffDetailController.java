@@ -782,28 +782,30 @@ public class StaffDetailController extends BaseController {
 												if(!sbRet.contains("人员编码不能为空！")){
 													sbRet.add("人员编码不能为空！");
 												}
-											}
-											if(listUserCode.contains(getUSER_CODE.trim())){
-												String strUserAdd = "人员编码:" + getUSER_CODE + "重复！";
-												if(!sbRet.contains(strUserAdd)){
-													sbRet.add(strUserAdd);
-												}
 											} else {
-												listUserCode.add(getUSER_CODE.trim());
+												if(listUserCode.contains(getUSER_CODE.trim())){
+													String strUserAdd = "人员编码:" + getUSER_CODE + "重复！";
+													if(!sbRet.contains(strUserAdd)){
+														sbRet.add(strUserAdd);
+													}
+												} else {
+													listUserCode.add(getUSER_CODE.trim());
+												}
 											}
 											if(!(getSTAFF_IDENT!=null && !getSTAFF_IDENT.trim().equals(""))){
 												if(!sbRet.contains("身份证号不能为空！")){
 													sbRet.add("身份证号不能为空！");
 												}
-											}
-											if(listStaffIdent.contains(getSTAFF_IDENT.trim())){
-												String getUSER_NAME = (String) pdAdd.get("USER_NAME");
-												String strUserAdd = "编号：" + getUSER_CODE + " 姓名：" + getUSER_NAME + " 身份证号：" + getSTAFF_IDENT + " 导入数据重复！";
-												if(!sbRet.contains(strUserAdd)){
-													sbRet.add(strUserAdd);
-												}
 											} else {
-												listStaffIdent.add(getSTAFF_IDENT.trim());
+												if(listStaffIdent.contains(getSTAFF_IDENT.trim())){
+													String getUSER_NAME = (String) pdAdd.get("USER_NAME");
+													String strUserAdd = "编号：" + getUSER_CODE + " 姓名：" + getUSER_NAME + " 身份证号：" + getSTAFF_IDENT + " 导入数据重复！";
+													if(!sbRet.contains(strUserAdd)){
+														sbRet.add(strUserAdd);
+													}
+												} else {
+													listStaffIdent.add(getSTAFF_IDENT.trim());
+												}
 											}
 											String getESTB_DEPT = (String) pdAdd.get("ESTB_DEPT");
 											if(!(getESTB_DEPT!=null && !getESTB_DEPT.trim().equals(""))){
