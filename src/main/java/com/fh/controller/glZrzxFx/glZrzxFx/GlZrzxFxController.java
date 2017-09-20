@@ -71,7 +71,7 @@ public class GlZrzxFxController extends BaseController {
 		mv.addObject("zTreeNodes", departTreeSource);
 		// ***********************************************************
 		// LINE_NO fx 分线
-		mv.addObject("fxList", DictsUtil.getDictsByParentBianma(dictionariesService, "fx"));
+		mv.addObject("fxList", DictsUtil.getDictsByParentBianma(dictionariesService, "LINE_NO"));
 		
 		String departmentValus = DictsUtil.getDepartmentValue(departmentService);
 		String departmentStringAll = ":[All];" + departmentValus;
@@ -79,7 +79,7 @@ public class GlZrzxFxController extends BaseController {
 		mv.addObject("departmentStrAll", departmentStringAll);
 		mv.addObject("departmentStrSelect", departmentStringSelect);
 
-		String fxValus = DictsUtil.getDicValue(dictionariesService, "fx");
+		String fxValus = DictsUtil.getDicValue(dictionariesService, "LINE_NO");
 		String lineNoStringAll = ":[All];" + fxValus;
 		String lineNoStringSelect = ":;" + fxValus;
 		mv.addObject("lineNoStrAll", lineNoStringAll);
