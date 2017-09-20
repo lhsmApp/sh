@@ -45,12 +45,12 @@
 		AND A.CUST_COL7=B.BILL_OFF
 		LEFT JOIN tb_gl_cert C
 		ON A.BILL_CODE=C.BILL_CODE
-		WHERE B.STATE='1' and B.BILL_TYPE=#{BILL_TYPE} AND A.dept_code=#{RPT_DEPT} AND A.BUSI_DATE=#{RPT_DUR} AND B.BILL_OFF=#{BILL_OFF}
+		WHERE A.BILL_STATE='1' and A.USER_GROP=#{USER_GROP} and B.STATE='1' and B.BILL_TYPE=#{BILL_TYPE} AND A.dept_code=#{RPT_DEPT} AND A.BUSI_DATE=#{RPT_DUR} AND B.BILL_OFF=#{BILL_OFF}
 	</select>
 
 	<!-- 新增 -->
 	<insert id="save" parameterType="pd">
-		<foreach item="item" index="index" collection="list" open=" "
+		<!-- <foreach item="item" index="index" collection="list" open=" "
 			separator="; " close=" ">
 			<if test="item!=null">
 				delete from
@@ -60,6 +60,20 @@
 				<include refid="tableName"></include>(BILL_CODE,UNLK_DEPT,UNLK_DUR,BILL_TYPE,UNLK_USER,UNLK_DATE,BILL_OFF)
 				values
 				(#{item.BILL_CODE},#{item.UNLK_DEPT},#{item.UNLK_DUR},#{item.BILL_TYPE},#{item.UNLK_USER},#{item.UNLK_DATE},#{item.BILL_OFF})
+			</if>
+		</foreach> -->
+		
+		<!-- 插入保存 -->
+		insert into
+		<include refid="tableName"></include>
+		(BILL_CODE,UNLK_DEPT,UNLK_DUR,BILL_TYPE,UNLK_USER,UNLK_DATE,BILL_OFF) values
+		<foreach item="item" index="index" collection="list" open=" "
+			separator=", " close=" ">
+			<if test="item!=null">
+				<trim prefix="(" suffix=")" suffixOverrides=",">
+					#{item.BILL_CODE},#{item.UNLK_DEPT},#{item.UNLK_DUR},#{item.BILL_TYPE},#{item.UNLK_USER},#{item.UNLK_DATE},#{item.BILL_OFF}
+					<!-- <include refid="FieldValue"></include> -->
+				</trim>
 			</if>
 		</foreach>
 	</insert>

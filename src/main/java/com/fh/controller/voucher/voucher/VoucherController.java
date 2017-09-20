@@ -337,7 +337,7 @@ public class VoucherController extends BaseController {
 		pd.put("TABLE_CODE", tableCode);
 		String sealType = which == null ? TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey() : which;// 传输接口类型;
 		pd.put("BILL_TYPE", sealType);// 封存类型
-
+		pd.put("USER_GROP", DictsUtil.getEmplGroupType(which));
 		// String strDeptCode = pd.getString("DEPT_CODE");// 单位检索条件
 		String strDeptCode = "";
 		if (departSelf == 1)
