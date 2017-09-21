@@ -21,6 +21,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
 import com.fh.controller.common.DictsUtil;
 import com.fh.controller.common.FilterBillCode;
+import com.fh.controller.common.Message;
 import com.fh.controller.common.QueryFeildString;
 import com.fh.controller.common.TmplUtil;
 import com.fh.entity.CommonBase;
@@ -374,7 +375,7 @@ public class HouseFundDetailController extends BaseController {
 				TypeCodeListen, TypeCodeSummy, TableNameSummy);
 		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 			commonBase.setCode(2);
-			commonBase.setMessage("获取可操作的数据的条件失败！");
+			commonBase.setMessage(Message.GetHelpfulDetailFalue);
 			return commonBase;
 		}
 		getPd.put("CanOperate", strHelpful);
@@ -384,11 +385,11 @@ public class HouseFundDetailController extends BaseController {
 		List<String> repeatList = housefunddetailService.findUserCodeByModel(listData);
 		if(repeatList!=null && repeatList.size()>0){
 			commonBase.setCode(2);
-			commonBase.setMessage("此区间内编码已存在！");
-		} else {
+			//commonBase.setMessage("此区间内编码已存在！");
+			//return commonBase;
+		}
 			housefunddetailService.deleteUpdateAll(listData);
 			commonBase.setCode(0);
-		}
 		return commonBase;
 	}
 	
@@ -399,7 +400,7 @@ public class HouseFundDetailController extends BaseController {
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/updateAll")
 	public @ResponseBody CommonBase updateAll() throws Exception{
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限	
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限	
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
 
@@ -435,7 +436,7 @@ public class HouseFundDetailController extends BaseController {
 					TypeCodeListen, TypeCodeSummy, TableNameSummy);
 			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 				commonBase.setCode(2);
-				commonBase.setMessage("获取可操作的数据的条件失败！");
+				commonBase.setMessage(Message.GetHelpfulDetailFalue);
 				return commonBase;
 			}
 			
@@ -460,11 +461,11 @@ public class HouseFundDetailController extends BaseController {
 				List<String> repeatList = housefunddetailService.findUserCodeByModel(listData);
 				if(repeatList!=null && repeatList.size()>0){
 					commonBase.setCode(2);
-					commonBase.setMessage("此区间内编码已存在！");
-				} else {
+					//commonBase.setMessage("此区间内编码已存在！");
+					//return commonBase;
+				}
 					housefunddetailService.deleteUpdateAll(listData);
 					commonBase.setCode(0);
-				}
 			}
 		}
 		return commonBase;
@@ -477,7 +478,7 @@ public class HouseFundDetailController extends BaseController {
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/deleteAll")
 	public @ResponseBody CommonBase deleteAll() throws Exception{
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "delete")){return null;} //校验权限	
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "delete")){return null;} //校验权限	
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
 
@@ -513,7 +514,7 @@ public class HouseFundDetailController extends BaseController {
 					TypeCodeListen, TypeCodeSummy, TableNameSummy);
 			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 				commonBase.setCode(2);
-				commonBase.setMessage("获取可操作的数据的条件失败！");
+				commonBase.setMessage(Message.GetHelpfulDetailFalue);
 				return commonBase;
 			}
 			
@@ -617,7 +618,7 @@ public class HouseFundDetailController extends BaseController {
 	    					TypeCodeListen, TypeCodeSummy, TableNameSummy);
 					if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 						commonBase.setCode(2);
-						commonBase.setMessage("获取可操作的数据的条件失败！");
+						commonBase.setMessage(Message.GetHelpfulDetailFalue);
 					} else {
 						// 局部变量
 						LeadingInExcelToPageData<PageData> testExcel = null;
@@ -714,18 +715,19 @@ public class HouseFundDetailController extends BaseController {
 													sbRet.add("导入单位和当前单位必须一致！");
 												}
 											}
-											//if(!(getUSER_CODE!=null && !getUSER_CODE.trim().equals(""))){
-											//	if(!sbRet.contains("人员编码不能为空！")){
-											//		sbRet.add("人员编码不能为空！");
-											//	}
-											//}
-											if(listUserCode.contains(getUSER_CODE.trim())){
-												String strUserAdd = "编码" + getUSER_CODE + "重复！";
-												if(!sbRet.contains(strUserAdd)){
-													sbRet.add(strUserAdd);
+										    if(!(getUSER_CODE!=null && !getUSER_CODE.trim().equals(""))){
+												if(!sbRet.contains("人员编码不能为空！")){
+													sbRet.add("人员编码不能为空！");
 												}
 											} else {
-												listUserCode.add(getUSER_CODE.trim());
+												if(listUserCode.contains(getUSER_CODE.trim())){
+													//String strUserAdd = "编码" + getUSER_CODE + "重复！";
+													//if(!sbRet.contains(strUserAdd)){
+													//	sbRet.add(strUserAdd);
+													//}
+												} else {
+													listUserCode.add(getUSER_CODE.trim());
+												}
 											}
 											String getESTB_DEPT = (String) pdAdd.get("ESTB_DEPT");
 											if(!(getESTB_DEPT!=null && !getESTB_DEPT.trim().equals(""))){
@@ -803,7 +805,7 @@ public class HouseFundDetailController extends BaseController {
 	@RequestMapping(value="/excel")
 	public ModelAndView exportExcel(JqPage page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"导出HouseFundDetail到excel");
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
 	    
 		PageData getPd = this.getPageData();
 		//单位
@@ -898,6 +900,11 @@ public class HouseFundDetailController extends BaseController {
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		if(!(TypeCodeDetail!=null && !TypeCodeDetail.trim().equals(""))){
+			commonBase.setCode(2);
+			commonBase.setMessage(Message.ReportTypeIsNull);
+			return commonBase;
+		}
 
 		//判断选择为必须选择的
 		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
@@ -940,9 +947,9 @@ public class HouseFundDetailController extends BaseController {
 	}
 	
 	private String CheckState(String CUST_COL7, String DEPT_CODE) throws Exception{
-		String strRut = "封存类型为空！";
+		String strRut = Message.ReportTypeIsNull;
 		if(TypeCodeDetail != null && !TypeCodeDetail.trim().equals("")){
-			strRut = "当前期间已封存！";
+			strRut = Message.CurrentDurationBeSealed;
 			if(CUST_COL7 != null && !CUST_COL7.trim().equals("") && DEPT_CODE != null && !DEPT_CODE.trim().equals("")){
 				//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
 				PageData statePd = new PageData();

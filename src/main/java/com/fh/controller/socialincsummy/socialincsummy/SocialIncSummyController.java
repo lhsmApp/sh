@@ -23,6 +23,7 @@ import com.fh.controller.base.BaseController;
 import com.fh.controller.common.BillCodeUtil;
 import com.fh.controller.common.DictsUtil;
 import com.fh.controller.common.FilterBillCode;
+import com.fh.controller.common.Message;
 import com.fh.controller.common.QueryFeildString;
 import com.fh.controller.common.TmplUtil;
 import com.fh.entity.CommonBase;
@@ -349,7 +350,7 @@ public class SocialIncSummyController extends BaseController {
 
 		if(!(TypeCodeSummy!=null && !TypeCodeSummy.trim().equals(""))){
 			commonBase.setCode(2);
-			commonBase.setMessage("工资对应的上报类型为空！");
+			commonBase.setMessage(Message.ReportTypeIsNull);
 			return commonBase;
 		}
 
@@ -404,7 +405,7 @@ public class SocialIncSummyController extends BaseController {
 	 */
 	@RequestMapping(value="/summaryDepartString")
 	public @ResponseBody CommonBase summaryDepartString() throws Exception{
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "delete")){return null;} //校验权限	
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "delete")){return null;} //校验权限	
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
 
@@ -486,7 +487,7 @@ public class SocialIncSummyController extends BaseController {
 		/***************************************************/
         if(!(listSummy!=null && listSummy.size()>0)){
 			commonBase.setCode(2);
-			commonBase.setMessage("没有传入可操作的数据！");
+			commonBase.setMessage(Message.NotTransferOperateData);
 			return commonBase;
         }
     	for(PageData eachSummy : listSummy){
@@ -532,7 +533,7 @@ public class SocialIncSummyController extends BaseController {
 					TypeCodeListen, TypeCodeSummy, TableNameBase);
 			if(!(strHelpfulDetail != null && !strHelpfulDetail.trim().equals(""))){
 				commonBase.setCode(2);
-				commonBase.setMessage("获取可操作的数据的条件失败！");
+				commonBase.setMessage(Message.GetHelpfulDetailFalue);
 				return commonBase;
 			}
 			SysSealed delReportEach = new SysSealed();
@@ -677,7 +678,7 @@ public class SocialIncSummyController extends BaseController {
 	}
 	
 	private String CheckStateLast(SysSealed item) throws Exception{
-		String strRut = "单位：" + item.getRPT_DEPT() + "汇总期间已封存！";
+		String strRut = "单位：" + item.getRPT_DEPT() + "汇总已上报！";
 		String State = syssealedinfoService.getStateFromModel(item);
 		if(!DurState.Sealed.getNameKey().equals(State)){// 枚举  1封存,0解封
 			strRut = "";
@@ -685,7 +686,7 @@ public class SocialIncSummyController extends BaseController {
 		return strRut;
 	}
 	private String CheckStateBefore(SysSealed item) throws Exception{
-		String strRut = "单位：" + item.getRPT_DEPT() + "明细期间未封存！";
+		String strRut = "单位：" + item.getRPT_DEPT() + "明细未上报！";
 		String State = syssealedinfoService.getStateFromModel(item);
 		if(DurState.Sealed.getNameKey().equals(State)){// 枚举  1封存,0解封
 			strRut = "";

@@ -319,11 +319,11 @@ public class AuditEditController extends BaseController {
 		List<PageData> repeatList = auditeditService.findByModel(pdFindByModel);
 		if(repeatList!=null && repeatList.size()>0){
 			commonBase.setCode(2);
-			commonBase.setMessage("此区间内编码已存在！");
-		} else {
+			//commonBase.setMessage("此区间内编码已存在！");
+			//return commonBase;
+		} 
             auditeditService.deleteUpdateAll(listData);
 			commonBase.setCode(0);
-		}
 		return commonBase;
 	}
 	
@@ -390,11 +390,11 @@ public class AuditEditController extends BaseController {
 			List<PageData> repeatList = auditeditService.findByModel(pdFindByModel);
 			if(repeatList!=null && repeatList.size()>0){
 				commonBase.setCode(2);
-				commonBase.setMessage("此区间内编码已存在！");
-			} else {
+				//commonBase.setMessage("此区间内编码已存在！");
+				//return commonBase;
+			}
 				auditeditService.deleteUpdateAll(listData);
 				commonBase.setCode(0);
-			}
 		}
 		return commonBase;
 	}
@@ -647,18 +647,19 @@ public class AuditEditController extends BaseController {
 											sbRet.add("导入单位和当前单位必须一致！");
 										}
 									}
-									//if(!(getUSER_CODE!=null && !getUSER_CODE.trim().equals(""))){
-									//	if(!sbRet.contains("人员编码不能为空！")){
-									//		sbRet.add("人员编码不能为空！");
-									//	}
-									//}
-									if(listUserCode.contains(getUSER_CODE.trim())){
-										String strUserAdd = "编码" + getUSER_CODE + "重复！";
-										if(!sbRet.contains(strUserAdd)){
-											sbRet.add(strUserAdd);
+									if(!(getUSER_CODE!=null && !getUSER_CODE.trim().equals(""))){
+										if(!sbRet.contains("人员编码不能为空！")){
+											sbRet.add("人员编码不能为空！");
 										}
 									} else {
-										listUserCode.add(getUSER_CODE.trim());
+										if(listUserCode.contains(getUSER_CODE.trim())){
+											//String strUserAdd = "编码" + getUSER_CODE + "重复！";
+											//if(!sbRet.contains(strUserAdd)){
+											//	sbRet.add(strUserAdd);
+											//}
+										} else {
+											listUserCode.add(getUSER_CODE.trim());
+										}
 									}
 									String getESTB_DEPT = (String) pdAdd.get("ESTB_DEPT");
 									if(!(getESTB_DEPT!=null && !getESTB_DEPT.trim().equals(""))){

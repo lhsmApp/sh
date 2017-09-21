@@ -23,6 +23,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
 import com.fh.controller.common.DictsUtil;
 import com.fh.controller.common.FilterBillCode;
+import com.fh.controller.common.Message;
 import com.fh.controller.common.QueryFeildString;
 import com.fh.controller.common.TmplUtil;
 import com.fh.entity.CommonBase;
@@ -388,7 +389,7 @@ public class StaffDetailController extends BaseController {
 				TypeCodeListen, TypeCodeSummy, TableNameSummy);
 		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 			commonBase.setCode(2);
-			commonBase.setMessage("获取可操作的数据的条件失败！");
+			commonBase.setMessage(Message.GetHelpfulDetailFalue);
 			return commonBase;
 		}
 		getPd.put("CanOperate", strHelpful);
@@ -398,15 +399,15 @@ public class StaffDetailController extends BaseController {
 		List<String> repeatList = staffdetailService.findUserCodeByModel(listData);
 		if(repeatList!=null && repeatList.size()>0){
 			commonBase.setCode(2);
-			commonBase.setMessage("此区间内编码已存在！");
-			return commonBase;
+			//commonBase.setMessage("此区间内编码已存在！");
+			//return commonBase;
 		} 
 		List<String> StaffIdentList = staffdetailService.findStaffIdentByModel(listData);
 		if(StaffIdentList!=null && StaffIdentList.size()>0){
 			commonBase.setCode(2);
-			commonBase.setMessage("此区间内身份证号已存在！");
-			return commonBase;
-		} 
+			//commonBase.setMessage("此区间内身份证号已存在！");
+			//return commonBase;
+		}
         staffdetailService.deleteUpdateAll(listData);
 		commonBase.setCode(0);
 		
@@ -420,7 +421,7 @@ public class StaffDetailController extends BaseController {
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/updateAll")
 	public @ResponseBody CommonBase updateAll() throws Exception{
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限	
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "edit")){return null;} //校验权限	
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
 		
@@ -459,7 +460,7 @@ public class StaffDetailController extends BaseController {
 					TypeCodeListen, TypeCodeSummy, TableNameSummy);
 			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 				commonBase.setCode(2);
-				commonBase.setMessage("获取可操作的数据的条件失败！");
+				commonBase.setMessage(Message.GetHelpfulDetailFalue);
 				return commonBase;
 			}
 			
@@ -474,14 +475,14 @@ public class StaffDetailController extends BaseController {
 	        	String strStaffIdent = item.getString("STAFF_IDENT__");
 	        	if(listUserCodeAdd.contains(strUserCode)){
 					commonBase.setCode(2);
-					commonBase.setMessage("此区间内编码重复:" + strUserCode);
-					return commonBase;
+					//commonBase.setMessage("此区间内编码重复:" + strUserCode);
+					//return commonBase;
 	        	}
 	        	listUserCodeAdd.add(strUserCode);
 	        	if(listStaffIdentAdd.contains(strStaffIdent)){
 					commonBase.setCode(2);
-					commonBase.setMessage("此区间内身份证号重复:" + strStaffIdent);
-					return commonBase;
+					//commonBase.setMessage("此区间内身份证号重复:" + strStaffIdent);
+					//return commonBase;
 	        	}
 	        	listStaffIdentAdd.add(strStaffIdent);
 	        	item.put("BILL_CODE", " ");
@@ -492,15 +493,15 @@ public class StaffDetailController extends BaseController {
 				List<String> repeatList = staffdetailService.findUserCodeByModel(listData);
 				if(repeatList!=null && repeatList.size()>0){
 					commonBase.setCode(2);
-					commonBase.setMessage("此区间内编码已存在！");
-					return commonBase;
+					//commonBase.setMessage("此区间内编码已存在！");
+					//return commonBase;
 				}
 
 				List<String> StaffIdentList = staffdetailService.findStaffIdentByModel(listData);
 				if(StaffIdentList!=null && StaffIdentList.size()>0){
 					commonBase.setCode(2);
-					commonBase.setMessage("此区间内身份证号已存在！");
-					return commonBase;
+					//commonBase.setMessage("此区间内身份证号已存在！");
+					//return commonBase;
 				} 
 				staffdetailService.deleteUpdateAll(listData);
 				commonBase.setCode(0);
@@ -517,7 +518,7 @@ public class StaffDetailController extends BaseController {
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/deleteAll")
 	public @ResponseBody CommonBase deleteAll() throws Exception{
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "delete")){return null;} //校验权限	
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "delete")){return null;} //校验权限	
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
 		
@@ -556,7 +557,7 @@ public class StaffDetailController extends BaseController {
 				    TypeCodeListen, TypeCodeSummy, TableNameSummy);
 			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 				commonBase.setCode(2);
-				commonBase.setMessage("获取可操作的数据的条件失败！");
+				commonBase.setMessage(Message.GetHelpfulDetailFalue);
 				return commonBase;
 			}
 			
@@ -667,7 +668,7 @@ public class StaffDetailController extends BaseController {
 							TypeCodeListen, TypeCodeSummy, TableNameSummy);
 					if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 						commonBase.setCode(2);
-						commonBase.setMessage("获取可操作的数据的条件失败！");
+						commonBase.setMessage(Message.GetHelpfulDetailFalue);
 					} else {
 						// 局部变量
 						LeadingInExcelToPageData<PageData> testExcel = null;
@@ -781,28 +782,30 @@ public class StaffDetailController extends BaseController {
 												if(!sbRet.contains("人员编码不能为空！")){
 													sbRet.add("人员编码不能为空！");
 												}
-											}
-											if(listUserCode.contains(getUSER_CODE.trim())){
-												String strUserAdd = "人员编码:" + getUSER_CODE + "重复！";
-												if(!sbRet.contains(strUserAdd)){
-													sbRet.add(strUserAdd);
-												}
 											} else {
-												listUserCode.add(getUSER_CODE.trim());
+												if(listUserCode.contains(getUSER_CODE.trim())){
+													//String strUserAdd = "人员编码:" + getUSER_CODE + "重复！";
+													//if(!sbRet.contains(strUserAdd)){
+													//	sbRet.add(strUserAdd);
+													//}
+												} else {
+													listUserCode.add(getUSER_CODE.trim());
+												}
 											}
 											if(!(getSTAFF_IDENT!=null && !getSTAFF_IDENT.trim().equals(""))){
 												if(!sbRet.contains("身份证号不能为空！")){
 													sbRet.add("身份证号不能为空！");
 												}
-											}
-											if(listStaffIdent.contains(getSTAFF_IDENT.trim())){
-												String getUSER_NAME = (String) pdAdd.get("USER_NAME");
-												String strUserAdd = "编号：" + getUSER_CODE + " 姓名：" + getUSER_NAME + " 身份证号：" + getSTAFF_IDENT + " 导入数据重复！";
-												if(!sbRet.contains(strUserAdd)){
-													sbRet.add(strUserAdd);
-												}
 											} else {
-												listStaffIdent.add(getSTAFF_IDENT.trim());
+												if(listStaffIdent.contains(getSTAFF_IDENT.trim())){
+													String getUSER_NAME = (String) pdAdd.get("USER_NAME");
+													//String strUserAdd = "编号：" + getUSER_CODE + " 姓名：" + getUSER_NAME + " 身份证号：" + getSTAFF_IDENT + " 导入数据重复！";
+													//if(!sbRet.contains(strUserAdd)){
+													//	sbRet.add(strUserAdd);
+													//}
+												} else {
+													listStaffIdent.add(getSTAFF_IDENT.trim());
+												}
 											}
 											String getESTB_DEPT = (String) pdAdd.get("ESTB_DEPT");
 											if(!(getESTB_DEPT!=null && !getESTB_DEPT.trim().equals(""))){
@@ -887,7 +890,7 @@ public class StaffDetailController extends BaseController {
 	@RequestMapping(value="/excel")
 	public ModelAndView exportExcel(JqPage page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"导出StaffDetail到excel");
-		if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
+		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
 		PageData getPd = this.getPageData();
 		//员工组
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
@@ -989,6 +992,11 @@ public class StaffDetailController extends BaseController {
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		if(!(TypeCodeDetail!=null && !TypeCodeDetail.trim().equals(""))){
+			commonBase.setCode(2);
+			commonBase.setMessage(Message.SelectedTabOppositeReportTypeIsNull);
+			return commonBase;
+		}
 
 		//判断选择为必须选择的
 		String strGetCheckMustSelected = CheckMustSelectedAndSame(emplGroupType, SelectedCustCol7, SelectedDepartCode, true);
@@ -1047,15 +1055,15 @@ public class StaffDetailController extends BaseController {
 			}
 		}
 		if(!(emplGroupType!=null && !emplGroupType.trim().equals(""))){
-			strRut += "工资对应的员工组编码为空！";
+			strRut += Message.StaffSelectedTabOppositeGroupTypeIsNull;
 		}
 		return strRut;
 	}
 
 	private String CheckState(String CUST_COL7, String DEPT_CODE) throws Exception{
-		String strRut = "选项卡对应的封存类型为空！";
+		String strRut = Message.SelectedTabOppositeReportTypeIsNull;
 		if(TypeCodeDetail != null && !TypeCodeDetail.trim().equals("")){
-			strRut = "当前期间已封存！";
+			strRut = Message.CurrentDurationBeSealed;
 			if(CUST_COL7 != null && !CUST_COL7.trim().equals("") && DEPT_CODE != null && !DEPT_CODE.trim().equals("")){
 				//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
 				PageData statePd = new PageData();
