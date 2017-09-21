@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.session.Session;
@@ -55,7 +56,7 @@ public class SysUserController extends BaseController {
 			if(Tools.checkKey("USERNAME", pd.getString("FKEY"))){	//检验请求key值是否合法
 				if(AppUtil.checkParam("registerSysUser", pd)){		//检查参数
 					
-					Session session = Jurisdiction.getSession();
+					HttpSession session = Jurisdiction.getSession();
 					String sessionCode = (String)session.getAttribute(Const.SESSION_SECURITY_CODE);		//获取session中的验证码
 					String rcode = pd.getString("rcode");
 					if(Tools.notEmpty(sessionCode) && sessionCode.equalsIgnoreCase(rcode)){				//判断登录验证码

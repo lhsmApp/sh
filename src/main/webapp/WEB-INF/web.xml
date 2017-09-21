@@ -27,7 +27,7 @@
   </filter-mapping>
   <context-param>
     <param-name>webAppRootKey</param-name>
-    <param-value>www.1b23.com</param-value>
+    <param-value>sh</param-value>
   </context-param>
   <filter>
     <filter-name>DruidWebStatFilter</filter-name>
