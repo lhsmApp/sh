@@ -190,7 +190,7 @@ public class StaffDetailController extends BaseController {
 		// ***********************************************************
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, 
-				departmentService,userService,keyListBase, null);//
+				departmentService,userService,keyListBase, null, null);//
 		String jqGridColModel = tmpl.generateStructure(SelectedTableNo, UserDepartCode, 3, MustNotEditList);
 		
 		SqlUserdata = tmpl.getSqlUserdata();
@@ -399,14 +399,14 @@ public class StaffDetailController extends BaseController {
 		List<String> repeatList = staffdetailService.findUserCodeByModel(listData);
 		if(repeatList!=null && repeatList.size()>0){
 			commonBase.setCode(2);
-			//commonBase.setMessage("此区间内编码已存在！");
-			//return commonBase;
+			commonBase.setMessage("此区间内编码已存在！");
+			return commonBase;
 		} 
 		List<String> StaffIdentList = staffdetailService.findStaffIdentByModel(listData);
 		if(StaffIdentList!=null && StaffIdentList.size()>0){
 			commonBase.setCode(2);
-			//commonBase.setMessage("此区间内身份证号已存在！");
-			//return commonBase;
+			commonBase.setMessage("此区间内身份证号已存在！");
+			return commonBase;
 		}
         staffdetailService.deleteUpdateAll(listData);
 		commonBase.setCode(0);
@@ -475,14 +475,14 @@ public class StaffDetailController extends BaseController {
 	        	String strStaffIdent = item.getString("STAFF_IDENT__");
 	        	if(listUserCodeAdd.contains(strUserCode)){
 					commonBase.setCode(2);
-					//commonBase.setMessage("此区间内编码重复:" + strUserCode);
-					//return commonBase;
+					commonBase.setMessage("此区间内编码重复:" + strUserCode);
+					return commonBase;
 	        	}
 	        	listUserCodeAdd.add(strUserCode);
 	        	if(listStaffIdentAdd.contains(strStaffIdent)){
 					commonBase.setCode(2);
-					//commonBase.setMessage("此区间内身份证号重复:" + strStaffIdent);
-					//return commonBase;
+					commonBase.setMessage("此区间内身份证号重复:" + strStaffIdent);
+					return commonBase;
 	        	}
 	        	listStaffIdentAdd.add(strStaffIdent);
 	        	item.put("BILL_CODE", " ");
@@ -493,15 +493,15 @@ public class StaffDetailController extends BaseController {
 				List<String> repeatList = staffdetailService.findUserCodeByModel(listData);
 				if(repeatList!=null && repeatList.size()>0){
 					commonBase.setCode(2);
-					//commonBase.setMessage("此区间内编码已存在！");
-					//return commonBase;
+					commonBase.setMessage("此区间内编码已存在！");
+					return commonBase;
 				}
 
 				List<String> StaffIdentList = staffdetailService.findStaffIdentByModel(listData);
 				if(StaffIdentList!=null && StaffIdentList.size()>0){
 					commonBase.setCode(2);
-					//commonBase.setMessage("此区间内身份证号已存在！");
-					//return commonBase;
+					commonBase.setMessage("此区间内身份证号已存在！");
+					return commonBase;
 				} 
 				staffdetailService.deleteUpdateAll(listData);
 				commonBase.setCode(0);
@@ -784,10 +784,10 @@ public class StaffDetailController extends BaseController {
 												}
 											} else {
 												if(listUserCode.contains(getUSER_CODE.trim())){
-													//String strUserAdd = "人员编码:" + getUSER_CODE + "重复！";
-													//if(!sbRet.contains(strUserAdd)){
-													//	sbRet.add(strUserAdd);
-													//}
+													String strUserAdd = "人员编码:" + getUSER_CODE + "重复！";
+													if(!sbRet.contains(strUserAdd)){
+														sbRet.add(strUserAdd);
+													}
 												} else {
 													listUserCode.add(getUSER_CODE.trim());
 												}
@@ -799,10 +799,10 @@ public class StaffDetailController extends BaseController {
 											} else {
 												if(listStaffIdent.contains(getSTAFF_IDENT.trim())){
 													String getUSER_NAME = (String) pdAdd.get("USER_NAME");
-													//String strUserAdd = "编号：" + getUSER_CODE + " 姓名：" + getUSER_NAME + " 身份证号：" + getSTAFF_IDENT + " 导入数据重复！";
-													//if(!sbRet.contains(strUserAdd)){
-													//	sbRet.add(strUserAdd);
-													//}
+													String strUserAdd = "编号：" + getUSER_CODE + " 姓名：" + getUSER_NAME + " 身份证号：" + getSTAFF_IDENT + " 导入数据重复！";
+													if(!sbRet.contains(strUserAdd)){
+														sbRet.add(strUserAdd);
+													}
 												} else {
 													listStaffIdent.add(getSTAFF_IDENT.trim());
 												}

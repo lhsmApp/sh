@@ -93,5 +93,11 @@ public interface SysSealedInfoManager{
 	 * @throws Exception
 	 */
 	public String valiState(PageData pd)throws Exception;
+	
+	/**获取封存状态，用于页面状态
+	 * @param pd
+	 * @throws Exception
+	 */
+	public List<PageData> getDeptOffList(String strWhereSql)throws Exception;
 }
 

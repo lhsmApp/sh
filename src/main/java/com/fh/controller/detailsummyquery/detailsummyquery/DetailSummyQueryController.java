@@ -146,7 +146,7 @@ public class DetailSummyQueryController extends BaseController {
 		// ***********************************************************
 		
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, 
-				departmentService,userService, keyListBase, jqGridGroupColumn);
+				departmentService,userService, keyListBase, jqGridGroupColumn, null);
 		String jqGridColModel = tmpl.generateStructureNoEdit(SelectedTableNo, UserDepartCode);
 
 		//分组字段是否显示在表中

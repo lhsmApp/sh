@@ -151,7 +151,7 @@ public class AccountsQueryController extends BaseController {
 		mv.addObject("zTreeNodes", DepartmentSelectTreeSource);
 		// ***********************************************************
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService,
-				departmentService,userService, keyListBase, null);
+				departmentService,userService, keyListBase, null, null);
 		String jqGridColModel = tmpl.generateStructureAccount(SelectedTableNo, UserDepartCode);
 		mv.addObject("jqGridColModel", jqGridColModel);
 
@@ -291,7 +291,7 @@ public class AccountsQueryController extends BaseController {
 		
 		List<String> resetList = Arrays.asList("USER_CODE");
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, 
-				dictionariesService, departmentService,userService,resetList, null);
+				dictionariesService, departmentService,userService,resetList, null, null);
 		String detailColModel = tmpl.generateStructureAccount(strTapTypeCode, DEPT_CODE);
 
 		// 字典

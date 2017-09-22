@@ -288,4 +288,15 @@
 			BILL_TYPE=#{VALI_TYPE} and RPT_DEPT=#{RPT_DEPT} and RPT_DUR=#{RPT_DUR} and BILL_OFF=#{BILL_OFF}
 		</where>
 	</select>
+	
+	<!-- 获取封存状态，用于页面状态-->
+	<select id="getDeptOffList" parameterType="string" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		<where>
+		    ${value}
+		</where>
+	</select>
 </mapper>

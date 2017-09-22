@@ -75,7 +75,11 @@
 		    <include refid="tableName"></include>
         <where>
 		<foreach item="item" index="index" collection="list" open=" " separator=" or " close=" ">
-            (BUSI_DATE = #{item.BUSI_DATE} and USER_CODE = #{item.USER_CODE} and USER_CODE != #{item.USER_CODE__} ${item.CanOperate})
+            (BUSI_DATE = #{item.BUSI_DATE}
+             <!-- and USER_CODE = #{item.USER_CODE} and USER_CODE != #{item.USER_CODE__} -->
+	        and DEPT_CODE = #{item.DEPT_CODE} and CUST_COL7 = #{item.CUST_COL7} 
+	        and USER_CODE = #{item.USER_CODE} and USER_CODE != #{item.USER_CODE__}
+            ${item.CanOperate})
 		</foreach>
 		</where>
 	</select>
@@ -84,7 +88,10 @@
 		from 
 		<include refid="tableName"></include>
 		where BUSI_DATE = '${SystemDateTime}'
-		and (DEPT_CODE != '${SelectedDepartCode}' or CUST_COL7 != '${SelectedCustCol7}')
+		<!-- and (DEPT_CODE != '${SelectedDepartCode}' or CUST_COL7 != '${SelectedCustCol7}') -->
+		and DEPT_CODE = '${SelectedDepartCode}' 
+        and CUST_COL7 = '${SelectedCustCol7}'
+        and 1 != 1
 		${CanOperate}
 	</select>
 	

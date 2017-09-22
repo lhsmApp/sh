@@ -117,7 +117,7 @@ public class QueryFeildString {
 	 * @return
 	 * @throws Exception
 	 */
-	private static String getSqlInString(String strList) throws Exception {
+	public static String getSqlInString(String strList) throws Exception {
 		String strIn = "";
 		if(strList!=null && !strList.trim().equals("")){
 			String[] list = strList.replace(" ", "").split(",");

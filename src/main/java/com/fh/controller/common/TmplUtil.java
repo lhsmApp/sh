@@ -2,7 +2,7 @@ package com.fh.controller.common;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
+import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +20,7 @@ import com.fh.util.Const;
 import com.fh.util.PageData;
 import com.fh.util.Tools;
 import com.fh.util.enums.BillState;
+import com.fh.util.enums.DurState;
 
 /**
  * 模板通用类
@@ -73,6 +74,9 @@ public class TmplUtil {
 		return map_SetColumnsList;
 	}
 	
+	//另加的列、配置模板之外的列
+	private List<String> AdditionalColumnsList = new ArrayList<String>();
+	
 
 	public TmplUtil(TmplConfigManager tmplconfigService, TmplConfigDictManager tmplConfigDictService,
 			DictionariesManager dictionariesService, DepartmentManager departmentService,UserManager userService) {
@@ -85,7 +89,7 @@ public class TmplUtil {
 
 	public TmplUtil(TmplConfigManager tmplconfigService, TmplConfigDictManager tmplConfigDictService,
 			DictionariesManager dictionariesService, DepartmentManager departmentService,UserManager userService,
-			List<String> keyList, List<String> jqGridGroupColumn) {
+			List<String> keyList, List<String> jqGridGroupColumn, List<String> AdditionalColumnsList) {
 		TmplUtil.tmplconfigService = tmplconfigService;
 		this.tmplConfigDictService = tmplConfigDictService;
 		this.dictionariesService = dictionariesService;
@@ -94,6 +98,8 @@ public class TmplUtil {
 		this.keyList = keyList;
 		this.jqGridGroupColumn = jqGridGroupColumn;
 		InitJqGridGroupColumnShow();
+		this.AdditionalColumnsList = AdditionalColumnsList;
+		
 	}
 
 	//分组字段是否显示在表中
@@ -363,6 +369,31 @@ public class TmplUtil {
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 		map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
 		
+		StringBuilder jqGridColModelAdditionalColumns = new StringBuilder();
+		if(AdditionalColumnsList != null && AdditionalColumnsList.size() > 0){
+			for(String colName : AdditionalColumnsList){
+				if(jqGridColModelAdditionalColumns != null && !jqGridColModelAdditionalColumns.toString().trim().equals("")){
+					jqGridColModelAdditionalColumns.append(", ");
+				}
+				jqGridColModelAdditionalColumns.append(" { ");
+				jqGridColModelAdditionalColumns.append(" name: '").append(colName).append("', ");
+				jqGridColModelAdditionalColumns.append(" label: '封存状态', ");
+				
+				// 选择
+				//jqGridColModelAdditionalColumns.append(" edittype:'select', ");
+				//jqGridColModelAdditionalColumns.append(" editoptions:{value:'" + strSelectValue + "'}, ");
+				// 翻译
+				//jqGridColModelAdditionalColumns.append(" formatter: 'select', ");
+				//jqGridColModelAdditionalColumns.append(" formatoptions: {value: '" + strDicValue + "'}, ");
+				// 查询
+				jqGridColModelAdditionalColumns.append(" stype: 'select', ");
+				jqGridColModelAdditionalColumns.append(" searchoptions: {value: ':[All]'}, ");
+				
+				jqGridColModelAdditionalColumns.append(" hidden: false, editable: false ");
+				jqGridColModelAdditionalColumns.append(" } ");
+			}
+		}
+		
 		PageData pd=new PageData();
 		pd.put("TABLE_NO", tableNo);
 		PageData pdResult=tmplconfigService.findTableCodeByTableNo(pd);
@@ -465,6 +496,12 @@ public class TmplUtil {
 		// 拼接真正设置的jqGrid的ColModel
 		StringBuilder sbJqGridColModelAll = new StringBuilder();
 		sbJqGridColModelAll.append("[");
+		sbJqGridColModelAll.append(jqGridColModelAdditionalColumns);
+		if (jqGridColModelAdditionalColumns!=null && !jqGridColModelAdditionalColumns.toString().trim().equals("")) {
+			if (jqGridColModelCustom!=null && !jqGridColModelCustom.toString().trim().equals("")) {
+				sbJqGridColModelAll.append(", ");
+			}
+		}
 		sbJqGridColModelAll.append(jqGridColModelCustom);
 		if (jqGridColModelCustom!=null && !jqGridColModelCustom.toString().trim().equals("")) {
 			if (jqGridColModelKey!=null && !jqGridColModelKey.toString().trim().equals("")) {

@@ -159,7 +159,7 @@ public class FinanceAccountsController extends BaseController {
 		// ***********************************************************
 				
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, 
-				departmentService,userService, keyListBase, null);
+				departmentService,userService, keyListBase, null, null);
 		String jqGridColModel = tmpl.generateStructureAccount(SelectedTableNo, UserDepartCode);
 		mv.addObject("jqGridColModel", jqGridColModel);
 
@@ -302,7 +302,7 @@ public class FinanceAccountsController extends BaseController {
 		
 		List<String> resetList = Arrays.asList("USER_CODE");
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, 
-				departmentService,userService,resetList, null);
+				departmentService,userService,resetList, null, null);
 		String detailColModel = tmpl.generateStructureAccount(strTapTypeCode, DEPT_CODE);
 
 		// 字典

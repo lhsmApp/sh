@@ -25,6 +25,7 @@ import com.fh.controller.common.DictsUtil;
 import com.fh.controller.common.FilterBillCode;
 import com.fh.controller.common.Message;
 import com.fh.controller.common.QueryFeildString;
+import com.fh.controller.common.SetListReportState;
 import com.fh.controller.common.TmplUtil;
 import com.fh.entity.CommonBase;
 import com.fh.entity.JqPage;
@@ -127,6 +128,11 @@ public class HouseFundSummyController extends BaseController {
     String SumFieldToString = "";//QueryFeildString.tranferListStringToGroupbyString(SumField);
 	//界面查询字段
     List<String> QueryFeildList = Arrays.asList("DEPT_CODE", "USER_CATG", "USER_GROP", "CUST_COL7", "UNITS_CODE", "ORG_UNIT");
+	//另加的列、配置模板之外的列 
+    //目前只能这么设置，改设置改的地方多
+	Map<String, String> AdditionalColumnsMap = new HashMap<String , String>(){{  
+        put("ReportState", "STATE");
+    }};
     //查询的所有可操作的责任中心
     List<String> AllDeptCode = new ArrayList<String>();
 
@@ -192,9 +198,13 @@ public class HouseFundSummyController extends BaseController {
 		mv.addObject("zTreeNodes2", UnitsCodeSelectTreeSource);
 		//组织单元文本字典ORGUNIT:"ORG_UNIT"
 		mv.addObject("ORGUNIT", DictsUtil.getDictsByParentCode(dictionariesService, "ORGUNIT"));
-		
+
+		//另加的列、配置模板之外的列
+	    Set<String> AdditionalColumnsSet = AdditionalColumnsMap.keySet();
+	    List<String> additionalColumnsList = new ArrayList<String>();
+	    additionalColumnsList.addAll(AdditionalColumnsSet);
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, 
-				departmentService,userService, keyListBase, jqGridGroupColumn);
+				departmentService,userService, keyListBase, jqGridGroupColumn, additionalColumnsList);
 		String jqGridColModel = tmpl.generateStructureNoEdit(TypeCodeSummy, UserDepartCode);
 
 		//分组字段是否显示在表中
@@ -279,6 +289,10 @@ public class HouseFundSummyController extends BaseController {
 		}
 		page.setPd(getPd);
 		List<PageData> varList = housefundsummyService.JqPage(page);	//列出Betting列表
+		varList = SetListReportState.SetListReportList(varList, syssealedinfoService, 
+				AdditionalColumnsMap, "ReportState", 
+				SystemDateTime, SelectedDepartCode, SelectedCustCol7,
+				TypeCodeSummy);
 		int records = housefundsummyService.countJqGridExtend(page);
 		PageData userdata = null;
 		if(SqlUserdata!=null && !SqlUserdata.toString().trim().equals("")){
@@ -392,6 +406,14 @@ public class HouseFundSummyController extends BaseController {
 				item.setBILL_TYPE(TypeCodeSummy.toString());
 				item.setSTATE(DurState.Sealed.getNameKey());// 枚举  1封存,0解封
 				listSysSealed.add(item);
+				
+        		//判断汇总信息为未上报
+    			String checkStateLast = CheckStateLast(item);
+    			if(checkStateLast!=null && !checkStateLast.trim().equals("")){
+    				commonBase.setCode(2);
+    				commonBase.setMessage(checkStateLast);
+    				return commonBase;
+    			}
 			}
 			syssealedinfoService.report(listSysSealed);
 			commonBase.setCode(0);

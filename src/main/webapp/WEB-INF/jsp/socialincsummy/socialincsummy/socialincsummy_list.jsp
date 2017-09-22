@@ -58,10 +58,6 @@
 											onclick="showQueryCondi($('#jqGrid'),null,true)">
 											<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>隐藏查询</span>
 										</button>
-						<button id="btnSummy" class="btn btn-white btn-info btn-sm"
-							onclick="btnSummyClick()">
-							<i class="ace-icon fa fa-pencil-square-o bigger-120 blue"></i> <span>汇总</span>
-						</button>
 								
 						            <div class="pull-right">
 									    <span class="label label-xlg label-blue arrowed-left"
@@ -91,7 +87,7 @@
 												    allSelectable="false" noGroup="false"></div>
 											    <input type="text" id="SelectedDepartCode" hidden></input>
 											</span>
-											<span class="pull-left" style="margin-right: 5px;">
+											<span class="pull-left" style="margin-right: 5px;" hidden>
 												<select class="chosen-select form-control"
 													name="SelectedUserGrop" id="SelectedUserGrop"
 													data-placeholder="请选择员工组"
@@ -102,7 +98,7 @@
 													</c:forEach>
 												</select>
 											</span>
-											<span class="pull-left" style="margin-right: 5px;">
+											<span class="pull-left" style="margin-right: 5px;" hidden>
 												<select class="chosen-select form-control"
 													name="SelectedUserCatg" id="SelectedUserCatg"
 													data-placeholder="请选择企业特定员工分类"
@@ -113,7 +109,7 @@
 													</c:forEach>
 												</select>
 											</span>
-											<span class="pull-left" style="margin-right: 5px;">
+											<span class="pull-left" style="margin-right: 5px;" hidden>
 												<select class="chosen-select form-control"
 													name="SelectedOrgUnit" id="SelectedOrgUnit"
 													data-placeholder="请选择组织单元文本"
@@ -129,6 +125,10 @@
 												    allSelectable="false" noGroup="false"></div>
 											    <input type="text" id="SelectedUnitsCode" hidden></input>
 											</span> -->
+						<button id="btnSummy" class="btn btn-white btn-info btn-sm"
+							onclick="btnSummyClick()">
+							<i class="ace-icon fa fa-pencil-square-o bigger-120 blue"></i> <span>汇总</span>
+						</button>
 												<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
 													<i class="ace-icon fa fa-search bigger-110"></i>
 												</button>
@@ -327,15 +327,15 @@
 				sepclass : "ui-separator",
 				sepcontent: ""
 			});
-	        $(gridBase_selector).navButtonAdd(pagerBase_selector, {
-				id : "batchEdit",
-	            title: "汇总",
-	            caption: "汇总",
-	        	buttonicon: "ace-icon fa fa-pencil-square-o purple",
-	            position: "last",
-	            onClickButton: summary,
-	            cursor : "pointer"
-	        });
+			//$(gridBase_selector).navButtonAdd(pagerBase_selector, {
+			//	id : "batchEdit",
+	        //    title: "汇总",
+	        //    caption: "汇总",
+	        //	buttonicon: "ace-icon fa fa-pencil-square-o purple",
+	        //    position: "last",
+	        //    onClickButton: summary,
+	        //    cursor : "pointer"
+	        //});
 			$(gridBase_selector).navButtonAdd(pagerBase_selector, {
 				id : "report",
 	             caption : "上报",

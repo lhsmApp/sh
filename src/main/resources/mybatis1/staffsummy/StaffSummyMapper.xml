@@ -31,7 +31,7 @@
 		                      and BILL_TYPE = '${pd.TypeCodeDetail}'
 		                      and BILL_OFF = '${pd.SelectedCustCol7}'
 		                      )
-		and DEPT_CODE not in (select RPT_DEPT 
+		<!-- and DEPT_CODE not in (select RPT_DEPT 
 		                      from tb_sys_sealed_info 
 		                      where RPT_DUR = '${pd.SystemDateTime}' 
 		                      and STATE = '${pd.DurState}'
@@ -43,7 +43,7 @@
 		                      where RPT_DUR = '${pd.SystemDateTime}' 
 		                      and BILL_TYPE = '${pd.TypeCodeListen}'
 		                      and BILL_OFF = '${pd.SelectedCustCol7}'
-		                      )
+		                      ) -->
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
@@ -67,7 +67,7 @@
 		                      and BILL_TYPE = '${pd.TypeCodeSummy}'
 		                      and BILL_OFF = '${pd.SelectedCustCol7}'
 		                      )
-		and DEPT_CODE in (select RPT_DEPT 
+		<!-- and DEPT_CODE in (select RPT_DEPT 
 		                      from tb_sys_sealed_info 
 		                      where RPT_DUR = '${pd.SystemDateTime}' 
 		                      and STATE = '${pd.DurState}'
@@ -79,7 +79,7 @@
 		                      where RPT_DUR = '${pd.SystemDateTime}' 
 		                      and BILL_TYPE = '${pd.TypeCodeListen}'
 		                      and BILL_OFF = '${pd.SelectedCustCol7}'
-		                      )
+		                      ) -->
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
@@ -98,7 +98,7 @@
 		                      and BILL_TYPE = '${pd.TypeCodeSummy}'
 		                      and BILL_OFF = '${pd.SelectedCustCol7}'
 		                      )
-		and DEPT_CODE in (select RPT_DEPT 
+		<!-- and DEPT_CODE in (select RPT_DEPT 
 		                      from tb_sys_sealed_info 
 		                      where RPT_DUR = '${pd.SystemDateTime}' 
 		                      and STATE = '${pd.DurState}'
@@ -110,7 +110,7 @@
 		                      where RPT_DUR = '${pd.SystemDateTime}' 
 		                      and BILL_TYPE = '${pd.TypeCodeListen}'
 		                      and BILL_OFF = '${pd.SelectedCustCol7}'
-		                      )
+		                      ) -->
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>

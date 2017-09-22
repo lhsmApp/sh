@@ -26,6 +26,7 @@ import com.fh.controller.common.DictsUtil;
 import com.fh.controller.common.FilterBillCode;
 import com.fh.controller.common.Message;
 import com.fh.controller.common.QueryFeildString;
+import com.fh.controller.common.SetListReportState;
 import com.fh.controller.common.TmplUtil;
 import com.fh.entity.CommonBase;
 import com.fh.entity.JqPage;
@@ -120,7 +121,7 @@ public class StaffSummyController extends BaseController {
 	Map<String, TmplConfigDetail> map_SetColumnsList = new HashMap<String, TmplConfigDetail>();
 	
 	//界面分组字段
-	List<String> jqGridGroupColumn = Arrays.asList("DEPT_CODE");
+	List<String> jqGridGroupColumn = Arrays.asList("DEPT_CODE");//, "ReportState"
 
 	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
 	private List<String> keyListBase = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7");
@@ -130,6 +131,11 @@ public class StaffSummyController extends BaseController {
     String SumFieldToString = "";//QueryFeildString.tranferListStringToGroupbyString(SumField);
 	//界面查询字段   员工组、账套、组织机构（特殊处理）、所属二级单位、组织单元文本
     List<String> QueryFeildList = Arrays.asList("USER_GROP", "CUST_COL7", "DEPT_CODE", "UNITS_CODE", "ORG_UNIT");
+	//另加的列、配置模板之外的列 
+    //目前只能这么设置，改设置改的地方多
+	Map<String, String> AdditionalColumnsMap = new HashMap<String , String>(){{  
+        put("ReportState", "STATE");
+    }};
     //查询的所有可操作的责任中心
     List<String> AllDeptCode = new ArrayList<String>();
     
@@ -191,9 +197,13 @@ public class StaffSummyController extends BaseController {
 		mv.addObject("zTreeNodes2", UnitsCodeSelectTreeSource);
 		//组织单元文本字典ORGUNIT:"ORG_UNIT"
 		mv.addObject("ORGUNIT", DictsUtil.getDictsByParentCode(dictionariesService, "ORGUNIT"));
-		
+
+		//另加的列、配置模板之外的列
+	    Set<String> AdditionalColumnsSet = AdditionalColumnsMap.keySet();
+	    List<String> additionalColumnsList = new ArrayList<String>();
+	    additionalColumnsList.addAll(AdditionalColumnsSet);
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, 
-				departmentService,userService, keyListBase, jqGridGroupColumn);
+				departmentService,userService, keyListBase, jqGridGroupColumn, additionalColumnsList);
 		String jqGridColModel = tmpl.generateStructureNoEdit(SelectedTableNo, UserDepartCode);
 
 		//分组字段是否显示在表中
@@ -278,6 +288,10 @@ public class StaffSummyController extends BaseController {
 		}
 		page.setPd(getPd);
 		List<PageData> varList = staffsummyService.JqPage(page);	//列出Betting列表
+		varList = SetListReportState.SetListReportList(varList, syssealedinfoService, 
+				AdditionalColumnsMap, "ReportState", 
+				SystemDateTime, SelectedDepartCode, SelectedCustCol7,
+				TypeCodeSummy);
 		int records = staffsummyService.countJqGridExtend(page);
 		PageData userdata = null;
 		if(SqlUserdata!=null && !SqlUserdata.toString().trim().equals("")){
@@ -395,6 +409,14 @@ public class StaffSummyController extends BaseController {
 				item.setBILL_OFF(data.getString("CUST_COL7__"));
 				item.setSTATE(DurState.Sealed.getNameKey());// 枚举  1封存,0解封
 				listSysSealed.add(item);
+				
+        		//判断汇总信息为未上报
+    			String checkStateLast = CheckStateLast(item);
+    			if(checkStateLast!=null && !checkStateLast.trim().equals("")){
+    				commonBase.setCode(2);
+    				commonBase.setMessage(checkStateLast);
+    				return commonBase;
+    			}
 			}
 			syssealedinfoService.report(listSysSealed);
 			commonBase.setCode(0);

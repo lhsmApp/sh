@@ -53,7 +53,11 @@
 		from ${TableName}
         <where>
 		<foreach item="item" index="index" collection="ListData" open=" " separator=" or " close=" ">
-            (BUSI_DATE = #{item.BUSI_DATE} and USER_CODE = #{item.USER_CODE} and USER_CODE != #{item.USER_CODE__})
+            (BUSI_DATE = #{item.BUSI_DATE} 
+            <!-- and USER_CODE = #{item.USER_CODE} and USER_CODE != #{item.USER_CODE__} -->
+	        and DEPT_CODE = #{item.DEPT_CODE} and CUST_COL7 = #{item.CUST_COL7} 
+            and USER_CODE = #{item.USER_CODE} and USER_CODE != #{item.USER_CODE__}
+            )
 		</foreach>
 		</where>
 	</select>
@@ -61,13 +65,23 @@
 		select USER_CODE
 		from ${TableName}
 		where BUSI_DATE = '${SystemDateTime}'
-		and ( 
+		<!-- and ( 
 		     DEPT_CODE != '${SelectedDepartCode}' 
 		     or CUST_COL7 != '${SelectedCustCol7}' 
 		     <if test="StaffOrNot!= null and StaffOrNot != ''">
 		         or USER_GROP != '${emplGroupType}'
 		     </if>
-		     )
+		     ) -->
+		and DEPT_CODE = '${SelectedDepartCode}' 
+        and CUST_COL7 = '${SelectedCustCol7}'
+        <choose>
+		     <when test="StaffOrNot!= null and StaffOrNot != ''">
+		         and USER_GROP != '${emplGroupType}'
+		     </when>
+		     <otherwise>
+		         and 1 != 1
+		     </otherwise>
+        </choose>
 	</select>
 	
 	<!-- 新增 -->
@@ -81,11 +95,11 @@
 		delete from ${TableName}
 		where BUSI_DATE = #{BUSI_DATE__} 
 		and USER_CODE = #{USER_CODE__} 
-	    <!-- and DEPT_CODE = #{DEPT_CODE__} 
+	    and DEPT_CODE = #{DEPT_CODE__} 
 	    and CUST_COL7 = #{CUST_COL7__} 
 		<if test="StaffOrNot!= null and StaffOrNot != ''">
 	        and USER_GROP = #{USER_GROP__} 
-		</if> -->
+		</if>
 	</delete>
 	
 	<!-- 批量删除 -->
@@ -94,12 +108,11 @@
 		where
 		<foreach item="item" index="index" collection="ListData" open=" (" separator=" or " close=") ">
             BUSI_DATE = #{item.BUSI_DATE__} and USER_CODE = #{item.USER_CODE__} 
-		    <!-- 
-	            and DEPT_CODE = #{DEPT_CODE__} 
-	            and CUST_COL7 = #{CUST_COL7__} 
-	            <if test="StaffOrNot!= null and StaffOrNot != ''">
+	        and DEPT_CODE = #{DEPT_CODE__} 
+	        and CUST_COL7 = #{CUST_COL7__} 
+	        <if test="StaffOrNot!= null and StaffOrNot != ''">
 	            and USER_GROP = #{USER_GROP__} 
-		    </if> -->
+		    </if>
 		</foreach>
 	</delete>
 	
