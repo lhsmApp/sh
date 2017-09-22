@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 
 import org.apache.shiro.session.Session;
 import org.springframework.stereotype.Controller;
@@ -70,7 +71,7 @@ public class HeadController extends BaseController {
 		try {
 			pd = this.getPageData();
 			List<PageData> pdList = new ArrayList<PageData>();
-			Session session = Jurisdiction.getSession();
+			HttpSession session = Jurisdiction.getSession();
 			PageData pds = new PageData();
 			/*pds = (PageData)session.getAttribute(Const.SESSION_userpds);
 			if(null == pds){

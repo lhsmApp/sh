@@ -159,24 +159,27 @@ public class SysSealedInfoController extends BaseController {
 						|| pd.getString("BILL_TYPE").equals(TmplType.TB_SOCIAL_INC_TRANSFER.getNameKey())
 						|| pd.getString("BILL_TYPE").equals(TmplType.TB_HOUSE_FUND_TRANSFER.getNameKey())) {
 					String tableCode = "";
+					String userGrop="";
 					if (pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey())
 							|| pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_MARKET.getNameKey())
 							|| pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_SYS_LABOR.getNameKey())
 							|| pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_OPER_LABOR.getNameKey())
 							|| pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_LABOR.getNameKey())) {
 						tableCode = "TB_STAFF_SUMMY";
+						userGrop=DictsUtil.getEmplGroupType(pd.getString("BILL_TYPE"));
 					} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_HOUSE_FUND_TRANSFER.getNameKey())) {
 						tableCode = "TB_HOUSE_FUND_SUMMY";
 					} else if (pd.getString("BILL_TYPE").equals(TmplType.TB_SOCIAL_INC_TRANSFER.getNameKey())) {
 						tableCode = "TB_SOCIAL_INC_SUMMY";
 					} else {
 						tableCode = "TB_STAFF_SUMMY";
+						userGrop=DictsUtil.getEmplGroupType(pd.getString("BILL_TYPE"));
 					}
 					pd.put("TABLE_CODE", tableCode);
 					User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
 					String userId = user.getUSER_ID();
 					pd.put("USER", userId);
-					pd.put("USER_GROP", DictsUtil.getEmplGroupType(pd.getString("BILL_TYPE")));
+					pd.put("USER_GROP",userGrop);
 					List<PageData> listSysUnlockInfo = sysUnlockInfoService.listSyncDelUnlock(pd); // 获取当前传输类型，当前二级单位当前期间当前封存状态为封存的的传输列表
 					if (listSysUnlockInfo != null && listSysUnlockInfo.size() > 0) {
 						PageData pdItem0 = listSysUnlockInfo.get(0);// 如果包含其中一条带有凭证号的记录，就可以证明此二级单位所有记录已经生成凭证号，不能再进行解封操作。

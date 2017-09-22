@@ -480,53 +480,58 @@ public class VoucherController extends BaseController {
 			call.setUseSOAPAction(true);
 			String message = (String) call.invoke(new Object[] { transferData });
 			System.out.println(message);
-			if (message.equals("TRUE")) {
-				String transferDataInsert = generateTransferData.generateTransferData(tableColumnsForTransfer,
-						mapTransferData, orgCode, TransferOperType.INSERT);
-				String messageInsert = (String) call.invoke(new Object[] { transferDataInsert });
-				if (messageInsert.equals("TRUE")) {
-					// 执行上传成功后对数据进行封存
-					List<SysSealed> listSysSealed = new ArrayList<SysSealed>();
-					User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
-					String userId = user.getUSER_ID();
-					// 将获取的字典数据进行分组
-					Map<String, List<PageData>> mapListTransferData = GroupUtils.group(listTransferData,
-							new GroupBy<String>() {
-								@Override
-								public String groupby(Object obj) {
-									PageData d = (PageData) obj;
-									return d.getString("DEPT_CODE"); // 分组依据为DEPT_CODE
-								}
-							});
-					// for (PageData pageData : mapListTransferData) {
-					for (Map.Entry<String, List<PageData>> entry : mapListTransferData.entrySet()) {
-						SysSealed item = new SysSealed();
-						// item.setBILL_CODE(pageData.getString("BILL_CODE"));
-						item.setBILL_CODE(" ");
-						item.setRPT_DEPT(entry.getKey());
-						List<PageData> listItem = entry.getValue();
-						PageData pgItem = listItem.get(0);
-						item.setRPT_DUR(pgItem.getString("BUSI_DATE"));
-						item.setBILL_OFF(pgItem.getString("CUST_COL7"));
-						item.setRPT_USER(userId);
-						item.setRPT_DATE(DateUtils.getCurrentTime());// YYYY-MM-DD
-																		// HH:MM:SS
-						// String sealType = getSealType(which, "2");// 封存类型
-						String sealType = which == null ? TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey() : which;// 传输接口类型
-						item.setBILL_TYPE(sealType);
-						item.setSTATE("1");// 枚举 1封存,0解封
-						listSysSealed.add(item);
+			if (message == null) {
+				commonBase.setCode(-1);
+				commonBase.setMessage("传输接口出错,请联系管理员！");
+			} else {
+				if (message.equals("TRUE")) {
+					String transferDataInsert = generateTransferData.generateTransferData(tableColumnsForTransfer,
+							mapTransferData, orgCode, TransferOperType.INSERT);
+					String messageInsert = (String) call.invoke(new Object[] { transferDataInsert });
+					if (messageInsert.equals("TRUE")) {
+						// 执行上传成功后对数据进行封存
+						List<SysSealed> listSysSealed = new ArrayList<SysSealed>();
+						User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
+						String userId = user.getUSER_ID();
+						// 将获取的字典数据进行分组
+						Map<String, List<PageData>> mapListTransferData = GroupUtils.group(listTransferData,
+								new GroupBy<String>() {
+									@Override
+									public String groupby(Object obj) {
+										PageData d = (PageData) obj;
+										return d.getString("DEPT_CODE"); // 分组依据为DEPT_CODE
+									}
+								});
+						// for (PageData pageData : mapListTransferData) {
+						for (Map.Entry<String, List<PageData>> entry : mapListTransferData.entrySet()) {
+							SysSealed item = new SysSealed();
+							// item.setBILL_CODE(pageData.getString("BILL_CODE"));
+							item.setBILL_CODE(" ");
+							item.setRPT_DEPT(entry.getKey());
+							List<PageData> listItem = entry.getValue();
+							PageData pgItem = listItem.get(0);
+							item.setRPT_DUR(pgItem.getString("BUSI_DATE"));
+							item.setBILL_OFF(pgItem.getString("CUST_COL7"));
+							item.setRPT_USER(userId);
+							item.setRPT_DATE(DateUtils.getCurrentTime());// YYYY-MM-DD
+																			// HH:MM:SS
+							// String sealType = getSealType(which, "2");// 封存类型
+							String sealType = which == null ? TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey() : which;// 传输接口类型
+							item.setBILL_TYPE(sealType);
+							item.setSTATE("1");// 枚举 1封存,0解封
+							listSysSealed.add(item);
+						}
+						syssealedinfoService.insertBatch(listSysSealed);
+						/******************************************************/
+						commonBase.setCode(0);
+					} else {
+						commonBase.setCode(-1);
+						commonBase.setMessage(messageInsert);
 					}
-					syssealedinfoService.insertBatch(listSysSealed);
-					/******************************************************/
-					commonBase.setCode(0);
 				} else {
 					commonBase.setCode(-1);
-					commonBase.setMessage(messageInsert);
+					commonBase.setMessage(message);
 				}
-			} else {
-				commonBase.setCode(-1);
-				commonBase.setMessage(message);
 			}
 		}
 		return commonBase;
@@ -643,20 +648,25 @@ public class VoucherController extends BaseController {
 			call.setUseSOAPAction(true);
 			String message = (String) call.invoke(new Object[] { transferData });
 			System.out.println(message);
-			if (message.equals("TRUE")) {
-				// 更改TB_SYS_UNLOCK_INFO删除状态
-				User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
-				String userId = user.getUSER_ID();
-				for (PageData pdItem : listTransferData) {
-					pdItem.put("DEL_USER", userId);
-					pdItem.put("DEL_DATE", DateUtils.getCurrentTime());// YYYY-MM-DD
-																		// HH:MM:SS
-				}
-				sysUnlockInfoService.edit(listTransferData);
-				commonBase.setCode(0);
-			} else {
+			if (message == null) {
 				commonBase.setCode(-1);
-				commonBase.setMessage(message);
+				commonBase.setMessage("传输接口出错,请联系管理员！");
+			} else {
+				if (message.equals("TRUE")) {
+					// 更改TB_SYS_UNLOCK_INFO删除状态
+					User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
+					String userId = user.getUSER_ID();
+					for (PageData pdItem : listTransferData) {
+						pdItem.put("DEL_USER", userId);
+						pdItem.put("DEL_DATE", DateUtils.getCurrentTime());// YYYY-MM-DD
+																			// HH:MM:SS
+					}
+					sysUnlockInfoService.edit(listTransferData);
+					commonBase.setCode(0);
+				} else {
+					commonBase.setCode(-1);
+					commonBase.setMessage(message);
+				}
 			}
 		}
 		return commonBase;

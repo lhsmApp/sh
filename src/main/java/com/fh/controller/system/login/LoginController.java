@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -97,7 +98,7 @@ public class LoginController extends BaseController {
 		String errInfo = "";
 		String KEYDATA[] = pd.getString("KEYDATA").split(",fh,");
 		if(null != KEYDATA && KEYDATA.length == 3){
-			Session session = Jurisdiction.getSession();
+			HttpSession session = Jurisdiction.getSession();
 			String sessionCode = (String)session.getAttribute(Const.SESSION_SECURITY_CODE);		//获取session中的验证码
 			String code = KEYDATA[2];
 			if(null == code || "".equals(code)){//判断效验码
@@ -168,7 +169,7 @@ public class LoginController extends BaseController {
 		PageData pd = new PageData();
 		pd = this.getPageData();
 		try{
-			Session session = Jurisdiction.getSession();
+			HttpSession session = Jurisdiction.getSession();
 			User user = (User)session.getAttribute(Const.SESSION_USER);						//读取session中的用户信息(单独用户信息)
 			if (user != null) {
 				/*User userr = (User)session.getAttribute(Const.SESSION_USERROL);				//读取session中的用户信息(含角色信息)
@@ -228,7 +229,7 @@ public class LoginController extends BaseController {
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Menu> getAttributeMenu(Session session, String USERNAME, String roleRights) throws Exception{
+	public List<Menu> getAttributeMenu(HttpSession session, String USERNAME, String roleRights) throws Exception{
 		List<Menu> allmenuList = new ArrayList<Menu>();
 		if(null == session.getAttribute(USERNAME + Const.SESSION_allmenuList)){	
 			allmenuList = menuService.listAllMenuQx("0");							//获取所有菜单
@@ -302,7 +303,7 @@ public class LoginController extends BaseController {
 	 * @return
 	 * @throws Exception 
 	 */
-	public void setAttributeToAllDEPARTMENT_ID(Session session, String USERNAME) throws Exception{
+	public void setAttributeToAllDEPARTMENT_ID(HttpSession session, String USERNAME) throws Exception{
 		String DEPARTMENT_IDS = "0",DEPARTMENT_ID = "0";
 		if(!"admin".equals(USERNAME)){
 			PageData pd = datajurService.getDEPARTMENT_IDS(USERNAME);
@@ -352,7 +353,7 @@ public class LoginController extends BaseController {
 		FHLOG.save(USERNAME, "退出");
 		ModelAndView mv = this.getModelAndView();
 		PageData pd = new PageData();
-		Session session = Jurisdiction.getSession();	//以下清除session缓存
+		HttpSession session = Jurisdiction.getSession();	//以下清除session缓存
 		session.removeAttribute(Const.SESSION_USER);
 		session.removeAttribute(USERNAME + Const.SESSION_ROLE_RIGHTS);
 		session.removeAttribute(USERNAME + Const.SESSION_allmenuList);

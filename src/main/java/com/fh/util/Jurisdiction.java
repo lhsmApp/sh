@@ -3,8 +3,13 @@ package com.fh.util;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.fh.entity.system.Menu;
 import com.fh.entity.system.User;
@@ -34,7 +39,7 @@ public class Jurisdiction {
 		 * 根据按钮权限，授权按钮(当前点的菜单和角色中各按钮的权限匹对)
 		 */
 		String USERNAME = getUsername(); // 获取当前登录者loginname
-		Session session = getSession();
+		HttpSession session = getSession();
 		List<Menu> menuList = (List<Menu>) session.getAttribute(USERNAME + Const.SESSION_allmenuList); // 获取菜单列表
 		return readMenu(menuList, menuUrl, session, USERNAME);
 	}
@@ -47,7 +52,7 @@ public class Jurisdiction {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static boolean readMenu(List<Menu> menuList, String menuUrl, Session session, String USERNAME) {
+	public static boolean readMenu(List<Menu> menuList, String menuUrl, HttpSession session, String USERNAME) {
 		for (int i = 0; i < menuList.size(); i++) {
 			if (menuList.get(i).getMENU_URL().split(".do")[0].equals(menuUrl.split(".do")[0])) { // 访问地址与菜单地址循环匹配，如何匹配到就进一步验证，如果没匹配到就不处理(可能是接口链接或其它链接)
 				if (!menuList.get(i).isHasMenu()) { // 判断有无此菜单权限
@@ -94,7 +99,7 @@ public class Jurisdiction {
 		 * 根据按钮权限，授权按钮(当前点的菜单和角色中各按钮的权限匹对)
 		 */
 		String USERNAME = getUsername(); // 获取当前登录者loginname
-		Session session = getSession();
+		HttpSession session = getSession();
 		List<Menu> menuList = (List<Menu>) session.getAttribute(USERNAME + Const.SESSION_allmenuList); // 获取菜单列表
 		return readMenuButton(menuList, menuUrl, session, USERNAME, type);
 	}
@@ -107,7 +112,7 @@ public class Jurisdiction {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static boolean readMenuButton(List<Menu> menuList, String menuUrl, Session session, String USERNAME,
+	public static boolean readMenuButton(List<Menu> menuList, String menuUrl, HttpSession session, String USERNAME,
 			String type) {
 		for (int i = 0; i < menuList.size(); i++) {
 			if (menuList.get(i).getMENU_URL().split(".do")[0].equals(menuUrl.split(".do")[0])) { // 访问地址与菜单地址循环匹配，如何匹配到就进一步验证，如果没匹配到就不处理(可能是接口链接或其它链接)
@@ -189,8 +194,18 @@ public class Jurisdiction {
 	 * 
 	 * @return
 	 */
-	public static Session getSession() {
+	public static HttpSession getSession() {
 		// Subject currentUser = SecurityUtils.getSubject();
-		return SecurityUtils.getSubject().getSession();
+		//return SecurityUtils.getSubject().getSession();
+		HttpServletRequest request=getRequest();
+		return request.getSession();
+	}
+	
+	/**得到request对象
+	 * @return
+	 */
+	public static HttpServletRequest getRequest() {
+		HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
+		return request;
 	}
 }
