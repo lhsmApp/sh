@@ -92,11 +92,12 @@
 						</div>
 					</div><!-- /.page-header -->
 			
-					<div class="row">
-						<div class="col-xs-12">
-							<div class="widget-box" style="display: none;">
-								<div class="widget-body">
-									<div class="widget-main">
+							<div class="row">
+							<div class="col-xs-12">
+								<div class="widget-box" style="display: none;">
+									<div class="widget-body">
+										<div class="widget-main">
+											<form class="form-inline">
 											<span class="input-icon pull-left" style="margin-right: 5px;">
 												<input id="SelectedBusiDate" class="input-mask-date" type="text"
 												placeholder="请输入业务区间"> <i
@@ -122,6 +123,7 @@
 											<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
 												<i class="ace-icon fa fa-search bigger-110"></i>
 											</button>
+											</form>
 									</div>
 								</div>
 							</div>
