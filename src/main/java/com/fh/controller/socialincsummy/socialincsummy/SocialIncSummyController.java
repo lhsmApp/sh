@@ -374,16 +374,6 @@ public class SocialIncSummyController extends BaseController {
 		List<PageData> listTransferData = (List<PageData>) JSONArray.toCollection(array, PageData.class);// 过时方法
 		if (null != listTransferData && listTransferData.size() > 0) {
 			List<SysSealed> listSysSealed = new ArrayList<SysSealed>();
-			//// 将获取的字典数据进行分组
-			//Map<String, List<PageData>> mapListTransferData = GroupUtils.group(listTransferData,
-			//		new GroupBy<String>() {
-			//			@Override
-			//			public String groupby(Object obj) {
-			//				PageData d = (PageData) obj;
-			//				return d.getString("DEPT_CODE__"); // 分组依据为DEPT_CODE
-			//			}
-			//		});
-			//for (Map.Entry<String, List<PageData>> entry : mapListTransferData.entrySet()) {
 			for (PageData data : listTransferData) { 
 				String BUSI_DATE__ = data.getString("BUSI_DATE__");
 				String DEPT_CODE__ = data.getString("DEPT_CODE__");
@@ -423,6 +413,7 @@ public class SocialIncSummyController extends BaseController {
 	 * @param
 	 * @throws Exception
 	 */
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/summaryDepartString")
 	public @ResponseBody CommonBase summaryDepartString() throws Exception{
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "delete")){return null;} //校验权限	
