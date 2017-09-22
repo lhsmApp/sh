@@ -75,7 +75,7 @@ public class TmplUtil {
 	}
 	
 	//另加的列、配置模板之外的列
-	private List<String> AdditionalColumnsList = new ArrayList<String>();
+	private String AdditionalReportColumns = "";
 	
 
 	public TmplUtil(TmplConfigManager tmplconfigService, TmplConfigDictManager tmplConfigDictService,
@@ -85,11 +85,14 @@ public class TmplUtil {
 		this.dictionariesService = dictionariesService;
 		this.departmentService = departmentService;
 		this.userService=userService;
+		this.jqGridGroupColumn = new ArrayList<String>();
+		InitJqGridGroupColumnShow();
+		this.AdditionalReportColumns = "";
 	}
 
 	public TmplUtil(TmplConfigManager tmplconfigService, TmplConfigDictManager tmplConfigDictService,
 			DictionariesManager dictionariesService, DepartmentManager departmentService,UserManager userService,
-			List<String> keyList, List<String> jqGridGroupColumn, List<String> AdditionalColumnsList) {
+			List<String> keyList, List<String> jqGridGroupColumn, String AdditionalReportColumns) {
 		TmplUtil.tmplconfigService = tmplconfigService;
 		this.tmplConfigDictService = tmplConfigDictService;
 		this.dictionariesService = dictionariesService;
@@ -98,7 +101,7 @@ public class TmplUtil {
 		this.keyList = keyList;
 		this.jqGridGroupColumn = jqGridGroupColumn;
 		InitJqGridGroupColumnShow();
-		this.AdditionalColumnsList = AdditionalColumnsList;
+		this.AdditionalReportColumns = AdditionalReportColumns;
 		
 	}
 
@@ -370,28 +373,31 @@ public class TmplUtil {
 		map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
 		
 		StringBuilder jqGridColModelAdditionalColumns = new StringBuilder();
-		if(AdditionalColumnsList != null && AdditionalColumnsList.size() > 0){
-			for(String colName : AdditionalColumnsList){
-				if(jqGridColModelAdditionalColumns != null && !jqGridColModelAdditionalColumns.toString().trim().equals("")){
-					jqGridColModelAdditionalColumns.append(", ");
-				}
-				jqGridColModelAdditionalColumns.append(" { ");
-				jqGridColModelAdditionalColumns.append(" name: '").append(colName).append("', ");
-				jqGridColModelAdditionalColumns.append(" label: '封存状态', ");
-				
-				// 选择
-				//jqGridColModelAdditionalColumns.append(" edittype:'select', ");
-				//jqGridColModelAdditionalColumns.append(" editoptions:{value:'" + strSelectValue + "'}, ");
-				// 翻译
-				//jqGridColModelAdditionalColumns.append(" formatter: 'select', ");
-				//jqGridColModelAdditionalColumns.append(" formatoptions: {value: '" + strDicValue + "'}, ");
-				// 查询
-				jqGridColModelAdditionalColumns.append(" stype: 'select', ");
-				jqGridColModelAdditionalColumns.append(" searchoptions: {value: ':[All]'}, ");
-				
-				jqGridColModelAdditionalColumns.append(" hidden: false, editable: false ");
-				jqGridColModelAdditionalColumns.append(" } ");
+		if(AdditionalReportColumns != null && !AdditionalReportColumns.trim().equals("")){
+			if(jqGridColModelAdditionalColumns != null && !jqGridColModelAdditionalColumns.toString().trim().equals("")){
+				jqGridColModelAdditionalColumns.append(", ");
 			}
+			jqGridColModelAdditionalColumns.append(" { ");
+			jqGridColModelAdditionalColumns.append(" name: '").append(AdditionalReportColumns).append("', ");
+			jqGridColModelAdditionalColumns.append(" label: '封存状态', ");
+
+			String strDicValue = getDicValue(AdditionalReportColumns);
+			String strSelectValue = ":";
+			if (strDicValue != null && !strDicValue.trim().equals("")) {
+				strSelectValue += ";" + strDicValue;
+			}
+			// 选择
+			jqGridColModelAdditionalColumns.append(" edittype:'select', ");
+			jqGridColModelAdditionalColumns.append(" editoptions:{value:'" + strSelectValue + "'}, ");
+			// 翻译
+			jqGridColModelAdditionalColumns.append(" formatter: 'select', ");
+			jqGridColModelAdditionalColumns.append(" formatoptions: {value: '" + strDicValue + "'}, ");
+			// 查询
+			jqGridColModelAdditionalColumns.append(" stype: 'select', ");
+			jqGridColModelAdditionalColumns.append(" searchoptions: {value: ':[All];" + strDicValue + "'}, ");
+			
+			jqGridColModelAdditionalColumns.append(" hidden: false, editable: false ");
+			jqGridColModelAdditionalColumns.append(" } ");
 		}
 		
 		PageData pd=new PageData();
@@ -561,48 +567,60 @@ public class TmplUtil {
 
 	private String getDicValue(String dicName) throws Exception {
 		StringBuilder ret = new StringBuilder();
-		String strDicType = tmplConfigDictService.getDicType(dicName);
 		Map<String, String> dicAdd = new LinkedHashMap<String, String>();
-		if (strDicType.equals("1")) {
-			List<Dictionaries> dicList = dictionariesService.getSysDictionaries(dicName);
-			for (Dictionaries dic : dicList) {
-				if (ret != null && !ret.toString().trim().equals("")) {
-					ret.append(";");
-				}
-				ret.append(dic.getDICT_CODE() + ":" + dic.getNAME());
-				dicAdd.put(dic.getDICT_CODE(), dic.getNAME());
+		if(AdditionalReportColumns != null 
+				&& AdditionalReportColumns.toUpperCase().equals((dicName).toUpperCase())){
+			for(DurState dur : DurState.values()){
+				ret.append(dur.getNameKey() + ":" + dur.getNameValue());
+				ret.append(';');
+				dicAdd.put(dur.getNameKey(), dur.getNameValue());
 			}
-		} else if (strDicType.equals("2")) {
-			if (dicName.toUpperCase().equals(("oa_department").toUpperCase())) {
-				PageData pd = new PageData();
-				List<Department> listPara = (List<Department>) departmentService.getDepartDic(pd);
-				for (Department dic : listPara) {
+			if (!ret.toString().trim().equals("")) {
+				ret.deleteCharAt(ret.length()-1);
+			}
+		} else {
+			String strDicType = tmplConfigDictService.getDicType(dicName);
+			if (strDicType.equals("1")) {
+				List<Dictionaries> dicList = dictionariesService.getSysDictionaries(dicName);
+				for (Dictionaries dic : dicList) {
 					if (ret != null && !ret.toString().trim().equals("")) {
 						ret.append(";");
 					}
-					ret.append(dic.getDEPARTMENT_CODE() + ":" + dic.getNAME());
-					dicAdd.put(dic.getDEPARTMENT_CODE(), dic.getNAME());
+					ret.append(dic.getDICT_CODE() + ":" + dic.getNAME());
+					dicAdd.put(dic.getDICT_CODE(), dic.getNAME());
 				}
-			}else if (dicName.toUpperCase().equals(("sys_user").toUpperCase())) {
-				PageData pd = new PageData();
-				List<PageData> listUser = (List<PageData>) userService.getUserValue(pd);
-				for (PageData dic : listUser) {
-					if (ret != null && !ret.toString().trim().equals("")) {
-						ret.append(";");
+			} else if (strDicType.equals("2")) {
+				if (dicName.toUpperCase().equals(("oa_department").toUpperCase())) {
+					PageData pd = new PageData();
+					List<Department> listPara = (List<Department>) departmentService.getDepartDic(pd);
+					for (Department dic : listPara) {
+						if (ret != null && !ret.toString().trim().equals("")) {
+							ret.append(";");
+						}
+						ret.append(dic.getDEPARTMENT_CODE() + ":" + dic.getNAME());
+						dicAdd.put(dic.getDEPARTMENT_CODE(), dic.getNAME());
 					}
-					ret.append(dic.get("USER_ID").toString() + ":" + dic.getString("NAME"));
-					dicAdd.put(dic.get("USER_ID").toString(), dic.getString("NAME"));
+				}else if (dicName.toUpperCase().equals(("sys_user").toUpperCase())) {
+					PageData pd = new PageData();
+					List<PageData> listUser = (List<PageData>) userService.getUserValue(pd);
+					for (PageData dic : listUser) {
+						if (ret != null && !ret.toString().trim().equals("")) {
+							ret.append(";");
+						}
+						ret.append(dic.get("USER_ID").toString() + ":" + dic.getString("NAME"));
+						dicAdd.put(dic.get("USER_ID").toString(), dic.getString("NAME"));
+					}
 				}
-			}
-		}else if (strDicType.equals("3")) {//枚举
-			if (dicName.toUpperCase().equals(("BILL_STATE").toUpperCase())) {
-				for(BillState billState:BillState.values()){
-					ret.append(billState.getNameKey() + ":" + billState.getNameValue());
-					ret.append(';');
-					dicAdd.put(billState.getNameKey(), billState.getNameValue());
-				}
-				if (!ret.toString().trim().equals("")) {
-					ret.deleteCharAt(ret.length()-1);
+			}else if (strDicType.equals("3")) {//枚举
+				if (dicName.toUpperCase().equals(("BILL_STATE").toUpperCase())) {
+					for(BillState billState:BillState.values()){
+						ret.append(billState.getNameKey() + ":" + billState.getNameValue());
+						ret.append(';');
+						dicAdd.put(billState.getNameKey(), billState.getNameValue());
+					}
+					if (!ret.toString().trim().equals("")) {
+						ret.deleteCharAt(ret.length()-1);
+					}
 				}
 			}
 		}

@@ -133,9 +133,7 @@ public class StaffSummyController extends BaseController {
     List<String> QueryFeildList = Arrays.asList("USER_GROP", "CUST_COL7", "DEPT_CODE", "UNITS_CODE", "ORG_UNIT");
 	//另加的列、配置模板之外的列 
     //目前只能这么设置，改设置改的地方多
-	Map<String, String> AdditionalColumnsMap = new HashMap<String , String>(){{  
-        put("ReportState", "STATE");
-    }};
+	String AdditionalReportColumn = "ReportState";
     //查询的所有可操作的责任中心
     List<String> AllDeptCode = new ArrayList<String>();
     
@@ -198,12 +196,8 @@ public class StaffSummyController extends BaseController {
 		//组织单元文本字典ORGUNIT:"ORG_UNIT"
 		mv.addObject("ORGUNIT", DictsUtil.getDictsByParentCode(dictionariesService, "ORGUNIT"));
 
-		//另加的列、配置模板之外的列
-	    Set<String> AdditionalColumnsSet = AdditionalColumnsMap.keySet();
-	    List<String> additionalColumnsList = new ArrayList<String>();
-	    additionalColumnsList.addAll(AdditionalColumnsSet);
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, 
-				departmentService,userService, keyListBase, jqGridGroupColumn, additionalColumnsList);
+				departmentService,userService, keyListBase, jqGridGroupColumn, AdditionalReportColumn);
 		String jqGridColModel = tmpl.generateStructureNoEdit(SelectedTableNo, UserDepartCode);
 
 		//分组字段是否显示在表中
@@ -286,12 +280,12 @@ public class StaffSummyController extends BaseController {
 		if(null != strFieldSelectKey && !"".equals(strFieldSelectKey.trim())){
 			getPd.put("FieldSelectKey", strFieldSelectKey);
 		}
+		
+		StringBuilder sbSpellingTableName = SetListReportState.GetHaveReportStateSql(AdditionalReportColumn, TableNameBase, TypeCodeSummy);
+		getPd.put("SpellingTableName", sbSpellingTableName);
+		
 		page.setPd(getPd);
 		List<PageData> varList = staffsummyService.JqPage(page);	//列出Betting列表
-		varList = SetListReportState.SetListReportList(varList, syssealedinfoService, 
-				AdditionalColumnsMap, "ReportState", 
-				SystemDateTime, SelectedDepartCode, SelectedCustCol7,
-				TypeCodeSummy);
 		int records = staffsummyService.countJqGridExtend(page);
 		PageData userdata = null;
 		if(SqlUserdata!=null && !SqlUserdata.toString().trim().equals("")){

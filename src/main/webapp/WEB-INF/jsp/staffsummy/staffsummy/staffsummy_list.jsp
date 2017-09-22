@@ -118,10 +118,9 @@
 												    allSelectable="false" noGroup="false"></div>
 											    <input type="text" id="SelectedUnitsCode" hidden></input>
 											</span> -->
-						<button id="btnSummy" class="btn btn-white btn-info btn-sm"
-							onclick="btnSummyClick()">
-							<i class="ace-icon fa fa-pencil-square-o bigger-120 blue"></i> <span>汇总</span>
-						</button>
+												<button type="button" class="btn btn-info btn-sm" onclick="btnSummyClick();">
+													<i class="ace-icon fa fa-pencil-square-o bigger-120 blue"></i> <span>汇总</span>
+												</button>
 												<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
 													<i class="ace-icon fa fa-search bigger-110"></i>
 												</button>
@@ -225,8 +224,11 @@
 				var target = $(this).find('input[type=radio]');
 				which = parseInt(target.val());
 				//if(which!='${pd.which}'){
-					window.location.href="<%=basePath%>staffsummy/list.do?SelectedTableNo="+which;
-	                //+'&SelectedDepartCode='+$("#SelectedDepartCode").val() + '&SelectedCustCol7='+$("#SelectedCustCol7").val()
+					window.location.href='<%=basePath%>staffsummy/list.do?SelectedTableNo='+which
+			            +'&SelectedCustCol7='+$("#SelectedCustCol7").val()
+			            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+		                //+'&SelectedUnitsCode='+$("#SelectedUnitsCode").val()
+		                +'&SelectedOrgUnit='+$("#SelectedOrgUnit").val();
 				//}
 			});
 			
@@ -388,10 +390,11 @@
 		    					top.jzts();
 		    					$.ajax({
 		    						type: "POST",
-		    						url: '<%=basePath%>staffsummy/summaryDepartString.do?SelectedTableNo='+which,
-		    			                //+'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-		    			                //+'&SelectedCustCol7='+$("#SelectedCustCol7").val()
-		    			                //+'&DataRowSummy='+JSON.stringify(listData),
+		    						url: '<%=basePath%>staffsummy/summaryDepartString.do?SelectedTableNo='+which
+		    			            +'&SelectedCustCol7='+$("#SelectedCustCol7").val()
+		    			            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+		    		                //+'&SelectedUnitsCode='+$("#SelectedUnitsCode").val()
+		    		                +'&SelectedOrgUnit='+$("#SelectedOrgUnit").val(),
 		    				    	data: {DataRowSummy:JSON.stringify(listData)},
 		    						dataType:'json',
 		    						cache: false,
@@ -458,7 +461,11 @@
 							top.jzts();
 							$.ajax({
 								type: "POST",
-								url: '<%=basePath%>staffsummy/report.do?SelectedTableNo='+which,
+								url: '<%=basePath%>staffsummy/report.do?SelectedTableNo='+which
+					            +'&SelectedCustCol7='+$("#SelectedCustCol7").val()
+					            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+				                //+'&SelectedUnitsCode='+$("#SelectedUnitsCode").val()
+				                +'&SelectedOrgUnit='+$("#SelectedOrgUnit").val(),
 	    				    	data: {DataRowsReport:JSON.stringify(listData)},
 	    						dataType:'json',
 	    						cache: false,
@@ -511,7 +518,11 @@
             var detailColModel = "[]";
 			$.ajax({
 				type: "GET",
-				url: '<%=basePath%>staffsummy/getDetailColModel.do?SelectedTableNo='+which,
+				url: '<%=basePath%>staffsummy/getDetailColModel.do?SelectedTableNo='+which
+	            +'&SelectedCustCol7='+$("#SelectedCustCol7").val()
+	            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+                //+'&SelectedUnitsCode='+$("#SelectedUnitsCode").val()
+                +'&SelectedOrgUnit='+$("#SelectedOrgUnit").val(),
 		    	data: {DataDeptCode:DEPT_CODE},
 				dataType:'json',
 				cache: false,
@@ -524,7 +535,12 @@
 			            var childGridID = parentRowID + "_table";
 			            var childGridPagerID = parentRowID + "_pager";
 			            // send the parent row primary key to the server so that we know which grid to show
-			            var childGridURL = '<%=basePath%>staffsummy/getDetailList.do?DetailListBillCode='+BILL_CODE+'';
+			            var childGridURL = '<%=basePath%>staffsummy/getDetailList.do?SelectedTableNo='+which
+			            +'&SelectedCustCol7='+$("#SelectedCustCol7").val()
+			            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+		                //+'&SelectedUnitsCode='+$("#SelectedUnitsCode").val()
+		                +'&SelectedOrgUnit='+$("#SelectedOrgUnit").val()
+		                +'&DetailListBillCode='+BILL_CODE+'';
 			            //childGridURL = childGridURL + "&parentRowID=" + encodeURIComponent(parentRowKey)
 
 			            // add a table and pager HTML elements to the parent grid row - we will render the child grid here
@@ -639,8 +655,10 @@
     					$.ajax({
     						type: "POST",
     						url: '<%=basePath%>staffsummy/summaryDepartString.do?SelectedTableNo='+which
-    			                +'&SelectedDepartCode='+transferDepartCode
-    			                +'&SelectedCustCol7='+transferCustCol7
+    			            +'&SelectedCustCol7='+$("#SelectedCustCol7").val()
+    			            +'&SelectedDepartCode='+$("#SelectedDepartCode").val()
+    		                //+'&SelectedUnitsCode='+$("#SelectedUnitsCode").val()
+    		                +'&SelectedOrgUnit='+$("#SelectedOrgUnit").val()
     			                +'&DataRowSummy='+'',
     						dataType:'json',
     						cache: false,

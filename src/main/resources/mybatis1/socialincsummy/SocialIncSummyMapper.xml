@@ -21,16 +21,8 @@
 		    <if test="pd.FieldSelectKey!= null and pd.FieldSelectKey != ''">
 		        ${pd.FieldSelectKey}
 		    </if>
-		from 
-		<include refid="tableName"></include>
+		from  ${pd.SpellingTableName}
 		where BUSI_DATE = '${pd.SystemDateTime}'
-		and DEPT_CODE not in (select RPT_DEPT 
-		                      from tb_sys_sealed_info 
-		                      where RPT_DUR = '${pd.SystemDateTime}'
-		                      and STATE = '${pd.DurState}'
-		                      and BILL_TYPE = '${pd.TypeCodeSummy}'
-		                      and BILL_OFF = '${pd.SelectedCustCol7}'
-		                      )
 		and DEPT_CODE in (select RPT_DEPT 
 		                      from tb_sys_sealed_info 
 		                      where RPT_DUR = '${pd.SystemDateTime}' 
@@ -38,12 +30,19 @@
 		                      and BILL_TYPE = '${pd.TypeCodeDetail}'
 		                      and BILL_OFF = '${pd.SelectedCustCol7}'
 		                      )
+		<!-- and DEPT_CODE not in (select RPT_DEPT 
+		                      from tb_sys_sealed_info 
+		                      where RPT_DUR = '${pd.SystemDateTime}'
+		                      and STATE = '${pd.DurState}'
+		                      and BILL_TYPE = '${pd.TypeCodeSummy}'
+		                      and BILL_OFF = '${pd.SelectedCustCol7}'
+		                      )
 		and DEPT_CODE not in (select RPT_DEPT 
 		                      from tb_sys_sealed_info 
 		                      where RPT_DUR = '${pd.SystemDateTime}' 
 		                      and BILL_TYPE = '${pd.TypeCodeListen}'
 		                      and BILL_OFF = '${pd.SelectedCustCol7}'
-		                      )
+		                      ) -->
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
@@ -58,15 +57,8 @@
         </if> -->
 	</select>
 	<select id="countJqGridExtend" parameterType="jqPage" resultType="int">
-		select count(*) from <include refid="tableName"></include> 
+		select count(*) from  ${pd.SpellingTableName}
 		where BUSI_DATE = '${pd.SystemDateTime}'
-		and DEPT_CODE not in (select RPT_DEPT 
-		                      from tb_sys_sealed_info 
-		                      where RPT_DUR = '${pd.SystemDateTime}'
-		                      and STATE = '${pd.DurState}'
-		                      and BILL_TYPE = '${pd.TypeCodeSummy}'
-		                      and BILL_OFF = '${pd.SelectedCustCol7}'
-		                      )
 		and DEPT_CODE in (select RPT_DEPT 
 		                      from tb_sys_sealed_info 
 		                      where RPT_DUR = '${pd.SystemDateTime}' 
@@ -74,12 +66,19 @@
 		                      and BILL_TYPE = '${pd.TypeCodeDetail}'
 		                      and BILL_OFF = '${pd.SelectedCustCol7}'
 		                      )
+		<!-- and DEPT_CODE not in (select RPT_DEPT 
+		                      from tb_sys_sealed_info 
+		                      where RPT_DUR = '${pd.SystemDateTime}'
+		                      and STATE = '${pd.DurState}'
+		                      and BILL_TYPE = '${pd.TypeCodeSummy}'
+		                      and BILL_OFF = '${pd.SelectedCustCol7}'
+		                      )
 		and DEPT_CODE not in (select RPT_DEPT 
 		                      from tb_sys_sealed_info 
 		                      where RPT_DUR = '${pd.SystemDateTime}' 
 		                      and BILL_TYPE = '${pd.TypeCodeListen}'
 		                      and BILL_OFF = '${pd.SelectedCustCol7}'
-		                      )
+		                      ) -->
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
@@ -89,15 +88,8 @@
 	</select>
 	<select id="getFooterSummary" parameterType="jqPage" resultType="pd">
 		select ${pd.Userdata} 
-		from <include refid="tableName"></include> 
+		from  ${pd.SpellingTableName}
 		where BUSI_DATE = '${pd.SystemDateTime}'
-		and DEPT_CODE not in (select RPT_DEPT 
-		                      from tb_sys_sealed_info 
-		                      where RPT_DUR = '${pd.SystemDateTime}'
-		                      and STATE = '${pd.DurState}'
-		                      and BILL_TYPE = '${pd.TypeCodeSummy}'
-		                      and BILL_OFF = '${pd.SelectedCustCol7}'
-		                      )
 		and DEPT_CODE in (select RPT_DEPT 
 		                      from tb_sys_sealed_info 
 		                      where RPT_DUR = '${pd.SystemDateTime}' 
@@ -105,12 +97,19 @@
 		                      and BILL_TYPE = '${pd.TypeCodeDetail}'
 		                      and BILL_OFF = '${pd.SelectedCustCol7}'
 		                      )
+		<!-- and DEPT_CODE not in (select RPT_DEPT 
+		                      from tb_sys_sealed_info 
+		                      where RPT_DUR = '${pd.SystemDateTime}'
+		                      and STATE = '${pd.DurState}'
+		                      and BILL_TYPE = '${pd.TypeCodeSummy}'
+		                      and BILL_OFF = '${pd.SelectedCustCol7}'
+		                      )
 		and DEPT_CODE not in (select RPT_DEPT 
 		                      from tb_sys_sealed_info 
 		                      where RPT_DUR = '${pd.SystemDateTime}' 
 		                      and BILL_TYPE = '${pd.TypeCodeListen}'
 		                      and BILL_OFF = '${pd.SelectedCustCol7}'
-		                      )
+		                      ) -->
 		<if test="pd.filterWhereResult!= null and pd.filterWhereResult != ''"><!-- 关键词检索 -->
 			${pd.filterWhereResult}
 		</if>
