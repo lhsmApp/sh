@@ -89,6 +89,7 @@
 							<div class="widget-box" style="display: block;">
 								<div class="widget-body">
 									<div class="widget-main">
+											<form class="form-inline">
 											<input name="DEPT_CODE" id="departCode"
 												type="hidden" value="" />
 											<!-- <span class="input-icon pull-left" style="margin-right: 5px;">
@@ -152,6 +153,7 @@
 											<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
 												<i class="ace-icon fa fa-search bigger-110"></i>
 											</button>
+											</form>
 									</div>
 								</div>
 							</div>
