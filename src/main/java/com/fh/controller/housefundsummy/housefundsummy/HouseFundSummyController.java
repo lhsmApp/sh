@@ -386,28 +386,32 @@ public class HouseFundSummyController extends BaseController {
 			//		});
 			//for (Map.Entry<String, List<PageData>> entry : mapListTransferData.entrySet()) {
 			for (PageData data : listTransferData) { 
-				SysSealed item = new SysSealed();
-				item.setBILL_CODE(" ");
-				//item.setRPT_DEPT(entry.getKey());
-				//List<PageData> listItem = entry.getValue();
-				//PageData pgItem = listItem.get(0);
-				//item.setRPT_DUR(pgItem.getString("BUSI_DATE__"));
-				item.setRPT_DEPT(data.getString("DEPT_CODE__"));
-				item.setRPT_DUR(data.getString("BUSI_DATE__"));
-				item.setBILL_OFF(data.getString("CUST_COL7__"));
-				item.setRPT_USER(userId);
-				item.setRPT_DATE(time);// YYYY-MM-DD HH:MM:SS
-				item.setBILL_TYPE(TypeCodeSummy.toString());
-				item.setSTATE(DurState.Sealed.getNameKey());// 枚举  1封存,0解封
-				listSysSealed.add(item);
+				String BUSI_DATE__ = data.getString("BUSI_DATE__");
+				String DEPT_CODE__ = data.getString("DEPT_CODE__");
+				String CUST_COL7__ = data.getString("CUST_COL7__");
 				
-        		//判断汇总信息为未上报
-    			String checkStateLast = CheckStateLast(item);
-    			if(checkStateLast!=null && !checkStateLast.trim().equals("")){
-    				commonBase.setCode(2);
-    				commonBase.setMessage(checkStateLast);
-    				return commonBase;
-    			}
+				if(BUSI_DATE__ != null && !BUSI_DATE__.trim().equals("")
+						&& DEPT_CODE__ != null && !DEPT_CODE__.trim().equals("")
+						&& CUST_COL7__ != null && !CUST_COL7__.trim().equals("")){
+					SysSealed item = new SysSealed();
+					item.setBILL_CODE(" ");
+					item.setRPT_DEPT(DEPT_CODE__);
+					item.setRPT_DUR(BUSI_DATE__);
+					item.setBILL_OFF(CUST_COL7__);
+					item.setRPT_USER(userId);
+					item.setRPT_DATE(time);// YYYY-MM-DD HH:MM:SS
+					item.setBILL_TYPE(TypeCodeSummy.toString());
+					item.setSTATE(DurState.Sealed.getNameKey());// 枚举  1封存,0解封
+					listSysSealed.add(item);
+					
+	        		//判断汇总信息为未上报
+	    			String checkStateLast = CheckStateLast(item);
+	    			if(checkStateLast!=null && !checkStateLast.trim().equals("")){
+	    				commonBase.setCode(2);
+	    				commonBase.setMessage(checkStateLast);
+	    				return commonBase;
+	    			}
+				}
 			}
 			syssealedinfoService.report(listSysSealed);
 			commonBase.setCode(0);
