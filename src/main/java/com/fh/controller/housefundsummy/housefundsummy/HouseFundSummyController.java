@@ -389,10 +389,10 @@ public class HouseFundSummyController extends BaseController {
 				String BUSI_DATE__ = data.getString("BUSI_DATE__");
 				String DEPT_CODE__ = data.getString("DEPT_CODE__");
 				String CUST_COL7__ = data.getString("CUST_COL7__");
-				
-				if(BUSI_DATE__ != null && !BUSI_DATE__.trim().equals("")
-						&& DEPT_CODE__ != null && !DEPT_CODE__.trim().equals("")
-						&& CUST_COL7__ != null && !CUST_COL7__.trim().equals("")){
+
+				if(BUSI_DATE__ != null && !BUSI_DATE__.trim().equals("")){
+				//		&& DEPT_CODE__ != null && !DEPT_CODE__.trim().equals("")
+				//		&& CUST_COL7__ != null && !CUST_COL7__.trim().equals("")
 					SysSealed item = new SysSealed();
 					item.setBILL_CODE(" ");
 					item.setRPT_DEPT(DEPT_CODE__);
