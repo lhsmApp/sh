@@ -395,7 +395,7 @@ public class VoucherController extends BaseController {
 		PageData pd = this.getPageData();
 		String DEPT_CODE = (String) pd.get("DEPT_CODE");
 		String which = pd.getString("TABLE_CODE");
-		String tableCodeSub = "";
+		/*String tableCodeSub = "";
 		if (which != null && which.equals("1")) {
 			tableCodeSub = "TB_STAFF_DETAIL";
 		} else if (which != null && which.equals("2")) {
@@ -404,10 +404,10 @@ public class VoucherController extends BaseController {
 			tableCodeSub = "TB_HOUSE_FUND_DETAIL";
 		} else {
 			tableCodeSub = "TB_STAFF_DETAIL";
-		}
+		}*/
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplConfigDictService, dictionariesService, departmentService,
 				userService);
-		String detailColModel = tmpl.generateStructureNoEdit(tableCodeSub, DEPT_CODE);
+		String detailColModel = tmpl.generateStructureNoEdit(which, DEPT_CODE);
 
 		commonBase.setCode(0);
 		commonBase.setMessage(detailColModel);
@@ -453,9 +453,10 @@ public class VoucherController extends BaseController {
 		@SuppressWarnings("unchecked")
 		List<PageData> listTransferData = (List<PageData>) JSONArray.toCollection(array, PageData.class);// 过时方法
 		if (null != listTransferData && listTransferData.size() > 0) {
+			List<PageData> listTransferDataFiltered=filterGroupRow(listTransferData);
 			/********************** 生成传输数据 ************************/
 			String which = pd.getString("TABLE_CODE");
-			addLineNumForTransferData(which, listTransferData);
+			addLineNumForTransferData(which, listTransferDataFiltered);
 			String tableCode = getTableCode(which);
 			String tableCodeOnFmis = getTableCodeOnFmis(which);
 			// String voucherType=pd.getString("VOUCHER_TYPE");
@@ -463,7 +464,7 @@ public class VoucherController extends BaseController {
 			List<TableColumns> tableColumnsForTransfer = getTableColumnsForTransfer(which, tableCode);
 			GenerateTransferData generateTransferData = new GenerateTransferData();
 			Map<String, List<PageData>> mapTransferData = new HashMap<String, List<PageData>>();
-			mapTransferData.put(tableCodeOnFmis, listTransferData);
+			mapTransferData.put(tableCodeOnFmis, listTransferDataFiltered);
 			PageData pdFirst = listTransferData.get(0);
 			String orgCode = pdFirst.getString("CUST_COL7");
 			String transferData = generateTransferData.generateTransferData(tableColumnsForTransfer, mapTransferData,
@@ -494,7 +495,7 @@ public class VoucherController extends BaseController {
 						User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
 						String userId = user.getUSER_ID();
 						// 将获取的字典数据进行分组
-						Map<String, List<PageData>> mapListTransferData = GroupUtils.group(listTransferData,
+						Map<String, List<PageData>> mapListTransferData = GroupUtils.group(listTransferDataFiltered,
 								new GroupBy<String>() {
 									@Override
 									public String groupby(Object obj) {
@@ -600,6 +601,24 @@ public class VoucherController extends BaseController {
 	}
 
 	/**
+	 * 根据表编号和真实表名称获取用于传输的字段列配置信息
+	 * 
+	 * @param which
+	 * @param tableCode
+	 * @return
+	 * @throws Exception
+	 */
+	private List<PageData> filterGroupRow(List<PageData> listTransferData) throws Exception {
+		List<PageData> listTransferDataFiltered = new ArrayList<PageData>();
+		for (PageData pdSource : listTransferData) {
+			if (StringUtil.isEmpty(pdSource.getString("BILL_CODE")))
+				continue;
+			listTransferDataFiltered.add(pdSource);
+		}
+		return listTransferDataFiltered;
+	}
+
+	/**
 	 * 同步删除
 	 * 
 	 * @param
@@ -619,6 +638,7 @@ public class VoucherController extends BaseController {
 		@SuppressWarnings("unchecked")
 		List<PageData> listTransferData = (List<PageData>) JSONArray.toCollection(array, PageData.class);// 过时方法
 		if (null != listTransferData && listTransferData.size() > 0) {
+			List<PageData> listTransferDataFiltered=filterGroupRow(listTransferData);
 			/********************** 生成传输数据 ************************/
 			String which = pd.getString("TABLE_CODE");
 			String tableCode = getTableCode(which);
@@ -631,8 +651,8 @@ public class VoucherController extends BaseController {
 			List<TableColumns> tableColumnsForTransfer = getTableColumnsForTransfer(which, tableCode);
 			GenerateTransferData generateTransferData = new GenerateTransferData();
 			Map<String, List<PageData>> mapTransferData = new HashMap<String, List<PageData>>();
-			mapTransferData.put(tableCodeOnFmis, listTransferData);
-			PageData pdFirst = listTransferData.get(0);
+			mapTransferData.put(tableCodeOnFmis, listTransferDataFiltered);
+			PageData pdFirst = listTransferDataFiltered.get(0);
 			String orgCode = pdFirst.getString("CUST_COL7");
 			String transferData = generateTransferData.generateTransferData(tableColumnsForTransfer, mapTransferData,
 					orgCode, TransferOperType.DELETE);
@@ -656,12 +676,12 @@ public class VoucherController extends BaseController {
 					// 更改TB_SYS_UNLOCK_INFO删除状态
 					User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
 					String userId = user.getUSER_ID();
-					for (PageData pdItem : listTransferData) {
+					for (PageData pdItem : listTransferDataFiltered) {
 						pdItem.put("DEL_USER", userId);
 						pdItem.put("DEL_DATE", DateUtils.getCurrentTime());// YYYY-MM-DD
 																			// HH:MM:SS
 					}
-					sysUnlockInfoService.edit(listTransferData);
+					sysUnlockInfoService.edit(listTransferDataFiltered);
 					commonBase.setCode(0);
 				} else {
 					commonBase.setCode(-1);
@@ -692,6 +712,7 @@ public class VoucherController extends BaseController {
 		@SuppressWarnings("unchecked")
 		List<PageData> listTransferData = (List<PageData>) JSONArray.toCollection(array, PageData.class);// 过时方法
 		if (null != listTransferData && listTransferData.size() > 0) {
+			List<PageData> listTransferDataFiltered=filterGroupRow(listTransferData);
 			String which = pd.getString("TABLE_CODE");
 			List<PageData> listVoucherNo = new ArrayList<PageData>();
 			// 执行从FIMS获取凭证号
@@ -706,7 +727,7 @@ public class VoucherController extends BaseController {
 			// 遍历批量获取凭证号
 			User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
 			String userId = user.getUSER_ID();
-			for (PageData item : listTransferData) {
+			for (PageData item : listTransferDataFiltered) {
 				String invoiceNumber = item.getString("BILL_CODE");// 单据编号
 				// String fmisOrg = item.getString("DEPT_CODE");// FMIS组织机构编码
 				// String fmisOrg = Tools.readTxtFile(Const.ORG_CODE); //
@@ -756,6 +777,7 @@ public class VoucherController extends BaseController {
 		@SuppressWarnings("unchecked")
 		List<PageData> listTransferData = (List<PageData>) JSONArray.toCollection(array, PageData.class);// 过时方法
 		if (null != listTransferData && listTransferData.size() > 0) {
+			List<PageData> listTransferDataFiltered=filterGroupRow(listTransferData);
 			/********************** 生成传输数据 ************************/
 			String which = pd.getString("TABLE_CODE");
 			List<PageData> listVoucherNo = new ArrayList<PageData>();
@@ -771,7 +793,7 @@ public class VoucherController extends BaseController {
 			// 遍历批量获取凭证号
 			User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
 			String userId = user.getUSER_ID();
-			for (PageData item : listTransferData) {
+			for (PageData item : listTransferDataFiltered) {
 				// String fmisOrg = item.getString("DEPT_CODE");// FMIS组织机构编码
 				String fmisOrg = item.getString("CUST_COL7"); // 读取总部组织机构编码
 				String fmisUrl = strUrl;// FMIS应用地址

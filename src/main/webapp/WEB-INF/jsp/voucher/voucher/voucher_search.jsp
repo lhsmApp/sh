@@ -310,9 +310,9 @@
 			rownumbers: true, // show row numbers
             rownumWidth: 35, // the width of the row numbers columns
 			
-			multiselect: true,
+			multiselect: false,
 			//multikey: "ctrlKey",
-	        multiboxonly: true,
+	        //multiboxonly: true,
 	        //editurl: "<%=basePath%>jqgridJia/edit.do",//nothing is saved
 	        
 	      	//subgrid options
