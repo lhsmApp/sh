@@ -94,7 +94,7 @@
 
 					<div class="row">
 						<div class="col-xs-12">
-							<div class="widget-box" style="display: block;">
+							<div class="widget-box" show>
 								<div class="widget-body">
 									<div class="widget-main">
 										<form class="form-inline">
@@ -194,16 +194,19 @@
 		if (gridHeight=="undefined"||gridHeight == null || gridHeight == "" || gridHeight == 0) {
 			gridHeight = 279;
 		}
+		console.log($(".widget-box"));
 		$(jqGridBase).jqGrid( 'setGridWidth', $(".page-content").width());
 		$(jqGridDetail).jqGrid( 'setGridWidth', $(".page-content").width());
-		if ($(".widget-box").css("display") == "block") {
+		if ($(".widget-box").is(':visible')) {
 			$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass('fa-chevron-down');
 			$("#btnQuery").find("span").text("显示查询");
+			//$(".widget-box").hide();
 			$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight) * (2/5));
 			$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight) * (3/5));
 		} else {
 			$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass('fa-chevron-up');
 			$("#btnQuery").find("span").text("隐藏查询");
+			//$(".widget-box").show();
 			$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (2/5));
 			$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (3/5));
 		}
@@ -216,7 +219,7 @@
 		}
 		$(jqGridBase).jqGrid( 'setGridWidth', $(".page-content").width());
 		$(jqGridDetail).jqGrid( 'setGridWidth', $(".page-content").width());
-		if ($(".widget-box").css("display") == "block") {
+		if ($(".widget-box").is(':visible')) {
 			$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (2/5));
 			$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (3/5));
 		} else {
@@ -233,7 +236,7 @@
 	    jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
 	    departTreeSourceNum = '${pd.departTreeSource}';
 	    
-		if ($(".widget-box").css("display") == "block") {
+		if ($(".widget-box").is(':visible')) {
 		    if(departTreeSourceNum == '0'){
 				showQueryCondi($(gridBase_selector),$(gridDetail_selector),null,true);
 		    	$("#btnQuery").addClass('hidden');
