@@ -47,6 +47,14 @@ public class SysSealedInfoService implements SysSealedInfoManager{
 		dao.update("SysSealedInfoMapper.edit", pd);
 	}
 	
+	/**修改
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void editTransfer(PageData pd)throws Exception{
+		dao.update("SysSealedInfoMapper.editTransfer", pd);
+	}
+	
 	/**列表
 	 * @param page
 	 * @throws Exception

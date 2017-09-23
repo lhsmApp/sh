@@ -183,6 +183,8 @@
                         	//console.log(response.responseText.code);
                         	var code=JSON.parse(response.responseText);
 							if(code.code==0){
+								$(".tooltip").remove();
+								$("#jqGrid").trigger("reloadGrid");
 								return [true];
 							}else{
 								/* console.log(code.code);

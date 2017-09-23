@@ -32,6 +32,12 @@ public interface SysSealedInfoManager{
 	 */
 	public void edit(PageData pd)throws Exception;
 	
+	/**修改
+	 * @param pd
+	 * @throws Exception
+	 */
+	public void editTransfer(PageData pd)throws Exception;
+	
 	/**列表
 	 * @param page
 	 * @throws Exception
