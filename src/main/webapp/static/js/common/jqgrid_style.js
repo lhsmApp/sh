@@ -186,18 +186,20 @@ function showQueryCondi(jqgrid, gridHeight,withBottom) {
 			gridHeight = 140;
 		}
 	}
-	if ($(".widget-box").css("display") == "block") {
+	if ($(".widget-box").is(':visible')) {
 		$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass(
 				'fa-chevron-down');
 		$("#btnQuery").find("span").text("显示查询");
+		$(".widget-box").hide();
 		$(jqgrid).jqGrid('setGridHeight', $(window).height() - gridHeight);
 	} else {
 		$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass(
 				'fa-chevron-up');
 		$("#btnQuery").find("span").text("隐藏查询");
+		$(".widget-box").show();
 		$(jqgrid).jqGrid('setGridHeight', $(window).height() - gridHeight - 65);
 	}
-	$(".widget-box").toggle("fast");
+	//$(".widget-box").toggle("fast");
 }
 
 // 重设GridHeight
@@ -211,7 +213,7 @@ function resizeGridHeight(jqgrid, gridHeight, withBottom) {
 			gridHeight = 140;
 		}
 	}
-	if ($(".widget-box").css("display") == "block") {
+	if ($(".widget-box").is(':visible')) {
 		$(jqgrid).jqGrid('setGridHeight', $(window).height() - gridHeight - 65);
 	} else {
 		$(jqgrid).jqGrid('setGridHeight', $(window).height() - gridHeight);

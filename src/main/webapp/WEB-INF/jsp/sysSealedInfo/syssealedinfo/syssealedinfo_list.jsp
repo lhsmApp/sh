@@ -57,7 +57,7 @@
 
 					<div class="row">
 						<div class="col-xs-12">
-							<div class="widget-box" style="display: none;">
+							<div class="widget-box" hidden>
 								<div class="widget-body">
 									<div class="widget-main">
 										<!-- <p class="alert alert-info">Nunc aliquam enim ut arcu.</p> -->

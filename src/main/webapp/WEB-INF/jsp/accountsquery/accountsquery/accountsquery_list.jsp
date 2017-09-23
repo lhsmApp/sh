@@ -94,7 +94,7 @@
 			
 					<div class="row">
 						<div class="col-xs-12">
-							<div class="widget-box" style="display: none;">
+							<div class="widget-box" hidden>
 								<div class="widget-body">
 									<div class="widget-main">
 										<form class="form-inline">
@@ -205,18 +205,20 @@
 		}
 		$(jqGridBase).jqGrid( 'setGridWidth', $(".page-content").width());
 		$(jqGridDetail).jqGrid( 'setGridWidth', $(".page-content").width());
-		if ($(".widget-box").css("display") == "block") {
+		if ($(".widget-box").is(':visible')) {
 			$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass('fa-chevron-down');
 			$("#btnQuery").find("span").text("显示查询");
+			$(".widget-box").hide();
 			$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight) * (2/5));
 			$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight) * (3/5));
 		} else {
 			$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass('fa-chevron-up');
 			$("#btnQuery").find("span").text("隐藏查询");
+			$(".widget-box").show();
 			$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (2/5));
 			$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (3/5));
 		}
-		$(".widget-box").toggle("fast");
+		//$(".widget-box").toggle("fast");
 	}
 	
 	function setGridHeight(jqGridBase, jqGridDetail, gridHeight,withBottom){
@@ -225,7 +227,7 @@
 		}
 		$(jqGridBase).jqGrid( 'setGridWidth', $(".page-content").width());
 		$(jqGridDetail).jqGrid( 'setGridWidth', $(".page-content").width());
-		if ($(".widget-box").css("display") == "block") {
+		if ($(".widget-box").is(':visible')) {
 			$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (2/5));
 			$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (3/5));
 		} else {
