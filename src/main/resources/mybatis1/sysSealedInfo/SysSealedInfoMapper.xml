@@ -57,7 +57,8 @@
 		set
 		BILL_CODE = #{BILL_CODE},
 		RPT_DEPT = #{RPT_DEPT},
-		RPT_DUR = #{RPT_DUR},
+		RPT_DUR =
+		#{RPT_DUR},
 		<!-- RPT_USER = #{RPT_USER}, RPT_DATE = #{RPT_DATE}, BILL_TYPE = #{BILL_TYPE}, -->
 		STATE = #{STATE}
 		where
@@ -68,6 +69,36 @@
 		RPT_DUR = #{RPT_DUR}
 		and
 		BILL_TYPE = #{BILL_TYPE}
+		and
+		BILL_OFF =
+		#{BILL_OFF}
+	</update>
+
+	<!-- 修改 -->
+	<update id="editTransfer" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set
+		BILL_CODE = #{BILL_CODE},
+		RPT_DEPT = #{RPT_DEPT},
+		RPT_DUR =
+		#{RPT_DUR},
+		<!-- RPT_USER = #{RPT_USER}, RPT_DATE = #{RPT_DATE}, BILL_TYPE = #{BILL_TYPE}, -->
+		STATE = #{STATE}
+		where
+		BILL_CODE = #{BILL_CODE}
+		and
+		RPT_DEPT = #{RPT_DEPT}
+		and
+		RPT_DUR = #{RPT_DUR}
+		<!-- and BILL_TYPE = #{BILL_TYPE} -->
+		<if test="BILL_TYPES!= null and BILL_TYPES != ''"><!-- 根据类型检索 -->
+			and BILL_TYPE in
+			<foreach item="item" index="index" collection="BILL_TYPES"
+				open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
 		and
 		BILL_OFF = #{BILL_OFF}
 	</update>
@@ -87,19 +118,17 @@
 		select
 		A.*<!-- , B.NAME,C.NAME as USERNAME -->
 		from
-		<include refid="tableName"></include> A
-		<!-- left join OA_DEPARTMENT B
-		on A.RPT_DEPT=B.DEPARTMENT_CODE
-		left join sys_user C
-		on A.RPT_USER=C.USER_ID -->
+		<include refid="tableName"></include>
+		A
+		<!-- left join OA_DEPARTMENT B on A.RPT_DEPT=B.DEPARTMENT_CODE left join 
+			sys_user C on A.RPT_USER=C.USER_ID -->
 		<where>
-			<!-- <if test="pd.RPT_DEPT!= null and pd.RPT_DEPT != ''">根据本门单位检索
-				and RPT_DEPT LIKE CONCAT(CONCAT('%', #{pd.RPT_DEPT}),'%')
-			</if> -->
+			<!-- <if test="pd.RPT_DEPT!= null and pd.RPT_DEPT != ''">根据本门单位检索 and 
+				RPT_DEPT LIKE CONCAT(CONCAT('%', #{pd.RPT_DEPT}),'%') </if> -->
 			<if test="pd.RPT_DEPTS!= null and pd.RPT_DEPTS != ''"><!-- 根据本门单位检索 -->
-				and RPT_DEPT in 
-				<foreach item="item" index="index" collection="pd.RPT_DEPTS" open="("
-					separator="," close=")">
+				and RPT_DEPT in
+				<foreach item="item" index="index" collection="pd.RPT_DEPTS"
+					open="(" separator="," close=")">
 					#{item}
 				</foreach>
 			</if>
@@ -128,13 +157,12 @@
 		select count(*) from
 		<include refid="tableName"></include>
 		<where>
-			<!-- <if test="pd.RPT_DEPT!= null and pd.RPT_DEPT != ''">根据本门单位检索
-				and RPT_DEPT LIKE CONCAT(CONCAT('%', #{pd.RPT_DEPT}),'%')
-			</if> -->
+			<!-- <if test="pd.RPT_DEPT!= null and pd.RPT_DEPT != ''">根据本门单位检索 and 
+				RPT_DEPT LIKE CONCAT(CONCAT('%', #{pd.RPT_DEPT}),'%') </if> -->
 			<if test="RPT_DEPTS!= null and RPT_DEPTS != ''"><!-- 根据本门单位检索 -->
-				and RPT_DEPT in 
-				<foreach item="item" index="index" collection="RPT_DEPTS" open="("
-					separator="," close=")">
+				and RPT_DEPT in
+				<foreach item="item" index="index" collection="RPT_DEPTS"
+					open="(" separator="," close=")">
 					#{item}
 				</foreach>
 			</if>
@@ -180,16 +208,19 @@
 		<include refid="tableName"></include>
 		where RPT_DEPT = '${RPT_DEPT}'
 		and RPT_DUR = '${RPT_DUR}'
-		and BILL_TYPE = '${BILL_TYPE}'
+		and BILL_TYPE
+		= '${BILL_TYPE}'
 		and BILL_OFF = '${BILL_OFF}'
 	</select>
-	<select id="getStateFromModel" parameterType="com.fh.entity.SysSealed" resultType="String">
+	<select id="getStateFromModel" parameterType="com.fh.entity.SysSealed"
+		resultType="String">
 		select STATE
 		from
 		<include refid="tableName"></include>
 		where RPT_DEPT = #{RPT_DEPT}
 		and RPT_DUR = #{RPT_DUR}
-		and BILL_TYPE = #{BILL_TYPE}
+		and BILL_TYPE =
+		#{BILL_TYPE}
 		and BILL_OFF = #{BILL_OFF}
 	</select>
 
@@ -199,7 +230,8 @@
 		<include refid="tableName"></include>
 		where RPT_DUR = #{RPT_DUR}
 		and RPT_DEPT = #{RPT_DEPT}
-		and BILL_TYPE = #{BILL_TYPE}
+		and BILL_TYPE =
+		#{BILL_TYPE}
 		and BILL_OFF=#{BILL_OFF}
 	</delete>
 	<insert id="reportInsert" parameterType="com.fh.entity.SysSealed">
@@ -218,7 +250,8 @@
 		<include refid="tableName"></include>
 		where RPT_DUR = '${BUSI_DATE}'
 		and RPT_DEPT = '${DEPT_CODE}'
-		and BILL_TYPE = '${TypeCodeSummy}'
+		and
+		BILL_TYPE = '${TypeCodeSummy}'
 		and BILL_OFF = '${CUST_COL7}'
 	</insert>
 
@@ -237,11 +270,13 @@
 				RPT_DUR = #{item.RPT_DUR},
 				STATE = #{item.STATE}
 				where
-				BILL_CODE = #{item.BILL_CODE}
+				BILL_CODE =
+				#{item.BILL_CODE}
 				and
 				RPT_DEPT = #{item.RPT_DEPT}
 				and
-				RPT_DUR = #{item.RPT_DUR}
+				RPT_DUR =
+				#{item.RPT_DUR}
 				and
 				BILL_OFF = #{item.BILL_OFF}
 			</if>
@@ -250,53 +285,50 @@
 
 	<!-- 批量生成 -->
 	<insert id="insertBatch" parameterType="com.fh.entity.SysSealed">
-		<!-- insert into
-		<include refid="tableName"></include>
-		(
-		<include refid="Field"></include>
-		) values
+		<!-- insert into <include refid="tableName"></include> ( <include refid="Field"></include> 
+			) values <foreach item="item" index="index" collection="list" open=" " separator=", 
+			" close=" "> <if test="item!=null"> <trim prefix="(" suffix=")" suffixOverrides=","> 
+			#{item.BILL_CODE},#{item.RPT_DEPT},#{item.RPT_DUR},#{item.RPT_USER},#{item.RPT_DATE},#{item.BILL_TYPE},#{item.STATE} 
+			</trim> </if> </foreach> -->
+
 		<foreach item="item" index="index" collection="list" open=" "
-			separator=", " close=" ">
+			separator="; " close=" ">
 			<if test="item!=null">
-				<trim prefix="(" suffix=")" suffixOverrides=",">
-					#{item.BILL_CODE},#{item.RPT_DEPT},#{item.RPT_DUR},#{item.RPT_USER},#{item.RPT_DATE},#{item.BILL_TYPE},#{item.STATE}
-				</trim>
-			</if>
-		</foreach> -->
-		
-		<foreach item="item" index="index" collection="list" open=" " separator="; " close=" ">
-		    <if test="item!=null">
-		    	delete from
+				delete from
 				<include refid="tableName"></include>
 				where BILL_CODE = #{item.BILL_CODE}
 				and RPT_DUR = #{item.RPT_DUR}
-				and RPT_DEPT = #{item.RPT_DEPT}
+				and
+				RPT_DEPT = #{item.RPT_DEPT}
 				and BILL_OFF=#{item.BILL_OFF}
-				and BILL_TYPE = #{item.BILL_TYPE};
-		        insert into
-		        <include refid="tableName"></include>
-		        values (#{item.BILL_CODE},#{item.RPT_DEPT},#{item.RPT_DUR},#{item.RPT_USER},#{item.RPT_DATE},#{item.BILL_TYPE},#{item.STATE},#{item.BILL_OFF})
-		    </if>
+				and
+				BILL_TYPE = #{item.BILL_TYPE};
+				insert into
+				<include refid="tableName"></include>
+				values
+				(#{item.BILL_CODE},#{item.RPT_DEPT},#{item.RPT_DUR},#{item.RPT_USER},#{item.RPT_DATE},#{item.BILL_TYPE},#{item.STATE},#{item.BILL_OFF})
+			</if>
 		</foreach>
 	</insert>
-	
+
 	<!-- 获取封存状态，用于验证解封某业务时是否可以进行解封 -->
 	<select id="valiState" parameterType="pd" resultType="string">
 		select STATE from
 		<include refid="tableName"></include>
 		<where>
-			BILL_TYPE=#{VALI_TYPE} and RPT_DEPT=#{RPT_DEPT} and RPT_DUR=#{RPT_DUR} and BILL_OFF=#{BILL_OFF}
+			BILL_TYPE=#{VALI_TYPE} and RPT_DEPT=#{RPT_DEPT} and
+			RPT_DUR=#{RPT_DUR} and BILL_OFF=#{BILL_OFF}
 		</where>
 	</select>
-	
-	<!-- 获取封存状态，用于页面状态-->
+
+	<!-- 获取封存状态，用于页面状态 -->
 	<select id="getDeptOffList" parameterType="string" resultType="pd">
 		select
 		<include refid="Field"></include>
 		from
 		<include refid="tableName"></include>
 		<where>
-		    ${value}
+			${value}
 		</where>
 	</select>
 </mapper>
