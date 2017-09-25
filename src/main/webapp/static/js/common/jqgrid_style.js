@@ -202,7 +202,7 @@ function showQueryCondi(jqgrid, gridHeight,withBottom) {
 	//$(".widget-box").toggle("fast");
 }
 
-// 重设GridHeight
+//重设GridHeight
 function resizeGridHeight(jqgrid, gridHeight, withBottom) {
 	if (gridHeight=="undefined"||gridHeight == null || gridHeight == "" || gridHeight == 0) {
 		if (withBottom) {
@@ -217,5 +217,43 @@ function resizeGridHeight(jqgrid, gridHeight, withBottom) {
 		$(jqgrid).jqGrid('setGridHeight', $(window).height() - gridHeight - 65);
 	} else {
 		$(jqgrid).jqGrid('setGridHeight', $(window).height() - gridHeight);
+	}
+}
+
+//显示隐藏查询 标准高度统一定为192（含底行），如果不含底行高度定为155.
+function showQueryCondi(jqGridBase, jqGridDetail, gridHeight,withBottom) {
+	if (gridHeight=="undefined"||gridHeight == null || gridHeight == "" || gridHeight == 0) {
+		gridHeight = 279;
+	}
+	$(jqGridBase).jqGrid( 'setGridWidth', $(".page-content").width());
+	$(jqGridDetail).jqGrid( 'setGridWidth', $(".page-content").width());
+	if ($(".widget-box").is(':visible')) {
+		$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass('fa-chevron-down');
+		$("#btnQuery").find("span").text("显示查询");
+		$(".widget-box").hide();
+		$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight) * (2/5));
+		$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight) * (3/5));
+	} else {
+		$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass('fa-chevron-up');
+		$("#btnQuery").find("span").text("隐藏查询");
+		$(".widget-box").show();
+		$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (2/5));
+		$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (3/5));
+	}
+	//$(".widget-box").toggle("fast");
+}
+
+function resizeGridHeight(jqGridBase, jqGridDetail, gridHeight,withBottom){
+	if (gridHeight=="undefined"||gridHeight == null || gridHeight == "" || gridHeight == 0) {
+		gridHeight = 279;
+	}
+	$(jqGridBase).jqGrid( 'setGridWidth', $(".page-content").width());
+	$(jqGridDetail).jqGrid( 'setGridWidth', $(".page-content").width());
+	if ($(".widget-box").is(':visible')) {
+		$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (2/5));
+		$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (3/5));
+	} else {
+		$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight) * (2/5));
+		$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight) * (3/5));
 	}
 }

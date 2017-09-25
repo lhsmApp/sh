@@ -197,44 +197,6 @@
 	var which;
 	var jqGridColModel;
 	var TabType = 1;
-
-	//显示隐藏查询 标准高度统一定为192（含底行），如果不含底行高度定为155.
-	function showQueryCondi(jqGridBase, jqGridDetail, gridHeight,withBottom) {
-		if (gridHeight=="undefined"||gridHeight == null || gridHeight == "" || gridHeight == 0) {
-			gridHeight = 279;
-		}
-		$(jqGridBase).jqGrid( 'setGridWidth', $(".page-content").width());
-		$(jqGridDetail).jqGrid( 'setGridWidth', $(".page-content").width());
-		if ($(".widget-box").is(':visible')) {
-			$("#btnQuery").find("i").removeClass('fa-chevron-up').addClass('fa-chevron-down');
-			$("#btnQuery").find("span").text("显示查询");
-			$(".widget-box").hide();
-			$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight) * (2/5));
-			$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight) * (3/5));
-		} else {
-			$("#btnQuery").find("i").removeClass('fa-chevron-down').addClass('fa-chevron-up');
-			$("#btnQuery").find("span").text("隐藏查询");
-			$(".widget-box").show();
-			$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (2/5));
-			$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (3/5));
-		}
-		//$(".widget-box").toggle("fast");
-	}
-	
-	function setGridHeight(jqGridBase, jqGridDetail, gridHeight,withBottom){
-		if (gridHeight=="undefined"||gridHeight == null || gridHeight == "" || gridHeight == 0) {
-			gridHeight = 279;
-		}
-		$(jqGridBase).jqGrid( 'setGridWidth', $(".page-content").width());
-		$(jqGridDetail).jqGrid( 'setGridWidth', $(".page-content").width());
-		if ($(".widget-box").is(':visible')) {
-			$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (2/5));
-			$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight - 65) * (3/5));
-		} else {
-			$(jqGridBase).jqGrid('setGridHeight', ($(window).height() - gridHeight) * (2/5));
-			$(jqGridDetail).jqGrid('setGridHeight', ($(window).height() - gridHeight) * (3/5));
-		}
-	}
 	
 	$(document).ready(function () {
 		$(top.hangge());//关闭加载状态
@@ -417,7 +379,7 @@
 						    			},
 						            });
 						    	    
-						    		setGridHeight($(gridBase_selector),$(gridDetail_selector),null,true);
+						    		resizeGridHeight($(gridBase_selector),$(gridDetail_selector),null,true);
 
 						    		$(gridDetail_selector).navGrid(pagerDetail_selector, 
 						    				{
