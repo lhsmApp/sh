@@ -159,11 +159,19 @@ public class DictTransferController extends BaseController {
 			tableColumn1.setColumn_type("VARCHAR");
 			// tableColumns.add(tableColumn2);
 			tableColumns.add(tableColumn);
-
 			tableColumns.add(tableColumn1);
 			for(PageData pdItem:listTransferData){
 				pdItem.put("BIANMA", pdItem.getString("DICT_CODE"));
 			}
+			
+			//****************临时删除字典信息************************
+			/*List<PageData> testList=new ArrayList<PageData>();
+			PageData pd2=new PageData();
+			pd2.put("BIANMA", "01010");
+			pd2.put("NAME", "盛大基地公司");
+			pd2.put("PARENT_CODE", "oa_department");
+			testList.add(pd2);*/
+			//***************************************************
 
 			// 将获取的字典数据进行分组
 			Map<String, List<PageData>> mapTransferData = GroupUtils.group(listTransferData, new GroupBy<String>() {
