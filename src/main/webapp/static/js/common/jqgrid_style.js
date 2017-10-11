@@ -221,7 +221,7 @@ function resizeGridHeight(jqgrid, gridHeight, withBottom) {
 }
 
 //显示隐藏查询 标准高度统一定为192（含底行），如果不含底行高度定为155.
-function showQueryCondi(jqGridBase, jqGridDetail, gridHeight,withBottom) {
+function showQueryCondiFour(jqGridBase, jqGridDetail, gridHeight,withBottom) {
 	if (gridHeight=="undefined"||gridHeight == null || gridHeight == "" || gridHeight == 0) {
 		gridHeight = 279;
 	}
@@ -243,7 +243,7 @@ function showQueryCondi(jqGridBase, jqGridDetail, gridHeight,withBottom) {
 	//$(".widget-box").toggle("fast");
 }
 
-function resizeGridHeight(jqGridBase, jqGridDetail, gridHeight,withBottom){
+function resizeGridHeightFour(jqGridBase, jqGridDetail, gridHeight,withBottom){
 	if (gridHeight=="undefined"||gridHeight == null || gridHeight == "" || gridHeight == 0) {
 		gridHeight = 279;
 	}
