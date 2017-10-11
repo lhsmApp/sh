@@ -59,7 +59,7 @@
 								
 						<button id="btnQuery" class="btn btn-white btn-info btn-sm"
 								onclick="showQueryCondi($('#jqGrid'),null,true)">
-							<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>隐藏查询</span>
+							<i class="ace-icon fa fa-chevron-up bigger-120 blue"></i> <span>隐藏查询</span>
 						</button>
 						
 						<div class="pull-right">
@@ -685,7 +685,7 @@ function fn_addSubmit_extend(response, postdata) {
 		//赋给data属性
 		$("#selectTree").data("data",defaultNodes);  
 		$("#selectTree").render();
-		$("#selectTree2_input").val("请选择");
+		$("#selectTree2_input").val("请选择单位");
 	}
 	
 

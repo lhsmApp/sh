@@ -189,8 +189,29 @@
 				//multipleGroup:true,
 				showQuery: false
 				
-			}
+			},{},{}
 		);
+   		$(gridBase_selector).navSeparatorAdd(pagerBase_selector, {
+			sepclass : "ui-separator",
+			sepcontent: ""
+		});
+		$(gridBase_selector).navButtonAdd(pagerBase_selector, {
+             caption : "导出",
+             buttonicon : "ace-icon fa fa-cloud-download",
+             onClickButton : exportItems,
+             position : "last",
+             title : "导出",
+             cursor : "pointer"
+         });
+/**
+* 导出
+*/
+function exportItems(){
+window.location.href='<%=basePath%>detailimportquery/excel.do?SelectedTableNo='+which
++'&SelectedBusiDate='+$("#SelectedBusiDate").val()
++'&SelectedDepartCode='+$("#SelectedDepartCode").val()
++'&SelectedCustCol7='+$("#SelectedCustCol7").val();
+}
 	});
 
 

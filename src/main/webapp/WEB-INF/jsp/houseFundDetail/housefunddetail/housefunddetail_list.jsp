@@ -854,7 +854,7 @@ function getCheckState(){
 		//赋给data属性
 		$("#selectTree").data("data",defaultNodes);  
 		$("#selectTree").render();
-		$("#selectTree2_input").val("请选择");
+		$("#selectTree2_input").val("请选择单位");
 	}
 
  	</script>
