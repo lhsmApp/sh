@@ -349,19 +349,7 @@
 		    }
 		});
 		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
-	
-		$(gridBase_selector).navSeparatorAdd(pagerBase_selector, {
-			sepclass : "ui-separator",
-			sepcontent: ""
-		});
-		$(gridBase_selector).navButtonAdd(pagerBase_selector, {
-             caption : "导出",
-             buttonicon : "ace-icon fa fa-cloud-download",
-             onClickButton : exportItems,
-             position : "last",
-             title : "导出",
-             cursor : "pointer"
-         });
+		
 		//navButtons
 		jQuery("#jqGrid").jqGrid('navGrid',"#jqGridPager",
 			{ 	//navbar options
@@ -398,20 +386,8 @@
 				//multipleGroup:true,
 				showQuery: false
 			}
-			
 		);
-   		
-/**
-* 导出
-*/
-function exportItems(){
-window.location.href='<%=basePath%>voucher/excel.do?SelectedTableNo='+which
-+'&SelectedBusiDate='+$("#SelectedBusiDate").val()
-+'&SelectedDepartCode='+$("#SelectedDepartCode").val()
-+'&SelectedCustCol7='+$("#SelectedCustCol7").val();
-} 
 	});
-
 	//显示明细信息
 	// the event handler on expanding parent row receives two parameters
     // the ID of the grid tow  and the primary key of the row
