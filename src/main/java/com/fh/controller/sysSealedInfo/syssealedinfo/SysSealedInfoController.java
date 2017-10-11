@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.alibaba.druid.sql.dialect.oracle.ast.stmt.OracleIfStatement.Else;
 import com.fh.controller.base.BaseController;
 import com.fh.controller.common.DictsUtil;
 import com.fh.entity.CommonBase;
@@ -194,6 +195,7 @@ public class SysSealedInfoController extends BaseController {
 						}
 					}
 					List<String> listBillTypes = new ArrayList<String>();
+					//有传输到明细
 					if(pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey())){
 						listBillTypes.add(TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey());
 						listBillTypes.add(TmplType.TB_STAFF_SUMMY_CONTRACT.getNameKey());
@@ -227,7 +229,33 @@ public class SysSealedInfoController extends BaseController {
 					syssealedinfoService.editTransfer(pd);
 					commonBase.setCode(0);
 				}else{
-					syssealedinfoService.edit(pd);
+					//syssealedinfoService.edit(pd);
+					//由汇总到明细
+					List<String> listBillTypes = new ArrayList<String>();
+				    if(pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_SUMMY_CONTRACT.getNameKey())){
+						listBillTypes.add(TmplType.TB_STAFF_SUMMY_CONTRACT.getNameKey());
+						listBillTypes.add(TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey());
+					}else if(pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_SUMMY_MARKET.getNameKey())){
+						listBillTypes.add(TmplType.TB_STAFF_SUMMY_MARKET.getNameKey());
+						listBillTypes.add(TmplType.TB_STAFF_DETAIL_MARKET.getNameKey());
+					}else if(pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_SUMMY_SYS_LABOR.getNameKey())){
+						listBillTypes.add(TmplType.TB_STAFF_SUMMY_SYS_LABOR.getNameKey());
+						listBillTypes.add(TmplType.TB_STAFF_DETAIL_SYS_LABOR.getNameKey());
+					}else if(pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_SUMMY_OPER_LABOR.getNameKey())){
+						listBillTypes.add(TmplType.TB_STAFF_SUMMY_OPER_LABOR.getNameKey());
+						listBillTypes.add(TmplType.TB_STAFF_DETAIL_OPER_LABOR.getNameKey());
+					}else if(pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_SUMMY_LABOR.getNameKey())){
+						listBillTypes.add(TmplType.TB_STAFF_SUMMY_LABOR.getNameKey());
+						listBillTypes.add(TmplType.TB_STAFF_DETAIL_LABOR.getNameKey());
+					}else if(pd.getString("BILL_TYPE").equals(TmplType.TB_SOCIAL_INC_SUMMY.getNameKey())){
+						listBillTypes.add(TmplType.TB_SOCIAL_INC_SUMMY.getNameKey());
+						listBillTypes.add(TmplType.TB_SOCIAL_INC_DETAIL.getNameKey());
+					}else if(pd.getString("BILL_TYPE").equals(TmplType.TB_HOUSE_FUND_SUMMY.getNameKey())){
+						listBillTypes.add(TmplType.TB_HOUSE_FUND_SUMMY.getNameKey());
+						listBillTypes.add(TmplType.TB_HOUSE_FUND_DETAIL.getNameKey());
+					}
+					pd.put("BILL_TYPES", listBillTypes.toArray());
+					syssealedinfoService.editTransfer(pd);
 					commonBase.setCode(0);
 				}
 			}
