@@ -57,7 +57,7 @@
                         <span style="border-left: 1px solid #e2e2e2; margin: 0px 10px;">&nbsp;</span>
 								
 						<button id="btnQuery" class="btn btn-white btn-info btn-sm"
-							onclick="showQueryCondi($('#jqGridBase'),$('#jqGridDetail'),null,true)">
+							onclick="showQueryCondiFour($('#jqGridBase'),$('#jqGridDetail'),null,true)">
 							<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
 						</button>
 						
@@ -213,8 +213,8 @@
 		//	$(gridBase_selector).jqGrid( 'setGridWidth', $(".page-content").width());
 		//	$(gridDetail_selector).jqGrid( 'setGridWidth', $(".page-content").width());
 		//	var gridHeight = 424 + 398;
-		//	resizeGridHeight($(gridBase_selector), gridHeight * (2.6/5));
-		//	resizeGridHeight($(gridDetail_selector), gridHeight * (2.4/5));
+		//	resizeGridHeightFour($(gridBase_selector), gridHeight * (2.6/5));
+		//	resizeGridHeightFour($(gridDetail_selector), gridHeight * (2.4/5));
 	    //});
 		
 		//初始化当前选择凭证类型
@@ -379,7 +379,7 @@
 						    			},
 						            });
 						    	    
-						    		resizeGridHeight($(gridBase_selector),$(gridDetail_selector),null,true);
+						    		resizeGridHeightFour($(gridBase_selector),$(gridDetail_selector),null,true);
 
 						    		$(gridDetail_selector).navGrid(pagerDetail_selector, 
 						    				{
