@@ -379,7 +379,7 @@
 						    			},
 						            });
 						    	    
-						            resizeGridHeightFour($(gridBase_selector),$(gridDetail_selector),null,true);
+						    		resizeGridHeightFour($(gridBase_selector),$(gridDetail_selector),null,true);
 
 						    		$(gridDetail_selector).navGrid(pagerDetail_selector, 
 						    				{
@@ -483,7 +483,7 @@
 		//赋给data属性
 		$("#selectTree").data("data",defaultNodes);  
 		$("#selectTree").render();
-		$("#selectTree2_input").val("请选择");
+		$("#selectTree2_input").val("请选择单位");
 	}
 </script>
 </html>
