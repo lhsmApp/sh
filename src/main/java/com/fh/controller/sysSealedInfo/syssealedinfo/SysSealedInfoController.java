@@ -38,6 +38,7 @@ import com.fh.util.enums.BillType;
 import com.fh.util.enums.TmplType;
 
 import net.sf.json.JSONArray;
+import oracle.net.aso.e;
 
 /**
  * 业务封存信息
@@ -252,6 +253,23 @@ public class SysSealedInfoController extends BaseController {
 						listBillTypes.add(TmplType.TB_SOCIAL_INC_DETAIL.getNameKey());
 					}else if(pd.getString("BILL_TYPE").equals(TmplType.TB_HOUSE_FUND_SUMMY.getNameKey())){
 						listBillTypes.add(TmplType.TB_HOUSE_FUND_SUMMY.getNameKey());
+						listBillTypes.add(TmplType.TB_HOUSE_FUND_DETAIL.getNameKey());
+					}
+				    
+				    //明细部分
+					else if(pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey())){
+						listBillTypes.add(TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey());
+					}else if(pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_DETAIL_MARKET.getNameKey())){
+						listBillTypes.add(TmplType.TB_STAFF_DETAIL_MARKET.getNameKey());
+					}else if(pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_DETAIL_SYS_LABOR.getNameKey())){
+						listBillTypes.add(TmplType.TB_STAFF_DETAIL_SYS_LABOR.getNameKey());
+					}else if(pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_DETAIL_OPER_LABOR.getNameKey())){
+						listBillTypes.add(TmplType.TB_STAFF_DETAIL_OPER_LABOR.getNameKey());
+					}else if(pd.getString("BILL_TYPE").equals(TmplType.TB_STAFF_DETAIL_LABOR.getNameKey())){
+						listBillTypes.add(TmplType.TB_STAFF_DETAIL_LABOR.getNameKey());
+					}else if(pd.getString("BILL_TYPE").equals(TmplType.TB_SOCIAL_INC_DETAIL.getNameKey())){
+						listBillTypes.add(TmplType.TB_SOCIAL_INC_DETAIL.getNameKey());
+					}else if(pd.getString("BILL_TYPE").equals(TmplType.TB_HOUSE_FUND_DETAIL.getNameKey())){
 						listBillTypes.add(TmplType.TB_HOUSE_FUND_DETAIL.getNameKey());
 					}
 					pd.put("BILL_TYPES", listBillTypes.toArray());
