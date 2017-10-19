@@ -307,7 +307,7 @@ public class AuditEditController extends BaseController {
 				getPd.put(strFeild, getPd.get(strFeild + TmplUtil.keyExtra));
 			}
 		}
-		TmplUtil.setModelDefault(getPd, map_HaveColumnsList);
+		TmplUtil.setModelDefault(getPd, map_HaveColumnsList, map_SetColumnsList);
 		//表名
 		getPd.put("TableName", tableName);
 		
@@ -379,7 +379,7 @@ public class AuditEditController extends BaseController {
     			item.put("StaffOrNot", "true");
     		}
         	item.put("BILL_CODE", " ");
-			TmplUtil.setModelDefault(item, map_HaveColumnsList);
+			TmplUtil.setModelDefault(item, map_HaveColumnsList, map_SetColumnsList);
 			//表名
 			item.put("TableName", tableName);
         }
@@ -665,7 +665,7 @@ public class AuditEditController extends BaseController {
 									if(!(getESTB_DEPT!=null && !getESTB_DEPT.trim().equals(""))){
 										pdAdd.put("ESTB_DEPT", Jurisdiction.getCurrentDepartmentID());
 									}
-									TmplUtil.setModelDefault(pdAdd, map_HaveColumnsList);
+									TmplUtil.setModelDefault(pdAdd, map_HaveColumnsList, map_SetColumnsList);
 									//表名
 									pdAdd.put("TableName", tableName);
 									listAdd.add(pdAdd);

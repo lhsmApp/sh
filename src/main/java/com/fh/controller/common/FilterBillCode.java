@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.fh.entity.CommonBase;
 import com.fh.entity.TableColumns;
+import com.fh.entity.TmplConfigDetail;
 import com.fh.service.importdetail.importdetail.impl.ImportDetailService;
 import com.fh.service.sysSealedInfo.syssealedinfo.impl.SysSealedInfoService;
 import com.fh.util.PageData;
@@ -27,7 +28,8 @@ public class FilterBillCode {
 			String DepartCode, String SystemDateTime, String CUST_COL7,
 			String TypeCodeListen, String TypeCodeSummy, String TableNameSummy, String TableNameDetail,
 			String emplGroupType,
-			Map<String, TableColumns> map_HaveColumnsList) throws Exception{
+			Map<String, TableColumns> map_HaveColumnsList, 
+			Map<String, TmplConfigDetail> map_SetColumnsList) throws Exception{
 		//, Boolean report
 		CommonBase commonBase = new CommonBase();
 		commonBase.setCode(-1);
@@ -63,7 +65,7 @@ public class FilterBillCode {
 					for(PageData each : getList){
 						each.put("TableNameDetail", TableNameDetail);
 						each.put("BILL_CODE", " ");
-						TmplUtil.setModelDefault(each, map_HaveColumnsList);
+						TmplUtil.setModelDefault(each, map_HaveColumnsList, map_SetColumnsList);
 
 						each.put("TypeCodeSummy", TypeCodeSummy);
 					}

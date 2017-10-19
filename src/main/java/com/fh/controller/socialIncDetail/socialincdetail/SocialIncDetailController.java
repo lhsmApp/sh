@@ -364,13 +364,13 @@ public class SocialIncDetailController extends BaseController {
 			}
 		}
 		getPd.put("BILL_CODE", " ");
-		TmplUtil.setModelDefault(getPd, map_HaveColumnsList);
+		TmplUtil.setModelDefault(getPd, map_HaveColumnsList, map_SetColumnsList);
 
 		FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
 				SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
 				TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
 				"", 
-				map_HaveColumnsList);
+				map_HaveColumnsList, map_SetColumnsList);
 		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
 				SelectedDepartCode, SystemDateTime, SelectedCustCol7,
 				TypeCodeListen, TypeCodeSummy, TableNameSummy);
@@ -432,7 +432,7 @@ public class SocialIncDetailController extends BaseController {
 					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
 					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
 					"", 
-					map_HaveColumnsList);
+					map_HaveColumnsList, map_SetColumnsList);
 			String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
 					SelectedDepartCode, SystemDateTime, SelectedCustCol7,
 					TypeCodeListen, TypeCodeSummy, TableNameSummy);
@@ -457,7 +457,7 @@ public class SocialIncDetailController extends BaseController {
 	        	listUserCodeAdd.add(strUserCode);
 	        	item.put("BILL_CODE", " ");
 	        	item.put("CanOperate", strHelpful);
-				TmplUtil.setModelDefault(item, map_HaveColumnsList);
+				TmplUtil.setModelDefault(item, map_HaveColumnsList, map_SetColumnsList);
 	        }
 			if(null != listData && listData.size() > 0){
 				List<String> repeatList = socialincdetailService.findUserCodeByModel(listData);
@@ -510,7 +510,7 @@ public class SocialIncDetailController extends BaseController {
 					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
 					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
 					"", 
-					map_HaveColumnsList);
+					map_HaveColumnsList, map_SetColumnsList);
 			String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
 					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
 					TypeCodeListen, TypeCodeSummy, TableNameSummy);
@@ -614,7 +614,7 @@ public class SocialIncDetailController extends BaseController {
 							SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
 							TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
 							"", 
-							map_HaveColumnsList);
+							map_HaveColumnsList, map_SetColumnsList);
 					String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
 							SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
 	    					TypeCodeListen, TypeCodeSummy, TableNameSummy);
@@ -735,7 +735,7 @@ public class SocialIncDetailController extends BaseController {
 											if(!(getESTB_DEPT!=null && !getESTB_DEPT.trim().equals(""))){
 												pdAdd.put("ESTB_DEPT", SelectedDepartCode);
 											}
-											TmplUtil.setModelDefault(pdAdd, map_HaveColumnsList);
+											TmplUtil.setModelDefault(pdAdd, map_HaveColumnsList, map_SetColumnsList);
 											listAdd.add(pdAdd);
 										}
 									}
@@ -924,7 +924,7 @@ public class SocialIncDetailController extends BaseController {
 					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
 					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
 					"", 
-					map_HaveColumnsList);
+					map_HaveColumnsList, map_SetColumnsList);
 			
 			User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
 			String userId = user.getUSER_ID();

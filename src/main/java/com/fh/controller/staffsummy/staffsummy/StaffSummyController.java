@@ -557,13 +557,14 @@ public class StaffSummyController extends BaseController {
 
     			TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
     			tmpl.generateStructureNoEdit(TypeCodeDetail, strDepartCode);
-    			Map<String, TableColumns> setColumnsList = tmpl.getHaveColumnsList();
+    			Map<String, TableColumns> getHaveColumnsList = tmpl.getHaveColumnsList();
+    			Map<String, TmplConfigDetail> getSetColumnsList = tmpl.getSetColumnsList();
     			
     			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
     					strDepartCode, SystemDateTime, strCustCol7, 
     					TypeCodeListen, TypeCodeSummy, TableNameBase, TableNameDetail, 
     					emplGroupType, 
-    					setColumnsList);
+    					getHaveColumnsList, getSetColumnsList);
     			String strHelpfulDetail = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
     					strDepartCode, SystemDateTime, strCustCol7,
     					TypeCodeListen, TypeCodeSummy, TableNameBase);
@@ -648,7 +649,7 @@ public class StaffSummyController extends BaseController {
                     updateFilter.append(FilterBillCode.getBillCodeNotInSumInvalid(TableNameBase));
 	    			addTo.put("updateFilter", updateFilter);
                     //添加未设置字段默认值
-	    			TmplUtil.setModelDefault(addTo, map_HaveColumnsList);
+	    			TmplUtil.setModelDefault(addTo, map_HaveColumnsList, map_SetColumnsList);
     			}
         		Map<String, Object> mapAdd = new HashMap<String, Object>();
     			mapAdd.put("DelSum", bolDelSum);

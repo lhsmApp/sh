@@ -39,6 +39,14 @@ public class TmplUtil {
 	private DepartmentManager departmentService;
 	private UserManager userService;
 
+	//必须保存列
+	//public static List<String> MustSaveFeildListStaffDetail = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP", "USER_CODE");
+	//public static List<String> MustSaveFeildListStaffSummy = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP", "USER_CODE", "BILL_STATE");
+	//public static List<String> MustSaveFeildListSocialIncDetail = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP", "USER_CODE");
+	//public static List<String> MustSaveFeildListSocialIncSummy = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP", "USER_CODE", "BILL_STATE");
+	//public static List<String> MustSaveFeildListHouseFundDetail = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP", "USER_CODE");
+	//public static List<String> MustSaveFeildListHouseFundSummy = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP", "USER_CODE", "BILL_STATE");
+
 	// 查询表的主键字段后缀，区别于主键字段，用于修改或删除
 	public static String keyExtra = "__";
 	// 查询表的主键字段
@@ -630,19 +638,30 @@ public class TmplUtil {
 		return ret.toString();
 	}
 
-	public static void setModelDefault(PageData pd, Map<String, TableColumns> haveColumnsList)
+	public static void setModelDefault(PageData pd, Map<String, TableColumns> haveColumnsList, 
+			Map<String, TmplConfigDetail> map_SetColumnsList)
 			throws ClassNotFoundException {
 		String InsertField = "";
 		String InsertVale = "";
 	    for (TableColumns col : haveColumnsList.values()) {
-			Object value = pd.get(col.getColumn_name().toUpperCase());
-			if(value != null && value.toString() != null && !value.toString().trim().equals("")){
-				if(InsertField!=null && !InsertField.trim().equals("")){
-					InsertField += ",";
-					InsertVale += ",";
+	    	String column_name = col.getColumn_name().toUpperCase();
+	    	String data_type = col.getData_type().toUpperCase();
+	    	TmplConfigDetail configDetail = map_SetColumnsList.get(column_name);
+	    	int intHide = 0;
+	    	if(configDetail != null){
+				intHide = Integer.parseInt(configDetail.getCOL_HIDE());
+	    	}
+			// intHide != 1 隐藏
+			if(!(IsNumFeild(data_type) && intHide != 1)){
+				Object value = pd.get(column_name);
+				if(value != null && value.toString() != null && !value.toString().trim().equals("")){
+					if(InsertField!=null && !InsertField.trim().equals("")){
+						InsertField += ",";
+						InsertVale += ",";
+					}
+					InsertField += col.getColumn_name();
+					InsertVale += "'" + value.toString() + "'";
 				}
-				InsertField += col.getColumn_name();
-				InsertVale += "'" + value.toString() + "'";
 			}
 		}
 		pd.put("InsertField", InsertField);

@@ -135,6 +135,7 @@ public class StaffDetailController extends BaseController {
 		}
 		return list;
 	}
+	String CheckFeild_STAFF_IDENT = "STAFF_IDENT";
 	
 	String getPageListSelectedCustCol7 = "";
 	String getPageListSelectedDepartCode = "";
@@ -377,13 +378,13 @@ public class StaffDetailController extends BaseController {
 			}
 		}
 		getPd.put("BILL_CODE", " ");
-		TmplUtil.setModelDefault(getPd, map_HaveColumnsList);
+		TmplUtil.setModelDefault(getPd, map_HaveColumnsList, map_SetColumnsList);
 		
 		FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
 				SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
 				TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
 				emplGroupType,
-				map_HaveColumnsList);
+				map_HaveColumnsList, map_SetColumnsList);
 		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
 				SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
 				TypeCodeListen, TypeCodeSummy, TableNameSummy);
@@ -402,11 +403,18 @@ public class StaffDetailController extends BaseController {
 			commonBase.setMessage("此区间内编码已存在！");
 			return commonBase;
 		} 
-		List<String> StaffIdentList = staffdetailService.findStaffIdentByModel(listData);
-		if(StaffIdentList!=null && StaffIdentList.size()>0){
-			commonBase.setCode(2);
-			commonBase.setMessage("此区间内身份证号已存在！");
-			return commonBase;
+		if(map_SetColumnsList.containsKey(CheckFeild_STAFF_IDENT)){
+			TmplConfigDetail col = map_SetColumnsList.get(CheckFeild_STAFF_IDENT);
+			int intHide = Integer.parseInt(col.getCOL_HIDE());
+			// intHide == 1 显示
+			if (intHide == 1) {
+			    List<String> StaffIdentList = staffdetailService.findStaffIdentByModel(listData);
+			    if(StaffIdentList!=null && StaffIdentList.size()>0){
+				    commonBase.setCode(2);
+				    commonBase.setMessage("此区间内身份证号已存在！");
+				    return commonBase;
+			    }
+			}
 		}
         staffdetailService.deleteUpdateAll(listData);
 		commonBase.setCode(0);
@@ -454,7 +462,7 @@ public class StaffDetailController extends BaseController {
 					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
 					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
 					emplGroupType,
-					map_HaveColumnsList);
+					map_HaveColumnsList, map_SetColumnsList);
 			String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
 					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
 					TypeCodeListen, TypeCodeSummy, TableNameSummy);
@@ -478,16 +486,23 @@ public class StaffDetailController extends BaseController {
 					commonBase.setMessage("此区间内编码重复:" + strUserCode);
 					return commonBase;
 	        	}
-	        	listUserCodeAdd.add(strUserCode);
-	        	if(listStaffIdentAdd.contains(strStaffIdent)){
-					commonBase.setCode(2);
-					commonBase.setMessage("此区间内身份证号重复:" + strStaffIdent);
-					return commonBase;
-	        	}
-	        	listStaffIdentAdd.add(strStaffIdent);
+	        	listUserCodeAdd.add(strUserCode); 
+	    		if(map_SetColumnsList.containsKey(CheckFeild_STAFF_IDENT)){
+	    			TmplConfigDetail col = map_SetColumnsList.get(CheckFeild_STAFF_IDENT);
+	    			int intHide = Integer.parseInt(col.getCOL_HIDE());
+	    			// intHide == 1 显示
+	    			if (intHide == 1) {
+	        	        if(listStaffIdentAdd.contains(strStaffIdent)){
+					        commonBase.setCode(2);
+					        commonBase.setMessage("此区间内身份证号重复:" + strStaffIdent);
+					        return commonBase;
+	        	        }
+	        	        listStaffIdentAdd.add(strStaffIdent);
+	    			}
+	    		}
 	        	item.put("BILL_CODE", " ");
 	        	item.put("CanOperate", strHelpful);
-				TmplUtil.setModelDefault(item, map_HaveColumnsList);
+				TmplUtil.setModelDefault(item, map_HaveColumnsList, map_SetColumnsList);
 	        }
 			if(null != listData && listData.size() > 0){
 				List<String> repeatList = staffdetailService.findUserCodeByModel(listData);
@@ -497,12 +512,19 @@ public class StaffDetailController extends BaseController {
 					return commonBase;
 				}
 
-				List<String> StaffIdentList = staffdetailService.findStaffIdentByModel(listData);
-				if(StaffIdentList!=null && StaffIdentList.size()>0){
-					commonBase.setCode(2);
-					commonBase.setMessage("此区间内身份证号已存在！");
-					return commonBase;
-				} 
+	    		if(map_SetColumnsList.containsKey(CheckFeild_STAFF_IDENT)){
+	    			TmplConfigDetail col = map_SetColumnsList.get(CheckFeild_STAFF_IDENT);
+	    			int intHide = Integer.parseInt(col.getCOL_HIDE());
+	    			// intHide == 1 显示
+	    			if (intHide == 1) {
+				        List<String> StaffIdentList = staffdetailService.findStaffIdentByModel(listData);
+				        if(StaffIdentList!=null && StaffIdentList.size()>0){
+					        commonBase.setCode(2);
+					        commonBase.setMessage("此区间内身份证号已存在！");
+					        return commonBase;
+				        } 
+	    			}
+	    		}
 				staffdetailService.deleteUpdateAll(listData);
 				commonBase.setCode(0);
 			}
@@ -551,7 +573,7 @@ public class StaffDetailController extends BaseController {
 					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
 					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
 					emplGroupType,
-					map_HaveColumnsList);
+					map_HaveColumnsList, map_SetColumnsList);
 			String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
 					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
 				    TypeCodeListen, TypeCodeSummy, TableNameSummy);
@@ -662,7 +684,7 @@ public class StaffDetailController extends BaseController {
 							SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
 							TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
 							emplGroupType,
-							map_HaveColumnsList);
+							map_HaveColumnsList, map_SetColumnsList);
 					String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
 							SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
 							TypeCodeListen, TypeCodeSummy, TableNameSummy);
@@ -792,26 +814,33 @@ public class StaffDetailController extends BaseController {
 													listUserCode.add(getUSER_CODE.trim());
 												}
 											}
-											if(!(getSTAFF_IDENT!=null && !getSTAFF_IDENT.trim().equals(""))){
-												if(!sbRet.contains("身份证号不能为空！")){
-													sbRet.add("身份证号不能为空！");
-												}
-											} else {
-												if(listStaffIdent.contains(getSTAFF_IDENT.trim())){
-													String getUSER_NAME = (String) pdAdd.get("USER_NAME");
-													String strUserAdd = "编号：" + getUSER_CODE + " 姓名：" + getUSER_NAME + " 身份证号：" + getSTAFF_IDENT + " 导入数据重复！";
-													if(!sbRet.contains(strUserAdd)){
-														sbRet.add(strUserAdd);
+								    		if(map_SetColumnsList.containsKey(CheckFeild_STAFF_IDENT)){
+								    			TmplConfigDetail col = map_SetColumnsList.get(CheckFeild_STAFF_IDENT);
+								    			int intHide = Integer.parseInt(col.getCOL_HIDE());
+								    			// intHide == 1 显示
+								    			if (intHide == 1) {
+													if(!(getSTAFF_IDENT!=null && !getSTAFF_IDENT.trim().equals(""))){
+														if(!sbRet.contains("身份证号不能为空！")){
+															sbRet.add("身份证号不能为空！");
+														}
+													} else {
+														if(listStaffIdent.contains(getSTAFF_IDENT.trim())){
+															String getUSER_NAME = (String) pdAdd.get("USER_NAME");
+															String strUserAdd = "编号：" + getUSER_CODE + " 姓名：" + getUSER_NAME + " 身份证号：" + getSTAFF_IDENT + " 导入数据重复！";
+															if(!sbRet.contains(strUserAdd)){
+																sbRet.add(strUserAdd);
+															}
+														} else {
+															listStaffIdent.add(getSTAFF_IDENT.trim());
+														}
 													}
-												} else {
-													listStaffIdent.add(getSTAFF_IDENT.trim());
-												}
-											}
+								    			}
+								    		}
 											String getESTB_DEPT = (String) pdAdd.get("ESTB_DEPT");
 											if(!(getESTB_DEPT!=null && !getESTB_DEPT.trim().equals(""))){
 												pdAdd.put("ESTB_DEPT", SelectedDepartCode);
 											}
-											TmplUtil.setModelDefault(pdAdd, map_HaveColumnsList);
+											TmplUtil.setModelDefault(pdAdd, map_HaveColumnsList, map_SetColumnsList);
 											listAdd.add(pdAdd);
 										}
 									}
@@ -1015,7 +1044,7 @@ public class StaffDetailController extends BaseController {
 					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
 					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
 					emplGroupType,
-					map_HaveColumnsList);
+					map_HaveColumnsList, map_SetColumnsList);
 			
 			User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
 			String userId = user.getUSER_ID();
