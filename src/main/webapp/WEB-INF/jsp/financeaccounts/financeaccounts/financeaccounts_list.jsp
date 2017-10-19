@@ -57,7 +57,7 @@
 								
 						<button id="btnQuery" class="btn btn-white btn-info btn-sm"
 								onclick="showQueryCondiFour($('#jqGridBase'),$('#jqGridDetail'),null,true)">
-							<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>隐藏查询</span>
+							<i class="ace-icon fa fa-chevron-up bigger-120 blue"></i> <span>隐藏查询</span>
 						</button>
 								
 						<div class="pull-right">
@@ -365,7 +365,7 @@
 			    			},
 			            });
 			    	    
-			            resizeGridHeightFour($(gridBase_selector),$(gridDetail_selector),null,true);
+			    		resizeGridHeightFour($(gridBase_selector),$(gridDetail_selector),null,true);
 
 			    		$(gridDetail_selector).navGrid(pagerDetail_selector, 
 			    				{
@@ -468,7 +468,7 @@
 		//赋给data属性
 		$("#selectTree").data("data",defaultNodes);  
 		$("#selectTree").render();
-		$("#selectTree2_input").val("请选择");
+		$("#selectTree2_input").val("请选择单位");
 	}
 </script>
 </html>

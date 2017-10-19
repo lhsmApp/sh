@@ -148,7 +148,7 @@
 		});
 		
 		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
-	
+		
 		//navButtons
 		jQuery("#jqGrid").jqGrid('navGrid',"#jqGridPager",
 			{ 	//navbar options
@@ -192,8 +192,7 @@
 			}
 		);
 	});
-
-
+   	
 	//显示隐藏查询
 	function showQueryCondi(){
 		if($(".widget-box").css("display")=="block"){

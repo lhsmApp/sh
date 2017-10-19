@@ -50,7 +50,7 @@
 
 						<button id="btnQuery" class="btn btn-white btn-info btn-sm"
 							onclick="showQueryCondi($('#jqGrid'),gridHeight)">
-							<i class="ace-icon fa fa-chevron-up bigger-120 blue"></i> <span>隐藏查询</span>
+							<i class="ace-icon fa fa-chevron-down bigger-120 blue"></i> <span>显示查询</span>
 						</button>
 						<div class="pull-right">
 							<span class="green middle bolder">凭证数据类型: &nbsp;</span>
@@ -128,7 +128,7 @@
 														</c:forEach>
 												</select>
 											</span>
-											<span style="margin-right: 5px;"> 
+											<!--  <span style="margin-right: 5px;"> 
 												<select
 													class="chosen-select form-control" name="PARTUSERTYPE"
 													id="PARTUSERTYPE" data-placeholder="请选择企业特定员工分类"
@@ -149,7 +149,7 @@
 															<option value="${salary.DICT_CODE}">${salary.NAME}</option>
 														</c:forEach>
 												</select>
-											</span> 
+											</span> -->
 											<button type="button" class="btn btn-info btn-sm" onclick="tosearch();">
 												<i class="ace-icon fa fa-search bigger-110"></i>
 											</button>
@@ -349,7 +349,7 @@
 		    }
 		});
 		$(window).triggerHandler('resize.jqGrid');//trigger window resize to make the grid get the correct size
-	
+		
 		//navButtons
 		jQuery("#jqGrid").jqGrid('navGrid',"#jqGridPager",
 			{ 	//navbar options
@@ -388,7 +388,6 @@
 			}
 		);
 	});
-	
 	//显示明细信息
 	// the event handler on expanding parent row receives two parameters
     // the ID of the grid tow  and the primary key of the row
@@ -530,7 +529,7 @@
 		//赋给data属性
 		$("#selectTree").data("data",defaultNodes);  
 		$("#selectTree").render();
-		$("#selectTree2_input").val("请选择");
+		$("#selectTree2_input").val("请选择单位");
 	}
  	</script>
 </body>
