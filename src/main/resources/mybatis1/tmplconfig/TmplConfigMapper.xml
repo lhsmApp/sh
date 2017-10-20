@@ -19,7 +19,11 @@
 		COL_HIDE,
 		COL_SUM,
 		COL_AVE,
-		COL_TRANSFER
+		COL_TRANSFER,
+		COL_FORMULA,
+		CAL_ORDER,
+		NUM_DGT,
+		DEC_PRECISION
 	</sql>
 	<sql id="FieldColumns">
 		RPT_DUR,
@@ -32,7 +36,11 @@
 		COL_HIDE,
 		COL_SUM,
 		COL_AVE,
-		COL_TRANSFER
+		COL_TRANSFER,
+		COL_FORMULA,
+		CAL_ORDER,
+		NUM_DGT,
+		DEC_PRECISION
 	</sql>
 
 	<!-- 字段值 -->
@@ -47,26 +55,62 @@
 		#{COL_HIDE},
 		#{COL_SUM},
 		#{COL_AVE},
-		#{COL_TRANSFER}
+		#{COL_TRANSFER},
+		#{COL_FORMULA},
+		#{CAL_ORDER},
+		#{NUM_DGT},
+		#{DEC_PRECISION}
 	</sql>
 
 	<!-- 新增 -->
 	<insert id="save" parameterType="pd">
-		insert into
+		<!-- insert into
 		<include refid="tableName"></include>
 		(
 		<include refid="Field"></include>
 		) values (
 		<include refid="FieldValue"></include>
+		) -->
+		insert into
+		<include refid="tableName"></include>
+		(
+			COL_FORMULA,
+			CAL_ORDER,
+			NUM_DGT,
+			DEC_PRECISION
+		) values (
+			#{COL_FORMULA},
+			#{CAL_ORDER},
+			#{NUM_DGT},
+			#{DEC_PRECISION}
 		)
+		
 	</insert>
 
 	<!-- 删除 -->
 	<delete id="delete" parameterType="pd">
-		delete from
+		<!-- delete from
 		<include refid="tableName"></include>
 		where
+		TABLE_CODE = #{TABLE_CODE} -->
+		
+		update
+		<include refid="tableName"></include>
+		set
+		<!-- DEPT_CODE = #{DEPT_CODE}, TABLE_CODE = #{TABLE_CODE}, COL_CODE = #{COL_CODE}, -->
+		COL_FORMULA = #{COL_FORMULA},
+		CAL_ORDER = #{CAL_ORDER},
+		NUM_DGT =#{NUM_DGT},
+		COL_HIDE = #{COL_HIDE},
+		DEC_PRECISION = #{DEC_PRECISION}
+		where
+		RPT_DUR = #{RPT_DUR}
+		and
+		DEPT_CODE = #{DEPT_CODE}
+		and
 		TABLE_CODE = #{TABLE_CODE}
+		and
+		COL_CODE = #{COL_CODE}
 	</delete>
 
 	<!-- 删除 -->
@@ -83,10 +127,9 @@
 
 	<!-- 修改 -->
 	<update id="edit" parameterType="pd">
-		update
+		<!-- update
 		<include refid="tableName"></include>
 		set
-		<!-- DEPT_CODE = #{DEPT_CODE}, TABLE_CODE = #{TABLE_CODE}, COL_CODE = #{COL_CODE}, -->
 		COL_NAME = #{COL_NAME},
 		DISP_ORDER = #{DISP_ORDER},
 		DICT_TRANS =#{DICT_TRANS},
@@ -95,6 +138,23 @@
 		COL_AVE =#{COL_AVE},
 		COL_TRANSFER =#{COL_TRANSFER}
 		where
+		DEPT_CODE = #{DEPT_CODE}
+		and
+		TABLE_CODE = #{TABLE_CODE}
+		and
+		COL_CODE = #{COL_CODE} -->
+		
+		
+		update
+		<include refid="tableName"></include>
+		set
+		COL_FORMULA = #{COL_FORMULA},
+		CAL_ORDER = #{CAL_ORDER},
+		NUM_DGT =#{NUM_DGT},
+		DEC_PRECISION = #{DEC_PRECISION}
+		where
+		RPT_DUR = #{RPT_DUR}
+		and
 		DEPT_CODE = #{DEPT_CODE}
 		and
 		TABLE_CODE = #{TABLE_CODE}
@@ -110,6 +170,15 @@
 		<include refid="tableName"></include>
 		where
 		TABLE_CODE = #{TABLE_CODE}
+	</select>
+	
+	<!-- 验证公式是否正确 -->
+	<select id="validateFormula" parameterType="pd" resultType="pd">
+		select
+		${COL_FORMULA}
+		from
+		${TABLE_CODE_ORI}
+		LIMIT 1
 	</select>
 	
 	<!-- 通过期间获取数据，判断是否已经生成过模板配置信息 -->
@@ -154,6 +223,10 @@
 		a.COL_SUM,
 		a.COL_AVE,
 		a.COL_TRANSFER,
+		a.COL_FORMULA,
+		a.CAL_ORDER,
+		a.NUM_DGT,
+		a.DEC_PRECISION,
 		b.NAME DNAME,
 		c.TABLE_NAME,
 		d.DICT_NAME
