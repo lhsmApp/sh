@@ -59,6 +59,12 @@ public interface TmplConfigManager{
 	 */
 	public PageData findById(PageData pd)throws Exception;
 	
+	/**验证编辑的公式是否正确
+	 * @param pd
+	 * @throws Exception
+	 */
+	public PageData validateFormula(PageData pd)throws Exception;
+	
 	/**批量删除
 	 * @param ArrayDATA_IDS
 	 * @throws Exception

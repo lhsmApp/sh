@@ -82,6 +82,14 @@ public class TmplConfigService implements TmplConfigManager{
 		return (PageData)dao.findForObject("TmplConfigMapper.findById", pd);
 	}
 	
+	/**验证编辑的公式是否正确
+	 * @param pd
+	 * @throws Exception
+	 */
+	public PageData validateFormula(PageData pd)throws Exception{
+		return (PageData)dao.findForObject("TmplConfigMapper.validateFormula", pd);
+	}
+	
 	/**批量删除
 	 * @param ArrayDATA_IDS
 	 * @throws Exception
