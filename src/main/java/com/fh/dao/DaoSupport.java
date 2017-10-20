@@ -25,7 +25,33 @@ public class DaoSupport implements DAO {
 
 	@Resource(name = "sqlSessionTemplate")
 	private SqlSessionTemplate sqlSessionTemplate;
+
+	/**
+	 * 查找对象
+	 * @param str
+	 * @param obj
+	 * @return
+	 * @throws Exception
+	 */
+	public Object findForObject(String str, Object obj) throws Exception {
+		return sqlSessionTemplate.selectOne(str, obj);
+	}
+
+	/**
+	 * 查找对象
+	 * @param str
+	 * @param obj
+	 * @return
+	 * @throws Exception
+	 */
+	public Object findForList(String str, Object obj) throws Exception {
+		return sqlSessionTemplate.selectList(str, obj);
+	}
 	
+	public Object findForMap(String str, Object obj, String key, String value) throws Exception {
+		return sqlSessionTemplate.selectMap(str, obj, key);
+	}
+
 	/**
 	 * 保存对象
 	 * @param str
@@ -60,13 +86,35 @@ public class DaoSupport implements DAO {
 	}
 
 	/**
+	 * 删除对象 
+	 * @param str
+	 * @param obj
+	 * @return
+	 * @throws Exception
+	 */
+	public Object delete(String str, Object obj) throws Exception {
+		return sqlSessionTemplate.delete(str, obj);
+	}
+
+	/**
 	 * 批量更新
 	 * @param str
 	 * @param obj
 	 * @return
 	 * @throws Exception
 	 */
-	public void batchUpdate(String str, List objs )throws Exception{
+	public Object batchDelete(String str, List objs )throws Exception{
+		return sqlSessionTemplate.delete(str, objs);
+	}
+	
+	/**
+	 * 批量更新
+	 * @param str
+	 * @param obj
+	 * @return
+	 * @throws Exception
+	 */
+	public void batchUpdate(String str, List<?> objs )throws Exception{
 		SqlSessionFactory sqlSessionFactory = sqlSessionTemplate.getSqlSessionFactory();
 		//批量执行器
 		SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH,false);
@@ -83,7 +131,7 @@ public class DaoSupport implements DAO {
 			sqlSession.close();
 		}
 	}
-	public void batchDeleteAllUpdate(String deleteAll, String insert, List objs )throws Exception{
+	public void batchDeleteAllUpdate(String deleteAll, String insert, List<?> objs )throws Exception{
 		SqlSessionFactory sqlSessionFactory = sqlSessionTemplate.getSqlSessionFactory();
 		//批量执行器
 		SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH,false);
@@ -101,7 +149,7 @@ public class DaoSupport implements DAO {
 			sqlSession.close();
 		}
 	}
-	public void batchDeleteOneUpdate(String delete, String insert, List objs )throws Exception{
+	public void batchDeleteOneUpdate(String delete, String insert, List<?> objs )throws Exception{
 		SqlSessionFactory sqlSessionFactory = sqlSessionTemplate.getSqlSessionFactory();
 		//批量执行器
 		SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH,false);
@@ -169,61 +217,13 @@ public class DaoSupport implements DAO {
 				sqlSession.commit();
 				sqlSession.clearCache();
 			}
-		} catch (Exception e) { 
-			sqlSession.rollback(); 
+		//} catch (Exception e) { 
+		//	sqlSession.rollback(); 
 		} finally{
 			sqlSession.close();
 		}
 	}
 	
-	/**
-	 * 批量更新
-	 * @param str
-	 * @param obj
-	 * @return
-	 * @throws Exception
-	 */
-	public Object batchDelete(String str, List objs )throws Exception{
-		return sqlSessionTemplate.delete(str, objs);
-	}
-	
-	/**
-	 * 删除对象 
-	 * @param str
-	 * @param obj
-	 * @return
-	 * @throws Exception
-	 */
-	public Object delete(String str, Object obj) throws Exception {
-		return sqlSessionTemplate.delete(str, obj);
-	}
-	 
-	/**
-	 * 查找对象
-	 * @param str
-	 * @param obj
-	 * @return
-	 * @throws Exception
-	 */
-	public Object findForObject(String str, Object obj) throws Exception {
-		return sqlSessionTemplate.selectOne(str, obj);
-	}
-
-	/**
-	 * 查找对象
-	 * @param str
-	 * @param obj
-	 * @return
-	 * @throws Exception
-	 */
-	public Object findForList(String str, Object obj) throws Exception {
-		return sqlSessionTemplate.selectList(str, obj);
-	}
-	
-	public Object findForMap(String str, Object obj, String key, String value) throws Exception {
-		return sqlSessionTemplate.selectMap(str, obj, key);
-	}
-
 	/**
 	 * 上报
 	 * @param str
