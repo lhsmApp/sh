@@ -42,7 +42,7 @@ public interface SocialIncSummyManager{
 	 * @param pd
 	 * @throws Exception
 	 */
-	public void summaryModelList(List<Map<String, Object>> listMap, PageData pdBillNum, List<SysSealed> delReportList)throws Exception;
+	public void saveSummyModelList(List<Map<String, Object>> listMap, PageData pdBillNum, List<SysSealed> delReportList)throws Exception;
 	
 	
 }

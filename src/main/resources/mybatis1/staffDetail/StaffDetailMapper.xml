@@ -195,14 +195,6 @@
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
 	<!-- 获取汇总里的明细 -->
 	<select id="getDetailList" parameterType="pd" resultType="pd">
 		select * 

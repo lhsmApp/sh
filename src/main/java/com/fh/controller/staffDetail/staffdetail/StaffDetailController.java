@@ -711,7 +711,6 @@ public class StaffDetailController extends BaseController {
 									titleAndAttribute.put(col.getCOL_NAME(), col.getCOL_CODE());
 								}
 							}
-
 							// 调用解析工具包
 							testExcel = new LeadingInExcelToPageData<PageData>(formart);
 							// 解析excel，获取客户信息集合
@@ -1061,7 +1060,7 @@ public class StaffDetailController extends BaseController {
 			item.setSTATE(DurState.Sealed.getNameKey());// 枚举  1封存,0解封
             List<SysSealed> listReport = new ArrayList<SysSealed>();
             listReport.add(item);
-			syssealedinfoService.report(listReport);
+			syssealedinfoService.saveReport(listReport);
 			commonBase.setCode(0);
 		}
 		return commonBase;

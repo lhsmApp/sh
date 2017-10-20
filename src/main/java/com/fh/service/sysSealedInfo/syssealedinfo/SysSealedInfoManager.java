@@ -80,7 +80,7 @@ public interface SysSealedInfoManager{
 	 * @param
 	 * @throws Exception
 	 */
-	public void report(List<SysSealed> list)throws Exception;
+	public void saveReport(List<SysSealed> list)throws Exception;
 	
 	/**批量修改
 	 * @param pd

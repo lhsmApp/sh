@@ -79,6 +79,10 @@
 			           rollback-for="java.lang.Exception" />
 			<tx:method name="import*" propagation="REQUIRED" read-only="false" 
 			           rollback-for="java.lang.Exception" />
+			<tx:method name="batch*" propagation="REQUIRED" read-only="false" 
+			           rollback-for="java.lang.Exception" />
+			<tx:method name="copy*" propagation="REQUIRED" read-only="false" 
+			           rollback-for="java.lang.Exception" />
 		</tx:attributes>
 	</tx:advice>
 	<bean name="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">   

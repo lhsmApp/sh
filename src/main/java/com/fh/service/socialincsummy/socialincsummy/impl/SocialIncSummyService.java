@@ -59,7 +59,7 @@ public class SocialIncSummyService implements SocialIncSummyManager{
 	 * @param 
 	 * @throws Exception
 	 */
-	public void summaryModelList(List<Map<String, Object>> listMap, PageData pdBillNum, List<SysSealed> delReportList)throws Exception{
+	public void saveSummyModelList(List<Map<String, Object>> listMap, PageData pdBillNum, List<SysSealed> delReportList)throws Exception{
 		dao.batch_One_del_Ins("SocialIncSummyMapper.delete", "SocialIncSummyMapper.save", "SocialIncSummyMapper.updateBillState", "SocialIncDetailMapper.editBillCode", listMap, 
 				"SysBillnumMapper.delete", "SysBillnumMapper.save", pdBillNum,
 				"SysSealedInfoMapper.reportDelete", delReportList);
