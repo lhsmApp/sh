@@ -80,12 +80,12 @@
 							</ul>
 						</li> -->
 
-				 <li title="标准页面" class="purple" onclick="instframe();"
+				 <!-- <li title="标准页面" class="purple" onclick="instframe();"
 					id="instframe"><a data-toggle="dropdown"
 					class="dropdown-toggle" href="#"> <i
 						class="ace-icon fa fa-users icon-animated-vertical"></i>
 
-				</a></li>
+				</a></li> -->
 
 				<!--<li title="练习" class="green" onclick="fhsms();" id="fhsmstss">
 					fhsms()在 WebRoot\static\js\myjs\head.js中 <a

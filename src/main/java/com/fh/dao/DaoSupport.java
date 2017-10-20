@@ -217,8 +217,6 @@ public class DaoSupport implements DAO {
 				sqlSession.commit();
 				sqlSession.clearCache();
 			}
-		//} catch (Exception e) { 
-		//	sqlSession.rollback(); 
 		} finally{
 			sqlSession.close();
 		}
