@@ -227,7 +227,7 @@ public class JgGridControllerJia extends BaseController {
             }
         }  */
 		if(null != listData && listData.size() > 0){
-			//jqgridServiceJia.updateAll(listData);
+			jqgridServiceJia.updateAll(listData);
 			commonBase.setCode(0);
 		}
 		return commonBase;

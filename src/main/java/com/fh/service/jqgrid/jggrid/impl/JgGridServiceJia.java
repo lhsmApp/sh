@@ -97,7 +97,7 @@ public class JgGridServiceJia implements JgGridManagerJia{
 	 * @param pd
 	 * @throws Exception
 	 */
-	public void updateAll(List<JqGridModel> pd)throws Exception{
+	public void updateAll(List<PageData> pd)throws Exception{
 		dao.update("JgGridMapperJia.updateAll", pd);
 	}
 	
