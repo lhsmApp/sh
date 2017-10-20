@@ -163,13 +163,15 @@ public class DaoSupport implements DAO {
 				    sqlSession.delete(importDelete, objs.get(i));
 				}
 				for(int i=0,size=objs.size();i<size;i++){
-					sqlSession.update(importInsert, objs.get(i));
+					sqlSession.insert(importInsert, objs.get(i));
 				}
 				sqlSession.flushStatements();
 				sqlSession.commit();
 				sqlSession.clearCache();
 			}
-		}finally{
+		} catch (Exception e) { 
+			sqlSession.rollback(); 
+		} finally{
 			sqlSession.close();
 		}
 	}
@@ -229,7 +231,7 @@ public class DaoSupport implements DAO {
 	 * @return
 	 * @throws Exception
 	 */
-	public void report(String reportDelete, String reportInsert, List<?> objs)throws Exception{
+	public void saveReport(String reportDelete, String reportInsert, List<?> objs)throws Exception{
 		SqlSessionFactory sqlSessionFactory = sqlSessionTemplate.getSqlSessionFactory();
 		//批量执行器
 		SqlSession sqlSession = sqlSessionFactory.openSession(ExecutorType.BATCH,false);

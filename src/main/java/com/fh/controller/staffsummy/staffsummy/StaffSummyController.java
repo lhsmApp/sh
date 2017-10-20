@@ -416,7 +416,7 @@ public class StaffSummyController extends BaseController {
 	    			}
 				}
 			}
-			syssealedinfoService.report(listSysSealed);
+			syssealedinfoService.saveReport(listSysSealed);
 			commonBase.setCode(0);
 		}
 		return commonBase;
@@ -663,7 +663,7 @@ public class StaffSummyController extends BaseController {
 			pdBillNum.put("BILL_NUMBER", billNum);
 		}
         if(commonBase.getCode() == -1){
-			staffsummyService.summaryModelList(listMap, pdBillNum, delReportList);
+			staffsummyService.saveSummyModelList(listMap, pdBillNum, delReportList);
 			commonBase.setCode(0);
         }
 		return commonBase;

@@ -402,7 +402,7 @@ public class SocialIncSummyController extends BaseController {
 	    			}
 				}
 			}
-			syssealedinfoService.report(listSysSealed);
+			syssealedinfoService.saveReport(listSysSealed);
 			commonBase.setCode(0);
 		}
 		return commonBase;
@@ -638,7 +638,7 @@ public class SocialIncSummyController extends BaseController {
 			pdBillNum.put("BILL_NUMBER", billNum);
 		}
         if(commonBase.getCode() == -1){
-			socialincsummyService.summaryModelList(listMap, pdBillNum, delReportList);
+			socialincsummyService.saveSummyModelList(listMap, pdBillNum, delReportList);
 			commonBase.setCode(0);
         }
 		return commonBase;

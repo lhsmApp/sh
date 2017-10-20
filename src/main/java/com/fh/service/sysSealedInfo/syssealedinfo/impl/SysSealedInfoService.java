@@ -117,8 +117,8 @@ public class SysSealedInfoService implements SysSealedInfoManager{
 	 * @param
 	 * @throws Exception
 	 */
-	public void report(List<SysSealed> list)throws Exception{
-		dao.report("SysSealedInfoMapper.reportDelete", "SysSealedInfoMapper.reportInsert", list);
+	public void saveReport(List<SysSealed> list)throws Exception{
+		dao.saveReport("SysSealedInfoMapper.reportDelete", "SysSealedInfoMapper.reportInsert", list);
 	}
 	
 	/**批量修改

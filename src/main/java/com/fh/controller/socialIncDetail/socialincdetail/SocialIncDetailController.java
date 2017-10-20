@@ -941,7 +941,7 @@ public class SocialIncDetailController extends BaseController {
 			item.setSTATE(DurState.Sealed.getNameKey());// 枚举  1封存,0解封
             List<SysSealed> listReport = new ArrayList<SysSealed>();
             listReport.add(item);
-			syssealedinfoService.report(listReport);
+			syssealedinfoService.saveReport(listReport);
 			commonBase.setCode(0);
 		}
 		return commonBase;

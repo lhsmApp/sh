@@ -413,7 +413,7 @@ public class HouseFundSummyController extends BaseController {
 	    			}
 				}
 			}
-			syssealedinfoService.report(listSysSealed);
+			syssealedinfoService.saveReport(listSysSealed);
 			commonBase.setCode(0);
 		}
 		return commonBase;
@@ -649,7 +649,7 @@ public class HouseFundSummyController extends BaseController {
 			pdBillNum.put("BILL_NUMBER", billNum);
 		}
         if(commonBase.getCode() == -1){
-			housefundsummyService.summaryModelList(listMap, pdBillNum, delReportList);
+			housefundsummyService.saveSummyModelList(listMap, pdBillNum, delReportList);
 			commonBase.setCode(0);
         }
 		return commonBase;
