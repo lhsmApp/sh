@@ -154,36 +154,4 @@ public class CalculateFormulaController extends BaseController {
 		//commonBase.setMessage("当前删除的信息含有业务关联字段，不能删除");
 		return commonBase;
 	}
-	
-	/**
-	 * 批量修改
-	 * 
-	 * @param
-	 * @throws Exception
-	 */
-	@RequestMapping(value = "/updateAll")
-	/* @RequestBody RequestBase<JqGridModel> jqGridModel */
-	public @ResponseBody CommonBase updateAll() throws Exception {
-		logBefore(logger, Jurisdiction.getUsername() + "批量删除JgGrid");
-		// if(!Jurisdiction.buttonJurisdiction(menuUrl, "del")){return null;}
-		// //校验权限
-		CommonBase commonBase = new CommonBase();
-		commonBase.setCode(-1);
-		PageData pd = this.getPageData();
-		String strDataRows = pd.getString("DATA_ROWS");
-		JSONArray array = JSONArray.fromObject(strDataRows);
-		List<PageData> listData = (List<PageData>) JSONArray.toCollection(array, PageData.class);// 过时方法
-
-		if (null != listData && listData.size() > 0) {
-			// 根据这两个条件删除表
-			pd.put("DEPT_CODE", listData.get(0).get("DEPT_CODE"));
-			pd.put("TABLE_CODE", listData.get(0).get("TABLE_CODE"));
-			pd.put("RPT_DUR", listData.get(0).get("RPT_DUR"));
-			tmplconfigService.deleteTable(pd);
-
-			tmplconfigService.updateAll(listData);
-			commonBase.setCode(0);
-		}
-		return commonBase;
-	}
 }

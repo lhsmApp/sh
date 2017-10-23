@@ -25,6 +25,21 @@
 		NUM_DGT,
 		DEC_PRECISION
 	</sql>
+	<!-- 字段 -->
+	<sql id="FieldTmpl">
+		RPT_DUR,
+		DEPT_CODE,
+		TABLE_CODE,
+		COL_CODE,
+		COL_NAME,
+		DISP_ORDER,
+		DICT_TRANS,
+		COL_HIDE,
+		COL_SUM,
+		COL_AVE,
+		COL_TRANSFER
+	</sql>
+	
 	<sql id="FieldColumns">
 		RPT_DUR,
 		DEPT_CODE,
@@ -325,7 +340,7 @@
 		insert into
 		<include refid="tableName"></include>
 		(
-		<include refid="Field"></include>
+		<include refid="FieldTmpl"></include>
 		) values
 		<foreach item="item" index="index" collection="list" open=" "
 			separator=", " close=" ">
@@ -357,7 +372,7 @@
 		insert into
 		<include refid="tableName"></include>
 		(
-		<include refid="Field"></include>
+		<include refid="FieldTmpl"></include>
 		)
 		<foreach item="item" index="index" collection="DEPT_CODES"
 			open=" " separator="union all " close=" ">
@@ -376,7 +391,7 @@
 		insert into
 		<include refid="tableName"></include>
 		(
-		<include refid="Field"></include>
+		<include refid="FieldTmpl"></include>
 		)
 		SELECT #{NEXT_RPT_DUR} as RPT_DUR,DEPT_CODE,
 		TABLE_CODE,COL_CODE,COL_NAME,DISP_ORDER,DICT_TRANS,COL_HIDE,COL_SUM,COL_AVE,COL_TRANSFER

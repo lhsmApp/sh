@@ -162,7 +162,7 @@
 	    })
 		
 		$("#jqGrid").jqGrid({
-			//url: '<%=basePath%>tmplconfig/getPageList.do',
+			//url: '<%=basePath%>calculateFormula/getPageList.do',
 			datatype: "json",
 			 colModel: [
 				{
@@ -328,58 +328,6 @@
     		return [ false, responseJSON.message ];
     	}
     }
-	
-	//批量保存
-	function batchSave(e) {
-		 var listData =new Array();
-		var ids = $("#jqGrid").jqGrid('getDataIDs');
-		//console.log("ids"+ids);
-		//遍历访问这个集合  
-		var rowData;
-		$(ids).each(function (index, id){  
-			console.log("index"+index);
-			console.log("id"+id);
-
-           $("#jqGrid").saveRow(id, false, 'clientArray');
-            
-             rowData = $("#jqGrid").getRowData(id);
-     		console.log("rowData"+rowData);
-            listData.push(rowData);
-		}); 
-		top.jzts();
-		$.ajax({
-			type: "POST",
-			url: '<%=basePath%>tmplconfig/updateAll.do?',
-	    	//data: rowData,//可以单独传入一个对象，后台可以直接通过对应模型接受参数。但是传入Array（listData）就不好用了，所以传list方式需将List转为Json字符窜。
-			//data: '{"rows":listData}',
-			data:{DATA_ROWS:JSON.stringify(listData)},
-	    	dataType:'json',
-			cache: false,
-			success: function(response){
-				if(response.code==0){
-					$("#jqGrid").trigger("reloadGrid");  
-					$(top.hangge());//关闭加载状态
-					$("#subTitle").tips({
-						side:3,
-			            msg:'保存成功',
-			            bg:'#009933',
-			            time:3
-			        });
-				}else{
-					$(top.hangge());//关闭加载状态
-					$("#subTitle").tips({
-						side:3,
-			            msg:'保存失败,'+response.responseJSON.message,
-			            bg:'#cc0033',
-			            time:3
-			        });
-				}
-			},
-	    	error: function(e) {
-				$(top.hangge());//关闭加载状态
-	    	}
-		}); 
-	 }
 		
 	//switch element when editing inline
 	function aceSwitch( cellvalue, options, cell ) {
@@ -441,7 +389,7 @@
 		var DNAME = $("#DNAME").val(); 
 		var busiDate = $("#busiDate").val(); 
 		$("#jqGrid").jqGrid('setGridParam',{  // 重新加载数据
-			url:'<%=basePath%>tmplconfig/getPageList.do?TABLE_NO='+TABLE_NO+'&DEPARTMENT_CODE='+DEPARTMENT_CODE
+			url:'<%=basePath%>calculateFormula/getPageList.do?TABLE_NO='+TABLE_NO+'&DEPARTMENT_CODE='+DEPARTMENT_CODE
 			+'&RPT_DUR='+busiDate+'&TABLE_NAME='+TABLE_NAME+'&DNAME='+DNAME,  
 			datatype:'json',
 		      page:1
