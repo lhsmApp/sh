@@ -65,7 +65,7 @@ public class FilterBillCode {
 					for(PageData each : getList){
 						each.put("TableNameDetail", TableNameDetail);
 						each.put("BILL_CODE", " ");
-						TmplUtil.setModelDefault(each, map_HaveColumnsList, map_SetColumnsList);
+						Common.setModelDefault(each, map_HaveColumnsList, map_SetColumnsList);
 
 						each.put("TypeCodeSummy", TypeCodeSummy);
 					}

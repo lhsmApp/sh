@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
+import com.fh.controller.common.Common;
 import com.fh.controller.common.DictsUtil;
 import com.fh.controller.common.FilterBillCode;
 import com.fh.controller.common.Message;
@@ -96,9 +97,9 @@ public class SocialIncDetailController extends BaseController {
 	//页面显示数据的年月
 	String SystemDateTime = "";
 	//页面显示数据的二级单位
-	String UserDepartCode = "";
+	//String UserDepartCode = "";
 	//登录人的二级单位是最末层
-	private int departSelf = 0;
+	//private int departSelf = 0;
 	//底行显示的求和与平均值字段
 	StringBuilder SqlUserdata = new StringBuilder();
 	//字典
@@ -106,7 +107,7 @@ public class SocialIncDetailController extends BaseController {
 	//表结构  
 	Map<String, TableColumns> map_HaveColumnsList = new LinkedHashMap<String, TableColumns>();
 	// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-	Map<String, TmplConfigDetail> map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
+	//Map<String, TmplConfigDetail> map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
 
 	//界面查询字段
     List<String> QueryFeildList = Arrays.asList("CUST_COL7", "DEPT_CODE");
@@ -130,8 +131,8 @@ public class SocialIncDetailController extends BaseController {
 		return list;
 	}
 
-	String getPageListSelectedCustCol7 = "";
-	String getPageListSelectedDepartCode = "";
+	//String getPageListSelectedCustCol7 = "";
+	//String getPageListSelectedDepartCode = "";
 	
 	/**列表
 	 * @param page
@@ -142,8 +143,8 @@ public class SocialIncDetailController extends BaseController {
 		logBefore(logger, Jurisdiction.getUsername()+"列表SocialIncDetail");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
 
-		getPageListSelectedCustCol7 = "";
-		getPageListSelectedDepartCode = "";
+		//getPageListSelectedCustCol7 = "";
+		//getPageListSelectedDepartCode = "";
 		
 		PageData getPd = this.getPageData();
 		ModelAndView mv = this.getModelAndView();
@@ -152,7 +153,7 @@ public class SocialIncDetailController extends BaseController {
 		SystemDateTime = sysConfigManager.currentSection(getPd);
 		mv.addObject("SystemDateTime", SystemDateTime);
 		//当前登录人所在二级单位
-		UserDepartCode = Jurisdiction.getCurrentDepartmentID();//
+		String UserDepartCode = Jurisdiction.getCurrentDepartmentID();//
 		User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
 		String DepartName = user.getDEPARTMENT_NAME();
 		mv.addObject("DepartName", DepartName);
@@ -177,10 +178,10 @@ public class SocialIncDetailController extends BaseController {
 		String DepartmentSelectTreeSource=DictsUtil.getDepartmentSelectTreeSource(departmentService);
 		if(DepartmentSelectTreeSource.equals("0"))
 		{
-			this.departSelf = 1;
+			//this.departSelf = 1;
 			getPd.put("departTreeSource", DepartmentSelectTreeSource);
 		} else {
-			departSelf = 0;
+			//departSelf = 0;
 			getPd.put("departTreeSource", 1);
 		}
 		mv.addObject("zTreeNodes", DepartmentSelectTreeSource);
@@ -197,7 +198,7 @@ public class SocialIncDetailController extends BaseController {
 		//表结构  
 		map_HaveColumnsList = tmpl.getHaveColumnsList();
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-		map_SetColumnsList = tmpl.getSetColumnsList();
+		//map_SetColumnsList = tmpl.getSetColumnsList();
 
 		mv.addObject("pd", getPd);
 		mv.addObject("jqGridColModel", jqGridColModel);
@@ -218,8 +219,9 @@ public class SocialIncDetailController extends BaseController {
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		
 		if(SelectedCustCol7 != null && !SelectedCustCol7.trim().equals("") && SelectedDepartCode != null && !SelectedDepartCode.trim().equals("")){
@@ -248,20 +250,21 @@ public class SocialIncDetailController extends BaseController {
 	public @ResponseBody PageResult<PageData> getPageList(JqPage page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"列表SocialIncDetail");
 
-		getPageListSelectedCustCol7 = "";
-		getPageListSelectedDepartCode = "";
+		//getPageListSelectedCustCol7 = "";
+		//getPageListSelectedDepartCode = "";
 		
 		PageData getPd = this.getPageData();
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
 
-		getPageListSelectedCustCol7 = SelectedCustCol7;
-		getPageListSelectedDepartCode = SelectedDepartCode;
+		//getPageListSelectedCustCol7 = SelectedCustCol7;
+		//getPageListSelectedDepartCode = SelectedDepartCode;
 
 		PageData getQueryFeildPd = new PageData();
 		getQueryFeildPd.put("DEPT_CODE", SelectedDepartCode);
@@ -331,16 +334,23 @@ public class SocialIncDetailController extends BaseController {
 		PageData getPd = this.getPageData();
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		//
+		String DepartTreeSource = getPd.getString("DepartTreeSource");
+		String ShowDataDepartCode = getPd.getString("ShowDataDepartCode");
+		String ShowDataCustCol7 = getPd.getString("ShowDataCustCol7");
 		//操作
 		String oper = getPd.getString("oper");
+		Map<String, TmplConfigDetail> map_SetColumnsList = Common.GetSetColumnsList(TypeCodeDetail, SelectedDepartCode, tmplconfigService);
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode,
+				ShowDataDepartCode, ShowDataCustCol7, DepartTreeSource);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
@@ -364,7 +374,7 @@ public class SocialIncDetailController extends BaseController {
 			}
 		}
 		getPd.put("BILL_CODE", " ");
-		TmplUtil.setModelDefault(getPd, map_HaveColumnsList, map_SetColumnsList);
+		Common.setModelDefault(getPd, map_HaveColumnsList, map_SetColumnsList);
 
 		FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
 				SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
@@ -409,14 +419,21 @@ public class SocialIncDetailController extends BaseController {
 		PageData getPd = this.getPageData();
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		//
+		String DepartTreeSource = getPd.getString("DepartTreeSource");
+		String ShowDataDepartCode = getPd.getString("ShowDataDepartCode");
+		String ShowDataCustCol7 = getPd.getString("ShowDataCustCol7");
+		Map<String, TmplConfigDetail> map_SetColumnsList = Common.GetSetColumnsList(TypeCodeDetail, SelectedDepartCode, tmplconfigService);
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode,
+				ShowDataDepartCode, ShowDataCustCol7, DepartTreeSource);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
@@ -457,7 +474,7 @@ public class SocialIncDetailController extends BaseController {
 	        	listUserCodeAdd.add(strUserCode);
 	        	item.put("BILL_CODE", " ");
 	        	item.put("CanOperate", strHelpful);
-				TmplUtil.setModelDefault(item, map_HaveColumnsList, map_SetColumnsList);
+	        	Common.setModelDefault(item, map_HaveColumnsList, map_SetColumnsList);
 	        }
 			if(null != listData && listData.size() > 0){
 				List<String> repeatList = socialincdetailService.findUserCodeByModel(listData);
@@ -487,14 +504,21 @@ public class SocialIncDetailController extends BaseController {
 		PageData getPd = this.getPageData();
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		//
+		String DepartTreeSource = getPd.getString("DepartTreeSource");
+		String ShowDataDepartCode = getPd.getString("ShowDataDepartCode");
+		String ShowDataCustCol7 = getPd.getString("ShowDataCustCol7");
+		Map<String, TmplConfigDetail> map_SetColumnsList = Common.GetSetColumnsList(TypeCodeDetail, SelectedDepartCode, tmplconfigService);
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode,
+				ShowDataDepartCode, ShowDataCustCol7, DepartTreeSource);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
@@ -547,14 +571,20 @@ public class SocialIncDetailController extends BaseController {
 		PageData getPd = this.getPageData();
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		//
+		String DepartTreeSource = getPd.getString("DepartTreeSource");
+		String ShowDataDepartCode = getPd.getString("ShowDataDepartCode");
+		String ShowDataCustCol7 = getPd.getString("ShowDataCustCol7");
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode,
+				ShowDataDepartCode, ShowDataCustCol7, DepartTreeSource);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
@@ -565,6 +595,9 @@ public class SocialIncDetailController extends BaseController {
 		mv.addObject("local", "socialincdetail");
 		mv.addObject("SelectedDepartCode", SelectedDepartCode);
 		mv.addObject("SelectedCustCol7", SelectedCustCol7);
+		mv.addObject("DepartTreeSource", DepartTreeSource);
+		mv.addObject("ShowDataDepartCode", ShowDataDepartCode);
+		mv.addObject("ShowDataCustCol7", ShowDataCustCol7);
 		mv.addObject("commonBaseCode", commonBase.getCode());
 		mv.addObject("commonMessage", commonBase.getMessage());
 		return mv;
@@ -588,14 +621,21 @@ public class SocialIncDetailController extends BaseController {
 		PageData getPd = this.getPageData();
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		//
+		String DepartTreeSource = getPd.getString("DepartTreeSource");
+		String ShowDataDepartCode = getPd.getString("ShowDataDepartCode");
+		String ShowDataCustCol7 = getPd.getString("ShowDataCustCol7");
+		Map<String, TmplConfigDetail> map_SetColumnsList = Common.GetSetColumnsList(TypeCodeDetail, SelectedDepartCode, tmplconfigService);
 		
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode,
+				ShowDataDepartCode, ShowDataCustCol7, DepartTreeSource);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
@@ -735,7 +775,7 @@ public class SocialIncDetailController extends BaseController {
 											if(!(getESTB_DEPT!=null && !getESTB_DEPT.trim().equals(""))){
 												pdAdd.put("ESTB_DEPT", SelectedDepartCode);
 											}
-											TmplUtil.setModelDefault(pdAdd, map_HaveColumnsList, map_SetColumnsList);
+											Common.setModelDefault(pdAdd, map_HaveColumnsList, map_SetColumnsList);
 											listAdd.add(pdAdd);
 										}
 									}
@@ -767,6 +807,9 @@ public class SocialIncDetailController extends BaseController {
 		mv.addObject("local", "socialincdetail");
 		mv.addObject("SelectedDepartCode", SelectedDepartCode);
 		mv.addObject("SelectedCustCol7", SelectedCustCol7);
+		mv.addObject("DepartTreeSource", DepartTreeSource);
+		mv.addObject("ShowDataDepartCode", ShowDataDepartCode);
+		mv.addObject("ShowDataCustCol7", ShowDataCustCol7);
 		mv.addObject("commonBaseCode", commonBase.getCode());
 		mv.addObject("commonMessage", commonBase.getMessage());
 		return mv;
@@ -782,11 +825,13 @@ public class SocialIncDetailController extends BaseController {
 		PageData getPd = this.getPageData();
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		Map<String, TmplConfigDetail> map_SetColumnsList = Common.GetSetColumnsList(TypeCodeDetail, SelectedDepartCode, tmplconfigService);
 
 		PageData transferPd = this.getPageData();
 		//页面显示数据的二级单位
@@ -796,7 +841,7 @@ public class SocialIncDetailController extends BaseController {
 		////员工组
 		//transferPd.put("emplGroupType", emplGroupType);
 		List<PageData> varOList = socialincdetailService.exportModel(transferPd);
-		return export(varOList, "SocialIncDetail"); //社保明细
+		return export(varOList, "SocialIncDetail", map_SetColumnsList); //社保明细
 	}
 	
 	 /**导出到excel
@@ -811,11 +856,13 @@ public class SocialIncDetailController extends BaseController {
 		PageData getPd = this.getPageData();
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		Map<String, TmplConfigDetail> map_SetColumnsList = Common.GetSetColumnsList(TypeCodeDetail, SelectedDepartCode, tmplconfigService);
 		
 		//页面显示数据的年月
 		getPd.put("SystemDateTime", SystemDateTime);
@@ -837,11 +884,11 @@ public class SocialIncDetailController extends BaseController {
 		
 		page.setPd(getPd);
 		List<PageData> varOList = socialincdetailService.exportList(page);
-		return export(varOList, "");
+		return export(varOList, "", map_SetColumnsList);
 	}
 	
 	@SuppressWarnings("unchecked")
-	private ModelAndView export(List<PageData> varOList, String ExcelName){
+	private ModelAndView export(List<PageData> varOList, String ExcelName, Map<String, TmplConfigDetail> map_SetColumnsList){
 		ModelAndView mv = new ModelAndView();
 		Map<String,Object> dataMap = new LinkedHashMap<String,Object>();
 		dataMap.put("filename", ExcelName);
@@ -896,11 +943,18 @@ public class SocialIncDetailController extends BaseController {
 		PageData getPd = this.getPageData();
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		//
+		String DepartTreeSource = getPd.getString("DepartTreeSource");
+		String ShowDataDepartCode = getPd.getString("ShowDataDepartCode");
+		String ShowDataCustCol7 = getPd.getString("ShowDataCustCol7");
+		Map<String, TmplConfigDetail> map_SetColumnsList = Common.GetSetColumnsList(TypeCodeDetail, SelectedDepartCode, tmplconfigService);
+		
 		if(!(TypeCodeDetail!=null && !TypeCodeDetail.trim().equals(""))){
 			commonBase.setCode(2);
 			commonBase.setMessage(Message.ReportTypeIsNull);
@@ -908,7 +962,8 @@ public class SocialIncDetailController extends BaseController {
 		}
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedCustCol7, SelectedDepartCode,
+				ShowDataDepartCode, ShowDataCustCol7, DepartTreeSource);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
@@ -967,21 +1022,22 @@ public class SocialIncDetailController extends BaseController {
 		return strRut;
 	}
 	
-	private String CheckMustSelectedAndSame(String CUST_COL7, String DEPT_CODE, Boolean isCheckSame) throws Exception{
+	private String CheckMustSelectedAndSame(String CUST_COL7, String DEPT_CODE, 
+			String ShowDataDepartCode, String ShowDataCustCol7, String DepartTreeSource) throws Exception{
 		String strRut = "";
 		if(!(CUST_COL7 != null && !CUST_COL7.trim().equals(""))){
 			strRut += "查询条件中的账套必须选择！";
+		} else {
+		    if(!CUST_COL7.equals(ShowDataCustCol7)){
+				strRut += "查询条件中所选账套与页面显示数据账套不一致，请单击查询再进行操作！";
+		    }
 		}
 		if(!(DEPT_CODE != null && !DEPT_CODE.trim().equals(""))){
 			strRut += "查询条件中的责任中心不能为空！";
-		}
-		if(isCheckSame){
-			if(CUST_COL7 != null && !CUST_COL7.equals(getPageListSelectedCustCol7)){
-				strRut += "查询条件中所选账套与页面显示数据账套不一致，请单击查询再进行操作！";
-			}
-			if(DEPT_CODE != null && !DEPT_CODE.equals(getPageListSelectedDepartCode)){
+		} else {
+		    if(!String.valueOf(0).equals(DepartTreeSource) && !DEPT_CODE.equals(ShowDataDepartCode)){
 				strRut += "查询条件中所选责任中心与页面显示数据责任中心不一致，请单击查询再进行操作！";
-			}
+		    }
 		}
 		return strRut;
 	}

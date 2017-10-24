@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
 import com.fh.controller.common.AcconutsShowList;
+import com.fh.controller.common.Common;
 import com.fh.controller.common.DictsUtil;
 import com.fh.controller.common.FilterBillCode;
 import com.fh.controller.common.QueryFeildString;
@@ -29,6 +30,7 @@ import com.fh.entity.Page;
 import com.fh.entity.PageResult;
 import com.fh.entity.TableColumns;
 import com.fh.entity.TmplConfigDetail;
+import com.fh.entity.TmplTypeInfo;
 import com.fh.util.PageData;
 import com.fh.util.SqlTools;
 import com.fh.util.Jurisdiction;
@@ -81,18 +83,18 @@ public class FinanceAccountsController extends BaseController {
 	//页面显示数据的年月
 	String SystemDateTime = "";
 	//页面显示数据的二级单位
-	String UserDepartCode = "";
+	//String UserDepartCode = "";
 	//登录人的二级单位是最末层
-	private int departSelf = 0;
+	//private int departSelf = 0;
 
 	String tbHouseFundSummy = "tb_house_fund_summy";
 	String tbSocialIncSummy = "tb_social_inc_summy";
 	String tbStaffSummy = "TB_STAFF_summy";
 
 	//枚举类型  
-	String TypeCodeStaffDetail = "";
-	String TypeCodeStaffSummy = "";
-	String TypeCodeStaffListen = "";
+	//String TypeCodeStaffDetail = "";
+	//String TypeCodeStaffSummy = "";
+	//String TypeCodeStaffListen = "";
 	String TypeCodeSocialDetail = TmplType.TB_SOCIAL_INC_DETAIL.getNameKey();
 	String TypeCodeSocialSummy = TmplType.TB_SOCIAL_INC_SUMMY.getNameKey();
 	String TypeCodeSocialListen = TmplType.TB_SOCIAL_INC_TRANSFER.getNameKey();
@@ -103,33 +105,34 @@ public class FinanceAccountsController extends BaseController {
 	//界面查询字段
     List<String> QueryFeildList = Arrays.asList("DEPT_CODE", "USER_GROP");
     //分组字段
-	String GroupbyFeild = new String();
+	//String GroupbyFeild = new String();
 	//分组字段list  查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
-    List<String> keyListBase = new ArrayList<String>();
+    //List<String> keyListBase = new ArrayList<String>();
     //查询的所有可操作的责任中心
-    List<String> AllDeptCode = new ArrayList<String>();
+    //List<String> AllDeptCode = new ArrayList<String>();
 	
 	/**列表
 	 * @param page
 	 * @throws Exception
 	 */
-	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/list")
 	public ModelAndView list(Page page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"列表FinanceAccounts");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
 
 		//查询的所有可操作的责任中心
-	    AllDeptCode = new ArrayList<String>();
+	    //AllDeptCode = new ArrayList<String>();
 
 		PageData getPd = this.getPageData();
 		//员工组
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
+		TmplTypeInfo implTypeCode = getWhileValueToTypeCode(SelectedTableNo);
+		List<String> keyListBase = implTypeCode.getKeyListBase();
 		
 		//当前期间,取自tb_system_config的SystemDateTime字段
 		SystemDateTime = sysConfigManager.currentSection(getPd);
 		//当前登录人所在二级单位
-		UserDepartCode = Jurisdiction.getCurrentDepartmentID();//
+		String UserDepartCode = Jurisdiction.getCurrentDepartmentID();//
 		
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("financeaccounts/financeaccounts/financeaccounts_list");
@@ -141,19 +144,19 @@ public class FinanceAccountsController extends BaseController {
 		String DepartmentSelectTreeSource=DictsUtil.getDepartmentSelectTreeSource(departmentService);
 		if(DepartmentSelectTreeSource.equals("0"))
 		{
-			this.departSelf = 1;
+			//this.departSelf = 1;
 			getPd.put("departTreeSource", DepartmentSelectTreeSource);
-			AllDeptCode.add(UserDepartCode);
+			//AllDeptCode.add(UserDepartCode);
 		} else {
-			departSelf = 0;
+			//departSelf = 0;
 			getPd.put("departTreeSource", 1);
-	        JSONArray jsonArray = JSONArray.fromObject(DepartmentSelectTreeSource);  
-			List<PageData> listDepart = (List<PageData>) JSONArray.toCollection(jsonArray, PageData.class);
-			if(listDepart!=null && listDepart.size()>0){
-				for(PageData pdDept : listDepart){
-					AllDeptCode.add(pdDept.getString(DictsUtil.Id));
-				}
-			}
+	        //JSONArray jsonArray = JSONArray.fromObject(DepartmentSelectTreeSource);  
+			//List<PageData> listDepart = (List<PageData>) JSONArray.toCollection(jsonArray, PageData.class);
+			//if(listDepart!=null && listDepart.size()>0){
+			//	for(PageData pdDept : listDepart){
+			//		AllDeptCode.add(pdDept.getString(DictsUtil.Id));
+			//	}
+			//}
 		}
 		mv.addObject("zTreeNodes", DepartmentSelectTreeSource);
 		// ***********************************************************
@@ -180,9 +183,16 @@ public class FinanceAccountsController extends BaseController {
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
+		List<String> AllDeptCode = Common.getAllDeptCode(departmentService, Jurisdiction.getCurrentDepartmentID());
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
+		TmplTypeInfo implTypeCode = getWhileValueToTypeCode(SelectedTableNo);
+		String TypeCodeStaffSummy = implTypeCode.getTypeCodeSummy();
+		String TypeCodeStaffListen = implTypeCode.getTypeCodeListen();
+		String GroupbyFeild = implTypeCode.getGroupbyFeild();
+		List<String> keyListBase = implTypeCode.getKeyListBase();
 
 		PageData getQueryFeildPd = new PageData();
 		//工资分的类型, 只有工资返回值
@@ -219,7 +229,7 @@ public class FinanceAccountsController extends BaseController {
 		
 		//获取明细汇总信息
 		List<TableColumns> tableDetailColumns = tmplconfigService.getTableColumns(detailTableName);
-		String detailSelectFeild = TmplUtil.getSumFeildSelect(keyListBase, tableDetailColumns);
+		String detailSelectFeild = Common.getSumFeildSelect(keyListBase, tableDetailColumns, TmplUtil.keyExtra);
 		getPd.put("SelectFeild", detailSelectFeild);
 		//表名
 		getPd.put("TableName", detailTableName);
@@ -244,7 +254,7 @@ public class FinanceAccountsController extends BaseController {
 
 		//获取对账汇总信息
 		List<TableColumns> tableAuditeColumns = tmplconfigService.getTableColumns(auditeTableName);
-		String auditeSelectFeild = TmplUtil.getSumFeildSelect(keyListBase, tableAuditeColumns);
+		String auditeSelectFeild = Common.getSumFeildSelect(keyListBase, tableAuditeColumns, TmplUtil.keyExtra);
 		getPd.put("SelectFeild", auditeSelectFeild);
 		//表名
 		getPd.put("TableName", auditeTableName);
@@ -337,6 +347,10 @@ public class FinanceAccountsController extends BaseController {
 		//if(departSelf == 1){
 		//	SelectedDepartCode = UserDepartCode;
 		//}
+		TmplTypeInfo implTypeCode = getWhileValueToTypeCode(SelectedTableNo);
+		String TypeCodeStaffSummy = implTypeCode.getTypeCodeSummy();
+		String TypeCodeStaffListen = implTypeCode.getTypeCodeListen();
+		List<String> keyListBase = implTypeCode.getKeyListBase();
 
 		Object DATA_ROWS = getPd.get("GetDetailListTransferList");
 		String json = DATA_ROWS.toString();  
@@ -381,9 +395,9 @@ public class FinanceAccountsController extends BaseController {
 			}
 		}
 		whereSqlFirst = whereSql;
-		whereSqlFirst += getDetailHelpful(SelectedTabType, true);
+		whereSqlFirst += getDetailHelpful(SelectedTabType, true, TypeCodeStaffSummy, TypeCodeStaffListen);
 		whereSqlSecond = whereSql;
-		whereSqlSecond += getDetailHelpful(SelectedTabType, false);
+		whereSqlSecond += getDetailHelpful(SelectedTabType, false, TypeCodeStaffSummy, TypeCodeStaffListen);
 		
 		String firstTableName = getDetailTableCode(SelectedTableNo, SelectedTabType, true);
 		getPd.put("TableName", firstTableName);
@@ -476,10 +490,11 @@ public class FinanceAccountsController extends BaseController {
 		if(value != null && !value.trim().equals("")){
 			which = value;
 		}
-	    //分组字段
-		GroupbyFeild = new String();
-		// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
-	    keyListBase = new ArrayList<String>();
+		return which;
+	}
+
+	private TmplTypeInfo getWhileValueToTypeCode(String which) throws Exception{
+		TmplTypeInfo retItem = new TmplTypeInfo();
 
 		String strKeyCode = "";
 		if (which != null){
@@ -521,14 +536,14 @@ public class FinanceAccountsController extends BaseController {
 			listGroupbyFeild.add("DEPT_CODE");
 		}
 	    //分组字段
-		GroupbyFeild = patGroupbyFeild;
+		retItem.setGroupbyFeild(patGroupbyFeild);
 		//分组字段list  查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
-	    keyListBase = listGroupbyFeild;
+		retItem.setKeyListBase(listGroupbyFeild);
 	    
 		//枚举类型 TmplType
-		TypeCodeStaffDetail = "";
-		TypeCodeStaffSummy = "";
-		TypeCodeStaffListen = "";
+		String TypeCodeStaffDetail = "";
+		String TypeCodeStaffSummy = "";
+		String TypeCodeStaffListen = "";
 		if(which.equals(TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey())){
 			//合同化
 			TypeCodeStaffDetail = TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey();
@@ -559,8 +574,10 @@ public class FinanceAccountsController extends BaseController {
 			TypeCodeStaffSummy = TmplType.TB_STAFF_SUMMY_LABOR.getNameKey();
 			TypeCodeStaffListen = TmplType.TB_STAFF_TRANSFER_LABOR.getNameKey();
 		}
-		
-		return which;
+		retItem.setTypeCodeDetail(TypeCodeStaffDetail);
+		retItem.setTypeCodeSummy(TypeCodeStaffSummy);
+		retItem.setTypeCodeListen(TypeCodeStaffListen);
+		return retItem;
 	}
     private String getDetailTypeCode(String which){
 		String strKeyCode = "";
@@ -732,7 +749,8 @@ public class FinanceAccountsController extends BaseController {
 		return typeCode;
 	}
     
-	private String getDetailHelpful(String tabType, Boolean bolFirst) {
+	private String getDetailHelpful(String tabType, Boolean bolFirst,
+			String TypeCodeStaffSummy, String TypeCodeStaffListen) {
 		String detailReport = "";
 		if("1".equals(tabType)){
 			if(bolFirst){

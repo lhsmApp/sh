@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
 import com.fh.controller.common.BillCodeUtil;
+import com.fh.controller.common.Common;
 import com.fh.controller.common.DictsUtil;
 import com.fh.controller.common.FilterBillCode;
 import com.fh.controller.common.Message;
@@ -108,15 +109,15 @@ public class SocialIncSummyController extends BaseController {
 	//页面显示数据的年月
 	String SystemDateTime = "";
 	//页面显示数据的二级单位
-	String UserDepartCode = "";
+	//String UserDepartCode = "";
 	//登录人的二级单位是最末层
-	private int departSelf = 0;
+	//private int departSelf = 0;
 	//底行显示的求和与平均值字段
 	StringBuilder SqlUserdata = new StringBuilder();
 	//表结构  
 	Map<String, TableColumns> map_HaveColumnsList = new HashMap<String, TableColumns>();
 	// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-	Map<String, TmplConfigDetail> map_SetColumnsList = new HashMap<String, TmplConfigDetail>();
+	//Map<String, TmplConfigDetail> map_SetColumnsList = new HashMap<String, TmplConfigDetail>();
 	
 	//界面分组字段
 	List<String> jqGridGroupColumn = Arrays.asList("DEPT_CODE");
@@ -132,7 +133,7 @@ public class SocialIncSummyController extends BaseController {
     //目前只能这么设置，改设置改的地方多
 	String AdditionalReportColumn = "ReportState";
     //查询的所有可操作的责任中心
-    List<String> AllDeptCode = new ArrayList<String>();
+    //List<String> AllDeptCode = new ArrayList<String>();
 
 	/**列表
 	 * @param page
@@ -150,13 +151,13 @@ public class SocialIncSummyController extends BaseController {
 		SumField = QueryFeildString.tranferStringToList(SumFieldToString);
 		
 		//查询的所有可操作的责任中心
-	    AllDeptCode = new ArrayList<String>();
+	    //AllDeptCode = new ArrayList<String>();
 		
 		PageData getPd = this.getPageData();
 		//当前期间,取自tb_system_config的SystemDateTime字段
 		SystemDateTime = sysConfigManager.currentSection(getPd);
 		//当前登录人所在二级单位
-		UserDepartCode = Jurisdiction.getCurrentDepartmentID();//
+		String UserDepartCode = Jurisdiction.getCurrentDepartmentID();//
 		
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("socialincsummy/socialincsummy/socialincsummy_list");
@@ -172,19 +173,19 @@ public class SocialIncSummyController extends BaseController {
 		String DepartmentSelectTreeSource=DictsUtil.getDepartmentSelectTreeSource(departmentService);
 		if(DepartmentSelectTreeSource.equals("0"))
 		{
-			this.departSelf = 1;
+			//this.departSelf = 1;
 			getPd.put("departTreeSource", DepartmentSelectTreeSource);
-			AllDeptCode.add(UserDepartCode);
+			//AllDeptCode.add(UserDepartCode);
 		} else {
-			departSelf = 0;
+			//departSelf = 0;
 			getPd.put("departTreeSource", 1);
-	        JSONArray jsonArray = JSONArray.fromObject(DepartmentSelectTreeSource);  
-			List<PageData> listDepart = (List<PageData>) JSONArray.toCollection(jsonArray, PageData.class);
-			if(listDepart!=null && listDepart.size()>0){
-				for(PageData pdDept : listDepart){
-					AllDeptCode.add(pdDept.getString(DictsUtil.Id));
-				}
-			}
+	        //JSONArray jsonArray = JSONArray.fromObject(DepartmentSelectTreeSource);  
+			//List<PageData> listDepart = (List<PageData>) JSONArray.toCollection(jsonArray, PageData.class);
+			//if(listDepart!=null && listDepart.size()>0){
+			//	for(PageData pdDept : listDepart){
+			//		AllDeptCode.add(pdDept.getString(DictsUtil.Id));
+			//	}
+			//}
 		}
 		mv.addObject("zTreeNodes1", DepartmentSelectTreeSource);
 		// ***********************************************************
@@ -209,7 +210,7 @@ public class SocialIncSummyController extends BaseController {
 		//表结构  
 		map_HaveColumnsList = tmpl.getHaveColumnsList();
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-		map_SetColumnsList = tmpl.getSetColumnsList();
+		//map_SetColumnsList = tmpl.getSetColumnsList();
 
 		mv.addObject("pd", getPd);
 		mv.addObject("jqGridColModel", jqGridColModel);
@@ -235,8 +236,10 @@ public class SocialIncSummyController extends BaseController {
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
+		List<String> AllDeptCode = Common.getAllDeptCode(departmentService, Jurisdiction.getCurrentDepartmentID());
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//员工组
 		String SelectedUserGrop = getPd.getString("SelectedUserGrop");
@@ -423,8 +426,9 @@ public class SocialIncSummyController extends BaseController {
 		PageData getPd = this.getPageData();
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
@@ -588,7 +592,7 @@ public class SocialIncSummyController extends BaseController {
 			mapSave.put("GroupbyFeild", SumFieldToString);
 			
 			//获取汇总的select的字段
-			String SelectFeild = TmplUtil.getSumFeildSelect(SumField, tableDetailColumns);
+			String SelectFeild = Common.getSumFeildSelect(SumField, tableDetailColumns, TmplUtil.keyExtra);
 			
 			mapSave.put("SelectFeild", SelectFeild);
 			mapSave.put("CanOperate", strHelpfulDetail);
@@ -623,7 +627,7 @@ public class SocialIncSummyController extends BaseController {
                 updateFilter.append(FilterBillCode.getBillCodeNotInSumInvalid(TableNameBase));
     			addTo.put("updateFilter", updateFilter);
                 //添加未设置字段默认值
-    			TmplUtil.setModelDefault(addTo, map_HaveColumnsList, map_SetColumnsList);
+    			Common.setModelDefault(addTo, map_HaveColumnsList, getSetColumnsList);
 			}
     		Map<String, Object> mapAdd = new HashMap<String, Object>();
 			mapAdd.put("DelSum", bolDelSum);

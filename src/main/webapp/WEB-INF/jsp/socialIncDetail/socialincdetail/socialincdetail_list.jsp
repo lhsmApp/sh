@@ -152,6 +152,11 @@
 
 	// 枚举  1封存,0解封
 	var State;
+	//部门是否是最末层节点，是否显示
+	var DepartTreeSource;
+	//页面显示的数据的责任中心和账套信息，在tosearch()里赋值
+	var ShowDataDepartCode = "";
+	var ShowDataCustCol7 = "";
 	//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
     var jqGridColModel;
 
@@ -239,7 +244,10 @@
 			altRows: true, //斑马条纹
 			editurl: '<%=basePath%>socialincdetail/edit.do?'
 				+ 'SelectedDepartCode='+$("#SelectedDepartCode").val()
-	            + '&SelectedCustCol7='+$("#SelectedCustCol7").val(),
+	            + '&SelectedCustCol7='+$("#SelectedCustCol7").val()
+                +'&DepartTreeSource='+DepartTreeSource
+                +'&ShowDataDepartCode='+ShowDataDepartCode
+                +'&ShowDataCustCol7='+ShowDataCustCol7,
 			
 			pager: pagerBase_selector,
 			footerrow: true,
@@ -299,15 +307,7 @@
 		            } , 
 		            afterSubmit: fn_addSubmit_extend
 		        },
-		        {
-					//delete record form
-				id: "del",
-					recreateForm: true,
-					beforeShowForm : beforeDeleteCallback,
-					onClick : function(e) {
-
-					}
-		        },
+		        { },
 		        {
 					//search form
 					recreateForm: true,
@@ -413,6 +413,8 @@
 		//封存状态,取自tb_sys_sealed_info表state字段, 数据操作需要前提为当前明细数据未封存，如果已确认封存，则明细数据不能再进行操作。
 	    // 枚举  1封存,0解封
 		State = '${State}';
+		//部门是否是最末层节点，是否显示
+		DepartTreeSource = '${pd.departTreeSource}';
 		//前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
 	    jqGridColModel = eval("(${jqGridColModel})");//此处记得用eval()行数将string转为array
 
@@ -533,7 +535,10 @@
 						type: "POST",
 						url: '<%=basePath%>socialincdetail/deleteAll.do?'
 							+ 'SelectedDepartCode='+$("#SelectedDepartCode").val()
-				            + '&SelectedCustCol7='+$("#SelectedCustCol7").val(),
+				            + '&SelectedCustCol7='+$("#SelectedCustCol7").val()
+		                    +'&DepartTreeSource='+DepartTreeSource
+		                    +'&ShowDataDepartCode='+ShowDataDepartCode
+		                    +'&ShowDataCustCol7='+ShowDataCustCol7,
 				    	data: {DataRows:JSON.stringify(listData)},
 						dataType:'json',
 						cache: false,
@@ -603,7 +608,10 @@ function batchSave(){
 					type: "POST",
 					url: '<%=basePath%>socialincdetail/updateAll.do?'
 						+ 'SelectedDepartCode='+$("#SelectedDepartCode").val()
-			            + '&SelectedCustCol7='+$("#SelectedCustCol7").val(),
+			            + '&SelectedCustCol7='+$("#SelectedCustCol7").val()
+	                    +'&DepartTreeSource='+DepartTreeSource
+	                    +'&ShowDataDepartCode='+ShowDataDepartCode
+	                    +'&ShowDataCustCol7='+ShowDataCustCol7,
 			    	data: {DataRows:JSON.stringify(listData)},
 					dataType:'json',
 					cache: false,
@@ -654,7 +662,10 @@ function importItems(){
 	   diag.Title ="EXCEL 导入到数据库";
 	   diag.URL = '<%=basePath%>socialincdetail/goUploadExcel.do?'
 			+ 'SelectedDepartCode='+$("#SelectedDepartCode").val()
-            + '&SelectedCustCol7='+$("#SelectedCustCol7").val();
+            + '&SelectedCustCol7='+$("#SelectedCustCol7").val()
+            +'&DepartTreeSource='+DepartTreeSource
+            +'&ShowDataDepartCode='+ShowDataDepartCode
+            +'&ShowDataCustCol7='+ShowDataCustCol7;
 	   diag.Width = 300;
 	   diag.Height = 150;
 	   diag.CancelEvent = function(){ //关闭事件
@@ -672,7 +683,10 @@ function importItems(){
 function exportItems(){
 	window.location.href='<%=basePath%>socialincdetail/excel.do?'
 		+ 'SelectedDepartCode='+$("#SelectedDepartCode").val()
-        + '&SelectedCustCol7='+$("#SelectedCustCol7").val();
+        + '&SelectedCustCol7='+$("#SelectedCustCol7").val()
+        +'&DepartTreeSource='+DepartTreeSource
+        +'&ShowDataDepartCode='+ShowDataDepartCode
+        +'&ShowDataCustCol7='+ShowDataCustCol7;
 }
 
 /**
@@ -697,7 +711,10 @@ function report(){
 				type: "POST",
 				url: '<%=basePath%>socialincdetail/report.do?'
 					+ 'SelectedDepartCode='+$("#SelectedDepartCode").val()
-		            + '&SelectedCustCol7='+$("#SelectedCustCol7").val(),
+		            + '&SelectedCustCol7='+$("#SelectedCustCol7").val()
+                    +'&DepartTreeSource='+DepartTreeSource
+                    +'&ShowDataDepartCode='+ShowDataDepartCode
+                    +'&ShowDataCustCol7='+ShowDataCustCol7,
 				cache: false,
 				success: function(response){
 					if(response.code==0){
@@ -815,7 +832,8 @@ function getCheckState(){
 	
 	//检索
 	function tosearch() {
-		console.log($("#SelectedDepartCode").val());
+		ShowDataDepartCode = $("#SelectedDepartCode").val();
+		ShowDataCustCol7 = $("#SelectedCustCol7").val();
 		setStateTrue();
 		setNavButtonState();
 		$(gridBase_selector).jqGrid('GridUnload'); 
@@ -833,12 +851,6 @@ function getCheckState(){
 	function initComplete(){
 		//下拉树
 		var nodes = ${zTreeNodes};
-		//if(nodes.length <= 1){
-        //    $("#spanSelectTree").hide();
-		//	return;
-		//} else {
-        //    $("#spanSelectTree").show();
-		//}
 		var defaultNodes = {"treeNodes":nodes};
 		//绑定change事件
 		$("#selectTree").bind("change",function(){

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
 import com.fh.controller.common.BillCodeUtil;
+import com.fh.controller.common.Common;
 import com.fh.controller.common.DictsUtil;
 import com.fh.controller.common.FilterBillCode;
 import com.fh.controller.common.Message;
@@ -35,6 +36,7 @@ import com.fh.entity.PageResult;
 import com.fh.entity.SysSealed;
 import com.fh.entity.TableColumns;
 import com.fh.entity.TmplConfigDetail;
+import com.fh.entity.TmplTypeInfo;
 import com.fh.entity.system.User;
 import com.fh.util.Const;
 import com.fh.util.DateUtil;
@@ -103,22 +105,22 @@ public class StaffSummyController extends BaseController {
 	//默认的which值
 	String DefaultWhile = TmplType.TB_STAFF_SUMMY_CONTRACT.getNameKey();
 	//枚举类型 TmplType
-	String TypeCodeDetail = "";
-	String TypeCodeSummy = "";
-	String TypeCodeListen = "";
+	//String TypeCodeDetail = "";
+	//String TypeCodeSummy = "";
+	//String TypeCodeListen = "";
 	
 	//页面显示数据的年月
 	String SystemDateTime = "";
 	//页面显示数据的二级单位
-	String UserDepartCode = "";
+	//String UserDepartCode = "";
 	//登录人的二级单位是最末层
-	private int departSelf = 0;
+	//private int departSelf = 0;
 	//底行显示的求和与平均值字段
 	StringBuilder SqlUserdata = new StringBuilder();
 	//表结构  
 	Map<String, TableColumns> map_HaveColumnsList = new HashMap<String, TableColumns>();
 	// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-	Map<String, TmplConfigDetail> map_SetColumnsList = new HashMap<String, TmplConfigDetail>();
+	//Map<String, TmplConfigDetail> map_SetColumnsList = new HashMap<String, TmplConfigDetail>();
 	
 	//界面分组字段
 	List<String> jqGridGroupColumn = Arrays.asList("DEPT_CODE");//, "ReportState"
@@ -127,28 +129,27 @@ public class StaffSummyController extends BaseController {
 	private List<String> keyListBase = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7");
 	//1、合同化、市场化、运行人员、系统内运行按6列汇总：业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本、企业特定员工分类、工资范围编码
 	//2、劳务派遣运行按4列汇总：                                                      业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本
-    List<String> SumField = new ArrayList<String>();
-    String SumFieldToString = "";//QueryFeildString.tranferListStringToGroupbyString(SumField);
+    //List<String> SumField = new ArrayList<String>();
+   // String SumFieldToString = "";//QueryFeildString.tranferListStringToGroupbyString(SumField);
 	//界面查询字段   员工组、账套、组织机构（特殊处理）、所属二级单位、组织单元文本
     List<String> QueryFeildList = Arrays.asList("USER_GROP", "CUST_COL7", "DEPT_CODE", "UNITS_CODE", "ORG_UNIT");
 	//另加的列、配置模板之外的列 
     //目前只能这么设置，改设置改的地方多
 	String AdditionalReportColumn = "ReportState";
     //查询的所有可操作的责任中心
-    List<String> AllDeptCode = new ArrayList<String>();
+    //List<String> AllDeptCode = new ArrayList<String>();
     
 	/**列表
 	 * @param page
 	 * @throws Exception
 	 */
-	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/list")
 	public ModelAndView list(Page page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"列表StaffSummy");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
 		
 		//查询的所有可操作的责任中心
-	    AllDeptCode = new ArrayList<String>();
+	    //AllDeptCode = new ArrayList<String>();
 		
 		PageData getPd = this.getPageData();
 		//员工组
@@ -156,7 +157,7 @@ public class StaffSummyController extends BaseController {
 		//当前期间,取自tb_system_config的SystemDateTime字段
 		SystemDateTime = sysConfigManager.currentSection(getPd);
 		//当前登录人所在二级单位
-		UserDepartCode = Jurisdiction.getCurrentDepartmentID();
+		String UserDepartCode = Jurisdiction.getCurrentDepartmentID();
 		
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("staffsummy/staffsummy/staffsummy_list");
@@ -174,19 +175,19 @@ public class StaffSummyController extends BaseController {
 		String DepartmentSelectTreeSource=DictsUtil.getDepartmentSelectTreeSource(departmentService);
 		if(DepartmentSelectTreeSource.equals("0"))
 		{
-			this.departSelf = 1;
+			//this.departSelf = 1;
 			getPd.put("departTreeSource", DepartmentSelectTreeSource);
-			AllDeptCode.add(UserDepartCode);
+			//AllDeptCode.add(UserDepartCode);
 		} else {
-			departSelf = 0;
+			//departSelf = 0;
 			getPd.put("departTreeSource", 1);
-	        JSONArray jsonArray = JSONArray.fromObject(DepartmentSelectTreeSource);  
+	        /*JSONArray jsonArray = JSONArray.fromObject(DepartmentSelectTreeSource);  
 			List<PageData> listDepart = (List<PageData>) JSONArray.toCollection(jsonArray, PageData.class);
 			if(listDepart!=null && listDepart.size()>0){
 				for(PageData pdDept : listDepart){
 					AllDeptCode.add(pdDept.getString(DictsUtil.Id));
 				}
-			}
+			}*/
 		}
 		mv.addObject("zTreeNodes1", DepartmentSelectTreeSource);
 		// ***********************************************************
@@ -207,7 +208,7 @@ public class StaffSummyController extends BaseController {
 		//表结构  
 		map_HaveColumnsList = tmpl.getHaveColumnsList();
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-		map_SetColumnsList = tmpl.getSetColumnsList();
+		//map_SetColumnsList = tmpl.getSetColumnsList();
 		
 		mv.addObject("jqGridColModel", jqGridColModel);
         //分组字段  格式：groupField: ['DEPT_CODE'],
@@ -230,10 +231,16 @@ public class StaffSummyController extends BaseController {
 		//员工组
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
+		TmplTypeInfo implTypeCode = getWhileValueToTypeCode(SelectedTableNo);
+		String TypeCodeDetail = implTypeCode.getTypeCodeDetail();
+		String TypeCodeSummy = implTypeCode.getTypeCodeSummy();
+		String TypeCodeListen = implTypeCode.getTypeCodeListen();
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
+		List<String> AllDeptCode = Common.getAllDeptCode(departmentService, Jurisdiction.getCurrentDepartmentID());
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
@@ -317,6 +324,8 @@ public class StaffSummyController extends BaseController {
 		PageData getPd = this.getPageData();
 		//员工组 必须执行，用来设置汇总和传输上报类型
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
+		TmplTypeInfo implTypeCode = getWhileValueToTypeCode(SelectedTableNo);
+		String TypeCodeDetail = implTypeCode.getTypeCodeDetail();
 		
 		String DEPT_CODE = (String) getPd.get("DataDeptCode");
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
@@ -365,6 +374,8 @@ public class StaffSummyController extends BaseController {
 		PageData getPd = this.getPageData();
 		//员工组 必须执行，用来设置汇总和传输上报类型
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
+		TmplTypeInfo implTypeCode = getWhileValueToTypeCode(SelectedTableNo);
+		String TypeCodeSummy = implTypeCode.getTypeCodeSummy();
 		if(!(TypeCodeSummy!=null && !TypeCodeSummy.trim().equals(""))){
 			commonBase.setCode(2);
 			commonBase.setMessage(Message.SelectedTabOppositeReportTypeIsNull);
@@ -438,10 +449,18 @@ public class StaffSummyController extends BaseController {
 		//员工组
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
+		TmplTypeInfo implTypeCode = getWhileValueToTypeCode(SelectedTableNo);
+		String TypeCodeDetail = implTypeCode.getTypeCodeDetail();
+		String TypeCodeSummy = implTypeCode.getTypeCodeSummy();
+		String TypeCodeListen = implTypeCode.getTypeCodeListen();
+		List<String> SumField = implTypeCode.getSumField();
+		String SumFieldToString = implTypeCode.getSumFieldToString();
+		
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
@@ -614,12 +633,12 @@ public class StaffSummyController extends BaseController {
     			mapSave.put("USER_GROP", emplGroupType);
     			mapSave.put("GroupbyFeild", SumFieldToString);
     			//获取汇总的select的字段
-    			String SelectFeild = TmplUtil.getSumFeildSelect(SumField, tableDetailColumns);
+    			String SelectFeild = Common.getSumFeildSelect(SumField, tableDetailColumns, TmplUtil.keyExtra);
     			mapSave.put("SelectFeild", SelectFeild);
     			mapSave.put("CanOperate", strHelpfulDetail);
     			List<PageData> getSaveDate = staffdetailService.getSum(mapSave);
     			
-    			List<PageData> listAdd = getListTo(getHaveDate, getSaveDate);
+    			List<PageData> listAdd = getListTo(getHaveDate, getSaveDate, SumField);
 
     			for(PageData addTo : listAdd){
     				Object getBILL_CODE = addTo.get("BILL_CODE");
@@ -649,7 +668,7 @@ public class StaffSummyController extends BaseController {
                     updateFilter.append(FilterBillCode.getBillCodeNotInSumInvalid(TableNameBase));
 	    			addTo.put("updateFilter", updateFilter);
                     //添加未设置字段默认值
-	    			TmplUtil.setModelDefault(addTo, map_HaveColumnsList, map_SetColumnsList);
+	    			Common.setModelDefault(addTo, map_HaveColumnsList, getSetColumnsList);
     			}
         		Map<String, Object> mapAdd = new HashMap<String, Object>();
     			mapAdd.put("DelSum", bolDelSum);
@@ -669,7 +688,7 @@ public class StaffSummyController extends BaseController {
 		return commonBase;
 	}
 	
-	private List<PageData> getListTo(List<PageData> listHave, List<PageData> listSave){
+	private List<PageData> getListTo(List<PageData> listHave, List<PageData> listSave, List<String> SumField){
 		List<String> listNotSetCode = new ArrayList<String>();
 	    if(listSave!=null && listSave.size()>0){
 			for(PageData eachSave : listSave){
@@ -736,19 +755,19 @@ public class StaffSummyController extends BaseController {
 		if(value != null && !value.trim().equals("")){
 			which = value;
 		}
+		return which;
+	}
+
+	private TmplTypeInfo getWhileValueToTypeCode(String which) throws Exception{
+		TmplTypeInfo retItem = new TmplTypeInfo();
 		//枚举类型 TmplType
-		TypeCodeDetail = "";
-		TypeCodeSummy = "";
-		TypeCodeListen = "";
 		//1、合同化、市场化、运行人员、系统内运行按6列汇总：业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本、企业特定员工分类、工资范围编码
-		//2、劳务派遣运行按4列汇总：                                                      业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本
-	    SumField = new ArrayList<String>();
-	    SumFieldToString = "";//QueryFeildString.tranferListStringToGroupbyString(SumField);
+		//2、劳务派遣运行按4列汇总：                                                      业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本retItem
 		if(which.equals(TmplType.TB_STAFF_SUMMY_CONTRACT.getNameKey())){
 			//合同化
-			TypeCodeDetail = TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey();
-			TypeCodeSummy = TmplType.TB_STAFF_SUMMY_CONTRACT.getNameKey();
-			TypeCodeListen = TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey();
+			retItem.setTypeCodeDetail(TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey());
+			retItem.setTypeCodeSummy(TmplType.TB_STAFF_SUMMY_CONTRACT.getNameKey());
+			retItem.setTypeCodeListen(TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey());
 			//1、合同化、市场化、运行人员、系统内运行按6列汇总：业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本、企业特定员工分类、工资范围编码
 			//2、劳务派遣运行按4列汇总：                                                      业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本
 		    //SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP", "UNITS_CODE", "ORG_UNIT", "USER_CATG", "SAL_RANGE");
@@ -756,14 +775,14 @@ public class StaffSummyController extends BaseController {
 			
 			PageData pdSysConfig = new PageData();
 			pdSysConfig.put("KEY_CODE", SysConfigKeyCode.ContractGRPCond);
-			SumFieldToString = sysConfigManager.getSysConfigByKey(pdSysConfig);
-			SumField = QueryFeildString.tranferStringToList(SumFieldToString);
+			retItem.setSumFieldToString(sysConfigManager.getSysConfigByKey(pdSysConfig));
+			retItem.setSumField(QueryFeildString.tranferStringToList(retItem.getSumFieldToString()));
 		}
 		if(which.equals(TmplType.TB_STAFF_SUMMY_MARKET.getNameKey())){
 			//市场化
-			TypeCodeDetail = TmplType.TB_STAFF_DETAIL_MARKET.getNameKey();
-			TypeCodeSummy = TmplType.TB_STAFF_SUMMY_MARKET.getNameKey();
-			TypeCodeListen = TmplType.TB_STAFF_TRANSFER_MARKET.getNameKey();
+			retItem.setTypeCodeDetail(TmplType.TB_STAFF_DETAIL_MARKET.getNameKey());
+			retItem.setTypeCodeSummy(TmplType.TB_STAFF_SUMMY_MARKET.getNameKey());
+			retItem.setTypeCodeListen(TmplType.TB_STAFF_TRANSFER_MARKET.getNameKey());
 			//1、合同化、市场化、运行人员、系统内运行按6列汇总：业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本、企业特定员工分类、工资范围编码
 			//2、劳务派遣运行按4列汇总：                                                      业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本
 		    //SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP", "UNITS_CODE", "ORG_UNIT", "USER_CATG", "SAL_RANGE");
@@ -771,14 +790,14 @@ public class StaffSummyController extends BaseController {
 			
 			PageData pdSysConfig = new PageData();
 			pdSysConfig.put("KEY_CODE", SysConfigKeyCode.MarketGRPCond);
-			SumFieldToString = sysConfigManager.getSysConfigByKey(pdSysConfig);
-			SumField = QueryFeildString.tranferStringToList(SumFieldToString);
+			retItem.setSumFieldToString(sysConfigManager.getSysConfigByKey(pdSysConfig));
+			retItem.setSumField(QueryFeildString.tranferStringToList(retItem.getSumFieldToString()));
 		}
 		if(which.equals(TmplType.TB_STAFF_SUMMY_SYS_LABOR.getNameKey())){
 			//系统内劳务
-			TypeCodeDetail = TmplType.TB_STAFF_DETAIL_SYS_LABOR.getNameKey();
-			TypeCodeSummy = TmplType.TB_STAFF_SUMMY_SYS_LABOR.getNameKey();
-			TypeCodeListen = TmplType.TB_STAFF_TRANSFER_SYS_LABOR.getNameKey();
+			retItem.setTypeCodeDetail(TmplType.TB_STAFF_DETAIL_SYS_LABOR.getNameKey());
+			retItem.setTypeCodeSummy(TmplType.TB_STAFF_SUMMY_SYS_LABOR.getNameKey());
+			retItem.setTypeCodeListen(TmplType.TB_STAFF_TRANSFER_SYS_LABOR.getNameKey());
 			//1、合同化、市场化、运行人员、系统内运行按6列汇总：业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本、企业特定员工分类、工资范围编码
 			//2、劳务派遣运行按4列汇总：                                                      业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本
 		    //SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP", "UNITS_CODE", "ORG_UNIT", "USER_CATG", "SAL_RANGE");
@@ -786,14 +805,14 @@ public class StaffSummyController extends BaseController {
 			
 			PageData pdSysConfig = new PageData();
 			pdSysConfig.put("KEY_CODE", SysConfigKeyCode.SysLaborGRPCond);
-			SumFieldToString = sysConfigManager.getSysConfigByKey(pdSysConfig);
-			SumField = QueryFeildString.tranferStringToList(SumFieldToString);
+			retItem.setSumFieldToString(sysConfigManager.getSysConfigByKey(pdSysConfig));
+			retItem.setSumField(QueryFeildString.tranferStringToList(retItem.getSumFieldToString()));
 		}
 		if(which.equals(TmplType.TB_STAFF_SUMMY_OPER_LABOR.getNameKey())){
 			//运行人员
-			TypeCodeDetail = TmplType.TB_STAFF_DETAIL_OPER_LABOR.getNameKey();
-			TypeCodeSummy = TmplType.TB_STAFF_SUMMY_OPER_LABOR.getNameKey();
-			TypeCodeListen = TmplType.TB_STAFF_TRANSFER_OPER_LABOR.getNameKey();
+			retItem.setTypeCodeDetail(TmplType.TB_STAFF_DETAIL_OPER_LABOR.getNameKey());
+			retItem.setTypeCodeSummy(TmplType.TB_STAFF_SUMMY_OPER_LABOR.getNameKey());
+			retItem.setTypeCodeListen(TmplType.TB_STAFF_TRANSFER_OPER_LABOR.getNameKey());
 			//1、合同化、市场化、运行人员、系统内运行按6列汇总：业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本、企业特定员工分类、工资范围编码
 			//2、劳务派遣运行按4列汇总：                                                      业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本
 		    //SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP", "UNITS_CODE", "ORG_UNIT", "USER_CATG", "SAL_RANGE");
@@ -801,14 +820,14 @@ public class StaffSummyController extends BaseController {
 			
 			PageData pdSysConfig = new PageData();
 			pdSysConfig.put("KEY_CODE", SysConfigKeyCode.OperLaborGRPCond);
-			SumFieldToString = sysConfigManager.getSysConfigByKey(pdSysConfig);
-			SumField = QueryFeildString.tranferStringToList(SumFieldToString);
+			retItem.setSumFieldToString(sysConfigManager.getSysConfigByKey(pdSysConfig));
+			retItem.setSumField(QueryFeildString.tranferStringToList(retItem.getSumFieldToString()));
 		}
 		if(which.equals(TmplType.TB_STAFF_SUMMY_LABOR.getNameKey())){
 			//劳务派遣工资
-			TypeCodeDetail = TmplType.TB_STAFF_DETAIL_LABOR.getNameKey();
-			TypeCodeSummy = TmplType.TB_STAFF_SUMMY_LABOR.getNameKey();
-			TypeCodeListen = TmplType.TB_STAFF_TRANSFER_LABOR.getNameKey();
+			retItem.setTypeCodeDetail(TmplType.TB_STAFF_DETAIL_LABOR.getNameKey());
+			retItem.setTypeCodeSummy(TmplType.TB_STAFF_SUMMY_LABOR.getNameKey());
+			retItem.setTypeCodeListen(TmplType.TB_STAFF_TRANSFER_LABOR.getNameKey());
 			//1、合同化、市场化、运行人员、系统内运行按6列汇总：业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本、企业特定员工分类、工资范围编码
 			//2、劳务派遣运行按4列汇总：                                                      业务日期、组织机构、帐套、员工组、所属二级单位、组织单元文本
 		    //SumField = Arrays.asList("BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP", "UNITS_CODE", "ORG_UNIT");
@@ -816,10 +835,10 @@ public class StaffSummyController extends BaseController {
 			
 			PageData pdSysConfig = new PageData();
 			pdSysConfig.put("KEY_CODE", SysConfigKeyCode.LaborGRPCond);
-			SumFieldToString = sysConfigManager.getSysConfigByKey(pdSysConfig);
-			SumField = QueryFeildString.tranferStringToList(SumFieldToString);
+			retItem.setSumFieldToString(sysConfigManager.getSysConfigByKey(pdSysConfig));
+			retItem.setSumField(QueryFeildString.tranferStringToList(retItem.getSumFieldToString()));
 		}
-		return which;
+		return retItem;
 	}
 	
 	@InitBinder

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
+import com.fh.controller.common.Common;
 import com.fh.controller.common.DictsUtil;
 import com.fh.controller.common.QueryFeildString;
 import com.fh.controller.common.TmplUtil;
@@ -71,7 +72,7 @@ public class DetailSummyQueryController extends BaseController {
 	//默认的which值
 	String DefaultWhile = TmplType.TB_STAFF_SUMMY_CONTRACT.getNameKey();
 	//页面显示数据的二级单位
-	String UserDepartCode = "";
+	//String UserDepartCode = "";
 	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
 	private List<String> keyListBase = Arrays.asList("BILL_CODE", "DEPT_CODE");
 
@@ -79,37 +80,36 @@ public class DetailSummyQueryController extends BaseController {
 	List<String> jqGridGroupColumn = Arrays.asList("DEPT_CODE");
     
 	//底行显示的求和与平均值字段
-	StringBuilder SqlUserdata = new StringBuilder();
+	//StringBuilder SqlUserdata = new StringBuilder();
 	//字典
-	Map<String, Object> DicList = new LinkedHashMap<String, Object>();
+	//Map<String, Object> DicList = new LinkedHashMap<String, Object>();
 	//表结构  
-	Map<String, TableColumns> map_HaveColumnsList = new LinkedHashMap<String, TableColumns>();
+	//Map<String, TableColumns> map_HaveColumnsList = new LinkedHashMap<String, TableColumns>();
 	// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-	Map<String, TmplConfigDetail> map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
+	//Map<String, TmplConfigDetail> map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
 	//界面查询字段
     List<String> QueryFeildList = Arrays.asList("BUSI_DATE", "DEPT_CODE", "USER_GROP", "CUST_COL7");
     //查询的所有可操作的责任中心
-    List<String> AllDeptCode = new ArrayList<String>();
+    //List<String> AllDeptCode = new ArrayList<String>();
 
 	/**列表
 	 * @param page
 	 * @throws Exception
 	 */
-	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/list")
 	public ModelAndView list(Page page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"列表detailsummyquery");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
 
 		//查询的所有可操作的责任中心
-	    AllDeptCode = new ArrayList<String>();
+	    //AllDeptCode = new ArrayList<String>();
 
 		PageData getPd = this.getPageData();
 		//员工组
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
 
 		//当前登录人所在二级单位
-		UserDepartCode = Jurisdiction.getCurrentDepartmentID();//
+		String UserDepartCode = Jurisdiction.getCurrentDepartmentID();//
 		
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("detailsummyquery/detailsummyquery/detailsummyquery_list");
@@ -131,16 +131,16 @@ public class DetailSummyQueryController extends BaseController {
 		if(DepartmentSelectTreeSource.equals("0"))
 		{
 			getPd.put("departTreeSource", DepartmentSelectTreeSource);
-			AllDeptCode.add(UserDepartCode);
+			//AllDeptCode.add(UserDepartCode);
 		} else {
 			getPd.put("departTreeSource", 1);
-	        JSONArray jsonArray = JSONArray.fromObject(DepartmentSelectTreeSource);  
-			List<PageData> listDepart = (List<PageData>) JSONArray.toCollection(jsonArray, PageData.class);
-			if(listDepart!=null && listDepart.size()>0){
-				for(PageData pdDept : listDepart){
-					AllDeptCode.add(pdDept.getString(DictsUtil.Id));
-				}
-			}
+	        //JSONArray jsonArray = JSONArray.fromObject(DepartmentSelectTreeSource);  
+			//List<PageData> listDepart = (List<PageData>) JSONArray.toCollection(jsonArray, PageData.class);
+			//if(listDepart!=null && listDepart.size()>0){
+			//	for(PageData pdDept : listDepart){
+			//		AllDeptCode.add(pdDept.getString(DictsUtil.Id));
+			//	}
+			//}
 		}
 		mv.addObject("zTreeNodes", DepartmentSelectTreeSource);
 		// ***********************************************************
@@ -152,13 +152,13 @@ public class DetailSummyQueryController extends BaseController {
 		//分组字段是否显示在表中
 		List<String> m_jqGridGroupColumnShow = tmpl.getJqGridGroupColumnShow();
 		//底行显示的求和与平均值字段
-		SqlUserdata = tmpl.getSqlUserdata();
+		//SqlUserdata = tmpl.getSqlUserdata();
 		//字典
-		DicList = tmpl.getDicList();
+		//DicList = tmpl.getDicList();
 		//表结构  
-		map_HaveColumnsList = tmpl.getHaveColumnsList();
+		//map_HaveColumnsList = tmpl.getHaveColumnsList();
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-		map_SetColumnsList = tmpl.getSetColumnsList();
+		//map_SetColumnsList = tmpl.getSetColumnsList();
 
 		mv.addObject("pd", getPd);
 		mv.addObject("jqGridColModel", jqGridColModel);
@@ -181,6 +181,10 @@ public class DetailSummyQueryController extends BaseController {
 		logBefore(logger, Jurisdiction.getUsername()+"列表FinanceAccounts");
 
 		PageData getPd = this.getPageData();
+		//员工组
+		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
+		//底行显示的求和与平均值字段
+		StringBuilder SqlUserdata = Common.GetSqlUserdata(SelectedTableNo, Jurisdiction.getCurrentDepartmentID(), tmplconfigService);
 		
 		PageData pdTransfer = setPutPd(getPd);
 		page.setPd(pdTransfer);
@@ -339,6 +343,7 @@ public class DetailSummyQueryController extends BaseController {
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
 		//日期
 		String SelectedBusiDate = getPd.getString("SelectedBusiDate");
+		List<String> AllDeptCode = Common.getAllDeptCode(departmentService, Jurisdiction.getCurrentDepartmentID());
 		
 		String tableNameSummy = getSummyTableCode(SelectedTableNo);
 		
@@ -375,8 +380,15 @@ public class DetailSummyQueryController extends BaseController {
 		//logBefore(logger, Jurisdiction.getUsername()+"导出HouseFundDetail到excel");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;}
 
-		PageData pd = setPutPd(this.getPageData());
-		page.setPd(pd);
+		PageData getPd = this.getPageData();
+		//员工组
+		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
+		Map<String, TmplConfigDetail> map_SetColumnsList = Common.GetSetColumnsList(SelectedTableNo, Jurisdiction.getCurrentDepartmentID(), tmplconfigService);
+		Map<String, Object> DicList = Common.GetDicList(SelectedTableNo, Jurisdiction.getCurrentDepartmentID(), 
+				tmplconfigService, tmplconfigdictService, dictionariesService, departmentService, userService, "");
+		
+		PageData pdTransfer = setPutPd(getPd);
+		page.setPd(pdTransfer);
 		List<PageData> varOList = detailsummyqueryryService.datalistExport(page);
 		
 		ModelAndView mv = new ModelAndView();
