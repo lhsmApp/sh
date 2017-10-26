@@ -277,9 +277,10 @@ public class HouseFundDetailController extends BaseController {
 			QueryFeild += " and 1 != 1 ";
 		}
 
-		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
+		String strHelpful = FilterBillCode.getExportViewShowList(syssealedinfoService, 
 				SelectedDepartCode, SystemDateTime, SelectedCustCol7,
-				TypeCodeListen, TypeCodeSummy, TableNameSummy);
+				TypeCodeListen, TypeCodeSummy, TypeCodeDetail,
+				TableNameSummy);
 		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 			strHelpful += " and 1 != 1 ";
 		}
@@ -377,12 +378,14 @@ public class HouseFundDetailController extends BaseController {
 		
 		FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
 				SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-				TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+				TypeCodeListen, TypeCodeSummy, TypeCodeDetail,
+				TableNameSummy, TableNameDetail, 
 				"", 
 				map_HaveColumnsList, map_SetColumnsList);
-		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-				SelectedDepartCode, SystemDateTime, SelectedCustCol7,
-				TypeCodeListen, TypeCodeSummy, TableNameSummy);
+		String strHelpful = FilterBillCode.getBillCodeNotInSumInvalid(TableNameSummy);
+		//FilterBillCode.getDetailCanOperateCondition(syssealedinfoService, 
+			//	SelectedDepartCode, SystemDateTime, SelectedCustCol7,
+			//	TypeCodeListen, TypeCodeSummy, TableNameSummy);
 		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 			commonBase.setCode(2);
 			commonBase.setMessage(Message.GetHelpfulDetailFalue);
@@ -445,12 +448,14 @@ public class HouseFundDetailController extends BaseController {
 		} else {
 			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
 					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+					TypeCodeListen, TypeCodeSummy, TypeCodeDetail,
+					TableNameSummy, TableNameDetail, 
 					"", 
 					map_HaveColumnsList, map_SetColumnsList);
-			String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-					SelectedDepartCode, SystemDateTime, SelectedCustCol7,
-					TypeCodeListen, TypeCodeSummy, TableNameSummy);
+			String strHelpful = FilterBillCode.getBillCodeNotInSumInvalid(TableNameSummy);
+			//FilterBillCode.getDetailCanOperateCondition(syssealedinfoService, 
+				//	SelectedDepartCode, SystemDateTime, SelectedCustCol7,
+				//	TypeCodeListen, TypeCodeSummy, TableNameSummy);
 			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 				commonBase.setCode(2);
 				commonBase.setMessage(Message.GetHelpfulDetailFalue);
@@ -530,12 +535,14 @@ public class HouseFundDetailController extends BaseController {
 		} else {
 			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
 					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+					TypeCodeListen, TypeCodeSummy, TypeCodeDetail,
+					TableNameSummy, TableNameDetail, 
 					"", 
 					map_HaveColumnsList, map_SetColumnsList);
-			String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-					TypeCodeListen, TypeCodeSummy, TableNameSummy);
+			String strHelpful = FilterBillCode.getBillCodeNotInSumInvalid(TableNameSummy);
+			//FilterBillCode.getDetailCanOperateCondition(syssealedinfoService, 
+				//	SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
+				//	TypeCodeListen, TypeCodeSummy, TableNameSummy);
 			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 				commonBase.setCode(2);
 				commonBase.setMessage(Message.GetHelpfulDetailFalue);
@@ -650,12 +657,14 @@ public class HouseFundDetailController extends BaseController {
 				} else {
 					FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
 							SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-							TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+							TypeCodeListen, TypeCodeSummy, TypeCodeDetail,
+							TableNameSummy, TableNameDetail, 
 							"", 
 							map_HaveColumnsList, map_SetColumnsList);
-					String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-							SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-	    					TypeCodeListen, TypeCodeSummy, TableNameSummy);
+					String strHelpful = FilterBillCode.getBillCodeNotInSumInvalid(TableNameSummy);
+					//FilterBillCode.getDetailCanOperateCondition(syssealedinfoService, 
+						//	SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
+	    				//	TypeCodeListen, TypeCodeSummy, TableNameSummy);
 					if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 						commonBase.setCode(2);
 						commonBase.setMessage(Message.GetHelpfulDetailFalue);
@@ -870,9 +879,10 @@ public class HouseFundDetailController extends BaseController {
 		//页面显示数据的二级单位
 		getPd.put("SelectedDepartCode", SelectedDepartCode);
 		
-		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
+		String strHelpful = FilterBillCode.getExportViewShowList(syssealedinfoService, 
 				SelectedDepartCode, SystemDateTime, SelectedCustCol7,
-				TypeCodeListen, TypeCodeSummy, TableNameSummy);
+				TypeCodeListen, TypeCodeSummy, TypeCodeDetail, 
+				TableNameSummy);
 		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 			ObjectExcelView erv = new ObjectExcelView();
 			Map<String,Object> dataMap = new LinkedHashMap<String,Object>();
@@ -976,7 +986,8 @@ public class HouseFundDetailController extends BaseController {
 		} else {
 			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
 					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+					TypeCodeListen, TypeCodeSummy, TypeCodeDetail,
+					TableNameSummy, TableNameDetail, 
 					"", 
 					map_HaveColumnsList, map_SetColumnsList);
 			

@@ -34,7 +34,10 @@ public class ImportDetailService implements ImportDetailManager{
 	 * @throws Exception
 	 */
 	public void insertCopy(List<PageData> listData)throws Exception{
-		dao.insertCopy("SysSealedInfoMapper.deleteReportRecord", "ImportDetailMapper.save", listData);
+		dao.insertCopy("SysSealedInfoMapper.deleteReportRecord", 
+				"ImportDetailMapper.save", 
+				"ImportDetailMapper.updateSummyBillState", 
+				listData);
 	}
 }
 

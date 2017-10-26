@@ -403,6 +403,27 @@ public class SocialIncSummyController extends BaseController {
 	    				commonBase.setMessage(checkStateLast);
 	    				return commonBase;
 	    			}
+	    			//判断明细信息为已上报
+	    			SysSealed itemBefore = new SysSealed();
+	    			itemBefore.setBILL_OFF(CUST_COL7__);
+	    			itemBefore.setRPT_DEPT(DEPT_CODE__);
+	    			itemBefore.setRPT_DUR(BUSI_DATE__);
+	    			itemBefore.setBILL_TYPE(TypeCodeDetail.toString());// 枚举
+	    			String checkStateBefore = CheckStateBefore(itemBefore);
+	    			if(checkStateBefore!=null && !checkStateBefore.trim().equals("")){
+	    				commonBase.setCode(2);
+	    				commonBase.setMessage(checkStateBefore);
+	    				return commonBase;
+	    			}
+	    			//判断凭证信息为没有记录
+	    			String checkStatePz = FilterBillCode.CheckCanSummyOperate(syssealedinfoService, 
+	    					DEPT_CODE__, BUSI_DATE__, CUST_COL7__,
+	    					TypeCodeListen);
+	    			if(checkStatePz!=null && !checkStatePz.trim().equals("")){
+	    				commonBase.setCode(2);
+	    				commonBase.setMessage(checkStatePz);
+	    				return commonBase;
+	    			}
 				}
 			}
 			syssealedinfoService.saveReport(listSysSealed);
@@ -508,7 +529,7 @@ public class SocialIncSummyController extends BaseController {
     	for(PageData eachSummy : listSummy){
     		String strDepartCode = eachSummy.getString("DEPT_CODE");
     		String strCustCol7 = eachSummy.getString("CUST_COL7");
-    		
+
     		//判断汇总信息为未上报
 			SysSealed itemLast = new SysSealed();
 			itemLast.setBILL_OFF(strCustCol7);
@@ -533,20 +554,31 @@ public class SocialIncSummyController extends BaseController {
 				commonBase.setMessage(checkStateBefore);
 				break;
 			}
+			//判断凭证信息为没有记录
+			String checkStatePz = FilterBillCode.CheckCanSummyOperate(syssealedinfoService, 
+					strDepartCode, SystemDateTime, strCustCol7,
+					TypeCodeListen);
+			if(checkStatePz!=null && !checkStatePz.trim().equals("")){
+				commonBase.setCode(2);
+				commonBase.setMessage(checkStatePz);
+				break;
+			}
 			
 			TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, departmentService,userService);
 			tmpl.generateStructureNoEdit(TypeCodeDetail, strDepartCode);
 			Map<String, TableColumns> getHaveColumnsList = tmpl.getHaveColumnsList();
 			Map<String, TmplConfigDetail> getSetColumnsList = tmpl.getSetColumnsList();
 			
-			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
-					strDepartCode, SystemDateTime, strCustCol7, 
-					TypeCodeListen, TypeCodeSummy, TableNameBase, TableNameDetail, 
-					"", 
-					getHaveColumnsList, getSetColumnsList);
-			String strHelpfulDetail = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-					strDepartCode, SystemDateTime, strCustCol7,
-					TypeCodeListen, TypeCodeSummy, TableNameBase);
+			//FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
+			//		strDepartCode, SystemDateTime, strCustCol7, 
+			//		TypeCodeListen, TypeCodeSummy, TypeCodeDetail,
+			//		TableNameBase, TableNameDetail, 
+			//		"", 
+			//		getHaveColumnsList, getSetColumnsList);
+			//String strHelpfulDetail = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
+			//		strDepartCode, SystemDateTime, strCustCol7,
+			//		TypeCodeListen, TypeCodeSummy, TableNameBase);
+			String strHelpfulDetail = FilterBillCode.getBillCodeNotInSumInvalid(TableNameBase);
 			if(!(strHelpfulDetail != null && !strHelpfulDetail.trim().equals(""))){
 				commonBase.setCode(2);
 				commonBase.setMessage(Message.GetHelpfulDetailFalue);
@@ -560,7 +592,7 @@ public class SocialIncSummyController extends BaseController {
 			delReportList.add(delReportEach);
 			
             //获取单位已有的汇总信息
-			Boolean bolDelSum = false;
+			//Boolean bolDelSum = false;
 			List<PageData> getHaveDate = new ArrayList<PageData>();
 			PageData pdReportListen = new PageData();
 			pdReportListen.put("BILL_OFF", strCustCol7);
@@ -571,7 +603,7 @@ public class SocialIncSummyController extends BaseController {
 			if(stateListen != null && !stateListen.equals("")){
 				//接口已上报过（接口有记录），单号要全部生成
 				getHaveDate = new ArrayList<PageData>();
-				bolDelSum = false;
+				//bolDelSum = false;
 			} else {
 				//接口未上报过（接口没记录），单号要获取原有的
     			Map<String, String> mapHave = new HashMap<String, String>();
@@ -580,7 +612,7 @@ public class SocialIncSummyController extends BaseController {
     			mapHave.put("DEPT_CODE", strDepartCode);
     			mapHave.put("BILL_STATE", BillState.Normal.getNameKey());
     			getHaveDate = socialincsummyService.getHave(mapHave);
-    			bolDelSum = true;
+    			//bolDelSum = true;
 			}
 			
 			//获取单位重新汇总信息
@@ -619,10 +651,7 @@ public class SocialIncSummyController extends BaseController {
                 //更新明细单号的条件
                 StringBuilder updateFilter = new StringBuilder();
                 for(String field : SumField){
-                	if(updateFilter != null && !updateFilter.toString().trim().equals("")){
-                    	updateFilter.append(" and ");
-                	}
-                	updateFilter.append(field + " = '" + addTo.getString(field) + "' ");
+                	updateFilter.append(" and " + field + " = '" + addTo.getString(field) + "' ");
                 }
                 updateFilter.append(FilterBillCode.getBillCodeNotInSumInvalid(TableNameBase));
     			addTo.put("updateFilter", updateFilter);
@@ -630,7 +659,7 @@ public class SocialIncSummyController extends BaseController {
     			Common.setModelDefault(addTo, map_HaveColumnsList, getSetColumnsList);
 			}
     		Map<String, Object> mapAdd = new HashMap<String, Object>();
-			mapAdd.put("DelSum", bolDelSum);
+			//mapAdd.put("DelSum", bolDelSum);
 			mapAdd.put("AddList", listAdd);
 			listMap.add(mapAdd);
     	}
@@ -642,7 +671,7 @@ public class SocialIncSummyController extends BaseController {
 			pdBillNum.put("BILL_NUMBER", billNum);
 		}
         if(commonBase.getCode() == -1){
-			socialincsummyService.saveSummyModelList(listMap, pdBillNum, delReportList);
+			socialincsummyService.saveSummyModelList(listMap, pdBillNum);//listMap, delReportList
 			commonBase.setCode(0);
         }
 		return commonBase;

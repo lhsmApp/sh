@@ -222,7 +222,9 @@
 		<include refid="tableName"></include>
 		set 
 			BILL_CODE = #{BILL_CODE}
-		where ${updateFilter}
+	    <where>
+	        ${updateFilter}
+	    </where>
 	</update>
 		
 </mapper>

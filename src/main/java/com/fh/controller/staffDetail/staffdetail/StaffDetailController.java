@@ -265,6 +265,7 @@ public class StaffDetailController extends BaseController {
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
 		TmplTypeInfo implTypeCode = getWhileValueToTypeCode(SelectedTableNo);
+		String TypeCodeDetail = implTypeCode.getTypeCodeDetail();
 		String TypeCodeSummy = implTypeCode.getTypeCodeSummy();
 		String TypeCodeListen = implTypeCode.getTypeCodeListen();
 		//单位
@@ -294,9 +295,10 @@ public class StaffDetailController extends BaseController {
 			QueryFeild += " and 1 != 1 ";
 		}
 		//根据凭证上报情况判断当前显示信息
-		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
+		String strHelpful = FilterBillCode.getExportViewShowList(syssealedinfoService, 
 				SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-				TypeCodeListen, TypeCodeSummy, TableNameSummy);
+				TypeCodeListen, TypeCodeSummy, TypeCodeDetail,
+				TableNameSummy);
 		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 			strHelpful += " and 1 != 1 ";
 		}
@@ -405,12 +407,14 @@ public class StaffDetailController extends BaseController {
 		
 		FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
 				SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-				TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+				TypeCodeListen, TypeCodeSummy, TypeCodeDetail,
+				TableNameSummy, TableNameDetail, 
 				emplGroupType,
 				map_HaveColumnsList, map_SetColumnsList);
-		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-				SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-				TypeCodeListen, TypeCodeSummy, TableNameSummy);
+		String strHelpful = FilterBillCode.getBillCodeNotInSumInvalid(TableNameSummy);
+				//FilterBillCode.getDetailCanOperateCondition(syssealedinfoService, 
+				//SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
+				//TypeCodeListen, TypeCodeSummy, TableNameSummy);
 		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 			commonBase.setCode(2);
 			commonBase.setMessage(Message.GetHelpfulDetailFalue);
@@ -494,12 +498,14 @@ public class StaffDetailController extends BaseController {
 		} else {
 			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
 					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+					TypeCodeListen, TypeCodeSummy, TypeCodeDetail,
+					TableNameSummy, TableNameDetail, 
 					emplGroupType,
 					map_HaveColumnsList, map_SetColumnsList);
-			String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-					TypeCodeListen, TypeCodeSummy, TableNameSummy);
+			String strHelpful = FilterBillCode.getBillCodeNotInSumInvalid(TableNameSummy);
+			//FilterBillCode.getDetailCanOperateCondition(syssealedinfoService, 
+					//SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
+					//TypeCodeListen, TypeCodeSummy, TableNameSummy);
 			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 				commonBase.setCode(2);
 				commonBase.setMessage(Message.GetHelpfulDetailFalue);
@@ -616,12 +622,14 @@ public class StaffDetailController extends BaseController {
 		} else {
 			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
 					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+					TypeCodeListen, TypeCodeSummy, TypeCodeDetail,
+					TableNameSummy, TableNameDetail, 
 					emplGroupType,
 					map_HaveColumnsList, map_SetColumnsList);
-			String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-				    TypeCodeListen, TypeCodeSummy, TableNameSummy);
+			String strHelpful = FilterBillCode.getBillCodeNotInSumInvalid(TableNameSummy);
+			//FilterBillCode.getDetailCanOperateCondition(syssealedinfoService, 
+					//SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
+				    //TypeCodeListen, TypeCodeSummy, TableNameSummy);
 			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 				commonBase.setCode(2);
 				commonBase.setMessage(Message.GetHelpfulDetailFalue);
@@ -748,12 +756,14 @@ public class StaffDetailController extends BaseController {
 				} else {
 					FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
 							SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-							TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+							TypeCodeListen, TypeCodeSummy, TypeCodeDetail,
+							TableNameSummy, TableNameDetail, 
 							emplGroupType,
 							map_HaveColumnsList, map_SetColumnsList);
-					String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-							SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-							TypeCodeListen, TypeCodeSummy, TableNameSummy);
+					String strHelpful = FilterBillCode.getBillCodeNotInSumInvalid(TableNameSummy);
+					//FilterBillCode.getDetailCanOperateCondition(syssealedinfoService, 
+					//		SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
+					//		TypeCodeListen, TypeCodeSummy, TableNameSummy);
 					if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 						commonBase.setCode(2);
 						commonBase.setMessage(Message.GetHelpfulDetailFalue);
@@ -938,6 +948,9 @@ public class StaffDetailController extends BaseController {
 		mv.addObject("which", SelectedTableNo);
 		mv.addObject("SelectedDepartCode", SelectedDepartCode);
 		mv.addObject("SelectedCustCol7", SelectedCustCol7);
+		mv.addObject("DepartTreeSource", DepartTreeSource);
+		mv.addObject("ShowDataDepartCode", ShowDataDepartCode);
+		mv.addObject("ShowDataCustCol7", ShowDataCustCol7);
 		mv.addObject("commonBaseCode", commonBase.getCode());
 		mv.addObject("commonMessage", commonBase.getMessage());
 		return mv;
@@ -992,6 +1005,7 @@ public class StaffDetailController extends BaseController {
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
 		TmplTypeInfo implTypeCode = getWhileValueToTypeCode(SelectedTableNo);
+		String TypeCodeDetail = implTypeCode.getTypeCodeDetail();
 		String TypeCodeSummy = implTypeCode.getTypeCodeSummy();
 		String TypeCodeListen = implTypeCode.getTypeCodeListen();
 		//单位
@@ -1013,9 +1027,10 @@ public class StaffDetailController extends BaseController {
 		//员工组
 		getPd.put("emplGroupType", emplGroupType);
 
-		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-				SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-				TypeCodeListen, TypeCodeSummy, TableNameSummy);
+		String strHelpful = FilterBillCode.getExportViewShowList(syssealedinfoService, 
+				SelectedDepartCode, SystemDateTime, SelectedCustCol7,
+				TypeCodeListen, TypeCodeSummy, TypeCodeDetail, 
+				TableNameSummy);
 		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 			ObjectExcelView erv = new ObjectExcelView();
 			Map<String,Object> dataMap = new LinkedHashMap<String,Object>();
@@ -1126,7 +1141,8 @@ public class StaffDetailController extends BaseController {
 		} else {
 			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
 					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+					TypeCodeListen, TypeCodeSummy, TypeCodeDetail,
+					TableNameSummy, TableNameDetail, 
 					emplGroupType,
 					map_HaveColumnsList, map_SetColumnsList);
 			
