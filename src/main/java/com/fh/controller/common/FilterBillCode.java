@@ -93,7 +93,8 @@ public class FilterBillCode {
 			String TypeCodeListen, String TypeCodeSummy, String TypeCodeDetail, 
 			String TableNameSummy) throws Exception{
 		String strHelpful = "";
-		PageData pd = new PageData();
+		strHelpful += FilterBillCode.getBillCodeNotInSumInvalid(TableNameSummy);
+		/*PageData pd = new PageData();
 		pd.put("RPT_DEPT", DepartCode);
 		pd.put("RPT_DUR", SystemDateTime);
 		pd.put("BILL_TYPE", TypeCodeListen);
@@ -117,7 +118,7 @@ public class FilterBillCode {
 				//明细已上报过（明细有记录），取汇总单据状态不为0的
 				strHelpful += FilterBillCode.getBillCodeNotInSumInvalid(TableNameSummy);
 			}
-		}
+		}*/
 		return strHelpful;
 	}
 	
