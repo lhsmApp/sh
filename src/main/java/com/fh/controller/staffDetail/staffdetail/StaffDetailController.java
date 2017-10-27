@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
+import com.fh.controller.common.Common;
 import com.fh.controller.common.DictsUtil;
 import com.fh.controller.common.FilterBillCode;
 import com.fh.controller.common.Message;
@@ -33,6 +34,7 @@ import com.fh.entity.PageResult;
 import com.fh.entity.SysSealed;
 import com.fh.entity.TableColumns;
 import com.fh.entity.TmplConfigDetail;
+import com.fh.entity.TmplTypeInfo;
 import com.fh.entity.system.User;
 import com.fh.exception.CustomException;
 import com.fh.util.ObjectExcelView;
@@ -94,16 +96,19 @@ public class StaffDetailController extends BaseController {
 	//默认的which值
 	String DefaultWhile = TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey();
 	//枚举类型 TmplType
-	String TypeCodeDetail = "";
-	String TypeCodeSummy = "";
-	String TypeCodeListen = "";
+	//String TypeCodeDetail = "";
+	//String TypeCodeSummy = "";
+	//String TypeCodeListen = "";
 
 	//页面显示数据的年月
 	String SystemDateTime = "";
 	//页面显示数据的二级单位
-	String UserDepartCode = "";
+	//String UserDepartCode = "";
 	//登录人的二级单位是最末层
-	private int departSelf = 0;
+	//private int departSelf = 0;
+
+	//String getPageListSelectedCustCol7 = "";
+	//String getPageListSelectedDepartCode = "";
 	
 	//底行显示的求和与平均值字段
 	StringBuilder SqlUserdata = new StringBuilder();
@@ -112,12 +117,12 @@ public class StaffDetailController extends BaseController {
 	//表结构  
 	Map<String, TableColumns> map_HaveColumnsList = new LinkedHashMap<String, TableColumns>();
 	// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-	Map<String, TmplConfigDetail> map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
+	//Map<String, TmplConfigDetail> map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
 
 	//界面查询字段
     List<String> QueryFeildList = Arrays.asList("DEPT_CODE", "CUST_COL7", "USER_GROP");
     //设置必定不用编辑的列
-    List<String> MustNotEditList = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP");
+    List<String> MustNotEditList = Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP");//, "RPT_USER", "RPT_DATETIME", "COL_BACKUP"
 	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
     List<String> keyListAdd = Arrays.asList("STAFF_IDENT", "USER_CODE");
 	List<String> keyListBase = getKeyListBase();
@@ -137,9 +142,6 @@ public class StaffDetailController extends BaseController {
 	}
 	String CheckFeild_STAFF_IDENT = "STAFF_IDENT";
 	
-	String getPageListSelectedCustCol7 = "";
-	String getPageListSelectedDepartCode = "";
-	
 	/**列表
 	 * @param page
 	 * @throws Exception
@@ -149,8 +151,8 @@ public class StaffDetailController extends BaseController {
 		logBefore(logger, Jurisdiction.getUsername()+"列表StaffDetail");
 		//if(!Jurisdiction.buttonJurisdiction(menuUrl, "cha")){return null;} //校验权限(无权查看时页面会有提示,如果不注释掉这句代码就无法进入列表页面,所以根据情况是否加入本句代码)
 
-		getPageListSelectedCustCol7 = "";
-		getPageListSelectedDepartCode = "";
+		//getPageListSelectedCustCol7 = "";
+		//getPageListSelectedDepartCode = "";
 		
 		PageData getPd = this.getPageData();
 		//员工组
@@ -158,7 +160,7 @@ public class StaffDetailController extends BaseController {
 		//当前期间,取自tb_system_config的SystemDateTime字段
 		SystemDateTime = sysConfigManager.currentSection(getPd);
 		//当前登录人所在二级单位
-		UserDepartCode = Jurisdiction.getCurrentDepartmentID();//
+		String UserDepartCode = Jurisdiction.getCurrentDepartmentID();//
 		//User user = (User) Jurisdiction.getSession().getAttribute(Const.SESSION_USERROL);
 		//String DepartName = user.getDEPARTMENT_NAME();
 		
@@ -181,10 +183,10 @@ public class StaffDetailController extends BaseController {
 		String DepartmentSelectTreeSource=DictsUtil.getDepartmentSelectTreeSource(departmentService);
 		if(DepartmentSelectTreeSource.equals("0"))
 		{
-			this.departSelf = 1;
+			//departSelf = 1;
 			getPd.put("departTreeSource", DepartmentSelectTreeSource);
 		} else {
-			departSelf = 0;
+			//departSelf = 0;
 			getPd.put("departTreeSource", 1);
 		}
 		mv.addObject("zTreeNodes", DepartmentSelectTreeSource);
@@ -200,7 +202,7 @@ public class StaffDetailController extends BaseController {
 		//表结构  
 		map_HaveColumnsList = tmpl.getHaveColumnsList();
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-		map_SetColumnsList = tmpl.getSetColumnsList();
+		//map_SetColumnsList = tmpl.getSetColumnsList();
 
 		mv.addObject("pd", getPd);
 		mv.addObject("jqGridColModel", jqGridColModel);
@@ -219,12 +221,14 @@ public class StaffDetailController extends BaseController {
 		
 		PageData getPd = this.getPageData();
 		//员工组 必须执行，用来设置汇总和传输上报类型
-		getWhileValue(getPd.getString("SelectedTableNo"));
+		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
+		String TypeCodeDetail = getWhileValueToTypeCode(SelectedTableNo).getTypeCodeDetail();
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		
 		if(SelectedCustCol7 != null && !SelectedCustCol7.trim().equals("") && SelectedDepartCode != null && !SelectedDepartCode.trim().equals("")){
@@ -253,23 +257,28 @@ public class StaffDetailController extends BaseController {
 	public @ResponseBody PageResult<PageData> getPageList(JqPage page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"列表StaffDetail");
 
-		getPageListSelectedCustCol7 = "";
-		getPageListSelectedDepartCode = "";
+		//getPageListSelectedCustCol7 = "";
+		//getPageListSelectedDepartCode = "";
 		
 		PageData getPd = this.getPageData();
 		//员工组
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
+		TmplTypeInfo implTypeCode = getWhileValueToTypeCode(SelectedTableNo);
+		String TypeCodeDetail = implTypeCode.getTypeCodeDetail();
+		String TypeCodeSummy = implTypeCode.getTypeCodeSummy();
+		String TypeCodeListen = implTypeCode.getTypeCodeListen();
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
 		
-		getPageListSelectedCustCol7 = SelectedCustCol7;
-		getPageListSelectedDepartCode = SelectedDepartCode;
+		//getPageListSelectedCustCol7 = SelectedCustCol7;
+		//getPageListSelectedDepartCode = SelectedDepartCode;
 
 		PageData getQueryFeildPd = new PageData();
 		getQueryFeildPd.put("USER_GROP", emplGroupType);
@@ -286,9 +295,10 @@ public class StaffDetailController extends BaseController {
 			QueryFeild += " and 1 != 1 ";
 		}
 		//根据凭证上报情况判断当前显示信息
-		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
+		String strHelpful = FilterBillCode.getExportViewShowList(syssealedinfoService, 
 				SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-				TypeCodeListen, TypeCodeSummy, TableNameSummy);
+				TypeCodeListen, TypeCodeSummy, TypeCodeDetail,
+				TableNameSummy);
 		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 			strHelpful += " and 1 != 1 ";
 		}
@@ -342,52 +352,69 @@ public class StaffDetailController extends BaseController {
 		//员工组
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
+		TmplTypeInfo implTypeCode = getWhileValueToTypeCode(SelectedTableNo);
+		String TypeCodeDetail = implTypeCode.getTypeCodeDetail();
+		String TypeCodeSummy = implTypeCode.getTypeCodeSummy();
+		String TypeCodeListen = implTypeCode.getTypeCodeListen();
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		//
+		String DepartTreeSource = getPd.getString("DepartTreeSource");
+		String ShowDataDepartCode = getPd.getString("ShowDataDepartCode");
+		String ShowDataCustCol7 = getPd.getString("ShowDataCustCol7");
 		//操作
 		String oper = getPd.getString("oper");
+		Map<String, TmplConfigDetail> map_SetColumnsList = Common.GetSetColumnsList(SelectedTableNo, SelectedDepartCode, tmplconfigService);
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(emplGroupType, SelectedCustCol7, SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(emplGroupType, SelectedCustCol7, SelectedDepartCode,
+				ShowDataDepartCode, ShowDataCustCol7, DepartTreeSource);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
 			return commonBase;
 		}
 		
-		String checkState = CheckState(SelectedCustCol7, SelectedDepartCode);
+		String checkState = CheckState(TypeCodeDetail, SelectedCustCol7, SelectedDepartCode);
 		if(checkState!=null && !checkState.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(checkState);
 			return commonBase;
 		}
-		//必定不用编辑的列  MustNotEditList Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP");
+		//必定不用编辑的列  MustNotEditList Arrays.asList("BILL_CODE", "BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP"
+		//                                         , "RPT_USER", "RPT_DATETIME", "COL_BACKUP");
 		if(oper.equals("add")){
-			getPd.put("BUSI_DATE", SystemDateTime);
-			getPd.put("DEPT_CODE", SelectedDepartCode);
-			getPd.put("CUST_COL7", SelectedCustCol7);
-			getPd.put("USER_GROP", emplGroupType);
+			getPd.put("BUSI_DATE", SystemDateTime); 
+			getPd.put("DEPT_CODE", SelectedDepartCode); 
+			getPd.put("CUST_COL7", SelectedCustCol7); 
+			getPd.put("USER_GROP", emplGroupType); 
+			//getPd.put("RPT_USER", ); 
+			//getPd.put("RPT_DATETIME", ); 
+			//getPd.put("COL_BACKUP", '0'); 
 		} else {
 			for(String strFeild : MustNotEditList){
 				getPd.put(strFeild, getPd.get(strFeild + TmplUtil.keyExtra));
 			}
 		}
 		getPd.put("BILL_CODE", " ");
-		TmplUtil.setModelDefault(getPd, map_HaveColumnsList, map_SetColumnsList);
+		Common.setModelDefault(getPd, map_HaveColumnsList, map_SetColumnsList);
 		
 		FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
 				SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-				TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+				TypeCodeListen, TypeCodeSummy, TypeCodeDetail,
+				TableNameSummy, TableNameDetail, 
 				emplGroupType,
 				map_HaveColumnsList, map_SetColumnsList);
-		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-				SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-				TypeCodeListen, TypeCodeSummy, TableNameSummy);
+		String strHelpful = FilterBillCode.getBillCodeNotInSumInvalid(TableNameSummy);
+				//FilterBillCode.getDetailCanOperateCondition(syssealedinfoService, 
+				//SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
+				//TypeCodeListen, TypeCodeSummy, TableNameSummy);
 		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 			commonBase.setCode(2);
 			commonBase.setMessage(Message.GetHelpfulDetailFalue);
@@ -437,35 +464,48 @@ public class StaffDetailController extends BaseController {
 		//员工组
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
+		TmplTypeInfo implTypeCode = getWhileValueToTypeCode(SelectedTableNo);
+		String TypeCodeDetail = implTypeCode.getTypeCodeDetail();
+		String TypeCodeSummy = implTypeCode.getTypeCodeSummy();
+		String TypeCodeListen = implTypeCode.getTypeCodeListen();
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		//
+		String DepartTreeSource = getPd.getString("DepartTreeSource");
+		String ShowDataDepartCode = getPd.getString("ShowDataDepartCode");
+		String ShowDataCustCol7 = getPd.getString("ShowDataCustCol7");
+		Map<String, TmplConfigDetail> map_SetColumnsList = Common.GetSetColumnsList(SelectedTableNo, SelectedDepartCode, tmplconfigService);
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(emplGroupType, SelectedCustCol7, SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(emplGroupType, SelectedCustCol7, SelectedDepartCode,
+				ShowDataDepartCode, ShowDataCustCol7, DepartTreeSource);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
 			return commonBase;
 		}
 		
-		String checkState = CheckState(SelectedCustCol7, SelectedDepartCode);
+		String checkState = CheckState(TypeCodeDetail, SelectedCustCol7, SelectedDepartCode);
 		if(checkState!=null && !checkState.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(checkState);
 		} else {
 			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
 					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+					TypeCodeListen, TypeCodeSummy, TypeCodeDetail,
+					TableNameSummy, TableNameDetail, 
 					emplGroupType,
 					map_HaveColumnsList, map_SetColumnsList);
-			String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-					TypeCodeListen, TypeCodeSummy, TableNameSummy);
+			String strHelpful = FilterBillCode.getBillCodeNotInSumInvalid(TableNameSummy);
+			//FilterBillCode.getDetailCanOperateCondition(syssealedinfoService, 
+					//SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
+					//TypeCodeListen, TypeCodeSummy, TableNameSummy);
 			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 				commonBase.setCode(2);
 				commonBase.setMessage(Message.GetHelpfulDetailFalue);
@@ -502,7 +542,7 @@ public class StaffDetailController extends BaseController {
 	    		}
 	        	item.put("BILL_CODE", " ");
 	        	item.put("CanOperate", strHelpful);
-				TmplUtil.setModelDefault(item, map_HaveColumnsList, map_SetColumnsList);
+	        	Common.setModelDefault(item, map_HaveColumnsList, map_SetColumnsList);
 	        }
 			if(null != listData && listData.size() > 0){
 				List<String> repeatList = staffdetailService.findUserCodeByModel(listData);
@@ -548,35 +588,48 @@ public class StaffDetailController extends BaseController {
 		//员工组
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
+		TmplTypeInfo implTypeCode = getWhileValueToTypeCode(SelectedTableNo);
+		String TypeCodeDetail = implTypeCode.getTypeCodeDetail();
+		String TypeCodeSummy = implTypeCode.getTypeCodeSummy();
+		String TypeCodeListen = implTypeCode.getTypeCodeListen();
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		//
+		String DepartTreeSource = getPd.getString("DepartTreeSource");
+		String ShowDataDepartCode = getPd.getString("ShowDataDepartCode");
+		String ShowDataCustCol7 = getPd.getString("ShowDataCustCol7");
+		Map<String, TmplConfigDetail> map_SetColumnsList = Common.GetSetColumnsList(SelectedTableNo, SelectedDepartCode, tmplconfigService);
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(emplGroupType, SelectedCustCol7, SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(emplGroupType, SelectedCustCol7, SelectedDepartCode,
+				ShowDataDepartCode, ShowDataCustCol7, DepartTreeSource);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
 			return commonBase;
 		}
 		
-		String checkState = CheckState(SelectedCustCol7, SelectedDepartCode);
+		String checkState = CheckState(TypeCodeDetail, SelectedCustCol7, SelectedDepartCode);
 		if(checkState!=null && !checkState.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(checkState);
 		} else {
 			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
 					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+					TypeCodeListen, TypeCodeSummy, TypeCodeDetail,
+					TableNameSummy, TableNameDetail, 
 					emplGroupType,
 					map_HaveColumnsList, map_SetColumnsList);
-			String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-				    TypeCodeListen, TypeCodeSummy, TableNameSummy);
+			String strHelpful = FilterBillCode.getBillCodeNotInSumInvalid(TableNameSummy);
+			//FilterBillCode.getDetailCanOperateCondition(syssealedinfoService, 
+					//SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
+				    //TypeCodeListen, TypeCodeSummy, TableNameSummy);
 			if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 				commonBase.setCode(2);
 				commonBase.setMessage(Message.GetHelpfulDetailFalue);
@@ -614,14 +667,20 @@ public class StaffDetailController extends BaseController {
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		//
+		String DepartTreeSource = getPd.getString("DepartTreeSource");
+		String ShowDataDepartCode = getPd.getString("ShowDataDepartCode");
+		String ShowDataCustCol7 = getPd.getString("ShowDataCustCol7");
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(emplGroupType, SelectedCustCol7, SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(emplGroupType, SelectedCustCol7, SelectedDepartCode,
+				ShowDataDepartCode, ShowDataCustCol7, DepartTreeSource);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
@@ -632,6 +691,9 @@ public class StaffDetailController extends BaseController {
 		mv.addObject("which", SelectedTableNo);
 		mv.addObject("SelectedDepartCode", SelectedDepartCode);
 		mv.addObject("SelectedCustCol7", SelectedCustCol7);
+		mv.addObject("DepartTreeSource", DepartTreeSource);
+		mv.addObject("ShowDataDepartCode", ShowDataDepartCode);
+		mv.addObject("ShowDataCustCol7", ShowDataCustCol7);
 		mv.addObject("commonBaseCode", commonBase.getCode());
 		mv.addObject("commonMessage", commonBase.getMessage());
 		return mv;
@@ -657,20 +719,32 @@ public class StaffDetailController extends BaseController {
 		//员工组
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
+		TmplTypeInfo implTypeCode = getWhileValueToTypeCode(SelectedTableNo);
+		String TypeCodeDetail = implTypeCode.getTypeCodeDetail();
+		String TypeCodeSummy = implTypeCode.getTypeCodeSummy();
+		String TypeCodeListen = implTypeCode.getTypeCodeListen();
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		//
+		String DepartTreeSource = getPd.getString("DepartTreeSource");
+		String ShowDataDepartCode = getPd.getString("ShowDataDepartCode");
+		String ShowDataCustCol7 = getPd.getString("ShowDataCustCol7");
+		Map<String, TmplConfigDetail> map_SetColumnsList = Common.GetSetColumnsList(SelectedTableNo, SelectedDepartCode, tmplconfigService);
+		
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(emplGroupType, SelectedCustCol7, SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(emplGroupType, SelectedCustCol7, SelectedDepartCode,
+				ShowDataDepartCode, ShowDataCustCol7, DepartTreeSource);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
 		} else {
-			String checkState = CheckState(SelectedCustCol7, SelectedDepartCode);
+			String checkState = CheckState(TypeCodeDetail, SelectedCustCol7, SelectedDepartCode);
 			if(checkState!=null && !checkState.trim().equals("")){
 				commonBase.setCode(2);
 				commonBase.setMessage(checkState);
@@ -682,12 +756,14 @@ public class StaffDetailController extends BaseController {
 				} else {
 					FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
 							SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-							TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+							TypeCodeListen, TypeCodeSummy, TypeCodeDetail,
+							TableNameSummy, TableNameDetail, 
 							emplGroupType,
 							map_HaveColumnsList, map_SetColumnsList);
-					String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-							SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-							TypeCodeListen, TypeCodeSummy, TableNameSummy);
+					String strHelpful = FilterBillCode.getBillCodeNotInSumInvalid(TableNameSummy);
+					//FilterBillCode.getDetailCanOperateCondition(syssealedinfoService, 
+					//		SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
+					//		TypeCodeListen, TypeCodeSummy, TableNameSummy);
 					if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 						commonBase.setCode(2);
 						commonBase.setMessage(Message.GetHelpfulDetailFalue);
@@ -839,7 +915,7 @@ public class StaffDetailController extends BaseController {
 											if(!(getESTB_DEPT!=null && !getESTB_DEPT.trim().equals(""))){
 												pdAdd.put("ESTB_DEPT", SelectedDepartCode);
 											}
-											TmplUtil.setModelDefault(pdAdd, map_HaveColumnsList, map_SetColumnsList);
+											Common.setModelDefault(pdAdd, map_HaveColumnsList, map_SetColumnsList);
 											listAdd.add(pdAdd);
 										}
 									}
@@ -872,6 +948,9 @@ public class StaffDetailController extends BaseController {
 		mv.addObject("which", SelectedTableNo);
 		mv.addObject("SelectedDepartCode", SelectedDepartCode);
 		mv.addObject("SelectedCustCol7", SelectedCustCol7);
+		mv.addObject("DepartTreeSource", DepartTreeSource);
+		mv.addObject("ShowDataDepartCode", ShowDataDepartCode);
+		mv.addObject("ShowDataCustCol7", ShowDataCustCol7);
 		mv.addObject("commonBaseCode", commonBase.getCode());
 		mv.addObject("commonMessage", commonBase.getMessage());
 		return mv;
@@ -891,11 +970,13 @@ public class StaffDetailController extends BaseController {
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		Map<String, TmplConfigDetail> map_SetColumnsList = Common.GetSetColumnsList(SelectedTableNo, SelectedDepartCode, tmplconfigService);
 
 		PageData transferPd = this.getPageData();
 		//页面显示数据的二级单位
@@ -907,7 +988,7 @@ public class StaffDetailController extends BaseController {
 		
 		//页面显示数据的二级单位
 		List<PageData> varOList = staffdetailService.exportModel(transferPd);
-		return export(varOList, "StaffDetail"); //工资明细
+		return export(varOList, "StaffDetail", map_SetColumnsList); //工资明细
 	}
 	
 	
@@ -923,13 +1004,19 @@ public class StaffDetailController extends BaseController {
 		//员工组
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
+		TmplTypeInfo implTypeCode = getWhileValueToTypeCode(SelectedTableNo);
+		String TypeCodeDetail = implTypeCode.getTypeCodeDetail();
+		String TypeCodeSummy = implTypeCode.getTypeCodeSummy();
+		String TypeCodeListen = implTypeCode.getTypeCodeListen();
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		Map<String, TmplConfigDetail> map_SetColumnsList = Common.GetSetColumnsList(SelectedTableNo, SelectedDepartCode, tmplconfigService);
 		
 		//页面显示数据的年月
 		getPd.put("SystemDateTime", SystemDateTime);
@@ -940,9 +1027,10 @@ public class StaffDetailController extends BaseController {
 		//员工组
 		getPd.put("emplGroupType", emplGroupType);
 
-		String strHelpful = FilterBillCode.getCanOperateCondition(syssealedinfoService, 
-				SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-				TypeCodeListen, TypeCodeSummy, TableNameSummy);
+		String strHelpful = FilterBillCode.getExportViewShowList(syssealedinfoService, 
+				SelectedDepartCode, SystemDateTime, SelectedCustCol7,
+				TypeCodeListen, TypeCodeSummy, TypeCodeDetail, 
+				TableNameSummy);
 		if(!(strHelpful != null && !strHelpful.trim().equals(""))){
 			ObjectExcelView erv = new ObjectExcelView();
 			Map<String,Object> dataMap = new LinkedHashMap<String,Object>();
@@ -953,11 +1041,11 @@ public class StaffDetailController extends BaseController {
 		
 		page.setPd(getPd);
 		List<PageData> varOList = staffdetailService.exportList(page);
-		return export(varOList, "");
+		return export(varOList, "", map_SetColumnsList);
 	}
 	
 	@SuppressWarnings("unchecked")
-	private ModelAndView export(List<PageData> varOList, String ExcelName){
+	private ModelAndView export(List<PageData> varOList, String ExcelName, Map<String, TmplConfigDetail> map_SetColumnsList){
 		ModelAndView mv = new ModelAndView();
 		Map<String,Object> dataMap = new LinkedHashMap<String,Object>();
 		dataMap.put("filename", ExcelName);
@@ -1013,13 +1101,24 @@ public class StaffDetailController extends BaseController {
 		//员工组 必须执行，用来设置汇总和传输上报类型
 		String SelectedTableNo = getWhileValue(getPd.getString("SelectedTableNo"));
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
+		TmplTypeInfo implTypeCode = getWhileValueToTypeCode(SelectedTableNo);
+		String TypeCodeDetail = implTypeCode.getTypeCodeDetail();
+		String TypeCodeSummy = implTypeCode.getTypeCodeSummy();
+		String TypeCodeListen = implTypeCode.getTypeCodeListen();
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		//
+		String DepartTreeSource = getPd.getString("DepartTreeSource");
+		String ShowDataDepartCode = getPd.getString("ShowDataDepartCode");
+		String ShowDataCustCol7 = getPd.getString("ShowDataCustCol7");
+		Map<String, TmplConfigDetail> map_SetColumnsList = Common.GetSetColumnsList(SelectedTableNo, SelectedDepartCode, tmplconfigService);
+		
 		if(!(TypeCodeDetail!=null && !TypeCodeDetail.trim().equals(""))){
 			commonBase.setCode(2);
 			commonBase.setMessage(Message.SelectedTabOppositeReportTypeIsNull);
@@ -1027,21 +1126,23 @@ public class StaffDetailController extends BaseController {
 		}
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(emplGroupType, SelectedCustCol7, SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(emplGroupType, SelectedCustCol7, SelectedDepartCode,
+				ShowDataDepartCode, ShowDataCustCol7, DepartTreeSource);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
 			return commonBase;
 		}
 		
-		String checkState = CheckState(SelectedCustCol7, SelectedDepartCode);
+		String checkState = CheckState(TypeCodeDetail, SelectedCustCol7, SelectedDepartCode);
 		if(checkState!=null && !checkState.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(checkState);
 		} else {
 			FilterBillCode.copyInsert(syssealedinfoService, importdetailService, 
 					SelectedDepartCode, SystemDateTime, SelectedCustCol7, 
-					TypeCodeListen, TypeCodeSummy, TableNameSummy, TableNameDetail, 
+					TypeCodeListen, TypeCodeSummy, TypeCodeDetail,
+					TableNameSummy, TableNameDetail, 
 					emplGroupType,
 					map_HaveColumnsList, map_SetColumnsList);
 			
@@ -1066,21 +1167,23 @@ public class StaffDetailController extends BaseController {
 		return commonBase;
 	}
 	
-	private String CheckMustSelectedAndSame(String emplGroupType, String CUST_COL7, String DEPT_CODE, Boolean isCheckSame) throws Exception{
+	private String CheckMustSelectedAndSame(String emplGroupType, String CUST_COL7, String DEPT_CODE, 
+			String ShowDataDepartCode, String ShowDataCustCol7, String DepartTreeSource)//
+			throws Exception{
 		String strRut = "";
 		if(!(CUST_COL7 != null && !CUST_COL7.trim().equals(""))){
 			strRut += "查询条件中的账套必须选择！";
+		} else {
+		    if(!CUST_COL7.equals(ShowDataCustCol7)){
+				strRut += "查询条件中所选账套与页面显示数据账套不一致，请单击查询再进行操作！";
+		    }
 		}
 		if(!(DEPT_CODE != null && !DEPT_CODE.trim().equals(""))){
 			strRut += "查询条件中的责任中心不能为空！";
-		}
-		if(isCheckSame){
-			if(CUST_COL7 != null && !CUST_COL7.equals(getPageListSelectedCustCol7)){
-				strRut += "查询条件中所选账套与页面显示数据账套不一致，请单击查询再进行操作！";
-			}
-			if(DEPT_CODE != null && !DEPT_CODE.equals(getPageListSelectedDepartCode)){
+		} else {
+		    if(!String.valueOf(0).equals(DepartTreeSource) && !DEPT_CODE.equals(ShowDataDepartCode)){
 				strRut += "查询条件中所选责任中心与页面显示数据责任中心不一致，请单击查询再进行操作！";
-			}
+		    }
 		}
 		if(!(emplGroupType!=null && !emplGroupType.trim().equals(""))){
 			strRut += Message.StaffSelectedTabOppositeGroupTypeIsNull;
@@ -1088,7 +1191,7 @@ public class StaffDetailController extends BaseController {
 		return strRut;
 	}
 
-	private String CheckState(String CUST_COL7, String DEPT_CODE) throws Exception{
+	private String CheckState(String TypeCodeDetail, String CUST_COL7, String DEPT_CODE) throws Exception{
 		String strRut = Message.SelectedTabOppositeReportTypeIsNull;
 		if(TypeCodeDetail != null && !TypeCodeDetail.trim().equals("")){
 			strRut = Message.CurrentDurationBeSealed;
@@ -1113,41 +1216,43 @@ public class StaffDetailController extends BaseController {
 		if(value != null && !value.trim().equals("")){
 			which = value;
 		}
+		return which;
+	}
+
+	private TmplTypeInfo getWhileValueToTypeCode(String which){
+		TmplTypeInfo retItem = new TmplTypeInfo();
 		//枚举类型 TmplType
-		TypeCodeDetail = "";
-		TypeCodeSummy = "";
-		TypeCodeListen = "";
 		if(which.equals(TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey())){
 			//合同化
-			TypeCodeDetail = TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey();
-			TypeCodeSummy = TmplType.TB_STAFF_SUMMY_CONTRACT.getNameKey();
-			TypeCodeListen = TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey();
+			retItem.setTypeCodeDetail(TmplType.TB_STAFF_DETAIL_CONTRACT.getNameKey());
+			retItem.setTypeCodeSummy(TmplType.TB_STAFF_SUMMY_CONTRACT.getNameKey());
+			retItem.setTypeCodeListen(TmplType.TB_STAFF_TRANSFER_CONTRACT.getNameKey());
 		}
 		if(which.equals(TmplType.TB_STAFF_DETAIL_MARKET.getNameKey())){
 			//市场化
-			TypeCodeDetail = TmplType.TB_STAFF_DETAIL_MARKET.getNameKey();
-			TypeCodeSummy = TmplType.TB_STAFF_SUMMY_MARKET.getNameKey();
-			TypeCodeListen = TmplType.TB_STAFF_TRANSFER_MARKET.getNameKey();
+			retItem.setTypeCodeDetail(TmplType.TB_STAFF_DETAIL_MARKET.getNameKey());
+			retItem.setTypeCodeSummy(TmplType.TB_STAFF_SUMMY_MARKET.getNameKey());
+			retItem.setTypeCodeListen(TmplType.TB_STAFF_TRANSFER_MARKET.getNameKey());
 		}
 		if(which.equals(TmplType.TB_STAFF_DETAIL_SYS_LABOR.getNameKey())){
 			//系统内劳务
-			TypeCodeDetail = TmplType.TB_STAFF_DETAIL_SYS_LABOR.getNameKey();
-			TypeCodeSummy = TmplType.TB_STAFF_SUMMY_SYS_LABOR.getNameKey();
-			TypeCodeListen = TmplType.TB_STAFF_TRANSFER_SYS_LABOR.getNameKey();
+			retItem.setTypeCodeDetail(TmplType.TB_STAFF_DETAIL_SYS_LABOR.getNameKey());
+			retItem.setTypeCodeSummy(TmplType.TB_STAFF_SUMMY_SYS_LABOR.getNameKey());
+			retItem.setTypeCodeListen(TmplType.TB_STAFF_TRANSFER_SYS_LABOR.getNameKey());
 		}
 		if(which.equals(TmplType.TB_STAFF_DETAIL_OPER_LABOR.getNameKey())){
 			//运行人员
-			TypeCodeDetail = TmplType.TB_STAFF_DETAIL_OPER_LABOR.getNameKey();
-			TypeCodeSummy = TmplType.TB_STAFF_SUMMY_OPER_LABOR.getNameKey();
-			TypeCodeListen = TmplType.TB_STAFF_TRANSFER_OPER_LABOR.getNameKey();
+			retItem.setTypeCodeDetail(TmplType.TB_STAFF_DETAIL_OPER_LABOR.getNameKey());
+			retItem.setTypeCodeSummy(TmplType.TB_STAFF_SUMMY_OPER_LABOR.getNameKey());
+			retItem.setTypeCodeListen(TmplType.TB_STAFF_TRANSFER_OPER_LABOR.getNameKey());
 		}
 		if(which.equals(TmplType.TB_STAFF_DETAIL_LABOR.getNameKey())){
 			//劳务派遣工资
-			TypeCodeDetail = TmplType.TB_STAFF_DETAIL_LABOR.getNameKey();
-			TypeCodeSummy = TmplType.TB_STAFF_SUMMY_LABOR.getNameKey();
-			TypeCodeListen = TmplType.TB_STAFF_TRANSFER_LABOR.getNameKey();
+			retItem.setTypeCodeDetail(TmplType.TB_STAFF_DETAIL_LABOR.getNameKey());
+			retItem.setTypeCodeSummy(TmplType.TB_STAFF_SUMMY_LABOR.getNameKey());
+			retItem.setTypeCodeListen(TmplType.TB_STAFF_TRANSFER_LABOR.getNameKey());
 		}
-		return which;
+		return retItem;
 	}
 	
 	@InitBinder

@@ -24,6 +24,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.druid.sql.visitor.functions.If;
 import com.fh.controller.base.BaseController;
+import com.fh.controller.common.Common;
 import com.fh.controller.common.DictsUtil;
 import com.fh.controller.common.GenerateTransferData;
 import com.fh.controller.common.TmplUtil;
@@ -549,14 +550,16 @@ public class VoucherController extends BaseController {
 	private List<TableColumns> getTableColumnsForTransfer(String which, String tableCode) throws Exception {
 		// 用语句查询出数据库表的所有字段及其属性；拼接成jqgrid全部列
 		List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCode);
-		TmplUtil tmplUtil = new TmplUtil(tmplconfigService, tmplConfigDictService, dictionariesService,
-				departmentService, userService);
+		//TmplUtil tmplUtil = new TmplUtil(tmplconfigService, tmplConfigDictService, dictionariesService,
+		//		departmentService, userService);
 		PageData pdTableCodeTmpl = new PageData();
 		pdTableCodeTmpl.put("TABLE_NO", which);
 		PageData pdTableCodeTmplResult = tmplconfigService.findTableCodeByTableNo(pdTableCodeTmpl);
 		String tableCodeTmpl = pdTableCodeTmplResult.getString("TABLE_CODE");
-		List<TmplConfigDetail> tmplColumns = tmplUtil.getShowColumnList(tableCodeTmpl,
-				Jurisdiction.getCurrentDepartmentID());
+		//List<TmplConfigDetail> tmplColumns = tmplUtil.getShowColumnList(tableCodeTmpl,
+		//		Jurisdiction.getCurrentDepartmentID());
+		List<TmplConfigDetail> tmplColumns = Common.getShowColumnList(tableCodeTmpl,
+				Jurisdiction.getCurrentDepartmentID(), tmplconfigService);
 		List<TableColumns> tableColumnsMerge = new ArrayList<TableColumns>();
 		for (TmplConfigDetail tmplConfigDetail : tmplColumns) {
 			if (tmplConfigDetail.getCOL_TRANSFER().equals("1")) {

@@ -22,6 +22,8 @@ import com.fh.util.Tools;
 import com.fh.util.enums.BillState;
 import com.fh.util.enums.DurState;
 
+import net.sf.json.JSONArray;
+
 /**
  * 模板通用类
  * 
@@ -151,7 +153,7 @@ public class TmplUtil {
 		List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCodeOri);
 		Map<String, Map<String, Object>> listColModelAll = jqGridColModelAll(tableColumns);
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-		List<TmplConfigDetail> m_columnsList = getShowColumnList(tableCodeTmpl, departCode);
+		List<TmplConfigDetail> m_columnsList = Common.getShowColumnList(tableCodeTmpl, departCode,tmplconfigService);
 		int row = 1;
 		int col = 1;
 		
@@ -179,7 +181,9 @@ public class TmplUtil {
 					// 配置表中的字典
 					if (m_columnsList.get(i).getDICT_TRANS() != null
 							&& !m_columnsList.get(i).getDICT_TRANS().trim().equals("")) {
-						String strDicValue = getDicValue(m_columnsList.get(i).getDICT_TRANS());
+						String strDicValue = Common.getDicValue(m_dicList, m_columnsList.get(i).getDICT_TRANS(),
+								tmplConfigDictService, dictionariesService, 
+								departmentService, userService, AdditionalReportColumns);
 						String strSelectValue = ":";
 						if (strDicValue != null && !strDicValue.trim().equals("")) {
 							strSelectValue += ";" + strDicValue;
@@ -310,7 +314,7 @@ public class TmplUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public Map<String, Map<String, Object>> jqGridColModelAll(List<TableColumns> columns) throws Exception {
+	private Map<String, Map<String, Object>> jqGridColModelAll(List<TableColumns> columns) throws Exception {
 		Map<String, Map<String, Object>> list = new LinkedHashMap<String, Map<String, Object>>();
 
 		for (TableColumns col : columns) {
@@ -332,8 +336,8 @@ public class TmplUtil {
 			//	model_notedit.append(" editable: true ");
 			//	editable = true;
 			//}
-			int intLength = getColumnLength(col.getColumn_type(), col.getData_type());
-			if (col.getData_type() != null && IsNumFeild(col.getData_type())) {
+			int intLength = Common.getColumnLength(col.getColumn_type(), col.getData_type());
+			if (col.getData_type() != null && Common.IsNumFeild(col.getData_type())) {
 				model_name.append(" width: '150', ");
 				model_name.append(" align: 'right', search: false, sorttype: 'number', editrules: {number: true}, ");
 				model_edittype.append(" edittype:'text', formatter: 'number', editoptions:{maxlength:'" + intLength
@@ -375,6 +379,8 @@ public class TmplUtil {
 		InitJqGridGroupColumnShow();
 		// 底行显示的求和与平均值字段
 		m_sqlUserdata = new StringBuilder();
+		// 字典
+		m_dicList = new LinkedHashMap<String, Object>();
 		//表结构
 		map_HaveColumnsList = new LinkedHashMap<String, TableColumns>();
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
@@ -389,7 +395,9 @@ public class TmplUtil {
 			jqGridColModelAdditionalColumns.append(" name: '").append(AdditionalReportColumns).append("', ");
 			jqGridColModelAdditionalColumns.append(" label: '封存状态', ");
 
-			String strDicValue = getDicValue(AdditionalReportColumns);
+			String strDicValue = Common.getDicValue(m_dicList, AdditionalReportColumns,
+					tmplConfigDictService, dictionariesService, 
+					departmentService, userService, AdditionalReportColumns);
 			String strSelectValue = ":";
 			if (strDicValue != null && !strDicValue.trim().equals("")) {
 				strSelectValue += ";" + strDicValue;
@@ -417,7 +425,7 @@ public class TmplUtil {
 		List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCodeOri);
 		Map<String, Map<String, Object>> listColModelAll = jqGridColModelAllNoEdit(tableColumns);
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-		List<TmplConfigDetail> m_columnsList = getShowColumnList(tableCodeTmpl, departCode);
+		List<TmplConfigDetail> m_columnsList = Common.getShowColumnList(tableCodeTmpl, departCode,tmplconfigService);
 		
 		StringBuilder jqGridColModelCustom = new StringBuilder();
 		// 添加配置表设置列，字典（未设置就使用表默认，text或number）、隐藏、表头显示
@@ -439,7 +447,9 @@ public class TmplUtil {
 					// 配置表中的字典
 					if (m_columnsList.get(i).getDICT_TRANS() != null
 							&& !m_columnsList.get(i).getDICT_TRANS().trim().equals("")) {
-						String strDicValue = getDicValue(m_columnsList.get(i).getDICT_TRANS());
+						String strDicValue = Common.getDicValue(m_dicList, m_columnsList.get(i).getDICT_TRANS(),
+								tmplConfigDictService, dictionariesService, 
+								departmentService, userService, AdditionalReportColumns);
 
 						String strSelectValue = ":";
 						if (strDicValue != null && !strDicValue.trim().equals("")) {
@@ -534,7 +544,7 @@ public class TmplUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public Map<String, Map<String, Object>> jqGridColModelAllNoEdit(List<TableColumns> columns) throws Exception {
+	private Map<String, Map<String, Object>> jqGridColModelAllNoEdit(List<TableColumns> columns) throws Exception {
 		Map<String, Map<String, Object>> list = new LinkedHashMap<String, Map<String, Object>>();
 
 		for (TableColumns col : columns) {
@@ -546,8 +556,8 @@ public class TmplUtil {
 
 			StringBuilder model_name = new StringBuilder();
 
-			int intLength = getColumnLength(col.getColumn_type(), col.getData_type());
-			if (col.getData_type() != null && IsNumFeild(col.getData_type())) {
+			int intLength = Common.getColumnLength(col.getColumn_type(), col.getData_type());
+			if (col.getData_type() != null && Common.IsNumFeild(col.getData_type())) {
 				model_name.append(" width: '150', ");
 				model_name.append(" align: 'right', search: false, sorttype: 'number', formatter: 'number',summaryTpl: 'sum: {0}', summaryType: 'sum', ");
 			} else {
@@ -563,147 +573,7 @@ public class TmplUtil {
 		}
 		return list;
 	}
-	
-	private int getColumnLength(String Column_type, String Data_type) {
-		int ret = 0;
-		String[] listLength = Column_type.replace(Data_type, "").replace("(", "").replace(")", "").split(",");
-		for (String length : listLength) {
-			ret += Integer.parseInt(length);
-		}
-		return ret;
-	}
 
-	private String getDicValue(String dicName) throws Exception {
-		StringBuilder ret = new StringBuilder();
-		Map<String, String> dicAdd = new LinkedHashMap<String, String>();
-		if(AdditionalReportColumns != null 
-				&& AdditionalReportColumns.toUpperCase().equals((dicName).toUpperCase())){
-			for(DurState dur : DurState.values()){
-				ret.append(dur.getNameKey() + ":" + dur.getNameValue());
-				ret.append(';');
-				dicAdd.put(dur.getNameKey(), dur.getNameValue());
-			}
-			if (!ret.toString().trim().equals("")) {
-				ret.deleteCharAt(ret.length()-1);
-			}
-		} else {
-			String strDicType = tmplConfigDictService.getDicType(dicName);
-			if (strDicType.equals("1")) {
-				List<Dictionaries> dicList = dictionariesService.getSysDictionaries(dicName);
-				for (Dictionaries dic : dicList) {
-					if (ret != null && !ret.toString().trim().equals("")) {
-						ret.append(";");
-					}
-					ret.append(dic.getDICT_CODE() + ":" + dic.getNAME());
-					dicAdd.put(dic.getDICT_CODE(), dic.getNAME());
-				}
-			} else if (strDicType.equals("2")) {
-				if (dicName.toUpperCase().equals(("oa_department").toUpperCase())) {
-					PageData pd = new PageData();
-					List<Department> listPara = (List<Department>) departmentService.getDepartDic(pd);
-					for (Department dic : listPara) {
-						if (ret != null && !ret.toString().trim().equals("")) {
-							ret.append(";");
-						}
-						ret.append(dic.getDEPARTMENT_CODE() + ":" + dic.getNAME());
-						dicAdd.put(dic.getDEPARTMENT_CODE(), dic.getNAME());
-					}
-				}else if (dicName.toUpperCase().equals(("sys_user").toUpperCase())) {
-					PageData pd = new PageData();
-					List<PageData> listUser = (List<PageData>) userService.getUserValue(pd);
-					for (PageData dic : listUser) {
-						if (ret != null && !ret.toString().trim().equals("")) {
-							ret.append(";");
-						}
-						ret.append(dic.get("USER_ID").toString() + ":" + dic.getString("NAME"));
-						dicAdd.put(dic.get("USER_ID").toString(), dic.getString("NAME"));
-					}
-				}
-			}else if (strDicType.equals("3")) {//枚举
-				if (dicName.toUpperCase().equals(("BILL_STATE").toUpperCase())) {
-					for(BillState billState:BillState.values()){
-						ret.append(billState.getNameKey() + ":" + billState.getNameValue());
-						ret.append(';');
-						dicAdd.put(billState.getNameKey(), billState.getNameValue());
-					}
-					if (!ret.toString().trim().equals("")) {
-						ret.deleteCharAt(ret.length()-1);
-					}
-				}
-			}
-		}
-		if (!m_dicList.containsKey(dicName)) {
-			m_dicList.put(dicName, dicAdd);
-		}
-		return ret.toString();
-	}
-
-	public static void setModelDefault(PageData pd, Map<String, TableColumns> haveColumnsList, 
-			Map<String, TmplConfigDetail> map_SetColumnsList)
-			throws ClassNotFoundException {
-		String InsertField = "";
-		String InsertVale = "";
-	    for (TableColumns col : haveColumnsList.values()) {
-	    	String column_name = col.getColumn_name().toUpperCase();
-	    	String data_type = col.getData_type().toUpperCase();
-	    	TmplConfigDetail configDetail = map_SetColumnsList.get(column_name);
-	    	int intHide = 0;
-	    	if(configDetail != null){
-				intHide = Integer.parseInt(configDetail.getCOL_HIDE());
-	    	}
-			// intHide != 1 隐藏
-			if(!(IsNumFeild(data_type) && intHide != 1)){
-				Object value = pd.get(column_name);
-				if(value != null && value.toString() != null && !value.toString().trim().equals("")){
-					if(InsertField!=null && !InsertField.trim().equals("")){
-						InsertField += ",";
-						InsertVale += ",";
-					}
-					InsertField += col.getColumn_name();
-					InsertVale += "'" + value.toString() + "'";
-				}
-			}
-		}
-		pd.put("InsertField", InsertField);
-		pd.put("InsertVale", InsertVale);
-	}
-
-	public static Boolean IsNumFeild(String Data_type){
-		Boolean bol = false;
-		if(Data_type.trim().equals("DECIMAL") || Data_type.trim().equals("DOUBLE")
-		    || Data_type.trim().equals("INT") || Data_type.trim().equals("FLOAT")){
-				bol = true;
-		}
-		return bol;
-	}
-
-	public static String getSumFeildSelect(List<String> GroupbyFeild, List<TableColumns> tableDetailColumns){
-		String SelectFeild = "";
-		if(GroupbyFeild != null){
-			for(String feild : GroupbyFeild){
-				if(SelectFeild!=null && !SelectFeild.trim().equals("")){
-					SelectFeild += ", ";
-				}
-				SelectFeild += feild + ", " + feild + " " + feild + keyExtra;
-			}
-		}
-		if(tableDetailColumns != null && tableDetailColumns.size() > 0){
-			for(TableColumns col : tableDetailColumns){
-				if(TmplUtil.IsNumFeild(col.getData_type())){
-					String getCOL_CODE = col.getColumn_name();
-					if(GroupbyFeild == null || (GroupbyFeild != null && !GroupbyFeild.contains(getCOL_CODE))){
-						if(SelectFeild!=null && !SelectFeild.trim().equals("")){
-							SelectFeild += ", ";
-						}
-						SelectFeild += " sum(" + getCOL_CODE +") " + getCOL_CODE;
-					}
-				}
-			}
-		}
-		return SelectFeild;
-	}
-	
-	
 
 
 	/**
@@ -733,7 +603,7 @@ public class TmplUtil {
 		List<TableColumns> tableColumns = tmplconfigService.getTableColumns(tableCodeOri);
 		Map<String, Map<String, Object>> listColModelAll = jqGridColModelAccount(tableColumns);
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-		List<TmplConfigDetail> m_columnsList = getShowColumnList(tableCodeTmpl, departCode);
+		List<TmplConfigDetail> m_columnsList = Common.getShowColumnList(tableCodeTmpl, departCode, tmplconfigService);
 		
 		StringBuilder jqGridColModelCustom = new StringBuilder();
 		// 添加配置表设置列，字典（未设置就使用表默认，text或number）、隐藏、表头显示
@@ -755,7 +625,9 @@ public class TmplUtil {
 					// 配置表中的字典
 					if (m_columnsList.get(i).getDICT_TRANS() != null
 							&& !m_columnsList.get(i).getDICT_TRANS().trim().equals("")) {
-						String strDicValue = getDicValue(m_columnsList.get(i).getDICT_TRANS());
+						String strDicValue = Common.getDicValue(m_dicList, m_columnsList.get(i).getDICT_TRANS(),
+								tmplConfigDictService, dictionariesService, 
+								departmentService, userService, AdditionalReportColumns);
 
 						String strSelectValue = ":";
 						if (strDicValue != null && !strDicValue.trim().equals("")) {
@@ -825,7 +697,7 @@ public class TmplUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public Map<String, Map<String, Object>> jqGridColModelAccount(List<TableColumns> columns) throws Exception {
+	private Map<String, Map<String, Object>> jqGridColModelAccount(List<TableColumns> columns) throws Exception {
 		Map<String, Map<String, Object>> list = new LinkedHashMap<String, Map<String, Object>>();
 
 		for (TableColumns col : columns) {
@@ -837,8 +709,8 @@ public class TmplUtil {
 			StringBuilder model_name = new StringBuilder();
 			model_name.append(" editable: false, ");
 
-			int intLength = getColumnLength(col.getColumn_type(), col.getData_type());
-			if (col.getData_type() != null && IsNumFeild(col.getData_type())) {
+			int intLength = Common.getColumnLength(col.getColumn_type(), col.getData_type());
+			if (col.getData_type() != null && Common.IsNumFeild(col.getData_type())) {
 				model_name.append(" width: '150', ");
 				model_name.append(" align: 'right', search: false, sorttype: 'number', ");
 			} else {
@@ -855,25 +727,4 @@ public class TmplUtil {
 		return list;
 	}
 	
-	/**
-	 * 获取显示结构，未设置获取上级单位
-	 * 
-	 * @param 
-	 * @return
-	 * @throws Exception
-	 */
-	public static List<TmplConfigDetail> getShowColumnList(String tableCode, String departCode) throws Exception{
-		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-		TmplConfigDetail item = new TmplConfigDetail();
-		item.setDEPT_CODE(departCode);
-		item.setTABLE_CODE(tableCode);
-		List<TmplConfigDetail> m_columnsList = tmplconfigService.listNeed(item);
-		if(m_columnsList.size()==0){
-			String rootDeptCode=Tools.readTxtFile(Const.ROOT_DEPT_CODE);
-			item.setDEPT_CODE(rootDeptCode);
-			item.setTABLE_CODE(tableCode);
-			m_columnsList = tmplconfigService.listNeed(item);
-		}
-		return m_columnsList;
-	}
 }

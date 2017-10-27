@@ -30,4 +30,16 @@
 		(${InsertField}) values (${InsertVale})
 	</insert>
 	
+	<!-- 删除数据 -->
+	<delete id="updateSummyBillState" parameterType="pd">
+		update ${TableNameSummy}
+		set BILL_STATE = '0'
+		where BUSI_DATE = #{BUSI_DATE}
+	    and DEPT_CODE = #{DEPT_CODE} 
+	    and CUST_COL7 = #{CUST_COL7} 
+		<if test="EmplGroupType != null and EmplGroupType != ''">
+		    and USER_GROP = '${USER_GROP}'
+		</if>
+	</delete>
+	
 </mapper>

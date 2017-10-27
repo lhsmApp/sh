@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import com.fh.controller.base.BaseController;
+import com.fh.controller.common.Common;
 import com.fh.controller.common.DictsUtil;
 import com.fh.controller.common.QueryFeildString;
 import com.fh.controller.common.TmplUtil;
@@ -81,26 +82,26 @@ public class AuditEditController extends BaseController {
 	//页面显示数据的年月
 	String SystemDateTime = "";
 	//页面显示数据的二级单位
-	String UserDepartCode = "";
+	//String UserDepartCode = "";
 	//登录人的二级单位是最末层
-	private int departSelf = 0;
+	//private int departSelf = 0;
 	//底行显示的求和与平均值字段
-	StringBuilder SqlUserdata = new StringBuilder();
+	//StringBuilder SqlUserdata = new StringBuilder();
 	//字典
-	Map<String, Object> DicList = new LinkedHashMap<String, Object>();
+	//Map<String, Object> DicList = new LinkedHashMap<String, Object>();
 	//表结构  
-	Map<String, TableColumns> map_HaveColumnsList = new LinkedHashMap<String, TableColumns>();
+	//Map<String, TableColumns> map_HaveColumnsList = new LinkedHashMap<String, TableColumns>();
 	// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-	Map<String, TmplConfigDetail> map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
+	//Map<String, TmplConfigDetail> map_SetColumnsList = new LinkedHashMap<String, TmplConfigDetail>();
 
 	//界面查询字段
     List<String> QueryFeildList = Arrays.asList("DEPT_CODE", "CUST_COL7", "USER_GROP");
 	// 设置必定不用编辑的列
-	List<String> MustNotEditList = new ArrayList<String>();
+	//List<String> MustNotEditList = new ArrayList<String>();
 	// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
     List<String> keyListAdd = Arrays.asList("USER_CODE");
-	List<String> keyListBase = getKeyListBase();
-	private List<String> getKeyListBase(){
+	//List<String> keyListBase = getKeyListBase(MustNotEditList);
+	private List<String> getKeyListBase(List<String> MustNotEditList){
 		List<String> list = new ArrayList<String>();
 		for(String strFeild : MustNotEditList){
 			if (!list.contains(strFeild)) {
@@ -115,8 +116,8 @@ public class AuditEditController extends BaseController {
 		return list;
 	}
 	
-	String getPageListSelectedCustCol7 = "";
-	String getPageListSelectedDepartCode = "";
+	//String getPageListSelectedCustCol7 = "";
+	//String getPageListSelectedDepartCode = "";
 	
 	/**列表
 	 * @param page
@@ -126,8 +127,8 @@ public class AuditEditController extends BaseController {
 	public ModelAndView list(Page page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"列表AuditEdit");
 
-		getPageListSelectedCustCol7 = "";
-		getPageListSelectedDepartCode = "";
+		//getPageListSelectedCustCol7 = "";
+		//getPageListSelectedDepartCode = "";
 		
 		PageData getPd = this.getPageData();
 		//员工组
@@ -135,7 +136,7 @@ public class AuditEditController extends BaseController {
 		//当前期间,取自tb_system_config的SystemDateTime字段
 		SystemDateTime = sysConfigManager.currentSection(getPd);
 		//当前登录人所在二级单位
-		UserDepartCode = Jurisdiction.getCurrentDepartmentID();//
+		String UserDepartCode = Jurisdiction.getCurrentDepartmentID();//
 
 		ModelAndView mv = this.getModelAndView();
 		mv.setViewName("auditedit/auditedit/auditedit_list");
@@ -149,26 +150,27 @@ public class AuditEditController extends BaseController {
 		String DepartmentSelectTreeSource=DictsUtil.getDepartmentSelectTreeSource(departmentService);
 		if(DepartmentSelectTreeSource.equals("0"))
 		{
-			this.departSelf = 1;
+			//this.departSelf = 1;
 			getPd.put("departTreeSource", DepartmentSelectTreeSource);
 		} else {
-			departSelf = 0;
+			//departSelf = 0;
 			getPd.put("departTreeSource", 1);
 		}
 		mv.addObject("zTreeNodes", DepartmentSelectTreeSource);
 		// ***********************************************************
-		
+		List<String> MustNotEditList = getMustNotEditList(SelectedTableNo);
+		List<String> keyListBase = getKeyListBase(MustNotEditList);
 		TmplUtil tmpl = new TmplUtil(tmplconfigService, tmplconfigdictService, dictionariesService, 
 				departmentService,userService, keyListBase, null, null);
 		String jqGridColModel = tmpl.generateStructure(SelectedTableNo, UserDepartCode, 3, MustNotEditList);
 		
-		SqlUserdata = tmpl.getSqlUserdata();
+		//SqlUserdata = tmpl.getSqlUserdata();
 		//字典
-		DicList = tmpl.getDicList();
+		//DicList = tmpl.getDicList();
 		//表结构  
-		map_HaveColumnsList = tmpl.getHaveColumnsList();
+		//map_HaveColumnsList = tmpl.getHaveColumnsList();
 		// 前端数据表格界面字段,动态取自tb_tmpl_config_detail，根据当前单位编码及表名获取字段配置信息
-		map_SetColumnsList = tmpl.getSetColumnsList();
+		//map_SetColumnsList = tmpl.getSetColumnsList();
 		
 		mv.addObject("jqGridColModel", jqGridColModel);
 		return mv;
@@ -182,8 +184,8 @@ public class AuditEditController extends BaseController {
 	public @ResponseBody PageResult<PageData> getPageList(JqPage page) throws Exception{
 		logBefore(logger, Jurisdiction.getUsername()+"列表AuditEdit");
 
-		getPageListSelectedCustCol7 = "";
-		getPageListSelectedDepartCode = "";
+		//getPageListSelectedCustCol7 = "";
+		//getPageListSelectedDepartCode = "";
 		
 		PageData getPd = this.getPageData();
 		//员工组
@@ -192,14 +194,17 @@ public class AuditEditController extends BaseController {
 		String tableNameAudit = getAuditTableCode(SelectedTableNo);
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		//底行显示的求和与平均值字段
+		StringBuilder SqlUserdata = Common.GetSqlUserdata(SelectedTableNo, SelectedDepartCode, tmplconfigService);
 		
-		getPageListSelectedCustCol7 = SelectedCustCol7;
-		getPageListSelectedDepartCode = SelectedDepartCode;
+		//getPageListSelectedCustCol7 = SelectedCustCol7;
+		//getPageListSelectedDepartCode = SelectedDepartCode;
 		
 		PageData getQueryFeildPd = new PageData();
 		//工资分的类型, 只有工资返回值
@@ -230,6 +235,8 @@ public class AuditEditController extends BaseController {
 		getPd.put("SystemDateTime", SystemDateTime);
 		//表名
 		getPd.put("TableName", tableNameAudit);
+		List<String> MustNotEditList = getMustNotEditList(SelectedTableNo);
+		List<String> keyListBase = getKeyListBase(MustNotEditList);
 		String strFieldSelectKey = QueryFeildString.getFieldSelectKey(keyListBase, TmplUtil.keyExtra);
 		if(null != strFieldSelectKey && !"".equals(strFieldSelectKey.trim())){
 			getPd.put("FieldSelectKey", strFieldSelectKey);
@@ -271,16 +278,24 @@ public class AuditEditController extends BaseController {
 		String tableName = getAuditTableCode(SelectedTableNo);
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		//
+		String DepartTreeSource = getPd.getString("DepartTreeSource");
+		String ShowDataDepartCode = getPd.getString("ShowDataDepartCode");
+		String ShowDataCustCol7 = getPd.getString("ShowDataCustCol7");
 		//操作
 		String oper = getPd.getString("oper");
+		Map<String, TmplConfigDetail> map_SetColumnsList = Common.GetSetColumnsList(SelectedTableNo, SelectedDepartCode, tmplconfigService);
+		Map<String, TableColumns> map_HaveColumnsList = Common.GetHaveColumnsList(SelectedTableNo, tmplconfigService);
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedTableNo, emplGroupType, SelectedCustCol7, SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedTableNo, emplGroupType, SelectedCustCol7, SelectedDepartCode,
+				ShowDataDepartCode, ShowDataCustCol7, DepartTreeSource);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
@@ -290,6 +305,7 @@ public class AuditEditController extends BaseController {
 		//必定不用编辑的列
 		//MustNotEditList = Arrays.asList("BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP");
 		//MustNotEditList = Arrays.asList("BUSI_DATE", "DEPT_CODE", "CUST_COL7");
+		List<String> MustNotEditList = getMustNotEditList(SelectedTableNo);
 		getPd.put("BILL_CODE", " ");
 		getPd.put("StaffOrNot", "");
 		if(CheckStaffOrNot(SelectedTableNo)){
@@ -307,7 +323,7 @@ public class AuditEditController extends BaseController {
 				getPd.put(strFeild, getPd.get(strFeild + TmplUtil.keyExtra));
 			}
 		}
-		TmplUtil.setModelDefault(getPd, map_HaveColumnsList, map_SetColumnsList);
+		Common.setModelDefault(getPd, map_HaveColumnsList, map_SetColumnsList);
 		//表名
 		getPd.put("TableName", tableName);
 		
@@ -345,16 +361,24 @@ public class AuditEditController extends BaseController {
 		String tableName = getAuditTableCode(SelectedTableNo);
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
-		
+		//
+		String DepartTreeSource = getPd.getString("DepartTreeSource");
+		String ShowDataDepartCode = getPd.getString("ShowDataDepartCode");
+		String ShowDataCustCol7 = getPd.getString("ShowDataCustCol7");
+		Map<String, TmplConfigDetail> map_SetColumnsList = Common.GetSetColumnsList(SelectedTableNo, SelectedDepartCode, tmplconfigService);
+		Map<String, TableColumns> map_HaveColumnsList = Common.GetHaveColumnsList(SelectedTableNo, tmplconfigService);
+
 		Boolean isStaffOrNot = CheckStaffOrNot(SelectedTableNo);
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedTableNo, emplGroupType, SelectedCustCol7, SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedTableNo, emplGroupType, SelectedCustCol7, SelectedDepartCode,
+				ShowDataDepartCode, ShowDataCustCol7, DepartTreeSource);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
@@ -379,7 +403,7 @@ public class AuditEditController extends BaseController {
     			item.put("StaffOrNot", "true");
     		}
         	item.put("BILL_CODE", " ");
-			TmplUtil.setModelDefault(item, map_HaveColumnsList, map_SetColumnsList);
+        	Common.setModelDefault(item, map_HaveColumnsList, map_SetColumnsList);
 			//表名
 			item.put("TableName", tableName);
         }
@@ -417,16 +441,22 @@ public class AuditEditController extends BaseController {
 		String tableName = getAuditTableCode(SelectedTableNo);
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		//
+		String DepartTreeSource = getPd.getString("DepartTreeSource");
+		String ShowDataDepartCode = getPd.getString("ShowDataDepartCode");
+		String ShowDataCustCol7 = getPd.getString("ShowDataCustCol7");
 		
 		Boolean isStaffOrNot = CheckStaffOrNot(SelectedTableNo);
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedTableNo, emplGroupType, SelectedCustCol7, SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedTableNo, emplGroupType, SelectedCustCol7, SelectedDepartCode,
+				ShowDataDepartCode, ShowDataCustCol7, DepartTreeSource);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
@@ -470,14 +500,20 @@ public class AuditEditController extends BaseController {
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		//
+		String DepartTreeSource = getPd.getString("DepartTreeSource");
+		String ShowDataDepartCode = getPd.getString("ShowDataDepartCode");
+		String ShowDataCustCol7 = getPd.getString("ShowDataCustCol7");
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedTableNo, emplGroupType, SelectedCustCol7, SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedTableNo, emplGroupType, SelectedCustCol7, SelectedDepartCode,
+				ShowDataDepartCode, ShowDataCustCol7, DepartTreeSource);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
@@ -489,6 +525,9 @@ public class AuditEditController extends BaseController {
 		mv.addObject("which", SelectedTableNo);
 		mv.addObject("SelectedDepartCode", SelectedDepartCode);
 		mv.addObject("SelectedCustCol7", SelectedCustCol7);
+		mv.addObject("DepartTreeSource", DepartTreeSource);
+		mv.addObject("ShowDataDepartCode", ShowDataDepartCode);
+		mv.addObject("ShowDataCustCol7", ShowDataCustCol7);
 		mv.addObject("commonBaseCode", commonBase.getCode());
 		mv.addObject("commonMessage", commonBase.getMessage());
 		return mv;
@@ -515,16 +554,26 @@ public class AuditEditController extends BaseController {
 		String emplGroupType = DictsUtil.getEmplGroupType(SelectedTableNo);
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
+		//
+		String DepartTreeSource = getPd.getString("DepartTreeSource");
+		String ShowDataDepartCode = getPd.getString("ShowDataDepartCode");
+		String ShowDataCustCol7 = getPd.getString("ShowDataCustCol7");
+		Map<String, TmplConfigDetail> map_SetColumnsList = Common.GetSetColumnsList(SelectedTableNo, SelectedDepartCode, tmplconfigService);
+		Map<String, TableColumns> map_HaveColumnsList = Common.GetHaveColumnsList(SelectedTableNo, tmplconfigService);
+		Map<String, Object> DicList = Common.GetDicList(SelectedTableNo, SelectedDepartCode, 
+				tmplconfigService, tmplconfigdictService, dictionariesService, departmentService, userService, "");
 		
 		String tableName = getAuditTableCode(SelectedTableNo);
 
 		//判断选择为必须选择的
-		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedTableNo, emplGroupType, SelectedCustCol7, SelectedDepartCode, true);
+		String strGetCheckMustSelected = CheckMustSelectedAndSame(SelectedTableNo, emplGroupType, SelectedCustCol7, SelectedDepartCode,
+				ShowDataDepartCode, ShowDataCustCol7, DepartTreeSource);
 		if(strGetCheckMustSelected!=null && !strGetCheckMustSelected.trim().equals("")){
 			commonBase.setCode(2);
 			commonBase.setMessage(strGetCheckMustSelected);
@@ -665,7 +714,7 @@ public class AuditEditController extends BaseController {
 									if(!(getESTB_DEPT!=null && !getESTB_DEPT.trim().equals(""))){
 										pdAdd.put("ESTB_DEPT", Jurisdiction.getCurrentDepartmentID());
 									}
-									TmplUtil.setModelDefault(pdAdd, map_HaveColumnsList, map_SetColumnsList);
+									Common.setModelDefault(pdAdd, map_HaveColumnsList, map_SetColumnsList);
 									//表名
 									pdAdd.put("TableName", tableName);
 									listAdd.add(pdAdd);
@@ -698,6 +747,9 @@ public class AuditEditController extends BaseController {
 		mv.addObject("which", SelectedTableNo);
 		mv.addObject("SelectedDepartCode", SelectedDepartCode);
 		mv.addObject("SelectedCustCol7", SelectedCustCol7);
+		mv.addObject("DepartTreeSource", DepartTreeSource);
+		mv.addObject("ShowDataDepartCode", ShowDataDepartCode);
+		mv.addObject("ShowDataCustCol7", ShowDataCustCol7);
 		mv.addObject("commonBaseCode", commonBase.getCode());
 		mv.addObject("commonMessage", commonBase.getMessage());
 		return mv;
@@ -717,12 +769,16 @@ public class AuditEditController extends BaseController {
 		String tableName = getAuditTableCode(SelectedTableNo);
 		//单位
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
+		int departSelf = Common.getDepartSelf(departmentService);
 		if(departSelf == 1){
-			SelectedDepartCode = UserDepartCode;
+			SelectedDepartCode = Jurisdiction.getCurrentDepartmentID();
 		}
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
-
+		Map<String, TmplConfigDetail> map_SetColumnsList = Common.GetSetColumnsList(SelectedTableNo, SelectedDepartCode, tmplconfigService);
+		Map<String, Object> DicList = Common.GetDicList(SelectedTableNo, SelectedDepartCode, 
+				tmplconfigService, tmplconfigdictService, dictionariesService, departmentService, userService, "");
+		
 		PageData getQueryFeildPd = new PageData();
 		//工资分的类型, 只有工资返回值
 		getQueryFeildPd.put("USER_GROP", emplGroupType);
@@ -747,7 +803,7 @@ public class AuditEditController extends BaseController {
 		page.setPd(getPd);
 		
 		List<PageData> varOList = auditeditService.exportModel(page);
-		return export(varOList, "AuditEdit"); //工资明细
+		return export(varOList, "AuditEdit", map_SetColumnsList, DicList); //工资明细
 	}
 	
 	 /**导出到excel
@@ -767,7 +823,10 @@ public class AuditEditController extends BaseController {
 		String SelectedDepartCode = getPd.getString("SelectedDepartCode");
 		//账套
 		String SelectedCustCol7 = getPd.getString("SelectedCustCol7");
-
+		Map<String, TmplConfigDetail> map_SetColumnsList = Common.GetSetColumnsList(SelectedTableNo, SelectedDepartCode, tmplconfigService);
+		Map<String, Object> DicList = Common.GetDicList(SelectedTableNo, SelectedDepartCode, 
+				tmplconfigService, tmplconfigdictService, dictionariesService, departmentService, userService, "");
+		
 		PageData getQueryFeildPd = new PageData();
 		//工资分的类型, 只有工资返回值
 		getQueryFeildPd.put("USER_GROP", emplGroupType);
@@ -793,11 +852,13 @@ public class AuditEditController extends BaseController {
 		getPd.put("SystemDateTime", SystemDateTime);
 		page.setPd(getPd);
 		List<PageData> varOList = auditeditService.exportList(page);
-		return export(varOList, "");
+		return export(varOList, "", map_SetColumnsList, DicList);
 	}
 	
 	@SuppressWarnings("unchecked")
-	private ModelAndView export(List<PageData> varOList, String ExcelName){
+	private ModelAndView export(List<PageData> varOList, String ExcelName, 
+			Map<String, TmplConfigDetail> map_SetColumnsList,
+			Map<String, Object> DicList){
 		ModelAndView mv = new ModelAndView();
 		Map<String,Object> dataMap = new LinkedHashMap<String,Object>();
 		dataMap.put("filename", ExcelName);
@@ -844,25 +905,27 @@ public class AuditEditController extends BaseController {
 		if(value != null && !value.trim().equals("")){
 			which = value;
 		}
-		// 设置必定不用编辑的列
-	    MustNotEditList = new ArrayList<String>();
-		// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
-		keyListBase = getKeyListBase();
-		if (which != null){
-			if (which.equals(TmplType.TB_STAFF_AUDIT_CONTRACT.getNameKey())
-                    ||which.equals(TmplType.TB_STAFF_AUDIT_MARKET.getNameKey())
-					||which.equals(TmplType.TB_STAFF_AUDIT_SYS_LABOR.getNameKey())
-					||which.equals(TmplType.TB_STAFF_AUDIT_OPER_LABOR.getNameKey())
-					||which.equals(TmplType.TB_STAFF_AUDIT_LABOR.getNameKey())) {
-				MustNotEditList = Arrays.asList("BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP");
-				keyListBase = getKeyListBase();
-			} else if (which.equals(TmplType.TB_SOCIAL_INC_AUDIT.getNameKey())
-					||which.equals(TmplType.TB_HOUSE_FUND_AUDIT.getNameKey())) {
-				MustNotEditList = Arrays.asList("BUSI_DATE", "DEPT_CODE", "CUST_COL7");
-				keyListBase = getKeyListBase();
-			}
-		}
 		return which;
+	}
+	
+	private List<String> getMustNotEditList(String which){
+		// 设置必定不用编辑的列
+		List<String> MustNotEditList = new ArrayList<String>();
+		// 查询表的主键字段，作为标准列，jqgrid添加带__列，mybaits获取带__列
+		//keyListBase = getKeyListBase();
+		if (which.equals(TmplType.TB_STAFF_AUDIT_CONTRACT.getNameKey())
+                ||which.equals(TmplType.TB_STAFF_AUDIT_MARKET.getNameKey())
+				||which.equals(TmplType.TB_STAFF_AUDIT_SYS_LABOR.getNameKey())
+				||which.equals(TmplType.TB_STAFF_AUDIT_OPER_LABOR.getNameKey())
+				||which.equals(TmplType.TB_STAFF_AUDIT_LABOR.getNameKey())) {
+			MustNotEditList = Arrays.asList("BUSI_DATE", "DEPT_CODE", "CUST_COL7", "USER_GROP");
+			//keyListBase = getKeyListBase();
+		} else if (which.equals(TmplType.TB_SOCIAL_INC_AUDIT.getNameKey())
+				||which.equals(TmplType.TB_HOUSE_FUND_AUDIT.getNameKey())) {
+			MustNotEditList = Arrays.asList("BUSI_DATE", "DEPT_CODE", "CUST_COL7");
+			//keyListBase = getKeyListBase();
+		}
+		return MustNotEditList;
 	}
 
 	private String getAuditTableCode(String which) {
@@ -895,21 +958,23 @@ public class AuditEditController extends BaseController {
 		return false;
 	}
 	
-	private String CheckMustSelectedAndSame(String SelectedTableNo, String emplGroupType, String CUST_COL7, String DEPT_CODE, Boolean isCheckSame) throws Exception{
+	private String CheckMustSelectedAndSame(String SelectedTableNo, String emplGroupType, 
+			String CUST_COL7, String DEPT_CODE, 
+			String ShowDataDepartCode, String ShowDataCustCol7, String DepartTreeSource){
 		String strRut = "";
 		if(!(CUST_COL7 != null && !CUST_COL7.trim().equals(""))){
 			strRut += "查询条件中的账套必须选择！";
+		} else {
+		    if(!CUST_COL7.equals(ShowDataCustCol7)){
+				strRut += "查询条件中所选账套与页面显示数据账套不一致，请单击查询再进行操作！";
+		    }
 		}
 		if(!(DEPT_CODE != null && !DEPT_CODE.trim().equals(""))){
 			strRut += "查询条件中的责任中心不能为空！";
-		}
-		if(isCheckSame){
-			if(CUST_COL7 != null && !CUST_COL7.equals(getPageListSelectedCustCol7)){
-				strRut += "查询条件中所选账套与页面显示数据账套不一致，请单击查询再进行操作！";
-			}
-			if(DEPT_CODE != null && !DEPT_CODE.equals(getPageListSelectedDepartCode)){
+		} else {
+		    if(!String.valueOf(0).equals(DepartTreeSource) && !DEPT_CODE.equals(ShowDataDepartCode)){
 				strRut += "查询条件中所选责任中心与页面显示数据责任中心不一致，请单击查询再进行操作！";
-			}
+		    }
 		}
 		if(CheckStaffOrNot(SelectedTableNo)){
 			if(!(emplGroupType!=null && !emplGroupType.trim().equals(""))){

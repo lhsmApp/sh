@@ -23,7 +23,7 @@ public class AcconutsShowList {
 			if(!(listSecond!=null && listSecond.size()>0)){
 				for(PageData fir : listFirst){
 					for(TableColumns col : m_columnsList){
-						if(TmplUtil.IsNumFeild(col.getData_type())){
+						if(Common.IsNumFeild(col.getData_type())){
 							BigDecimal firValue = (BigDecimal) fir.get(col.getColumn_name());
 							fir.put(col.getColumn_name(), firValue + "");
 						}
@@ -51,7 +51,7 @@ public class AcconutsShowList {
 						if(bolMatch){
 							bolNotHave = false;
 							for(TableColumns col : m_columnsList){
-								if(TmplUtil.IsNumFeild(col.getData_type())){
+								if(Common.IsNumFeild(col.getData_type())){
 									BigDecimal firValue = (BigDecimal) fir.get(col.getColumn_name());
 									BigDecimal secValue = (BigDecimal) sec.get(col.getColumn_name());
 									if(!firValue.equals(secValue)){
@@ -66,7 +66,7 @@ public class AcconutsShowList {
 					}
 					if(bolNotHave){
 						for(TableColumns col : m_columnsList){
-							if(TmplUtil.IsNumFeild(col.getData_type())){
+							if(Common.IsNumFeild(col.getData_type())){
 								BigDecimal firValue = (BigDecimal) fir.get(col.getColumn_name());
 								fir.put(col.getColumn_name(), firValue + "");
 							}

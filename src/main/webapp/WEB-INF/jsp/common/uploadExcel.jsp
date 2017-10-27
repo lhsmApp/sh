@@ -70,13 +70,19 @@
 	    var which = '${which}';
 	    var SelectedDepartCode = '${SelectedDepartCode}';
 	    var SelectedCustCol7 = '${SelectedCustCol7}';
+	    var DepartTreeSource = '${DepartTreeSource}';
+	    var ShowDataDepartCode = '${ShowDataDepartCode}';
+	    var ShowDataCustCol7 = '${ShowDataCustCol7}';
 	    var tipfiles = "请选择xls格式的文件";
 	    
 		$(document).ready(function () {
 			$(top.hangge());
 			
 			document.getElementById("Form").action = local + "/readExcel.do?TABLE_CODE="+which+"&SelectedTableNo="+which
-                +'&SelectedDepartCode='+SelectedDepartCode+'&SelectedCustCol7='+SelectedCustCol7;
+                +'&SelectedDepartCode='+SelectedDepartCode+'&SelectedCustCol7='+SelectedCustCol7
+                +'&DepartTreeSource='+DepartTreeSource
+                +'&ShowDataDepartCode='+ShowDataDepartCode
+                +'&ShowDataCustCol7='+ShowDataCustCol7;
 			
 		    var commonBaseCode = '${commonBaseCode}';
 		    var commonMessage = '${commonMessage}';
@@ -119,7 +125,10 @@
 		//下载模板
 		function downModel(basePath){
 			var url = basePath + local + '/downExcel.do?TABLE_CODE='+which+"&SelectedTableNo="+which
-                +'&SelectedDepartCode='+SelectedDepartCode+'&SelectedCustCol7='+SelectedCustCol7;
+                +'&SelectedDepartCode='+SelectedDepartCode+'&SelectedCustCol7='+SelectedCustCol7
+                +'&DepartTreeSource='+DepartTreeSource
+                +'&ShowDataDepartCode='+ShowDataDepartCode
+                +'&ShowDataCustCol7='+ShowDataCustCol7;
 			window.location.href = url;
 		}
 		//保存

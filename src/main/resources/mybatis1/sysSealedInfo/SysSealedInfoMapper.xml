@@ -252,7 +252,21 @@
 		and RPT_DEPT = '${DEPT_CODE}'
 		and
 		BILL_TYPE = '${TypeCodeSummy}'
-		and BILL_OFF = '${CUST_COL7}'
+		and BILL_OFF = '${CUST_COL7}';
+		delete from
+		<include refid="tableName"></include>
+		where RPT_DUR = '${BUSI_DATE}'
+		and RPT_DEPT = '${DEPT_CODE}'
+		and
+		BILL_TYPE = '${TypeCodeDetail}'
+		and BILL_OFF = '${CUST_COL7}';
+		delete from
+		<include refid="tableName"></include>
+		where RPT_DUR = '${BUSI_DATE}'
+		and RPT_DEPT = '${DEPT_CODE}'
+		and
+		BILL_TYPE = '${TypeCodeListen}'
+		and BILL_OFF = '${CUST_COL7}';
 	</insert>
 
 
