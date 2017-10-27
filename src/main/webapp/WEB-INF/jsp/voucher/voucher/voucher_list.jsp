@@ -224,6 +224,7 @@
 	var gridHeight;
 	var jqGridColModel;
 	var voucherType;
+	var tabIndex=1;
 	$(document).ready(function () {
 		$(top.hangge());//关闭加载状态
 		$('.input-mask-date').mask('999999');
@@ -282,6 +283,7 @@
 			//data:{VOUCHER_TYPE:voucherType,TABLE_CODE:'${pd.which}'},
 			if(target.attr('href')=='#voucherTransfer'){
 				voucherType=1;
+				tabIndex=1;
 				$("[data-original-title='上传']").removeClass("hidden");
 				$("[data-original-title='获取凭证号']").addClass("hidden");
 				$("[data-original-title='获取冲销凭证号']").addClass("hidden");
@@ -293,6 +295,7 @@
 				$("#jqGrid").trigger("reloadGrid");  
 			}else if(target.attr('href')=='#voucherMgr'){
 				voucherType=2;
+				tabIndex=2;
 				$("[data-original-title='上传']").addClass("hidden");
 				$("[data-original-title='获取凭证号']").removeClass("hidden");
 				$("[data-original-title='获取冲销凭证号']").removeClass("hidden");
@@ -329,6 +332,7 @@
 				$("#jqGrid").trigger("reloadGrid");  
 			}else{
 				voucherType=2;
+				tabIndex=3;
 				$("[data-original-title='上传']").addClass("hidden");
 				$("[data-original-title='获取凭证号']").addClass("hidden");
 				$("[data-original-title='获取冲销凭证号']").addClass("hidden");
@@ -425,12 +429,12 @@
 			cellEdit: true,
 			gridComplete:function(){
 				$("[role='checkbox']").on('click',function(e){
+					if(tabIndex==3) return;
 					var target = $(this);
 					var curRow=target.closest('tr');
 					var curRowId=curRow.attr('id');
 					var curRowData=$("#jqGrid").getRowData(curRowId);
 					var ids = $("#jqGrid").jqGrid('getDataIDs');
-					
 					$("#jqGrid").setSelection(curRowId,true);
                     for (i = 0; i < ids.length; i++) { 
                     	var item=$("#jqGrid").getRowData(ids[i]);
