@@ -271,7 +271,7 @@ public class LeadingInExcelToPageData<T> {
             for (int columnIndex = 0; columnIndex < titelRow.getLastCellNum(); columnIndex++) {
                 Cell cell = titelRow.getCell(columnIndex);
                 if (cell != null) {
-                    String key = cell.getStringCellValue();
+                    String key = TransferSbcDbc.ToDBC(cell.getStringCellValue());
                     String value = titleAndAttribute.get(key);
                     if (value == null) {
                         value = key;
@@ -311,7 +311,7 @@ public class LeadingInExcelToPageData<T> {
         List<PageData> info=new ArrayList<PageData>();
         FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator(); 
         //获取标题行列数
-        int titleCellNum = sheet.getRow(0).getLastCellNum();
+        //int titleCellNum = sheet.getRow(0).getLastCellNum();
         // 获取值
         int LastRowNum = sheet.getLastRowNum();
         for (int rowIndex = 1; rowIndex <= LastRowNum; rowIndex++) {
@@ -438,15 +438,15 @@ public class LeadingInExcelToPageData<T> {
                 result = cell.getBooleanCellValue();
                 break;
             case Cell.CELL_TYPE_FORMULA:
-                /*
-                 *  导入时如果为公式生成的数据则无值
-                 *  
-                    if (!cell.getStringCellValue().equals("")) {
-                        value = cell.getStringCellValue();
-                    } else {
-                        value = cell.getNumericCellValue() + "";
-                    }
-                */
+                ///*
+                // *  导入时如果为公式生成的数据则无值
+                // *  
+                //    if (!cell.getStringCellValue().equals("")) {
+                //        value = cell.getStringCellValue();
+                //    } else {
+                //        value = cell.getNumericCellValue() + "";
+                //    }
+                //*/
                 result = cell.getCellFormula();
                 break;
             case Cell.CELL_TYPE_ERROR:

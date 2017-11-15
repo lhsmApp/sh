@@ -173,10 +173,10 @@ public class FilterBillCode {
 	}
 
     //没汇总过
-	private static String getBillCodeNotInSummy(String tableNameSummy){
-		String strReturn = " and BILL_CODE not in (select BILL_CODE from " + tableNameSummy + ") ";
-		return strReturn;
-	}
+	//private static String getBillCodeNotInSummy(String tableNameSummy){
+	//	String strReturn = " and BILL_CODE not in (select BILL_CODE from " + tableNameSummy + ") ";
+	//	return strReturn;
+	//}
 
     //财务核算用到的
 	public static String getReportListenNotSummy(String tableNameSummy, String TypeCodeSummy, String TypeCodeListen){

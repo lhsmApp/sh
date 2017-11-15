@@ -47,6 +47,7 @@ import com.fh.util.enums.TmplType;
 import com.fh.util.Const;
 import com.fh.util.Jurisdiction;
 import com.fh.util.excel.LeadingInExcelToPageData;
+import com.fh.util.excel.TransferSbcDbc;
 
 import net.sf.json.JSONArray;
 
@@ -784,7 +785,7 @@ public class StaffDetailController extends BaseController {
 							//配置表设置列
 							if(map_SetColumnsList != null && map_SetColumnsList.size() > 0){
 								for (TmplConfigDetail col : map_SetColumnsList.values()) {
-									titleAndAttribute.put(col.getCOL_NAME(), col.getCOL_CODE());
+									titleAndAttribute.put(TransferSbcDbc.ToDBC(col.getCOL_NAME()), col.getCOL_CODE());
 								}
 							}
 							// 调用解析工具包
@@ -796,7 +797,7 @@ public class StaffDetailController extends BaseController {
 						} catch (Exception e) {
 							e.printStackTrace();
 							logger.error("读取Excel文件错误", e);
-							throw new CustomException("读取Excel文件错误",false);
+							throw new CustomException("读取Excel文件错误:" + e.getMessage(),false);
 						}
 						boolean judgement = false;
 
